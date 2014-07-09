@@ -28,13 +28,21 @@
 			<scope>test</scope>
 		</dependency>
 
-<!-- 		code coverage lib -->
+		<!-- code coverage lib -->
 		<dependency>
 			<groupId>org.jacoco</groupId>
 			<artifactId>jacoco-maven-plugin</artifactId>
 			<version>0.7.1.201405082137</version>
 		</dependency>
 
+		<!-- HTTP library for java -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.4</version>
+		</dependency>
+
+		<!-- library to manage time items - not used yet -->
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
