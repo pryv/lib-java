@@ -47,59 +47,69 @@ public class EventTest {
   private final String createdBy = "Bob";
   private final long modified = 50;
   private final String modifiedBy = "Tom";
+  private final String attachmentID = "abc";
 
-  private Event fullEvent;
+  private Event testEvent;
+  private JSONObject jsonTestEvent;
 
   @Before
   public void setUp() throws Exception {
     tags.add(tagTest);
     tags.add(tagBasicTest);
     references.add(testReference);
-    attachments.add(new Attachment("abc", "testfile", "test", 0, "abc132"));
+    attachments.add(new Attachment(attachmentID, "testfile", "test", 0, "abc132"));
     clientData.put(clientKey, clientValue);
-    fullEvent = new Event(null, streamID, time, duration, type, content, tags,
-        references, description, attachments, clientData, trashed, created, createdBy, modified,
-        modifiedBy);
-    fullEvent.setId(id);
+    testEvent =
+        new Event(null, streamID, time, duration, type, content, tags, references, description,
+            attachments, clientData, trashed, created, createdBy, modified, modifiedBy);
+    testEvent.setId(id);
+    jsonTestEvent = new JSONObject(testEvent.toJson());
   }
 
   @Test
-  public void testCreateEvent() {
-    Event e = new Event();
-    assertNotNull("failed to instanciate Eventw", e);
+  public void testCreateEmptyEvent() {
+    Event emptyEvent =
+        new Event(null, null, 0, 0, null, null, null, null, null, null, null, null, 0, null, 0,
+            null);
+    assertNotNull(emptyEvent);
   }
 
   @Test
-  public void testEventHasID() {
-    Event e = new Event();
-    e.setId(id);
-    assertNotNull("event ID null, should be assigned", e.getId());
+  public void testCreateEventFromEmptyJson() {
+    Event emptyJsonEvent = new Event("{}");
+    assertNotNull(emptyJsonEvent);
   }
 
   @Test
   public void testCreateEventWithFields() {
-    assertEquals(id, fullEvent.getId());
-    assertEquals(streamID, fullEvent.getStreamID());
-    assertEquals(time, fullEvent.getTime());
-    assertEquals(type, fullEvent.getType());
-    assertTrue("tags test failed", fullEvent.getTags().contains(tagTest));
-    assertEquals(duration, fullEvent.getDuration());
-    assertEquals(content, fullEvent.getContent());
-    assertTrue("refs test failed", fullEvent.getReferences().contains(testReference));
-    assertEquals(description, fullEvent.getDescription());
-    assertEquals(attachments, fullEvent.getAttachments());
-    assertEquals(clientData, fullEvent.getClientData());
-    assertEquals(trashed, fullEvent.getTrashed());
-    assertEquals(created, fullEvent.getCreated());
-    assertEquals(createdBy, fullEvent.getCreatedBy());
-    assertEquals(modified, fullEvent.getModified());
-    assertEquals(modifiedBy, fullEvent.getModifiedBy());
+    checkEventParams(testEvent);
+  }
+
+  private void checkEventParams(Event pEvent) {
+    assertEquals(id, pEvent.getId());
+    assertEquals(streamID, pEvent.getStreamID());
+    assertEquals(time, pEvent.getTime());
+    assertEquals(type, pEvent.getType());
+    assertTrue("tags test failed", pEvent.getTags().contains(tagTest));
+    assertEquals(duration, pEvent.getDuration());
+    assertEquals(content, pEvent.getContent());
+    assertTrue("refs test failed", pEvent.getReferences().contains(testReference));
+    assertEquals(description, pEvent.getDescription());
+    for (Attachment attachment : pEvent.getAttachments()) {
+      assertEquals(attachmentID, attachment.getId());
+    }
+    assertEquals(clientData, pEvent.getClientData());
+    assertEquals(trashed, pEvent.getTrashed());
+    assertEquals(created, pEvent.getCreated());
+    assertEquals(createdBy, pEvent.getCreatedBy());
+    assertEquals(modified, pEvent.getModified());
+    assertEquals(modifiedBy, pEvent.getModifiedBy());
   }
 
   @Test
   public void testCreateJsonFromEvent() {
-    JSONObject jsonEvent = new JSONObject(fullEvent.toJson());
-    System.out.println(fullEvent.toJson());
+    JSONObject jsonEvent = new JSONObject(testEvent.toJson());
+    System.out.println("event: " + testEvent.toJson());
     assertEquals(id, jsonEvent.get(JsonFields.ID.toString()));
     assertEquals(type, jsonEvent.get(JsonFields.TYPE.toString()));
     assertEquals(streamID, jsonEvent.get(JsonFields.STREAM_ID.toString()));
@@ -131,6 +141,12 @@ public class EventTest {
     }
     assertTrue("test for " + tagTest + " failed", tagsList.contains(tagTest));
     assertTrue("test for " + tagBasicTest + " failed", tagsList.contains(tagBasicTest));
+  }
+
+  @Test
+  public void testCreateEventFromJson() {
+    Event eventFromJson = new Event(jsonTestEvent.toString());
+    checkEventParams(eventFromJson);
   }
 
 }
