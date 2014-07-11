@@ -42,6 +42,19 @@
 			<version>4.3.4</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>fluent-hc</artifactId>
+			<version>4.3.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.4</version>
+		</dependency>
+
+
 		<!-- library to manage time items - not used yet -->
 		<dependency>
 			<groupId>joda-time</groupId>
