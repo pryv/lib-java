@@ -6,8 +6,8 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.pryv.dataStructures.Attachment;
-import com.pryv.dataStructures.JsonFields;
+import com.pryv.api.model.Attachment;
+import com.pryv.api.model.JsonFields;
 
 /**
  * Unit test for Attachment object
@@ -58,7 +58,7 @@ public class AttachmentTest {
   @Test
   public void testCreateJsonFromAttachment() {
     JSONObject jsonAttachment = new JSONObject(attachment.toJson());
-    System.out.println(attachment.toJson());
+    // System.out.println(attachment.toJson());
     assertEquals(id, jsonAttachment.get(JsonFields.ID.toString()));
     assertEquals(filename, jsonAttachment.get(JsonFields.FILENAME.toString()));
     assertEquals(type, jsonAttachment.get(JsonFields.TYPE.toString()));

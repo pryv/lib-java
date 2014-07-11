@@ -14,8 +14,8 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.pryv.dataStructures.JsonFields;
-import com.pryv.dataStructures.Stream;
+import com.pryv.api.model.JsonFields;
+import com.pryv.api.model.Stream;
 
 /**
  * Unit tests for Stream class params and functions
@@ -60,7 +60,7 @@ public class StreamTest {
 
   @Test
   public void testCreateJsonFromStream() {
-    System.out.println("stream: " + jsonStream);
+    // System.out.println("stream: " + jsonStream);
     assertEquals(id, jsonStream.get(JsonFields.ID.toString()));
     assertEquals(name, jsonStream.get(JsonFields.NAME.toString()));
     assertEquals(parentId, jsonStream.get(JsonFields.PARENT_ID.toString()));
@@ -74,10 +74,11 @@ public class StreamTest {
     assertEquals(modified, jsonStream.getLong(JsonFields.MODIFIED.toString()));
     assertEquals(modifiedBy, jsonStream.get(JsonFields.MODIFIED_BY.toString()));
     JSONArray jsonChildren = jsonStream.getJSONArray(JsonFields.CHILDREN.toString());
-    System.out.println("children: " + jsonChildren);
+    // System.out.println("children: " + jsonChildren);
     List<Stream> childs = new ArrayList<Stream>();
     for (int i = 0; i < jsonChildren.length(); i++) {
-      System.out.println("child-" + i + ": " + jsonChildren.getJSONObject(i).toString());
+      // System.out.println("child-" + i + ": " +
+      // jsonChildren.getJSONObject(i).toString());
       childs.add(new Stream(jsonChildren.getJSONObject(i).toString()));
     }
   }

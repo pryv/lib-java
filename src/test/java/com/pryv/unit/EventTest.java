@@ -14,9 +14,9 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.pryv.dataStructures.Attachment;
-import com.pryv.dataStructures.Event;
-import com.pryv.dataStructures.JsonFields;
+import com.pryv.api.model.Attachment;
+import com.pryv.api.model.Event;
+import com.pryv.api.model.JsonFields;
 
 /**
  * unit test for Event class methods
@@ -109,7 +109,7 @@ public class EventTest {
   @Test
   public void testCreateJsonFromEvent() {
     JSONObject jsonEvent = new JSONObject(testEvent.toJson());
-    System.out.println("event: " + testEvent.toJson());
+    // System.out.println("event: " + testEvent.toJson());
     assertEquals(id, jsonEvent.get(JsonFields.ID.toString()));
     assertEquals(type, jsonEvent.get(JsonFields.TYPE.toString()));
     assertEquals(streamID, jsonEvent.get(JsonFields.STREAM_ID.toString()));
