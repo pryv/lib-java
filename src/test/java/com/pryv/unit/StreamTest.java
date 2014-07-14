@@ -1,9 +1,11 @@
 package com.pryv.unit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,8 +16,11 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.pryv.api.model.JsonFields;
 import com.pryv.api.model.Stream;
+import com.pryv.utils.JsonConverter;
 
 /**
  * Unit tests for Stream class params and functions
@@ -26,7 +31,8 @@ import com.pryv.api.model.Stream;
 public class StreamTest {
 
   private Stream testStream;
-  private JSONObject jsonStream;
+  private JSONObject jsonObjStream;
+  private String jsonStream;
   private final String id = "abc";
   private final String name = "testStream";
   private final String parentId = "ABC";
@@ -49,7 +55,7 @@ public class StreamTest {
     testStream =
         new Stream(id, name, parentId, singleActivity, clientData, children, trashed, created,
             createdBy, modified, modifiedBy);
-    jsonStream = new JSONObject(testStream.toJson());
+    jsonStream = JsonConverter.toJson(testStream);
   }
 
   @Test
@@ -61,19 +67,20 @@ public class StreamTest {
   @Test
   public void testCreateJsonFromStream() {
     // System.out.println("stream: " + jsonStream);
-    assertEquals(id, jsonStream.get(JsonFields.ID.toString()));
-    assertEquals(name, jsonStream.get(JsonFields.NAME.toString()));
-    assertEquals(parentId, jsonStream.get(JsonFields.PARENT_ID.toString()));
-    assertEquals(singleActivity, jsonStream.get(JsonFields.SINGLE_ACTIVITY.toString()));
-    JSONObject cData = (JSONObject) jsonStream.get(JsonFields.CLIENT_DATA.toString());
+    jsonObjStream = new JSONObject(jsonStream);
+    assertEquals(id, jsonObjStream.get(JsonFields.ID.toString()));
+    assertEquals(name, jsonObjStream.get(JsonFields.NAME.toString()));
+    assertEquals(parentId, jsonObjStream.get(JsonFields.PARENT_ID.toString()));
+    assertEquals(singleActivity, jsonObjStream.get(JsonFields.SINGLE_ACTIVITY.toString()));
+    JSONObject cData = (JSONObject) jsonObjStream.get(JsonFields.CLIENT_DATA.toString());
     assertTrue(cData.has(clientKey));
     assertEquals(clientValue, cData.get(clientKey));
-    assertEquals(trashed, jsonStream.get(JsonFields.TRASHED.toString()));
-    assertEquals(created, jsonStream.getLong(JsonFields.CREATED.toString()));
-    assertEquals(createdBy, jsonStream.get(JsonFields.CREATED_BY.toString()));
-    assertEquals(modified, jsonStream.getLong(JsonFields.MODIFIED.toString()));
-    assertEquals(modifiedBy, jsonStream.get(JsonFields.MODIFIED_BY.toString()));
-    JSONArray jsonChildren = jsonStream.getJSONArray(JsonFields.CHILDREN.toString());
+    assertEquals(trashed, jsonObjStream.get(JsonFields.TRASHED.toString()));
+    assertEquals(created, jsonObjStream.getLong(JsonFields.CREATED.toString()));
+    assertEquals(createdBy, jsonObjStream.get(JsonFields.CREATED_BY.toString()));
+    assertEquals(modified, jsonObjStream.getLong(JsonFields.MODIFIED.toString()));
+    assertEquals(modifiedBy, jsonObjStream.get(JsonFields.MODIFIED_BY.toString()));
+    JSONArray jsonChildren = jsonObjStream.getJSONArray(JsonFields.CHILDREN.toString());
     // System.out.println("children: " + jsonChildren);
     List<Stream> childs = new ArrayList<Stream>();
     for (int i = 0; i < jsonChildren.length(); i++) {
@@ -84,8 +91,48 @@ public class StreamTest {
   }
 
   @Test
+  public void testCreateStreamFromMerge() {
+    Stream streamToUpdate = new Stream();
+    Stream baseStreamRef = streamToUpdate;
+    try {
+      JsonConverter.updateStreamFromJson(jsonStream, streamToUpdate);
+      assertTrue(baseStreamRef == streamToUpdate);
+      assertTrue(streamToUpdate.getId().equals(testStream.getId()));
+      assertTrue(streamToUpdate.getName().equals(testStream.getName()));
+      assertTrue(streamToUpdate.getParentId().equals(testStream.getParentId()));
+      assertTrue(streamToUpdate.getSingleActivity() == testStream.getSingleActivity());
+      assertFalse(streamToUpdate.getClientData() == testStream.getClientData());
+      for (String key : testStream.getClientData().keySet()) {
+        for (String key2 : streamToUpdate.getClientData().keySet()) {
+          assertTrue(key.equals(key2));
+          assertTrue(testStream.getClientData().get(key)
+              .equals(streamToUpdate.getClientData().get(key2)));
+        }
+      }
+      for (int i = 0; i < streamToUpdate.getChildren().size(); i++) {
+        assertTrue(streamToUpdate.getChildren().get(i).getId()
+            .equals(testStream.getChildren().get(i).getId()));
+      }
+      assertTrue(streamToUpdate.getTrashed() == testStream.getTrashed());
+      assertTrue(streamToUpdate.getCreated() == testStream.getCreated());
+      assertTrue(streamToUpdate.getCreatedBy().equals(testStream.getCreatedBy()));
+      assertTrue(streamToUpdate.getModified() == testStream.getModified());
+      assertTrue(streamToUpdate.getModifiedBy().equals(testStream.getModifiedBy()));
+    } catch (JsonParseException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (JsonMappingException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+  @Test
   public void testCreateStreamFromJson() {
-    Stream testStreamFromJson = new Stream(jsonStream.toString());
+    Stream testStreamFromJson = new Stream(jsonStream);
     checkStreamParams(testStreamFromJson);
   }
 

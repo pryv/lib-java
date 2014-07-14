@@ -9,7 +9,7 @@ import org.json.JSONObject;
  * @author ik
  *
  */
-public class Attachment {
+public class Attachment implements Cloneable {
 
   private String id;
   private String filename;
@@ -51,6 +51,7 @@ public class Attachment {
     readToken = jsonAttachment.getString(JsonFields.READ_TOKEN.toString());
   }
 
+
   public String getId() {
     return id;
   }
@@ -80,6 +81,14 @@ public class Attachment {
     jsonAttachment.putOpt(JsonFields.NUMBER.toString(), number);
     jsonAttachment.putOpt(JsonFields.READ_TOKEN.toString(), readToken);
     return jsonAttachment.toString();
+  }
+
+  public void merge(Attachment temp) {
+    id = temp.getId();
+    filename = temp.getFilename();
+    type = temp.getType();
+    number = temp.getNumber();
+    readToken = temp.getReadToken();
   }
 
 }

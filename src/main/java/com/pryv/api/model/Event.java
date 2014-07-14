@@ -5,8 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.rits.cloning.Cloner;
 
 /**
  * Event data structure from Pryv
@@ -17,11 +16,11 @@ import org.json.JSONObject;
 public class Event {
 
   private String id;
-  private String streamID;
+  private String streamId;
   private long time;
   private long duration;
   private String type;
-  private Object content;
+  private String content;
   private List<String> tags;
   private List<String> references;
   private String description;
@@ -37,7 +36,7 @@ public class Event {
    * Construct Event object from parameters
    *
    * @param pId
-   * @param pStreamID
+   * @param pStreamId
    * @param pTime
    * @param pDuration
    * @param pType
@@ -53,12 +52,12 @@ public class Event {
    * @param pModified
    * @param pModifiedBy
    */
-  public Event(String pId, String pStreamID, long pTime, long pDuration, String pType,
-      Object pContent, List<String> pTags, List<String> pReferences, String pDescription,
+  public Event(String pId, String pStreamId, long pTime, long pDuration, String pType,
+      String pContent, List<String> pTags, List<String> pReferences, String pDescription,
       List<Attachment> pAttachments, Map<String, String> pClientData, Boolean pTrashed,
       long pCreated, String pCreatedBy, long pModified, String pModifiedBy) {
     id = pId;
-    streamID = pStreamID;
+    streamId = pStreamId;
     time = pTime;
     duration = pDuration;
     type = pType;
@@ -75,82 +74,128 @@ public class Event {
     modifiedBy = pModifiedBy;
   }
 
-  /**
-   * Construct Event object from JSON saved in a String object
-   *
-   * @param pJsonEvent
-   */
-  public Event(String pJsonEvent) {
-    JSONObject jsonEvent = new JSONObject(pJsonEvent);
-    id = jsonEvent.optString(JsonFields.ID.toString());
-    streamID = jsonEvent.optString(JsonFields.STREAM_ID.toString());
-    JSONObject jsonClientData = jsonEvent.optJSONObject(JsonFields.CLIENT_DATA.toString());
-    if (jsonClientData != null) {
-      String cdKey = (String) jsonClientData.keySet().toArray()[0];
-      clientData = new HashMap<String, String>();
-      clientData.put(cdKey, jsonClientData.optString(cdKey));
-    }
-    JSONArray jsonTags = jsonEvent.optJSONArray(JsonFields.TAGS.toString());
-    if (jsonTags != null) {
-      tags = new ArrayList<String>();
-      for (int i = 0; i < jsonTags.length(); i++) {
-        tags.add(jsonTags.optString(i));
-      }
-    }
-    JSONArray jsonRefs = jsonEvent.optJSONArray(JsonFields.REFERENCES.toString());
-    if (jsonRefs != null) {
-      for (int i = 0; i < jsonRefs.length(); i++) {
-        references = new ArrayList<String>();
-        references.add(jsonRefs.optString(i));
-      }
-    }
-    JSONArray jsonAttachments = jsonEvent.optJSONArray(JsonFields.ATTACHMENTS.toString());
-    if (jsonAttachments != null) {
-      for (int i = 0; i < jsonAttachments.length(); i++) {
-        attachments = new ArrayList<Attachment>();
-        attachments.add(new Attachment(jsonAttachments.optJSONObject(i).toString()));
-      }
-    }
-    time = jsonEvent.optLong(JsonFields.TIME.toString());
-    type = jsonEvent.optString(JsonFields.TYPE.toString());
-    duration = jsonEvent.optLong(JsonFields.DURATION.toString());
-    content = jsonEvent.opt(JsonFields.CONTENT.toString());
-    description = jsonEvent.optString(JsonFields.DESCRIPTION.toString());
-    trashed = jsonEvent.optBoolean(JsonFields.TRASHED.toString());
-    created = jsonEvent.optLong(JsonFields.CREATED.toString());
-    createdBy = jsonEvent.optString(JsonFields.CREATED_BY.toString());
-    modified = jsonEvent.optLong(JsonFields.MODIFIED.toString());
-    modifiedBy = jsonEvent.optString(JsonFields.MODIFIED_BY.toString());
+  // /**
+  // * Construct Event object from JSON saved in a String object
+  // *
+  // * @param pJsonEvent
+  // */
+  // public Event(String pJsonEvent) {
+  // JSONObject jsonEvent = new JSONObject(pJsonEvent);
+  // id = jsonEvent.optString(JsonFields.ID.toString());
+  // streamID = jsonEvent.optString(JsonFields.STREAM_ID.toString());
+  // JSONObject jsonClientData =
+  // jsonEvent.optJSONObject(JsonFields.CLIENT_DATA.toString());
+  // if (jsonClientData != null) {
+  // String cdKey = (String) jsonClientData.keySet().toArray()[0];
+  // clientData = new HashMap<String, String>();
+  // clientData.put(cdKey, jsonClientData.optString(cdKey));
+  // }
+  // JSONArray jsonTags = jsonEvent.optJSONArray(JsonFields.TAGS.toString());
+  // if (jsonTags != null) {
+  // tags = new ArrayList<String>();
+  // for (int i = 0; i < jsonTags.length(); i++) {
+  // tags.add(jsonTags.optString(i));
+  // }
+  // }
+  // JSONArray jsonRefs =
+  // jsonEvent.optJSONArray(JsonFields.REFERENCES.toString());
+  // if (jsonRefs != null) {
+  // for (int i = 0; i < jsonRefs.length(); i++) {
+  // references = new ArrayList<String>();
+  // references.add(jsonRefs.optString(i));
+  // }
+  // }
+  // JSONArray jsonAttachments =
+  // jsonEvent.optJSONArray(JsonFields.ATTACHMENTS.toString());
+  // if (jsonAttachments != null) {
+  // for (int i = 0; i < jsonAttachments.length(); i++) {
+  // attachments = new ArrayList<Attachment>();
+  // attachments.add(new
+  // Attachment(jsonAttachments.optJSONObject(i).toString()));
+  // }
+  // }
+  // time = jsonEvent.optLong(JsonFields.TIME.toString());
+  // type = jsonEvent.optString(JsonFields.TYPE.toString());
+  // duration = jsonEvent.optLong(JsonFields.DURATION.toString());
+  // content = jsonEvent.opt(JsonFields.CONTENT.toString());
+  // description = jsonEvent.optString(JsonFields.DESCRIPTION.toString());
+  // trashed = jsonEvent.optBoolean(JsonFields.TRASHED.toString());
+  // created = jsonEvent.optLong(JsonFields.CREATED.toString());
+  // createdBy = jsonEvent.optString(JsonFields.CREATED_BY.toString());
+  // modified = jsonEvent.optLong(JsonFields.MODIFIED.toString());
+  // modifiedBy = jsonEvent.optString(JsonFields.MODIFIED_BY.toString());
+  //
+  // }
 
+  // /**
+  // * create JSON from Event object.
+  // *
+  // * @return
+  // */
+  // public String toJson() {
+  // JSONObject jsonEvent = new JSONObject();
+  // jsonEvent.putOpt(JsonFields.ID.toString(), id);
+  // jsonEvent.putOpt(JsonFields.TIME.toString(), time);
+  // jsonEvent.putOpt(JsonFields.STREAM_ID.toString(), streamID);
+  // jsonEvent.putOpt(JsonFields.TYPE.toString(), type);
+  // JSONArray jsonTags = new JSONArray(tags);
+  // jsonEvent.putOpt(JsonFields.TAGS.toString(), jsonTags);
+  // jsonEvent.putOpt(JsonFields.DURATION.toString(), duration);
+  // jsonEvent.putOpt(JsonFields.CONTENT.toString(), content);
+  // jsonEvent.putOpt(JsonFields.DESCRIPTION.toString(), description);
+  // JSONArray jsonRefs = new JSONArray(references);
+  // jsonEvent.putOpt(JsonFields.REFERENCES.toString(), jsonRefs);
+  // JSONArray jsonAttachments = new JSONArray(attachments);
+  // jsonEvent.putOpt(JsonFields.ATTACHMENTS.toString(), jsonAttachments);
+  // jsonEvent.putOpt(JsonFields.TRASHED.toString(), trashed);
+  // jsonEvent.putOpt(JsonFields.CREATED.toString(), created);
+  // jsonEvent.putOpt(JsonFields.CREATED_BY.toString(), createdBy);
+  // jsonEvent.putOpt(JsonFields.MODIFIED.toString(), modified);
+  // jsonEvent.putOpt(JsonFields.MODIFIED_BY.toString(), modifiedBy);
+  // jsonEvent.putOpt(JsonFields.CLIENT_DATA.toString(), new
+  // JSONObject(clientData));
+  // return jsonEvent.toString();
+  // }
+
+  /**
+   * make deep copy of Event fields, used when updating values of an Event in
+   * memory
+   *
+   * @param temp
+   */
+  public void merge(Event temp, Cloner cloner) {
+    id = temp.id;
+    streamId = temp.streamId;
+    time = temp.time;
+    duration = temp.duration;
+    type = temp.type;
+    content = temp.content;
+    tags = new ArrayList<String>();
+    for (String tag : temp.tags) {
+      tags.add(tag);
+    }
+    references = new ArrayList<String>();
+    for (String ref : temp.references) {
+      references.add(ref);
+    }
+    description = temp.description;
+    attachments = new ArrayList<Attachment>();
+    for (Attachment attachment : temp.attachments) {
+      attachments.add(cloner.deepClone(attachment));
+    }
+    clientData = new HashMap<String, String>();
+    for (String key : temp.clientData.keySet()) {
+      clientData.put(key, temp.clientData.get(key));
+    }
+    trashed = temp.trashed;
+    created = temp.created;
+    createdBy = temp.createdBy;
+    modified = temp.modified;
+    modifiedBy = temp.modifiedBy;
   }
 
-  /**
-   * create JSON from Event object.
-   *
-   * @return
-   */
-  public String toJson() {
-    JSONObject jsonEvent = new JSONObject();
-    jsonEvent.putOpt(JsonFields.ID.toString(), id);
-    jsonEvent.putOpt(JsonFields.TIME.toString(), time);
-    jsonEvent.putOpt(JsonFields.STREAM_ID.toString(), streamID);
-    jsonEvent.putOpt(JsonFields.TYPE.toString(), type);
-    JSONArray jsonTags = new JSONArray(tags);
-    jsonEvent.putOpt(JsonFields.TAGS.toString(), jsonTags);
-    jsonEvent.putOpt(JsonFields.DURATION.toString(), duration);
-    jsonEvent.putOpt(JsonFields.CONTENT.toString(), content);
-    jsonEvent.putOpt(JsonFields.DESCRIPTION.toString(), description);
-    JSONArray jsonRefs = new JSONArray(references);
-    jsonEvent.putOpt(JsonFields.REFERENCES.toString(), jsonRefs);
-    JSONArray jsonAttachments = new JSONArray(attachments);
-    jsonEvent.putOpt(JsonFields.ATTACHMENTS.toString(), jsonAttachments);
-    jsonEvent.putOpt(JsonFields.TRASHED.toString(), trashed);
-    jsonEvent.putOpt(JsonFields.CREATED.toString(), created);
-    jsonEvent.putOpt(JsonFields.CREATED_BY.toString(), createdBy);
-    jsonEvent.putOpt(JsonFields.MODIFIED.toString(), modified);
-    jsonEvent.putOpt(JsonFields.MODIFIED_BY.toString(), modifiedBy);
-    jsonEvent.putOpt(JsonFields.CLIENT_DATA.toString(), new JSONObject(clientData));
-    return jsonEvent.toString();
+  public Event() {
+
   }
 
   public String getDescription() {
@@ -165,8 +210,8 @@ public class Event {
     return id;
   }
 
-  public String getStreamID() {
-    return streamID;
+  public String getStreamId() {
+    return streamId;
   }
 
   public long getTime() {

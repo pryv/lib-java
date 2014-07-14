@@ -8,6 +8,8 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.rits.cloning.Cloner;
+
 /**
  *
  * Stream object from Pryv API
@@ -76,21 +78,47 @@ public class Stream {
     modifiedBy = jsonStream.optString(JsonFields.MODIFIED_BY.toString());
   }
 
-  public String toJson() {
-    JSONObject jsonStream = new JSONObject();
-    jsonStream.put(JsonFields.ID.toString(), id);
-    jsonStream.put(JsonFields.NAME.toString(), name);
-    jsonStream.putOpt(JsonFields.PARENT_ID.toString(), parentId);
-    jsonStream.putOpt(JsonFields.SINGLE_ACTIVITY.toString(), singleActivity);
-    jsonStream.putOpt(JsonFields.CLIENT_DATA.toString(), new JSONObject(clientData));
-    JSONArray jsonChildren = new JSONArray(children);
-    jsonStream.putOpt(JsonFields.CHILDREN.toString(), jsonChildren);
-    jsonStream.putOpt(JsonFields.TRASHED.toString(), trashed);
-    jsonStream.putOpt(JsonFields.CREATED.toString(), created);
-    jsonStream.putOpt(JsonFields.CREATED_BY.toString(), createdBy);
-    jsonStream.putOpt(JsonFields.MODIFIED.toString(), modified);
-    jsonStream.putOpt(JsonFields.MODIFIED_BY.toString(), modifiedBy);
-    return jsonStream.toString();
+  //
+  // public String toJson() {
+  // JSONObject jsonStream = new JSONObject();
+  // jsonStream.put(JsonFields.ID.toString(), id);
+  // jsonStream.put(JsonFields.NAME.toString(), name);
+  // jsonStream.putOpt(JsonFields.PARENT_ID.toString(), parentId);
+  // jsonStream.putOpt(JsonFields.SINGLE_ACTIVITY.toString(), singleActivity);
+  // jsonStream.putOpt(JsonFields.CLIENT_DATA.toString(), new
+  // JSONObject(clientData));
+  // JSONArray jsonChildren = new JSONArray(children);
+  // jsonStream.putOpt(JsonFields.CHILDREN.toString(), jsonChildren);
+  // jsonStream.putOpt(JsonFields.TRASHED.toString(), trashed);
+  // jsonStream.putOpt(JsonFields.CREATED.toString(), created);
+  // jsonStream.putOpt(JsonFields.CREATED_BY.toString(), createdBy);
+  // jsonStream.putOpt(JsonFields.MODIFIED.toString(), modified);
+  // jsonStream.putOpt(JsonFields.MODIFIED_BY.toString(), modifiedBy);
+  // return jsonStream.toString();
+  // }
+
+  public Stream() {
+  }
+
+  public void merge(Stream temp, Cloner cloner) {
+    id = temp.id;
+    name = temp.name;
+    parentId = temp.parentId;
+    singleActivity = temp.singleActivity;
+    clientData = new HashMap<String, String>();
+    for (String key : temp.clientData.keySet()) {
+      clientData.put(key, temp.clientData.get(key));
+    }
+    // maybe do recursive merge (compare ids, if exists merge, else new...)
+    children = new ArrayList<Stream>();
+    for (Stream stream : temp.children) {
+      children.add(cloner.deepClone(stream));
+    }
+    trashed = temp.trashed;
+    created = temp.created;
+    createdBy = temp.createdBy;
+    modified = temp.modified;
+    modifiedBy = temp.modifiedBy;
   }
 
   public String getId() {
