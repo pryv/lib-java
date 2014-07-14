@@ -1,10 +1,9 @@
-package com.pryv;
+package com.pryv.authorization;
 
 import java.util.List;
 
+import com.pryv.Connection;
 import com.pryv.api.model.Permission;
-import com.pryv.authorization.Login;
-import com.pryv.authorization.LoginController;
 
 /**
  *
@@ -29,7 +28,8 @@ public class Authenticator implements LoginController {
   private State state;
   private String requestingAppId;
   private List<Permission> permissions;
-  private String view;
+  private LoginView view;
+  private LoginModel model;
   // optional
   private String language;
   private String returnURL;
@@ -38,8 +38,8 @@ public class Authenticator implements LoginController {
 
   }
 
-  public Authenticator(String reqAppId, List<Permission> pPermissions, String pView, String pLang,
-      String pReturnURL) {
+  public Authenticator(String reqAppId, List<Permission> pPermissions, LoginView pView,
+      String pLang, String pReturnURL) {
     requestingAppId = reqAppId;
     permissions = pPermissions;
     view = pView;
@@ -47,24 +47,24 @@ public class Authenticator implements LoginController {
     returnURL = pReturnURL;
   }
 
-  public void authenticate() {
-    new Login(this, requestingAppId, permissions, view, language, returnURL);
-    // open view
+  public void startLogin() {
+    model = new Login(this, requestingAppId, permissions, language, returnURL);
+    model.startLogin();
   }
 
-  public void accepted() {
+  public void accepted(Connection newConnection) {
     state = State.ACCEPTED;
-
+    // instanciate/acquire Connection (username/token)
   }
 
-  public void refused() {
+  public void refused(String jsonMessage) {
     state = State.REFUSED;
-
+    // display state/error
   }
 
-  public void error() {
+  public void error(String jsonMessage) {
     state = State.REFUSED;
-
+    // display error/reason
   }
 
   public void inProgress() {
@@ -74,6 +74,11 @@ public class Authenticator implements LoginController {
 
   public State getState() {
     return state;
+  }
+
+  public void displayLoginView(String url) {
+    view = new LoginWebView(this);
+    view.displayLoginVew(url);
   }
 
 }

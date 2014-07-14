@@ -12,8 +12,10 @@ import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.pryv.Connection;
 import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
+import com.pryv.utils.JsonConverter;
 
 /**
  *
@@ -22,33 +24,28 @@ import com.pryv.api.model.Permission;
  * @author ik
  *
  */
-public class Login {
+public class Login implements LoginModel {
 
   private LoginController controller;
-  private Gson gson = new Gson();
   private final int errorStatusLimit = 450; // used in temporary implementation
+  private AuthenticationRequest authRequest;
+  private Boolean first = true;
+  private Gson gson = new Gson();
 
-  public Login(LoginController pController, String appId, List<Permission> perms, String view,
-      String lang, String returnURL) {
+  public Login(LoginController pController, String appId, List<Permission> perms, String lang,
+      String returnURL) {
     this.controller = pController;
-    AuthenticationRequest authRequest = new AuthenticationRequest(appId, perms, lang, returnURL);
-    String jsonRequest = gson.toJson(authRequest);
-    System.out.println("first request: " + jsonRequest);
-    startLogin(jsonRequest);
-
-    // start polling thread upon succesful response
-
-    //
-
+    authRequest = new AuthenticationRequest(appId, perms, lang, returnURL);
   }
 
-  public void startLogin(String jsonAuthRequest) {
+  public void startLogin() {
     try {
+      String jsonRequest = JsonConverter.toJson(authRequest);
+      System.out.println("first request: " + jsonRequest);
       System.out.println("executing startlogin on thread: " + Thread.currentThread().getName());
 
-      Request.Post(Pryv.REGISTRATION_URL)
-          .bodyString(jsonAuthRequest, ContentType.APPLICATION_JSON).execute()
-          .handleResponse(loginResponseHandler);
+      Request.Post(Pryv.REGISTRATION_URL).bodyString(jsonRequest, ContentType.APPLICATION_JSON)
+          .execute().handleResponse(loginResponseHandler);
 
     } catch (ClientProtocolException e) {
       // TODO Auto-generated catch block
@@ -60,9 +57,7 @@ public class Login {
   }
 
   /**
-   *
    * handles response to initial authorization request and to polling replies
-   *
    */
   private ResponseHandler<String> loginResponseHandler = new ResponseHandler<String>() {
 
@@ -75,26 +70,37 @@ public class Login {
       int status = response.getStatusLine().getStatusCode();
       if (status < errorStatusLimit) {
 
-        System.out.println("handling response on thread: " + Thread.currentThread().getName());
-
         String reply = EntityUtils.toString(response.getEntity());
-
         System.out.println("handling reply entity : " + reply);
-
         JsonObject jsonResponse = gson.fromJson(reply, JsonObject.class);
 
-        String pollURL = jsonResponse.get(Constants.POLL_URL).getAsString();
+        if (first) {
+          String loginURL = jsonResponse.get(Constants.SERVER_URL).getAsString();
+          controller.displayLoginView(loginURL);
+          first = false;
+          System.out.println("start view");
+        }
         String state = jsonResponse.get(Constants.STATUS).getAsString();
 
-        long rate = jsonResponse.get(Constants.POLL_RATE_MS).getAsLong();
+        if (state.equals(Constants.NEED_SIGNIN)) {
 
-        if (pollURL != null && state.equals(Constants.NEED_SIGNIN)) {
-
+          long rate = jsonResponse.get(Constants.POLL_RATE_MS).getAsLong();
+          String pollURL = jsonResponse.get(Constants.POLL_URL).getAsString();
           System.out.println("polling at address: " + pollURL);
-
           new PollingThread(pollURL, rate, loginResponseHandler).start();
-
           controller.inProgress();
+        } else if (state.equals(Constants.ACCEPTED)) {
+          String username = jsonResponse.get(Constants.USERNAME).getAsString();
+          String token = jsonResponse.get(Constants.TOKEN).getAsString();
+          controller.accepted(new Connection(username, token));
+        } else if (state.equals(Constants.REFUSED)) {
+          String message = jsonResponse.get(Constants.MESSAGE).getAsString();
+          controller.refused(message);
+        } else if (state.equals(Constants.ERROR)) {
+          int errorId = jsonResponse.get(Constants.ERROR_ID).getAsInt();
+          String message = jsonResponse.get(Constants.MESSAGE).getAsString();
+          String detail = jsonResponse.get(Constants.DETAIL).getAsString();
+          controller.error(message);
         } else {
           System.out.println("login-error");
         }

@@ -8,11 +8,12 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.pryv.Authenticator;
-import com.pryv.Authenticator.State;
 import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
 import com.pryv.api.model.Permissions;
+import com.pryv.authorization.Authenticator;
+import com.pryv.authorization.Authenticator.State;
+import com.pryv.authorization.LoginView;
 
 /**
  *
@@ -45,7 +46,7 @@ public class AuthenticationTest {
   // private JsonObject jsonAuthResponse;
   // private String pollURL;
   // private long pollRate;
-  private String view = null;
+  private LoginView view = null;
 
   // private Gson gson = new Gson();
   // private AuthenticationRequest correctAuthRequest;
@@ -85,8 +86,9 @@ public class AuthenticationTest {
   public void testStartLoginAndPoll() {
     Pryv.setStaging();
     Authenticator authenticator = new Authenticator(reqAppId, permissions, view, lang, returnURL);
-    authenticator.authenticate();
+    authenticator.startLogin();
     assertEquals(State.POLLING, authenticator.getState());
+
   }
 
 }

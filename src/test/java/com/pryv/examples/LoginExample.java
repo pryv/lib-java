@@ -3,9 +3,11 @@ package com.pryv.examples;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.pryv.Authenticator;
 import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
+import com.pryv.authorization.Authenticator;
+import com.pryv.authorization.LoginController;
+import com.pryv.authorization.LoginView;
 
 /**
  *
@@ -22,11 +24,12 @@ public class LoginExample {
     List<Permission> permissions = new ArrayList<Permission>();
     String lang = "en";
     String returnURL = "fakeURL";
-    String view = null;
+    LoginView view = null;
 
     Pryv.setStaging();
-    Authenticator authenticator = new Authenticator(reqAppId, permissions, view, lang, returnURL);
-    authenticator.authenticate();
+    LoginController authenticator =
+        new Authenticator(reqAppId, permissions, view, lang, returnURL);
+    authenticator.startLogin();
   }
 
 }

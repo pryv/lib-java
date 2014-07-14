@@ -1,5 +1,7 @@
 package com.pryv.authorization;
 
+import com.pryv.Connection;
+
 /**
  *
  * callback used by poller after login successful
@@ -10,22 +12,32 @@ package com.pryv.authorization;
 public interface LoginController {
 
   /**
+   * begin login sequence
+   */
+  void startLogin();
+
+  /**
    * login successful
    */
-  void accepted();
+  void accepted(Connection connection);
 
   /**
    * login refused - bad credentials/cancel
    */
-  void refused();
+  void refused(String jsonMessage);
 
   /**
    * error message
    */
-  void error();
+  void error(String jsonMessage);
 
   /**
    * polling
    */
   void inProgress();
+
+  /**
+   * display web view
+   */
+  void displayLoginView(String url);
 }
