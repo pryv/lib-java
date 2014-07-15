@@ -1,4 +1,9 @@
 #
+# Test related stuff
+#
+src/test/java/resources/
+
+#
 # maven specific
 #
 
