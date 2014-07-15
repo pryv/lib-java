@@ -1,16 +1,10 @@
 package com.pryv;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.util.EntityUtils;
+import java.util.Map;
 
 import com.pryv.api.Cache;
 import com.pryv.api.EventManager;
+import com.pryv.api.EventsCallback;
 import com.pryv.api.Online;
 import com.pryv.api.StreamManager;
 import com.pryv.api.model.Event;
@@ -23,13 +17,14 @@ import com.pryv.utils.Supervisor;
  * @author ik
  *
  */
-public class Connection implements StreamManager, EventManager {
+public class Connection implements StreamManager, EventManager, EventsCallback {
 
   private String username;
   private String token;
   private String apiDomain = Pryv.API_DOMAIN; // pryv.io or pryv.in
   private String apiScheme = "https"; // https
   private String url;
+  private String eventsUrl;
   private EventManager cacheEventManager;
   private EventManager onlineEventManager;
   private Supervisor supervisor;
@@ -40,7 +35,7 @@ public class Connection implements StreamManager, EventManager {
     initURL();
 
     supervisor = new Supervisor();
-    onlineEventManager = new Online();
+    onlineEventManager = new Online(eventsUrl);
     cacheEventManager = new Cache(onlineEventManager);
   }
 
@@ -54,6 +49,9 @@ public class Connection implements StreamManager, EventManager {
     sb.append("/");
     // apiScheme://username.apiDomain/
     url = sb.toString();
+    sb.append("events?auth=");
+    sb.append(token);
+    eventsUrl = sb.toString();
   }
 
   public String getUsername() {
@@ -76,20 +74,25 @@ public class Connection implements StreamManager, EventManager {
     return url;
   }
 
-  public List<Event> getEvents() {
-    try {
-      cacheEventManager.getEvents();
-      String eventsUrl = url + "events?auth=" + token;
-      System.out.println("fetching events: " + eventsUrl);
-      Request.Get(url + "events?auth=" + token).execute().handleResponse(eventsResponseHandler);
-    } catch (ClientProtocolException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    return null;
+  public void getEvents(EventsCallback eCallback) {
+    cacheEventManager.getEvents(this);
+    supervisor.getEvents();
+    // do stuff with inMemory events
+  }
+
+  public void onSuccess(Map<String, Event> newEvents) {
+    // TODO Auto-generated method stub
+
+  }
+
+  public void onPartialResult(Map<String, Event> newEvents) {
+    // TODO Auto-generated method stub
+
+  }
+
+  public void onError(String message) {
+    // TODO Auto-generated method stub
+
   }
 
   public Event createEvent(String id) {
@@ -106,13 +109,5 @@ public class Connection implements StreamManager, EventManager {
     // TODO Auto-generated method stub
     return null;
   }
-
-  private ResponseHandler<String> eventsResponseHandler = new ResponseHandler<String>() {
-
-    public String handleResponse(HttpResponse reply) throws ClientProtocolException, IOException {
-      System.out.println("received: " + EntityUtils.toString(reply.getEntity()));
-      return null;
-    }
-  };
 
 }

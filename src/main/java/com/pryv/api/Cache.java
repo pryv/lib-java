@@ -1,6 +1,6 @@
 package com.pryv.api;
 
-import java.util.List;
+import java.util.Map;
 
 import com.pryv.api.model.Event;
 
@@ -11,7 +11,7 @@ import com.pryv.api.model.Event;
  * @author ik
  *
  */
-public class Cache implements EventManager, StreamManager {
+public class Cache implements EventManager, StreamManager, EventsCallback {
 
   private EventManager online;
 
@@ -19,10 +19,10 @@ public class Cache implements EventManager, StreamManager {
     online = pOnline;
   }
 
-  public List<Event> getEvents() {
-    // look in cache
-    online.getEvents(); // fetch online and compare modified fields
-    return null;
+  public void getEvents(EventsCallback eCallback) {
+    // look in cache and send it onPartialResult
+    eCallback.onPartialResult(null);
+    online.getEvents(this); // fetch online and compare modified fields
   }
 
   public Event createEvent(String id) {
@@ -38,6 +38,21 @@ public class Cache implements EventManager, StreamManager {
   public Event updateEvenet(String id) {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  public void onSuccess(Map<String, Event> newEvents) {
+    // TODO Auto-generated method stub
+
+  }
+
+  public void onPartialResult(Map<String, Event> newEvents) {
+    // TODO Auto-generated method stub
+
+  }
+
+  public void onError(String message) {
+    // TODO Auto-generated method stub
+
   }
 
 }

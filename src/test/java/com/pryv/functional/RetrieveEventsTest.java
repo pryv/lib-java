@@ -3,6 +3,8 @@ package com.pryv.functional;
 import org.junit.Before;
 import org.junit.Test;
 
+import resources.TestCredentials;
+
 import com.pryv.Connection;
 import com.pryv.Pryv;
 import com.pryv.api.EventManager;
@@ -22,7 +24,7 @@ public class RetrieveEventsTest {
   public void setUp() throws Exception {
     // create Connection with valid username/token for testing
     Pryv.setStaging();
-    connection = new Connection("perkikiki", "chu2cc0zy0000iawkyrw7g9gq");
+    connection = new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN);
   }
 
   @Test
@@ -30,7 +32,7 @@ public class RetrieveEventsTest {
    * test fetching of events
    */
   public void testFetchEvents() {
-    connection.getEvents();
+    connection.getEvents(null);
   }
 
 }

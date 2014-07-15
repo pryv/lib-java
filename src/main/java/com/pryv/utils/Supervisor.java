@@ -1,7 +1,7 @@
 package com.pryv.utils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.pryv.api.model.Event;
 
@@ -14,14 +14,18 @@ import com.pryv.api.model.Event;
  */
 public class Supervisor {
 
-  private List<Event> events;
+  private Map<String, Event> events;
 
   public Supervisor() {
-    events = new ArrayList<Event>();
+    events = new HashMap<String, Event>();
   }
 
-  public List<Event> getEvents() {
+  public Map<String, Event> getEvents() {
     return events;
+  }
+
+  public void addEvents(Map<String, Event> newEvents) {
+    events.putAll(newEvents);
   }
 
 }

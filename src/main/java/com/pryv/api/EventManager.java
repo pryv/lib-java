@@ -1,7 +1,5 @@
 package com.pryv.api;
 
-import java.util.List;
-
 import com.pryv.api.model.Event;
 
 /**
@@ -19,7 +17,7 @@ public interface EventManager {
    * @param id
    * @return
    */
-  List<Event> getEvents();
+  void getEvents(EventsCallback eventsCallback);
 
   Event createEvent(String id);
 
