@@ -1,13 +1,17 @@
 package com.pryv.authorization;
 
+import java.io.IOException;
 import java.util.List;
+
+import org.apache.http.client.ClientProtocolException;
 
 import com.pryv.Connection;
 import com.pryv.api.model.Permission;
 
 /**
  *
- * High-level class used for login
+ * High-level used to Authenticate the user. Upon success, provides a Connection
+ * with the appropriate username and token.
  *
  * @author ik
  *
@@ -38,18 +42,25 @@ public class Authenticator implements LoginController {
 
   }
 
-  public Authenticator(String reqAppId, List<Permission> pPermissions, LoginView pView,
-      String pLang, String pReturnURL) {
-    requestingAppId = reqAppId;
+  public Authenticator(String pRequestingAppId, List<Permission> pPermissions, String pLang,
+    String pReturnURL) {
+    requestingAppId = pRequestingAppId;
     permissions = pPermissions;
-    view = pView;
     language = pLang;
     returnURL = pReturnURL;
   }
 
   public void startLogin() {
     model = new Login(this, requestingAppId, permissions, language, returnURL);
-    model.startLogin();
+    try {
+      model.startLogin();
+    } catch (ClientProtocolException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 
   public void accepted(Connection newConnection) {
@@ -62,7 +73,7 @@ public class Authenticator implements LoginController {
     // display state/error
   }
 
-  public void error(String jsonMessage) {
+  public void error(int errorId, String jsonMessage, String detail) {
     state = State.REFUSED;
     // display error/reason
   }

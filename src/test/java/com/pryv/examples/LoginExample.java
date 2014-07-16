@@ -7,7 +7,6 @@ import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
 import com.pryv.authorization.Authenticator;
 import com.pryv.authorization.LoginController;
-import com.pryv.authorization.LoginView;
 
 /**
  *
@@ -24,11 +23,9 @@ public class LoginExample {
     List<Permission> permissions = new ArrayList<Permission>();
     String lang = "en";
     String returnURL = "fakeURL";
-    LoginView view = null;
 
     Pryv.setStaging();
-    LoginController authenticator =
-        new Authenticator(reqAppId, permissions, view, lang, returnURL);
+    LoginController authenticator = new Authenticator(reqAppId, permissions, lang, returnURL);
     authenticator.startLogin();
   }
 

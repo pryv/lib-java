@@ -8,7 +8,6 @@ import org.junit.Test;
 
 import com.google.gson.Gson;
 import com.pryv.api.model.Permission;
-import com.pryv.api.model.Permissions;
 
 /**
  *
@@ -20,7 +19,7 @@ import com.pryv.api.model.Permissions;
 public class PermissionTest {
 
   private String streamId = "abc";
-  private String perm = Permissions.CONTRIBUTE.toString();
+  private Permission.Level perm = Permission.Level.contribute;
   private String defaultName = "ddd";
   private Permission testPermission;
   private Gson gson = new Gson();
@@ -46,7 +45,7 @@ public class PermissionTest {
   public void testCreatPermissionFromJson() {
     Permission permFromJson = gson.fromJson(stringTestPermission, Permission.class);
     assertEquals(streamId, permFromJson.getStreamId());
-    assertEquals(perm, permFromJson.getPermission());
+    assertEquals(perm, permFromJson.getLevel());
     assertEquals(defaultName, permFromJson.getDefaultName());
   }
 }

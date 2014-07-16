@@ -28,8 +28,11 @@ public interface LoginController {
 
   /**
    * error message
+   *
+   * @param detail
+   * @param errorId
    */
-  void error(String jsonMessage);
+  void error(int errorId, String jsonMessage, String detail);
 
   /**
    * polling

@@ -2,6 +2,7 @@ package com.pryv.authorization;
 
 import java.applet.Applet;
 import java.awt.Desktop;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,29 +22,28 @@ public class LoginWebView extends Applet implements LoginView {
     controller = pController;
   }
 
-
   public static void openWebpage(URI uri) {
     Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
     if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-        try {
-            desktop.browse(uri);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+      try {
+        desktop.browse(uri);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
-}
+  }
 
   public void displayLoginVew(String loginURL) {
     try {
       URL url = new URL(loginURL);
       openWebpage(url.toURI());
     } catch (URISyntaxException e) {
-        e.printStackTrace();
+      e.printStackTrace();
     } catch (MalformedURLException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
 
-}
+  }
 
 }

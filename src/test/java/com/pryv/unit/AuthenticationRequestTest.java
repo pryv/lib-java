@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
-import com.pryv.api.model.Permissions;
 import com.pryv.authorization.AuthenticationRequest;
 
 /**
@@ -26,11 +25,11 @@ public class AuthenticationRequestTest {
   private String reqAppId = "web-page-test";
   private List<Permission> permissions = new ArrayList<Permission>();
   private String streamId1 = "pics";
-  private String perm1 = Permissions.CONTRIBUTE.toString();
+  private Permission.Level perm1 = Permission.Level.contribute;
   private String defaultName1 = "ddd";
   private Permission testPermission1 = new Permission(streamId1, perm1, defaultName1);
   private String streamId2 = "vids";
-  private String perm2 = Permissions.READ.toString();
+  private Permission.Level perm2 = Permission.Level.read;
   private String defaultName2 = "eee";
   private Permission testPermission2 = new Permission(streamId2, perm2, defaultName2);
   private String lang = "en";

@@ -1,5 +1,9 @@
 package com.pryv.authorization;
 
+import java.io.IOException;
+
+import org.apache.http.client.ClientProtocolException;
+
 /**
  *
  * MVC model for logic of login sequence
@@ -9,5 +13,5 @@ package com.pryv.authorization;
  */
 public interface LoginModel {
 
-  void startLogin();
+  void startLogin() throws ClientProtocolException, IOException;
 }
