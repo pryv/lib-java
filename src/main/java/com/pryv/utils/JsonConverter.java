@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pryv.api.model.Attachment;
 import com.pryv.api.model.Event;
@@ -32,8 +33,12 @@ public class JsonConverter {
     return jsonMapper.writeValueAsString(source);
   }
 
+  public static JsonNode toJsonNode(String source) throws JsonProcessingException, IOException {
+    return jsonMapper.readTree(source);
+  }
+
   public static void updateAttachmentFromJson(String json, Attachment toUpdate)
-      throws JsonParseException, JsonMappingException, IOException {
+    throws JsonParseException, JsonMappingException, IOException {
     Attachment temp = jsonMapper.readValue(json, Attachment.class);
     toUpdate.merge(temp);
   }
