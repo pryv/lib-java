@@ -114,7 +114,4 @@
     <property name="severity" value="ignore"/>
     <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
   </module>
-  <module name="FileLength">
-    <property name="max" value="200"/>
-  </module>
 </module>
