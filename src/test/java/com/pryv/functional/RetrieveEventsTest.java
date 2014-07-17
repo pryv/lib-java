@@ -7,7 +7,7 @@ import resources.TestCredentials;
 
 import com.pryv.Connection;
 import com.pryv.Pryv;
-import com.pryv.api.EventManager;
+import com.pryv.api.EventsManager;
 
 /**
  *
@@ -18,7 +18,7 @@ import com.pryv.api.EventManager;
  */
 public class RetrieveEventsTest {
 
-  private EventManager connection;
+  private EventsManager connection;
 
   @Before
   public void setUp() throws Exception {

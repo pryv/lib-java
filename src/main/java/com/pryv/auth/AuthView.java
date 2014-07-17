@@ -1,4 +1,4 @@
-package com.pryv.authorization;
+package com.pryv.auth;
 
 /**
  *
@@ -7,7 +7,7 @@ package com.pryv.authorization;
  * @author ik
  *
  */
-public interface LoginView {
+public interface AuthView {
 
   void displayLoginVew(String loginURL);
 }

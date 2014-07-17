@@ -7,6 +7,6 @@ package com.pryv.api;
  * @author ik
  *
  */
-public interface StreamManager {
+public interface StreamsManager {
 
 }

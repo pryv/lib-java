@@ -1,4 +1,4 @@
-package com.pryv.authorization;
+package com.pryv.auth;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,7 +16,7 @@ import com.pryv.api.model.Permission;
  * @author ik
  *
  */
-public class Authenticator implements LoginController {
+public class AuthControllerImpl implements AuthController {
 
   /**
    *
@@ -32,17 +32,17 @@ public class Authenticator implements LoginController {
   private State state;
   private String requestingAppId;
   private List<Permission> permissions;
-  private LoginView view;
-  private LoginModel model;
+  private AuthView view;
+  private AuthModel model;
   // optional
   private String language;
   private String returnURL;
 
-  public Authenticator() {
+  public AuthControllerImpl() {
 
   }
 
-  public Authenticator(String pRequestingAppId, List<Permission> pPermissions, String pLang,
+  public AuthControllerImpl(String pRequestingAppId, List<Permission> pPermissions, String pLang,
     String pReturnURL) {
     requestingAppId = pRequestingAppId;
     permissions = pPermissions;
@@ -50,8 +50,8 @@ public class Authenticator implements LoginController {
     returnURL = pReturnURL;
   }
 
-  public void startLogin() {
-    model = new Login(this, requestingAppId, permissions, language, returnURL);
+  public void signIn() {
+    model = new AuthModelImpl(this, requestingAppId, permissions, language, returnURL);
     try {
       model.startLogin();
     } catch (ClientProtocolException e) {
@@ -65,7 +65,7 @@ public class Authenticator implements LoginController {
 
   public void accepted(Connection newConnection) {
     state = State.ACCEPTED;
-    // instanciate/acquire Connection (username/token)
+    // acquire ref to new Connection, instanciated
   }
 
   public void refused(String jsonMessage) {
@@ -88,7 +88,7 @@ public class Authenticator implements LoginController {
   }
 
   public void displayLoginView(String url) {
-    view = new LoginWebView(this);
+    view = new AuthBrowserView(this);
     view.displayLoginVew(url);
   }
 

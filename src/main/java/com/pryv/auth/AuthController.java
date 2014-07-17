@@ -1,4 +1,4 @@
-package com.pryv.authorization;
+package com.pryv.auth;
 
 import com.pryv.Connection;
 
@@ -9,12 +9,12 @@ import com.pryv.Connection;
  * @author ik
  *
  */
-public interface LoginController {
+public interface AuthController {
 
   /**
    * begin login sequence
    */
-  void startLogin();
+  void signIn();
 
   /**
    * login successful

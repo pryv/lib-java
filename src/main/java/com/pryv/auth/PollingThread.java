@@ -1,4 +1,4 @@
-package com.pryv.authorization;
+package com.pryv.auth;
 
 import java.io.IOException;
 

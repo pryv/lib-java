@@ -11,11 +11,11 @@ import com.pryv.api.model.Event;
  * @author ik
  *
  */
-public class Cache implements EventManager, StreamManager, EventsCallback {
+public class CacheEventsManager implements EventsManager, StreamsManager, EventsCallback {
 
-  private EventManager online;
+  private EventsManager online;
 
-  public Cache(EventManager pOnline) {
+  public CacheEventsManager(EventsManager pOnline) {
     online = pOnline;
   }
 

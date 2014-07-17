@@ -13,7 +13,7 @@ public class Permission {
 
   private String streamId;
   private Level level;
-  private String defaultName;
+  private String defaultName; // only used when requesting permission
 
   public Permission(String pStreamId, Level pLevel, String pDefaultName) {
     streamId = pStreamId;

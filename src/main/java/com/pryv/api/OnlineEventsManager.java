@@ -17,12 +17,12 @@ import com.pryv.api.model.Event;
  * @author ik
  *
  */
-public class Online implements EventManager, StreamManager {
+public class OnlineEventsManager implements EventsManager, StreamsManager {
 
   private String eventsUrl;
   private EventsCallback eCallback;
 
-  public Online(String pUrl) {
+  public OnlineEventsManager(String pUrl) {
     eventsUrl = pUrl;
   }
 

@@ -2,11 +2,11 @@ package com.pryv;
 
 import java.util.Map;
 
-import com.pryv.api.Cache;
-import com.pryv.api.EventManager;
+import com.pryv.api.CacheEventsManager;
 import com.pryv.api.EventsCallback;
-import com.pryv.api.Online;
-import com.pryv.api.StreamManager;
+import com.pryv.api.EventsManager;
+import com.pryv.api.OnlineEventsManager;
+import com.pryv.api.StreamsManager;
 import com.pryv.api.model.Event;
 import com.pryv.utils.Supervisor;
 
@@ -17,7 +17,7 @@ import com.pryv.utils.Supervisor;
  * @author ik
  *
  */
-public class Connection implements StreamManager, EventManager, EventsCallback {
+public class Connection implements StreamsManager, EventsManager, EventsCallback {
 
   private String username;
   private String token;
@@ -25,8 +25,7 @@ public class Connection implements StreamManager, EventManager, EventsCallback {
   private String apiScheme = "https"; // https
   private String url;
   private String eventsUrl;
-  private EventManager cacheEventManager;
-  private EventManager onlineEventManager;
+  private EventsManager cacheEventsManager;
   private Supervisor supervisor;
 
   public Connection(String pUsername, String pToken) {
@@ -35,8 +34,8 @@ public class Connection implements StreamManager, EventManager, EventsCallback {
     initURL();
 
     supervisor = new Supervisor();
-    onlineEventManager = new Online(eventsUrl);
-    cacheEventManager = new Cache(onlineEventManager);
+    EventsManager onlineEventsManager = new OnlineEventsManager(eventsUrl);
+    cacheEventsManager = new CacheEventsManager(onlineEventsManager);
   }
 
   private void initURL() {
@@ -75,7 +74,7 @@ public class Connection implements StreamManager, EventManager, EventsCallback {
   }
 
   public void getEvents(EventsCallback eCallback) {
-    cacheEventManager.getEvents(this);
+    cacheEventsManager.getEvents(this);
     supervisor.getEvents();
     // do stuff with inMemory events
   }

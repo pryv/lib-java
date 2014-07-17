@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
-import com.pryv.authorization.AuthenticationRequest;
+import com.pryv.auth.AuthenticationRequest;
 
 /**
  *

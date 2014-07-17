@@ -9,7 +9,7 @@ import com.pryv.api.model.Event;
  * @author ik
  *
  */
-public interface EventManager {
+public interface EventsManager {
 
   /**
    * retrieve events

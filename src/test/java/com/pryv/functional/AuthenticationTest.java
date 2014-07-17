@@ -10,8 +10,8 @@ import org.junit.Test;
 
 import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
-import com.pryv.authorization.Authenticator;
-import com.pryv.authorization.Authenticator.State;
+import com.pryv.auth.AuthControllerImpl;
+import com.pryv.auth.AuthControllerImpl.State;
 
 /**
  *
@@ -44,8 +44,8 @@ public class AuthenticationTest {
   @Test
   public void testStartLoginAndPoll() {
     Pryv.setStaging();
-    Authenticator authenticator = new Authenticator(reqAppId, permissions, lang, returnURL);
-    authenticator.startLogin();
+    AuthControllerImpl authenticator = new AuthControllerImpl(reqAppId, permissions, lang, returnURL);
+    authenticator.signIn();
     assertEquals(State.POLLING, authenticator.getState());
   }
 

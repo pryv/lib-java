@@ -1,4 +1,4 @@
-package com.pryv.authorization;
+package com.pryv.auth;
 
 import java.applet.Applet;
 import java.awt.Desktop;
@@ -15,10 +15,10 @@ import java.net.URL;
  * @author ik
  *
  */
-public class LoginWebView extends Applet implements LoginView {
-  private LoginController controller;
+public class AuthBrowserView extends Applet implements AuthView {
+  private AuthController controller;
 
-  public LoginWebView(LoginController pController) {
+  public AuthBrowserView(AuthController pController) {
     controller = pController;
   }
 

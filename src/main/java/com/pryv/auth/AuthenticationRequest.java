@@ -1,4 +1,4 @@
-package com.pryv.authorization;
+package com.pryv.auth;
 
 import java.util.List;
 
@@ -38,10 +38,6 @@ public class AuthenticationRequest {
   }
 
   public List<Permission> getRequestedPermissions() {
-    return requestedPermissions;
-  }
-
-  public List<Permission> getPermissions() {
     return requestedPermissions;
   }
 
