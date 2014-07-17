@@ -99,30 +99,29 @@ public class AuthModelImpl implements AuthModel {
           String pollURL = jsonResponse.get(POLL_URL_KEY).textValue();
           System.out.println("polling at address: " + pollURL);
           new PollingThread(pollURL, rate, loginResponseHandler).start();
-          controller.inProgress();
 
         } else if (state.equals(ACCEPTED_VALUE)) {
           String username = jsonResponse.get(USERNAME_KEY).textValue();
           String token = jsonResponse.get(TOKEN_KEY).textValue();
-          controller.accepted(new Connection(username, token));
+          controller.onSuccess(new Connection(username, token));
 
         } else if (state.equals(REFUSED_VALUE)) {
           String message = jsonResponse.get(MESSAGE_KEY).textValue();
-          controller.refused(message);
+          controller.onFailure(0, message, null);
 
         } else if (state.equals(ERROR_VALUE)) {
           int errorId = jsonResponse.get(ERROR_ID_KEY).intValue();
           String message = jsonResponse.get(MESSAGE_KEY).textValue();
           String detail = jsonResponse.get(DETAIL_KEY).textValue();
-          controller.error(errorId, message, detail);
+          controller.onFailure(errorId, message, detail);
 
         } else {
           System.out.println("LoginResponseHandler: state hit the else block");
-          controller.error(0, "unknown-error", null);
+          controller.onFailure(0, "unknown-error", null);
         }
 
       } else {
-        controller.error(statusCode, reply, null);
+        controller.onFailure(statusCode, reply, null);
       }
       return null;
     }

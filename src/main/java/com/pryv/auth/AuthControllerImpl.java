@@ -63,24 +63,14 @@ public class AuthControllerImpl implements AuthController {
     }
   }
 
-  public void accepted(Connection newConnection) {
+  public void onSuccess(Connection newConnection) {
     state = State.ACCEPTED;
     // acquire ref to new Connection, instanciated
   }
 
-  public void refused(String jsonMessage) {
-    state = State.REFUSED;
-    // display state/error
-  }
-
-  public void error(int errorId, String jsonMessage, String detail) {
+  public void onFailure(int errorId, String jsonMessage, String detail) {
     state = State.REFUSED;
     // display error/reason
-  }
-
-  public void inProgress() {
-    state = State.POLLING;
-    System.out.println("Authenticator in progress");
   }
 
   public State getState() {

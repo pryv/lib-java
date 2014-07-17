@@ -32,7 +32,7 @@ public class RetrieveEventsTest {
    * test fetching of events
    */
   public void testFetchEvents() {
-    connection.getEvents(null);
+    connection.get(null);
   }
 
 }

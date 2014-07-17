@@ -19,23 +19,23 @@ public class CacheEventsManager implements EventsManager, StreamsManager, Events
     online = pOnline;
   }
 
-  public void getEvents(EventsCallback eCallback) {
+  public void get(EventsCallback eCallback) {
     // look in cache and send it onPartialResult
     eCallback.onPartialResult(null);
-    online.getEvents(this); // fetch online and compare modified fields
+    online.get(this); // fetch online and compare modified fields
   }
 
-  public Event createEvent(String id) {
+  public Event create(String id) {
     // TODO Auto-generated method stub
     return null;
   }
 
-  public void deleteEvent(String id) {
+  public void delete(String id) {
     // TODO Auto-generated method stub
 
   }
 
-  public Event updateEvenet(String id) {
+  public Event update(String id) {
     // TODO Auto-generated method stub
     return null;
   }

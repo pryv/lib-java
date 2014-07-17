@@ -19,12 +19,7 @@ public interface AuthController {
   /**
    * login successful
    */
-  void accepted(Connection connection);
-
-  /**
-   * login refused - bad credentials/cancel
-   */
-  void refused(String jsonMessage);
+  void onSuccess(Connection connection);
 
   /**
    * error message
@@ -32,15 +27,11 @@ public interface AuthController {
    * @param detail
    * @param errorId
    */
-  void error(int errorId, String jsonMessage, String detail);
-
-  /**
-   * polling
-   */
-  void inProgress();
+  void onFailure(int errorId, String jsonMessage, String detail);
 
   /**
    * display web view
    */
   void displayLoginView(String url);
+
 }

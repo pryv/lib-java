@@ -26,7 +26,7 @@ public class OnlineEventsManager implements EventsManager, StreamsManager {
     eventsUrl = pUrl;
   }
 
-  public void getEvents(EventsCallback pECallback) {
+  public void get(EventsCallback pECallback) {
     eCallback = pECallback;
     System.out.println("fetching events: " + eventsUrl);
     new FetchEventsThread().start();
@@ -42,17 +42,17 @@ public class OnlineEventsManager implements EventsManager, StreamsManager {
     }
   };
 
-  public Event createEvent(String id) {
+  public Event create(String id) {
     // TODO Auto-generated method stub
     return null;
   }
 
-  public void deleteEvent(String id) {
+  public void delete(String id) {
     // TODO Auto-generated method stub
 
   }
 
-  public Event updateEvenet(String id) {
+  public Event update(String id) {
     // TODO Auto-generated method stub
     return null;
   }

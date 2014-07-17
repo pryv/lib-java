@@ -73,8 +73,8 @@ public class Connection implements StreamsManager, EventsManager, EventsCallback
     return url;
   }
 
-  public void getEvents(EventsCallback eCallback) {
-    cacheEventsManager.getEvents(this);
+  public void get(EventsCallback eCallback) {
+    cacheEventsManager.get(this);
     supervisor.getEvents();
     // do stuff with inMemory events
   }
@@ -94,17 +94,17 @@ public class Connection implements StreamsManager, EventsManager, EventsCallback
 
   }
 
-  public Event createEvent(String id) {
+  public Event create(String id) {
     // TODO Auto-generated method stub
     return null;
   }
 
-  public void deleteEvent(String id) {
+  public void delete(String id) {
     // TODO Auto-generated method stub
 
   }
 
-  public Event updateEvenet(String id) {
+  public Event update(String id) {
     // TODO Auto-generated method stub
     return null;
   }
