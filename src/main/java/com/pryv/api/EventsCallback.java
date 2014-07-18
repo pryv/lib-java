@@ -13,7 +13,7 @@ import com.pryv.api.model.Event;
  */
 public interface EventsCallback {
 
-  void onSuccess(Map<String, Event> newEvents);
+  void onSuccess(String jsonEvents);
 
   void onPartialResult(Map<String, Event> newEvents);
 

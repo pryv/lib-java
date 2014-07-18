@@ -83,7 +83,7 @@ public class AuthModelImpl implements AuthModel {
       System.out.println("handling reply entity : " + reply);
       if (statusCode == HttpStatus.SC_ACCEPTED || statusCode == HttpStatus.SC_OK) {
 
-        JsonNode jsonResponse = JsonConverter.toJsonNode(reply);
+        JsonNode jsonResponse = JsonConverter.fromJson(reply);
         System.out.println("response status code: " + statusCode);
 
         if (first) {

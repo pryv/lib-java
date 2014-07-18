@@ -1,13 +1,16 @@
 package com.pryv;
 
+import java.io.IOException;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pryv.api.CacheEventsManager;
 import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsManager;
 import com.pryv.api.OnlineEventsManager;
 import com.pryv.api.StreamsManager;
 import com.pryv.api.model.Event;
+import com.pryv.utils.JsonConverter;
 import com.pryv.utils.Supervisor;
 
 /**
@@ -22,7 +25,7 @@ public class Connection implements StreamsManager, EventsManager, EventsCallback
   private String username;
   private String token;
   private String apiDomain = Pryv.API_DOMAIN; // pryv.io or pryv.in
-  private String apiScheme = "https"; // https
+  private String apiScheme = "https";
   private String url;
   private String eventsUrl;
   private EventsManager cacheEventsManager;
@@ -31,26 +34,12 @@ public class Connection implements StreamsManager, EventsManager, EventsCallback
   public Connection(String pUsername, String pToken) {
     username = pUsername;
     token = pToken;
-    initURL();
+    url = apiScheme + "://" + username + "." + apiDomain + "/";
+    eventsUrl = url + "events?auth=" + token;
 
     supervisor = new Supervisor();
     EventsManager onlineEventsManager = new OnlineEventsManager(eventsUrl);
     cacheEventsManager = new CacheEventsManager(onlineEventsManager);
-  }
-
-  private void initURL() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(apiScheme);
-    sb.append("://");
-    sb.append(username);
-    sb.append(".");
-    sb.append(apiDomain);
-    sb.append("/");
-    // apiScheme://username.apiDomain/
-    url = sb.toString();
-    sb.append("events?auth=");
-    sb.append(token);
-    eventsUrl = sb.toString();
   }
 
   public String getUsername() {
@@ -79,8 +68,16 @@ public class Connection implements StreamsManager, EventsManager, EventsCallback
     // do stuff with inMemory events
   }
 
-  public void onSuccess(Map<String, Event> newEvents) {
-    // TODO Auto-generated method stub
+  public void onSuccess(String jsonEvents) {
+    try {
+      JsonConverter.updateEventsFromJson(jsonEvents, supervisor.getEvents());
+    } catch (JsonProcessingException e) {
+      this.onError(e.getMessage());
+      e.printStackTrace();
+    } catch (IOException e) {
+      this.onError(e.getMessage());
+      e.printStackTrace();
+    }
 
   }
 

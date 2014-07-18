@@ -1,5 +1,6 @@
 package com.pryv.api;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.pryv.api.model.Event;
@@ -14,14 +15,16 @@ import com.pryv.api.model.Event;
 public class CacheEventsManager implements EventsManager, StreamsManager, EventsCallback {
 
   private EventsManager online;
+  private EventsCallback eCallback;
 
   public CacheEventsManager(EventsManager pOnline) {
     online = pOnline;
   }
 
-  public void get(EventsCallback eCallback) {
+  public void get(EventsCallback pECallback) {
     // look in cache and send it onPartialResult
-    eCallback.onPartialResult(null);
+    eCallback = pECallback;
+    eCallback.onPartialResult(new HashMap<String, Event>());
     online.get(this); // fetch online and compare modified fields
   }
 
@@ -40,9 +43,9 @@ public class CacheEventsManager implements EventsManager, StreamsManager, Events
     return null;
   }
 
-  public void onSuccess(Map<String, Event> newEvents) {
-    // TODO Auto-generated method stub
-
+  public void onSuccess(String jsonEvents) {
+    // update cache with received events
+    eCallback.onSuccess(jsonEvents);
   }
 
   public void onPartialResult(Map<String, Event> newEvents) {

@@ -7,6 +7,7 @@ import resources.TestCredentials;
 
 import com.pryv.Connection;
 import com.pryv.Pryv;
+import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsManager;
 
 /**
@@ -32,7 +33,7 @@ public class RetrieveEventsTest {
    * test fetching of events
    */
   public void testFetchEvents() {
-    connection.get(null);
+    connection.get((EventsCallback) connection);
   }
 
 }

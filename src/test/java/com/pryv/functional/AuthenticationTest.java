@@ -1,7 +1,5 @@
 package com.pryv.functional;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +9,6 @@ import org.junit.Test;
 import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
 import com.pryv.auth.AuthControllerImpl;
-import com.pryv.auth.AuthControllerImpl.State;
 
 /**
  *
@@ -46,7 +43,6 @@ public class AuthenticationTest {
     Pryv.setStaging();
     AuthControllerImpl authenticator = new AuthControllerImpl(reqAppId, permissions, lang, returnURL);
     authenticator.signIn();
-    assertEquals(State.POLLING, authenticator.getState());
   }
 
 }

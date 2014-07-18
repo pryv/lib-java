@@ -20,7 +20,7 @@ public class Event {
   private long time;
   private long duration;
   private String type;
-  private String content;
+  private Object content;
   private List<String> tags;
   private List<String> references;
   private String description;
@@ -31,6 +31,7 @@ public class Event {
   private String createdBy;
   private long modified;
   private String modifiedBy;
+  private String tempRefId;
 
   /**
    * Construct Event object from parameters
@@ -53,9 +54,9 @@ public class Event {
    * @param pModifiedBy
    */
   public Event(String pId, String pStreamId, long pTime, long pDuration, String pType,
-      String pContent, List<String> pTags, List<String> pReferences, String pDescription,
-      List<Attachment> pAttachments, Map<String, String> pClientData, Boolean pTrashed,
-      long pCreated, String pCreatedBy, long pModified, String pModifiedBy) {
+    String pContent, List<String> pTags, List<String> pReferences, String pDescription,
+    List<Attachment> pAttachments, Map<String, String> pClientData, Boolean pTrashed,
+    long pCreated, String pCreatedBy, long pModified, String pModifiedBy) {
     id = pId;
     streamId = pStreamId;
     time = pTime;
@@ -174,18 +175,25 @@ public class Event {
     for (String tag : temp.tags) {
       tags.add(tag);
     }
-    references = new ArrayList<String>();
-    for (String ref : temp.references) {
-      references.add(ref);
+
+    if (temp.references != null) {
+      references = new ArrayList<String>();
+      for (String ref : temp.references) {
+        references.add(ref);
+      }
     }
     description = temp.description;
-    attachments = new ArrayList<Attachment>();
-    for (Attachment attachment : temp.attachments) {
-      attachments.add(cloner.deepClone(attachment));
+    if (temp.attachments != null) {
+      attachments = new ArrayList<Attachment>();
+      for (Attachment attachment : temp.attachments) {
+        attachments.add(cloner.deepClone(attachment));
+      }
     }
-    clientData = new HashMap<String, String>();
-    for (String key : temp.clientData.keySet()) {
-      clientData.put(key, temp.clientData.get(key));
+    if (temp.clientData != null) {
+      clientData = new HashMap<String, String>();
+      for (String key : temp.clientData.keySet()) {
+        clientData.put(key, temp.clientData.get(key));
+      }
     }
     trashed = temp.trashed;
     created = temp.created;
@@ -264,6 +272,10 @@ public class Event {
 
   public void setId(String pId) {
     this.id = pId;
+  }
+
+  public String getTempRefId() {
+    return tempRefId;
   }
 
 }

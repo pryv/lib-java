@@ -1,6 +1,7 @@
 package com.pryv.utils;
 
 import java.io.IOException;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -25,6 +26,8 @@ public class JsonConverter {
   private static ObjectMapper jsonMapper = new ObjectMapper();
   private static Cloner cloner = new Cloner();
 
+  private static final String ID_KEY = "id";
+
   public static void initMapper() {
     jsonMapper.setSerializationInclusion(Include.NON_NULL);
   }
@@ -33,8 +36,32 @@ public class JsonConverter {
     return jsonMapper.writeValueAsString(source);
   }
 
-  public static JsonNode toJsonNode(String source) throws JsonProcessingException, IOException {
+  public static JsonNode fromJson(String source) throws JsonProcessingException, IOException {
     return jsonMapper.readTree(source);
+  }
+
+  public static Map<String, Event> updateEventsFromJson(String jsonEventsArray,
+    Map<String, Event> eventsToUpdate) throws JsonParseException, JsonMappingException,
+    IOException {
+    JsonNode arrNode = new ObjectMapper().readTree(jsonEventsArray).get("events");
+    if (arrNode.isArray()) {
+      for (final JsonNode objNode : arrNode) {
+        String key = objNode.get(ID_KEY).asText();
+        if (eventsToUpdate.get(key) != null) {
+          updateEventFromJson(objNode.toString(), eventsToUpdate.get(key));
+          System.out.println("event updated: id = "
+            + key
+              + ", id = "
+              + eventsToUpdate.get(key).getId());
+        } else {
+          Event eventToAdd = new Event();
+          updateEventFromJson(objNode.toString(), eventToAdd);
+          eventsToUpdate.put(eventToAdd.getId(), eventToAdd);
+          System.out.println("event created: id = " + key + ", id = " + eventToAdd.getId());
+        }
+      }
+    }
+    return eventsToUpdate;
   }
 
   public static void updateAttachmentFromJson(String json, Attachment toUpdate)
@@ -44,14 +71,13 @@ public class JsonConverter {
   }
 
   public static void updateEventFromJson(String json, Event toUpdate) throws JsonParseException,
-      JsonMappingException, IOException {
+    JsonMappingException, IOException {
     Event temp = jsonMapper.readValue(json, Event.class);
     toUpdate.merge(temp, cloner);
-    System.out.println("new Event: " + jsonMapper.writeValueAsString(toUpdate));
   }
 
   public static void updateStreamFromJson(String json, Stream toUpdate) throws JsonParseException,
-      JsonMappingException, IOException {
+    JsonMappingException, IOException {
     Stream temp = jsonMapper.readValue(json, Stream.class);
     toUpdate.merge(temp, cloner);
   }

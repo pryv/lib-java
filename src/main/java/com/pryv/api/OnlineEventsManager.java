@@ -32,12 +32,13 @@ public class OnlineEventsManager implements EventsManager, StreamsManager {
     new FetchEventsThread().start();
   }
 
+
   private ResponseHandler<String> eventsResponseHandler = new ResponseHandler<String>() {
 
     public String handleResponse(HttpResponse reply) throws ClientProtocolException, IOException {
-      System.out.println("received: " + EntityUtils.toString(reply.getEntity()));
-      // JsonConverter.fromJson()
-      // eCallback.onSuccess(newEvents);
+      String response = EntityUtils.toString(reply.getEntity());
+      System.out.println("received: " + response);
+      eCallback.onSuccess(response);
       return null;
     }
   };
@@ -57,16 +58,22 @@ public class OnlineEventsManager implements EventsManager, StreamsManager {
     return null;
   }
 
+  /**
+   * Thread that executes the Get request to the Pryv server.
+   *
+   * @author ik
+   *
+   */
   private class FetchEventsThread extends Thread {
     @Override
     public void run() {
       try {
         Request.Get(eventsUrl).execute().handleResponse(eventsResponseHandler);
       } catch (ClientProtocolException e) {
-        // TODO Auto-generated catch block
+        eCallback.onError(e.getMessage());
         e.printStackTrace();
       } catch (IOException e) {
-        // TODO Auto-generated catch block
+        eCallback.onError(e.getMessage());
         e.printStackTrace();
       }
     }
