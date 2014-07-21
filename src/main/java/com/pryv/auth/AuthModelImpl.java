@@ -81,18 +81,20 @@ public class AuthModelImpl implements AuthModel {
       int statusCode = response.getStatusLine().getStatusCode();
       String reply = EntityUtils.toString(response.getEntity());
       System.out.println("handling reply entity : " + reply);
-      if (statusCode == HttpStatus.SC_ACCEPTED || statusCode == HttpStatus.SC_OK) {
+      System.out.println("response status code: " + statusCode);
+      if (statusCode == HttpStatus.SC_CREATED || statusCode == HttpStatus.SC_OK) {
 
         JsonNode jsonResponse = JsonConverter.fromJson(reply);
-        System.out.println("response status code: " + statusCode);
 
         if (first) {
+          System.out.println("first if case");
           String loginUrl = jsonResponse.get(SERVER_URL_KEY).textValue();
           controller.displayLoginView(loginUrl);
           first = false;
           System.out.println("start view");
         }
         String state = jsonResponse.get(STATUS_KEY).textValue();
+        System.out.println("state retrieved: " + state);
 
         if (state.equals(NEED_SIGNIN_VALUE)) {
           long rate = jsonResponse.get(POLL_RATE_MS_KEY).longValue();
