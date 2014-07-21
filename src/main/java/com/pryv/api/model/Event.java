@@ -18,8 +18,14 @@ public class Event {
   private String id;
   private String streamId;
   private long time;
-  private long duration;
   private String type;
+  private long created;
+  private String createdBy;
+  private long modified;
+  private String modifiedBy;
+
+  // optional
+  private long duration;
   private Object content;
   private List<String> tags;
   private List<String> references;
@@ -27,10 +33,6 @@ public class Event {
   private List<Attachment> attachments;
   private Map<String, String> clientData;
   private Boolean trashed;
-  private long created;
-  private String createdBy;
-  private long modified;
-  private String modifiedBy;
   private String tempRefId;
 
   /**
@@ -39,29 +41,45 @@ public class Event {
    * @param pId
    * @param pStreamId
    * @param pTime
-   * @param pDuration
    * @param pType
-   * @param pContent
-   * @param pTags
-   * @param pReferences
-   * @param pDescription
-   * @param pAttachments
-   * @param pClientData
-   * @param pTrashed
    * @param pCreated
    * @param pCreatedBy
    * @param pModified
    * @param pModifiedBy
+   *
+   * @param pDuration
+   *          optional
+   * @param pContent
+   *          optional
+   * @param pTags
+   *          optional
+   * @param pReferences
+   *          optional
+   * @param pDescription
+   *          optional
+   * @param pAttachments
+   *          optional
+   * @param pClientData
+   *          optional
+   * @param pTrashed
+   *          optional
+   * @param pTempRefId
+   *          optional
    */
   public Event(String pId, String pStreamId, long pTime, long pDuration, String pType,
     String pContent, List<String> pTags, List<String> pReferences, String pDescription,
     List<Attachment> pAttachments, Map<String, String> pClientData, Boolean pTrashed,
-    long pCreated, String pCreatedBy, long pModified, String pModifiedBy) {
+    long pCreated, String pCreatedBy, long pModified, String pModifiedBy, String pTempRefId) {
     id = pId;
     streamId = pStreamId;
     time = pTime;
-    duration = pDuration;
     type = pType;
+    created = pCreated;
+    createdBy = pCreatedBy;
+    modified = pModified;
+    modifiedBy = pModifiedBy;
+
+    duration = pDuration;
     content = pContent;
     tags = pTags;
     references = pReferences;
@@ -69,100 +87,21 @@ public class Event {
     attachments = pAttachments;
     clientData = pClientData;
     trashed = pTrashed;
-    created = pCreated;
-    createdBy = pCreatedBy;
-    modified = pModified;
-    modifiedBy = pModifiedBy;
+    tempRefId = pTempRefId;
   }
 
-  // /**
-  // * Construct Event object from JSON saved in a String object
-  // *
-  // * @param pJsonEvent
-  // */
-  // public Event(String pJsonEvent) {
-  // JSONObject jsonEvent = new JSONObject(pJsonEvent);
-  // id = jsonEvent.optString(JsonFields.ID.toString());
-  // streamID = jsonEvent.optString(JsonFields.STREAM_ID.toString());
-  // JSONObject jsonClientData =
-  // jsonEvent.optJSONObject(JsonFields.CLIENT_DATA.toString());
-  // if (jsonClientData != null) {
-  // String cdKey = (String) jsonClientData.keySet().toArray()[0];
-  // clientData = new HashMap<String, String>();
-  // clientData.put(cdKey, jsonClientData.optString(cdKey));
-  // }
-  // JSONArray jsonTags = jsonEvent.optJSONArray(JsonFields.TAGS.toString());
-  // if (jsonTags != null) {
-  // tags = new ArrayList<String>();
-  // for (int i = 0; i < jsonTags.length(); i++) {
-  // tags.add(jsonTags.optString(i));
-  // }
-  // }
-  // JSONArray jsonRefs =
-  // jsonEvent.optJSONArray(JsonFields.REFERENCES.toString());
-  // if (jsonRefs != null) {
-  // for (int i = 0; i < jsonRefs.length(); i++) {
-  // references = new ArrayList<String>();
-  // references.add(jsonRefs.optString(i));
-  // }
-  // }
-  // JSONArray jsonAttachments =
-  // jsonEvent.optJSONArray(JsonFields.ATTACHMENTS.toString());
-  // if (jsonAttachments != null) {
-  // for (int i = 0; i < jsonAttachments.length(); i++) {
-  // attachments = new ArrayList<Attachment>();
-  // attachments.add(new
-  // Attachment(jsonAttachments.optJSONObject(i).toString()));
-  // }
-  // }
-  // time = jsonEvent.optLong(JsonFields.TIME.toString());
-  // type = jsonEvent.optString(JsonFields.TYPE.toString());
-  // duration = jsonEvent.optLong(JsonFields.DURATION.toString());
-  // content = jsonEvent.opt(JsonFields.CONTENT.toString());
-  // description = jsonEvent.optString(JsonFields.DESCRIPTION.toString());
-  // trashed = jsonEvent.optBoolean(JsonFields.TRASHED.toString());
-  // created = jsonEvent.optLong(JsonFields.CREATED.toString());
-  // createdBy = jsonEvent.optString(JsonFields.CREATED_BY.toString());
-  // modified = jsonEvent.optLong(JsonFields.MODIFIED.toString());
-  // modifiedBy = jsonEvent.optString(JsonFields.MODIFIED_BY.toString());
-  //
-  // }
+  public Event() {
 
-  // /**
-  // * create JSON from Event object.
-  // *
-  // * @return
-  // */
-  // public String toJson() {
-  // JSONObject jsonEvent = new JSONObject();
-  // jsonEvent.putOpt(JsonFields.ID.toString(), id);
-  // jsonEvent.putOpt(JsonFields.TIME.toString(), time);
-  // jsonEvent.putOpt(JsonFields.STREAM_ID.toString(), streamID);
-  // jsonEvent.putOpt(JsonFields.TYPE.toString(), type);
-  // JSONArray jsonTags = new JSONArray(tags);
-  // jsonEvent.putOpt(JsonFields.TAGS.toString(), jsonTags);
-  // jsonEvent.putOpt(JsonFields.DURATION.toString(), duration);
-  // jsonEvent.putOpt(JsonFields.CONTENT.toString(), content);
-  // jsonEvent.putOpt(JsonFields.DESCRIPTION.toString(), description);
-  // JSONArray jsonRefs = new JSONArray(references);
-  // jsonEvent.putOpt(JsonFields.REFERENCES.toString(), jsonRefs);
-  // JSONArray jsonAttachments = new JSONArray(attachments);
-  // jsonEvent.putOpt(JsonFields.ATTACHMENTS.toString(), jsonAttachments);
-  // jsonEvent.putOpt(JsonFields.TRASHED.toString(), trashed);
-  // jsonEvent.putOpt(JsonFields.CREATED.toString(), created);
-  // jsonEvent.putOpt(JsonFields.CREATED_BY.toString(), createdBy);
-  // jsonEvent.putOpt(JsonFields.MODIFIED.toString(), modified);
-  // jsonEvent.putOpt(JsonFields.MODIFIED_BY.toString(), modifiedBy);
-  // jsonEvent.putOpt(JsonFields.CLIENT_DATA.toString(), new
-  // JSONObject(clientData));
-  // return jsonEvent.toString();
-  // }
+  }
 
   /**
    * make deep copy of Event fields, used when updating values of an Event in
    * memory
    *
    * @param temp
+   *          the Event from which the fields are merged
+   * @param Cloner
+   *          com.rits.cloning.Cloner instance from JsonConverter util class
    */
   public void merge(Event temp, Cloner cloner) {
     id = temp.id;
@@ -200,10 +139,6 @@ public class Event {
     createdBy = temp.createdBy;
     modified = temp.modified;
     modifiedBy = temp.modifiedBy;
-  }
-
-  public Event() {
-
   }
 
   public String getDescription() {
