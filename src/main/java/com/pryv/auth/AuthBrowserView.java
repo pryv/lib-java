@@ -46,4 +46,8 @@ public class AuthBrowserView extends Applet implements AuthView {
 
   }
 
+  public void closeLoginView() {
+    // close it if required and possible to do this externally
+  }
+
 }

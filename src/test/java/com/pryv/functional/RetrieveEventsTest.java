@@ -1,5 +1,7 @@
 package com.pryv.functional;
 
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,6 +11,7 @@ import com.pryv.Connection;
 import com.pryv.Pryv;
 import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsManager;
+import com.pryv.api.model.Event;
 
 /**
  *
@@ -19,7 +22,7 @@ import com.pryv.api.EventsManager;
  */
 public class RetrieveEventsTest {
 
-  private EventsManager connection;
+  private EventsManager<Map<String, Event>> connection;
 
   @Before
   public void setUp() throws Exception {
@@ -33,7 +36,7 @@ public class RetrieveEventsTest {
    * test fetching of events
    */
   public void testFetchEvents() {
-    connection.get((EventsCallback) connection);
+    connection.get((EventsCallback<Map<String, Event>>) connection);
   }
 
 }

@@ -10,4 +10,6 @@ package com.pryv.auth;
 public interface AuthView {
 
   void displayLoginVew(String loginURL);
+
+  void closeLoginView();
 }

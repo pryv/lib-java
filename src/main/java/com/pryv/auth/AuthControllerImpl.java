@@ -65,11 +65,13 @@ public class AuthControllerImpl implements AuthController {
 
   public void onSuccess(Connection newConnection) {
     state = State.ACCEPTED;
+    newConnection.get(newConnection);
     // acquire ref to new Connection, instanciated
   }
 
   public void onFailure(int errorId, String jsonMessage, String detail) {
     state = State.REFUSED;
+    System.out.println("failure: id=" + errorId + ", message=" + jsonMessage);
     // display error/reason
   }
 

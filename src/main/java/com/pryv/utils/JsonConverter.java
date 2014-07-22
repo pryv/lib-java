@@ -1,6 +1,7 @@
 package com.pryv.utils;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -26,8 +27,6 @@ public class JsonConverter {
   private static ObjectMapper jsonMapper = new ObjectMapper();
   private static Cloner cloner = new Cloner();
 
-  private static final String ID_KEY = "id";
-
   public static void initMapper() {
     jsonMapper.setSerializationInclusion(Include.NON_NULL);
   }
@@ -40,28 +39,20 @@ public class JsonConverter {
     return jsonMapper.readTree(source);
   }
 
-  public static Map<String, Event> updateEventsFromJson(String jsonEventsArray,
-    Map<String, Event> eventsToUpdate) throws JsonParseException, JsonMappingException,
-    IOException {
+  public static Map<String, Event> createEventsFromJson(String jsonEventsArray)
+    throws JsonParseException, JsonMappingException, IOException {
     JsonNode arrNode = new ObjectMapper().readTree(jsonEventsArray).get("events");
+    Map<String, Event> newEvents = new HashMap<String, Event>();
     if (arrNode.isArray()) {
       for (final JsonNode objNode : arrNode) {
-        String key = objNode.get(ID_KEY).asText();
-        if (eventsToUpdate.get(key) != null) {
-          updateEventFromJson(objNode.toString(), eventsToUpdate.get(key));
-          System.out.println("event updated: id = "
-            + key
-              + ", id = "
-              + eventsToUpdate.get(key).getId());
-        } else {
-          Event eventToAdd = new Event();
-          updateEventFromJson(objNode.toString(), eventToAdd);
-          eventsToUpdate.put(eventToAdd.getId(), eventToAdd);
-          System.out.println("event created: id = " + key + ", id = " + eventToAdd.getId());
-        }
+        Event eventToAdd = new Event();
+        resetEventFromJson(objNode.toString(), eventToAdd);
+        newEvents.put(eventToAdd.getId(), eventToAdd);
+        System.out.println("event created: id = " + eventToAdd.getId());
       }
     }
-    return eventsToUpdate;
+
+    return newEvents;
   }
 
   public static void updateAttachmentFromJson(String json, Attachment toUpdate)
@@ -70,7 +61,19 @@ public class JsonConverter {
     toUpdate.merge(temp);
   }
 
-  public static void updateEventFromJson(String json, Event toUpdate) throws JsonParseException,
+  /**
+   * resets all fields of Event toUpdate to values from JSON glossary json
+   *
+   * @param json
+   *          The glossary containing the values to which the Event's fields are
+   *          updated.
+   * @param toUpdate
+   *          The Event reference whose fields are reset.
+   * @throws JsonParseException
+   * @throws JsonMappingException
+   * @throws IOException
+   */
+  public static void resetEventFromJson(String json, Event toUpdate) throws JsonParseException,
     JsonMappingException, IOException {
     Event temp = jsonMapper.readValue(json, Event.class);
     toUpdate.merge(temp, cloner);
@@ -80,6 +83,10 @@ public class JsonConverter {
     JsonMappingException, IOException {
     Stream temp = jsonMapper.readValue(json, Stream.class);
     toUpdate.merge(temp, cloner);
+  }
+
+  public static Cloner getCloner() {
+    return cloner;
   }
 
 }

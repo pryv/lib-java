@@ -70,7 +70,7 @@ public class EventTest {
     clientData.put(clientKey, clientValue);
     testEvent =
         new Event(null, streamID, time, duration, type, content, tags, references, description,
-            attachments, clientData, trashed, created, createdBy, modified, modifiedBy);
+        attachments, clientData, trashed, created, createdBy, modified, modifiedBy, null);
     testEvent.setId(id);
     // jsonTestEvent = gson.toJson(testEvent);
     // jsonTestEvent = new JSONObject(testEvent.toJson());
@@ -81,7 +81,7 @@ public class EventTest {
   public void testCreateEmptyEvent() {
     Event emptyEvent =
         new Event(null, null, 0, 0, null, null, null, null, null, null, null, null, 0, null, 0,
-            null);
+        null, null);
     assertNotNull(emptyEvent);
   }
 
@@ -121,10 +121,10 @@ public class EventTest {
   public void testMergeEvent() {
     Event eventToUpdate =
         new Event(null, null, 0, 0, null, null, null, null, null, null, null, null, 0, null, 0,
-            null);
+        null, null);
     Event baseEventRef = eventToUpdate;
     try {
-      JsonConverter.updateEventFromJson(jsonTestEvent, eventToUpdate);
+      JsonConverter.resetEventFromJson(jsonTestEvent, eventToUpdate);
 
       assertTrue(eventToUpdate == baseEventRef);
       assertTrue(testEvent.getId().equals(eventToUpdate.getId()));
@@ -204,7 +204,7 @@ public class EventTest {
     // Event eventFromJson = gson.fromJson(jsonTestEvent, Event.class);
     Event eventFromJson = new Event();
     try {
-      JsonConverter.updateEventFromJson(jsonTestEvent, eventFromJson);
+      JsonConverter.resetEventFromJson(jsonTestEvent, eventFromJson);
     } catch (JsonParseException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
