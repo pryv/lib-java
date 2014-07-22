@@ -10,12 +10,16 @@ import com.pryv.api.model.Event;
  *
  * @author ik
  *
+ * @param <T>
+ *          the format in which the events are returned
+ *
  */
-public interface EventsCallback {
+public interface EventsCallback<T> {
 
-  void onSuccess(String jsonEvents);
+  void onSuccess(T events);
 
   void onPartialResult(Map<String, Event> newEvents);
 
   void onError(String message);
+
 }

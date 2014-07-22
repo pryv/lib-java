@@ -17,16 +17,16 @@ import com.pryv.api.model.Event;
  * @author ik
  *
  */
-public class OnlineEventsManager implements EventsManager, StreamsManager {
+public class OnlineEventsManager implements EventsManager<String>, StreamsManager {
 
   private String eventsUrl;
-  private EventsCallback eCallback;
+  private EventsCallback<String> eCallback;
 
   public OnlineEventsManager(String pUrl) {
     eventsUrl = pUrl;
   }
 
-  public void get(EventsCallback pECallback) {
+  public void get(EventsCallback<String> pECallback) {
     eCallback = pECallback;
     System.out.println("fetching events: " + eventsUrl);
     new FetchEventsThread().start();

@@ -1,9 +1,7 @@
 package com.pryv;
 
-import java.io.IOException;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pryv.api.CacheEventsManager;
 import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsManager;
@@ -20,7 +18,8 @@ import com.pryv.utils.Supervisor;
  * @author ik
  *
  */
-public class Connection implements StreamsManager, EventsManager, EventsCallback {
+public class Connection implements StreamsManager, EventsManager<Map<String, Event>>,
+  EventsCallback<Map<String, Event>> {
 
   private String username;
   private String token;
@@ -28,7 +27,7 @@ public class Connection implements StreamsManager, EventsManager, EventsCallback
   private String apiScheme = "https";
   private String url;
   private String eventsUrl;
-  private EventsManager cacheEventsManager;
+  private EventsManager<Map<String, Event>> cacheEventsManager;
   private Supervisor supervisor;
 
   public Connection(String pUsername, String pToken) {
@@ -38,7 +37,7 @@ public class Connection implements StreamsManager, EventsManager, EventsCallback
     eventsUrl = url + "events?auth=" + token;
 
     supervisor = new Supervisor();
-    EventsManager onlineEventsManager = new OnlineEventsManager(eventsUrl);
+    EventsManager<String> onlineEventsManager = new OnlineEventsManager(eventsUrl);
     cacheEventsManager = new CacheEventsManager(onlineEventsManager);
   }
 
@@ -62,21 +61,20 @@ public class Connection implements StreamsManager, EventsManager, EventsCallback
     return url;
   }
 
-  public void get(EventsCallback eCallback) {
+  public void get(EventsCallback<Map<String, Event>> eCallback) {
     cacheEventsManager.get(this);
     supervisor.getEvents();
     // do stuff with inMemory events
   }
 
-  public void onSuccess(String jsonEvents) {
-    try {
-      JsonConverter.updateEventsFromJson(jsonEvents, supervisor.getEvents());
-    } catch (JsonProcessingException e) {
-      this.onError(e.getMessage());
-      e.printStackTrace();
-    } catch (IOException e) {
-      this.onError(e.getMessage());
-      e.printStackTrace();
+  public void onSuccess(Map<String, Event> events) {
+    System.out.println("Connection: onSuccess");
+    for (String key : events.keySet()) {
+      if (supervisor.getEvents().get(key) != null) {
+        supervisor.getEvents().get(key).merge(events.get(key), JsonConverter.getCloner());
+      } else {
+        supervisor.getEvents().put(key, events.get(key));
+      }
     }
 
   }

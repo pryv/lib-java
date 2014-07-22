@@ -5,6 +5,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.pryv.api.model.Event;
 
@@ -20,7 +24,9 @@ public class SQLiteDBHelper {
   private Connection dbConnection;
   private Statement statement;
 
-  private String fieldNames;
+  private List<String> eventFields;
+
+  private List<String> streamFields;
 
   public SQLiteDBHelper() {
     initDB();
@@ -34,15 +40,11 @@ public class SQLiteDBHelper {
 
       statement = dbConnection.createStatement();
 
-      StringBuilder fieldNamesBuilder = new StringBuilder();
-
+      eventFields = new ArrayList<String>();
       Field[] fields = Event.class.getDeclaredFields();
       for (Field field : fields) {
-        fieldNamesBuilder.append(field.getName().toUpperCase());
-        fieldNamesBuilder.append(",");
+        eventFields.add(field.getName().toUpperCase());
       }
-      fieldNamesBuilder.deleteCharAt(fieldNamesBuilder.length() - 1);
-      fieldNames = fieldNamesBuilder.toString();
     } catch (ClassNotFoundException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -60,13 +62,30 @@ public class SQLiteDBHelper {
     statement = dbConnection.createStatement();
     String sql =
       "CREATE TABLE EVENT "
-        + "(ID TEXT PRIMARY KEY     NOT NULL,"
-          + " NAME           TEXT    NOT NULL, "
-          + " AGE            INT     NOT NULL, "
-          + " ADDRESS        CHAR(50), "
-          + " SALARY         REAL)";
+        + "(  ID TEXT PRIMARY KEY       NOT NULL,"
+          + " STREAMID        TEXT      NOT NULL, "
+          + " TIME            INTEGER   NOT NULL, "
+          + " TYPE            TEXT      NOT NULL, "
+          + " CREATED         INTEGER   NOT NULL, "
+          + " CREATEDBY       TEXT      NOT NULL, "
+          + " MODIFIED        INTEGER   NOT NULL, "
+          + " MODIFIEDBY      TEXT      NOT NULL, "
+          + " DURATION        INTEGER, "
+          + " CONTENT         BLOB, "
+          + " TAGS            TEXT, "
+          + " REFERENCES      TEXT, "
+          + " DESCRIPTION     TEXT, "
+          + " ATTACHMENTS     TEXT, "
+          + " CLIENTDATA      TEXT, "
+          + " TRASHED         INTEGER, "
+          + " TEMPREFID       TEXT)";
     statement.executeUpdate(sql);
     statement.close();
     dbConnection.close();
+  }
+
+  public Map<String, Event> getEvents() {
+
+    return new HashMap<String, Event>();
   }
 }

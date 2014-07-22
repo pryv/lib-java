@@ -8,8 +8,11 @@ import com.pryv.api.model.Event;
  *
  * @author ik
  *
+ * @param <T>
+ *          the format in which the events are returned
+ *
  */
-public interface EventsManager {
+public interface EventsManager<T> {
 
   /**
    * retrieve events
@@ -17,7 +20,7 @@ public interface EventsManager {
    * @param id
    * @return
    */
-  void get(EventsCallback eventsCallback);
+  void get(EventsCallback<T> eventsCallback);
 
   Event create(String id);
 
