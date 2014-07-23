@@ -4,108 +4,101 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import resources.TestCredentials;
+
+import org.w3c.dom.Document;
 
 import com.pryv.api.model.Permission;
 import com.pryv.auth.AuthController;
 import com.pryv.auth.AuthControllerImpl;
+import com.pryv.auth.AuthView;
 
-public class JavaApp extends Application {
+public class JavaApp extends Application implements AuthView {
 
+  private final static String REQUESTING_APP_ID = "web-app-test";
   private Connection connection;
-  private List<Permission> permissions;
-  private String streamId1 = "pics";
-  private Permission.Level perm1 = Permission.Level.contribute;
-  private String defaultName1 = "ddd";
-  private Permission testPermission1 = new Permission(streamId1, perm1, defaultName1);
-  private String streamId2 = "vids";
-  private Permission.Level perm2 = Permission.Level.read;
-  private String defaultName2 = "eee";
-  private Permission testPermission2 = new Permission(streamId2, perm2, defaultName2);
-  private String lang = "en";
-  private String returnURL = "fakeURL";
 
-  private TextField reqAppIdTextField;
+  private Stage stage;
 
   public static void main(String[] args) {
     launch(args);
   }
 
   @Override
-  public void start(Stage primaryStage) {
-    primaryStage.setTitle("Java Example App");
+  public void start(Stage pStage) {
+    Pryv.setStaging();
+    stage = pStage;
+    stage.setTitle("Java Example App");
+    stage.setHeight(600);
+    stage.setWidth(600);
 
-    StackPane root = new StackPane();
-    GridPane grid = new GridPane();
-    grid.setAlignment(Pos.CENTER);
-    grid.setHgap(10);
-    grid.setVgap(10);
-    grid.setPadding(new Insets(25, 25, 25, 25));
-    Text scenetitle = new Text("Welcome");
-    scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-    grid.add(scenetitle, 0, 0, 2, 1);
+    Permission testPermission =
+      new Permission("picsStream", Permission.Level.manage, "defaultPicsStream");
+    List<Permission> permissions = new ArrayList<Permission>();
+    permissions.add(testPermission);
 
-    Label reqAppLabel = new Label("Requesting App Id:");
-    grid.add(reqAppLabel, 0, 1);
+    Scene scene = new Scene(new Group());
+    TextField text = new TextField("Login in browser");
+    scene.setRoot(text);
+    stage.setScene(scene);
+    stage.show();
 
-    reqAppIdTextField = new TextField();
-    grid.add(reqAppIdTextField, 1, 1);
-
-    HBox hbBtn = new HBox(10);
-    Button authenticateBtn = new Button();
-    authenticateBtn.setText("Authenticate");
-    Button loginWithTestCredsBtn = new Button("testLogin");
-
-    hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
-    hbBtn.getChildren().add(authenticateBtn);
-    hbBtn.getChildren().add(loginWithTestCredsBtn);
-    grid.add(hbBtn, 1, 4);
-    final Text actiontarget = new Text();
-    grid.add(actiontarget, 1, 6);
-
-    loginWithTestCredsBtn.setOnAction(new EventHandler<ActionEvent>() {
-
-      public void handle(ActionEvent arg0) {
-        actiontarget.setFill(Color.FIREBRICK);
-        actiontarget.setText("signing in with test credentials");
-
-        Connection connection = new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN);
-      }
-    });
-
-    authenticateBtn.setOnAction(new EventHandler<ActionEvent>() {
-
-      public void handle(ActionEvent event) {
-        actiontarget.setFill(Color.FIREBRICK);
-        actiontarget.setText("Authentication started");
-        System.out.println("authenticate pressed");
-        permissions = new ArrayList<Permission>();
-        // permissions.add(testPermission1);
-        // permissions.add(testPermission2);
-        AuthController authenticator =
-          new AuthControllerImpl(reqAppIdTextField.getText(), permissions, "en", null);
-        authenticator.signIn();
-      }
-    });
-
-    Scene scene = new Scene(grid, 600, 500);
-    primaryStage.setScene(scene);
-    primaryStage.show();
+    AuthController authenticator =
+      new AuthControllerImpl(REQUESTING_APP_ID, permissions, "en", "");
+    authenticator.setView(this);
+    authenticator.signIn();
   }
+
+  public void onSignInSuccess() {
+    System.out.println("JavaApp: onSignInSuccess");
+    Scene scene = new Scene(new Group());
+    TextField text = new TextField("authentication complete");
+    scene.setRoot(text);
+    stage.setScene(scene);
+    stage.show();
+  }
+
+  public void displayLoginVew(String loginURL) {
+    System.out.println("displaying custom view");
+    final WebView webView = new WebView();
+    // browser.
+    final WebEngine webEngine = webView.getEngine();
+    // browser.set
+    webEngine.setJavaScriptEnabled(true);
+    webEngine.documentProperty().addListener(new ChangeListener<Document>() {
+      public void changed(ObservableValue<? extends Document> prop, Document oldDoc,
+        Document newDoc) {
+        enableFirebug(webEngine);
+      }
+    });
+    Scene scene = new Scene(new Group());
+    scene.setRoot(webView);
+    stage.setScene(scene);
+    stage.show();
+    webEngine.load(loginURL);
+    webView
+      .getEngine()
+      .executeScript(
+        "if (!document.getElementById('FirebugLite')){E = document['createElement' + 'NS'] && document.documentElement.namespaceURI;E = E ? document['createElement' + 'NS'](E, 'script') : document['createElement']('script');E['setAttribute']('id', 'FirebugLite');E['setAttribute']('src', 'https://getfirebug.com/' + 'firebug-lite.js' + '#startOpened');E['setAttribute']('FirebugLite', '4');(document['getElementsByTagName']('head')[0] || document['getElementsByTagName']('body')[0]).appendChild(E);E = new Image;E['setAttribute']('src', 'https://getfirebug.com/' + '#startOpened');}");
+
+  }
+
+  /**
+   * Enables Firebug Lite for debugging a webEngine.
+   *
+   * @param engine
+   *          the webEngine for which debugging is to be enabled.
+   */
+  private static void enableFirebug(final WebEngine engine) {
+    engine
+      .executeScript("if (!document.getElementById('FirebugLite')){E = document['createElement' + 'NS'] && document.documentElement.namespaceURI;E = E ? document['createElement' + 'NS'](E, 'script') : document['createElement']('script');E['setAttribute']('id', 'FirebugLite');E['setAttribute']('src', 'https://getfirebug.com/' + 'firebug-lite.js' + '#startOpened');E['setAttribute']('FirebugLite', '4');(document['getElementsByTagName']('head')[0] || document['getElementsByTagName']('body')[0]).appendChild(E);E = new Image;E['setAttribute']('src', 'https://getfirebug.com/' + '#startOpened');}");
+  }
+
 }
