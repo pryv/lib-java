@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
-import com.pryv.auth.AuthControllerImpl;
 import com.pryv.auth.AuthController;
+import com.pryv.auth.AuthControllerImpl;
 
 /**
  *
@@ -32,6 +32,7 @@ public class LoginExample {
 
     Pryv.setStaging();
     AuthController authenticator = new AuthControllerImpl(reqAppId, permissions, lang, returnURL);
+
     authenticator.signIn();
   }
 

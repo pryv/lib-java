@@ -26,7 +26,7 @@ public class RetrieveEventsExample {
     EventsCallback<Map<String, Event>> eventsCallback = connection;
 
     Pryv.setStaging();
-    eventsFetcher.get(eventsCallback);
+    eventsFetcher.get();
 
   }
 }

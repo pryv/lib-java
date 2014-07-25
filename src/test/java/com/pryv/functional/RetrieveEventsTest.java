@@ -9,7 +9,6 @@ import resources.TestCredentials;
 
 import com.pryv.Connection;
 import com.pryv.Pryv;
-import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsManager;
 import com.pryv.api.model.Event;
 
@@ -29,6 +28,7 @@ public class RetrieveEventsTest {
     // create Connection with valid username/token for testing
     Pryv.setStaging();
     connection = new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN);
+
   }
 
   @Test
@@ -36,7 +36,7 @@ public class RetrieveEventsTest {
    * test fetching of events
    */
   public void testFetchEvents() {
-    connection.get((EventsCallback<Map<String, Event>>) connection);
+    connection.get();
   }
 
 }
