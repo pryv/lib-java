@@ -1,5 +1,7 @@
 package com.pryv.api.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize.Inclusion;
 
 /**
  *
@@ -8,6 +10,7 @@ package com.pryv.api.model;
  * @author ik
  *
  */
+@JsonSerialize(include = Inclusion.NON_NULL)
 public class Permission {
 
 

@@ -1,11 +1,12 @@
 package com.pryv;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import com.pryv.api.CacheEventsManager;
 import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsManager;
-import com.pryv.api.OnlineEventsManager;
 import com.pryv.api.StreamsManager;
 import com.pryv.api.model.Event;
 import com.pryv.utils.JsonConverter;
@@ -29,16 +30,16 @@ public class Connection implements StreamsManager, EventsManager<Map<String, Eve
   private String eventsUrl;
   private EventsManager<Map<String, Event>> cacheEventsManager;
   private Supervisor supervisor;
+  private List<EventsCallback<Map<String, Event>>> eventsCallbackList;
 
   public Connection(String pUsername, String pToken) {
     username = pUsername;
     token = pToken;
     url = apiScheme + "://" + username + "." + apiDomain + "/";
     eventsUrl = url + "events?auth=" + token;
-
     supervisor = new Supervisor();
-    EventsManager<String> onlineEventsManager = new OnlineEventsManager(eventsUrl);
-    cacheEventsManager = new CacheEventsManager(onlineEventsManager);
+    cacheEventsManager = new CacheEventsManager(eventsUrl, this);
+    eventsCallbackList = new ArrayList<EventsCallback<Map<String, Event>>>();
   }
 
   public String getUsername() {
@@ -61,10 +62,13 @@ public class Connection implements StreamsManager, EventsManager<Map<String, Eve
     return url;
   }
 
-  public void get(EventsCallback<Map<String, Event>> eCallback) {
-    cacheEventsManager.get(this);
+  public void get() {
     supervisor.getEvents();
-    // do stuff with inMemory events
+    cacheEventsManager.get();
+  }
+
+  public void addEventsCallback(EventsCallback<Map<String, Event>> eCallback) {
+    eventsCallbackList.add(eCallback);
   }
 
   public void onSuccess(Map<String, Event> events) {
@@ -76,7 +80,9 @@ public class Connection implements StreamsManager, EventsManager<Map<String, Eve
         supervisor.getEvents().put(key, events.get(key));
       }
     }
-
+    for (EventsCallback<Map<String, Event>> ecb : eventsCallbackList) {
+      ecb.onSuccess(supervisor.getEvents());
+    }
   }
 
   public void onPartialResult(Map<String, Event> newEvents) {

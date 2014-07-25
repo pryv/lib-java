@@ -31,8 +31,8 @@ public class AuthModelImpl implements AuthModel {
   private AuthenticationRequest authRequest;
   private Boolean first = true;
 
-  public AuthModelImpl(AuthController pController, String requestingAppId, List<Permission> permissions,
-    String language, String returnURL) {
+  public AuthModelImpl(AuthController pController, String requestingAppId,
+    List<Permission> permissions, String language, String returnURL) {
     this.controller = pController;
     authRequest = new AuthenticationRequest(requestingAppId, permissions, language, returnURL);
   }
@@ -91,7 +91,7 @@ public class AuthModelImpl implements AuthModel {
           String loginUrl = jsonResponse.get(SERVER_URL_KEY).textValue();
           controller.displayLoginView(loginUrl);
           first = false;
-          System.out.println("start view");
+          System.out.println("start view of address : \'" + loginUrl + "\'");
         }
         String state = jsonResponse.get(STATUS_KEY).textValue();
         System.out.println("state retrieved: " + state);

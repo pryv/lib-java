@@ -20,21 +20,21 @@ public class CacheEventsManager implements EventsManager<Map<String, Event>>, St
   EventsCallback<String> {
 
   private EventsManager<String> online;
-  private EventsCallback<Map<String, Event>> eCallback;
+  private EventsCallback<Map<String, Event>> eventsCallback;
 
   private SQLiteDBHelper dbHelper;
 
-  public CacheEventsManager(EventsManager<String> pOnline) {
-    online = pOnline;
+  public CacheEventsManager(String url, EventsCallback<Map<String, Event>> eCallback) {
+    online = new OnlineEventsManager(url, this);
+    eventsCallback = eCallback;
     dbHelper = new SQLiteDBHelper();
   }
 
-  public void get(EventsCallback<Map<String, Event>> pECallback) {
+  public void get() {
     // look in cache and send it onPartialResult
-    eCallback = pECallback;
     dbHelper.getEvents();
-    eCallback.onPartialResult(new HashMap<String, Event>());
-    online.get(this); // fetch online and compare modified fields
+    eventsCallback.onPartialResult(new HashMap<String, Event>());
+    online.get(); // fetch online and compare modified fields
   }
 
   public Event create(String id) {
@@ -55,7 +55,7 @@ public class CacheEventsManager implements EventsManager<Map<String, Event>>, St
   public void onSuccess(String jsonEvents) {
     System.out.println("cache: onSuccess");
     try {
-      eCallback.onSuccess(JsonConverter.createEventsFromJson(jsonEvents));
+      eventsCallback.onSuccess(JsonConverter.createEventsFromJson(jsonEvents));
     } catch (JsonProcessingException e) {
       this.onError(e.getMessage());
       e.printStackTrace();
@@ -72,6 +72,11 @@ public class CacheEventsManager implements EventsManager<Map<String, Event>>, St
   }
 
   public void onError(String message) {
+    // TODO Auto-generated method stub
+
+  }
+
+  public void addEventsCallback(EventsCallback<Map<String, Event>> eCallback) {
     // TODO Auto-generated method stub
 
   }

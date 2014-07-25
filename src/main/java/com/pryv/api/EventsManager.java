@@ -20,12 +20,14 @@ public interface EventsManager<T> {
    * @param id
    * @return
    */
-  void get(EventsCallback<T> eventsCallback);
+  void get();
 
   Event create(String id);
 
   void delete(String id);
 
   Event update(String id);
+
+  void addEventsCallback(EventsCallback<T> eCallback);
 
 }

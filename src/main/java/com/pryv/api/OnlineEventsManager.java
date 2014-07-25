@@ -22,14 +22,35 @@ public class OnlineEventsManager implements EventsManager<String>, StreamsManage
   private String eventsUrl;
   private EventsCallback<String> eCallback;
 
-  public OnlineEventsManager(String pUrl) {
+  public OnlineEventsManager(String pUrl, EventsCallback<String> pECallback) {
     eventsUrl = pUrl;
+    eCallback = pECallback;
   }
 
-  public void get(EventsCallback<String> pECallback) {
-    eCallback = pECallback;
+  public void get() {
     System.out.println("fetching events: " + eventsUrl);
     new FetchEventsThread().start();
+  }
+
+  /**
+   * Thread that executes the Get request to the Pryv server.
+   *
+   * @author ik
+   *
+   */
+  private class FetchEventsThread extends Thread {
+    @Override
+    public void run() {
+      try {
+        Request.Get(eventsUrl).execute().handleResponse(eventsResponseHandler);
+      } catch (ClientProtocolException e) {
+        eCallback.onError(e.getMessage());
+        e.printStackTrace();
+      } catch (IOException e) {
+        eCallback.onError(e.getMessage());
+        e.printStackTrace();
+      }
+    }
   }
 
 
@@ -58,25 +79,10 @@ public class OnlineEventsManager implements EventsManager<String>, StreamsManage
     return null;
   }
 
-  /**
-   * Thread that executes the Get request to the Pryv server.
-   *
-   * @author ik
-   *
-   */
-  private class FetchEventsThread extends Thread {
-    @Override
-    public void run() {
-      try {
-        Request.Get(eventsUrl).execute().handleResponse(eventsResponseHandler);
-      } catch (ClientProtocolException e) {
-        eCallback.onError(e.getMessage());
-        e.printStackTrace();
-      } catch (IOException e) {
-        eCallback.onError(e.getMessage());
-        e.printStackTrace();
-      }
-    }
+  public void addEventsCallback(EventsCallback<String> eCallback) {
+    // TODO Auto-generated method stub
+
   }
+
 
 }

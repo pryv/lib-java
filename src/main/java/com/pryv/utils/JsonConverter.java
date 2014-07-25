@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -26,10 +25,6 @@ public class JsonConverter {
 
   private static ObjectMapper jsonMapper = new ObjectMapper();
   private static Cloner cloner = new Cloner();
-
-  public static void initMapper() {
-    jsonMapper.setSerializationInclusion(Include.NON_NULL);
-  }
 
   public static String toJson(Object source) throws JsonProcessingException {
     return jsonMapper.writeValueAsString(source);

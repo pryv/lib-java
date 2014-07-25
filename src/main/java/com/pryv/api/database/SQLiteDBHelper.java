@@ -29,7 +29,7 @@ public class SQLiteDBHelper {
   private List<String> streamFields;
 
   public SQLiteDBHelper() {
-    initDB();
+    // initDB();
   }
 
   private void initDB() {

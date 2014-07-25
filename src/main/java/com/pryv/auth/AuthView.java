@@ -1,5 +1,7 @@
 package com.pryv.auth;
 
+import com.pryv.Connection;
+
 /**
  *
  * view displayed to enter credentials
@@ -11,5 +13,7 @@ public interface AuthView {
 
   void displayLoginVew(String loginURL);
 
-  void closeLoginView();
+  void onDisplaySuccess(Connection connection);
+
+  void onDisplayFailure();
 }

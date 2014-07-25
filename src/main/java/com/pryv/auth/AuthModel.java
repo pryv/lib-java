@@ -13,5 +13,11 @@ import org.apache.http.client.ClientProtocolException;
  */
 public interface AuthModel {
 
+  /**
+   * start login protocol
+   *
+   * @throws ClientProtocolException
+   * @throws IOException
+   */
   void startLogin() throws ClientProtocolException, IOException;
 }

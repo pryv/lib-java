@@ -48,6 +48,11 @@ public class AuthControllerImpl implements AuthController {
     permissions = pPermissions;
     language = pLang;
     returnURL = pReturnURL;
+    view = new AuthBrowserView(this);
+  }
+
+  public void setView(AuthView pView) {
+    view = pView;
   }
 
   public void signIn() {
@@ -65,13 +70,14 @@ public class AuthControllerImpl implements AuthController {
 
   public void onSuccess(Connection newConnection) {
     state = State.ACCEPTED;
-    newConnection.get(newConnection);
+    view.onDisplaySuccess(newConnection);
     // acquire ref to new Connection, instanciated
   }
 
   public void onFailure(int errorId, String jsonMessage, String detail) {
     state = State.REFUSED;
     System.out.println("failure: id=" + errorId + ", message=" + jsonMessage);
+    view.onDisplayFailure();
     // display error/reason
   }
 
@@ -80,8 +86,8 @@ public class AuthControllerImpl implements AuthController {
   }
 
   public void displayLoginView(String url) {
-    view = new AuthBrowserView(this);
-    view.displayLoginVew(url);
+    new AuthBrowserView(this).displayLoginVew(url);
+    // view.displayLoginVew(url);
   }
 
 }

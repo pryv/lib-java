@@ -8,7 +8,7 @@ import org.apache.http.client.fluent.Request;
 
 /**
  *
- * Polling thread that polls the URL for login sequence state
+ * Polling thread that polls the URL for login sequence state.
  *
  * @author ik
  *
@@ -33,8 +33,8 @@ public class PollingThread extends Thread {
       sleep(pollRate);
       Request.Get(pollURL).execute().handleResponse(responseHandler);
 
-      System.out.println("PollingThread: polling request sent");
-
+      System.out.println("PollingThread: polling request sent by thread: "
+        + Thread.currentThread().getName());
 
     } catch (ClientProtocolException e) {
       // TODO Auto-generated catch block

@@ -12,6 +12,12 @@ import com.pryv.Connection;
 public interface AuthController {
 
   /**
+   * set custom View, default is a browser tab.
+   * @param view
+   */
+  void setView(AuthView view);
+
+  /**
    * begin login sequence
    */
   void signIn();
