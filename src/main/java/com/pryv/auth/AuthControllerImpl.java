@@ -48,7 +48,6 @@ public class AuthControllerImpl implements AuthController {
     permissions = pPermissions;
     language = pLang;
     returnURL = pReturnURL;
-    view = new AuthBrowserView(this);
   }
 
   public void setView(AuthView pView) {
@@ -86,8 +85,7 @@ public class AuthControllerImpl implements AuthController {
   }
 
   public void displayLoginView(String url) {
-    new AuthBrowserView(this).displayLoginVew(url);
-    // view.displayLoginVew(url);
+    view.displayLoginVew(url);
   }
 
 }

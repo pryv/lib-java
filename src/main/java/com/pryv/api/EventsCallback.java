@@ -16,10 +16,10 @@ import com.pryv.api.model.Event;
  */
 public interface EventsCallback<T> {
 
-  void onSuccess(T events);
+  void onEventsSuccess(T events);
 
-  void onPartialResult(Map<String, Event> newEvents);
+  void onEventsPartialResult(Map<String, Event> newEvents);
 
-  void onError(String message);
+  void onEventsError(String message);
 
 }

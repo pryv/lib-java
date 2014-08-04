@@ -23,7 +23,7 @@ public class Stream {
   private String name;
   private String parentId;
   private Boolean singleActivity;
-  private Map<String, String> clientData;
+  private Map<String, Object> clientData;
   private List<Stream> children;
   private Boolean trashed;
   private long created;
@@ -32,8 +32,8 @@ public class Stream {
   private String modifiedBy;
 
   public Stream(String pId, String pName, String pParentId, Boolean pSingleActivity,
-      Map<String, String> pClientData, List<Stream> pChildren, Boolean pTrashed, long pCreated,
-      String pCreatedBy, long pModified, String pModifiedBy) {
+    Map<String, Object> pClientData, List<Stream> pChildren, Boolean pTrashed, long pCreated,
+    String pCreatedBy, long pModified, String pModifiedBy) {
     id = pId;
     name = pName;
     parentId = pParentId;
@@ -61,7 +61,7 @@ public class Stream {
     JSONObject jsonClientData = jsonStream.optJSONObject(JsonFields.CLIENT_DATA.toString());
     if (jsonClientData != null) {
       String cdKey = (String) jsonClientData.keySet().toArray()[0];
-      clientData = new HashMap<String, String>();
+      clientData = new HashMap<String, Object>();
       clientData.put(cdKey, jsonClientData.optString(cdKey));
     }
     JSONArray jsonChildren = jsonStream.optJSONArray(JsonFields.CHILDREN.toString());
@@ -105,7 +105,7 @@ public class Stream {
     name = temp.name;
     parentId = temp.parentId;
     singleActivity = temp.singleActivity;
-    clientData = new HashMap<String, String>();
+    clientData = new HashMap<String, Object>();
     for (String key : temp.clientData.keySet()) {
       clientData.put(key, temp.clientData.get(key));
     }
@@ -137,7 +137,7 @@ public class Stream {
     return singleActivity;
   }
 
-  public Map<String, String> getClientData() {
+  public Map<String, Object> getClientData() {
     return clientData;
   }
 
@@ -165,5 +165,48 @@ public class Stream {
     return modifiedBy;
   }
 
+  public void setId(String pId) {
+    this.id = pId;
+  }
+
+  public void setName(String pName) {
+    this.name = pName;
+  }
+
+  public void setParentId(String pParentId) {
+    this.parentId = pParentId;
+  }
+
+  public void setSingleActivity(Boolean pSingleActivity) {
+    this.singleActivity = pSingleActivity;
+  }
+
+  public void setClientData(Map<String, Object> pClientData) {
+    this.clientData = pClientData;
+  }
+
+  public void setChildren(List<Stream> pChildren) {
+    this.children = pChildren;
+  }
+
+  public void setTrashed(Boolean pTrashed) {
+    this.trashed = pTrashed;
+  }
+
+  public void setCreated(long pCreated) {
+    this.created = pCreated;
+  }
+
+  public void setCreatedBy(String pCreatedBy) {
+    this.createdBy = pCreatedBy;
+  }
+
+  public void setModified(long pModified) {
+    this.modified = pModified;
+  }
+
+  public void setModifiedBy(String pModifiedBy) {
+    this.modifiedBy = pModifiedBy;
+  }
 
 }

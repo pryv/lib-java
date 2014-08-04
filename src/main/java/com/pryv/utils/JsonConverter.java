@@ -26,6 +26,9 @@ public class JsonConverter {
   private static ObjectMapper jsonMapper = new ObjectMapper();
   private static Cloner cloner = new Cloner();
 
+  private final static String EVENTS_KEY = "events";
+  private final static String STREAMS_KEY = "streams";
+
   public static String toJson(Object source) throws JsonProcessingException {
     return jsonMapper.writeValueAsString(source);
   }
@@ -36,7 +39,7 @@ public class JsonConverter {
 
   public static Map<String, Event> createEventsFromJson(String jsonEventsArray)
     throws JsonParseException, JsonMappingException, IOException {
-    JsonNode arrNode = new ObjectMapper().readTree(jsonEventsArray).get("events");
+    JsonNode arrNode = fromJson(jsonEventsArray).get(EVENTS_KEY);
     Map<String, Event> newEvents = new HashMap<String, Event>();
     if (arrNode.isArray()) {
       for (final JsonNode objNode : arrNode) {
@@ -48,6 +51,26 @@ public class JsonConverter {
     }
 
     return newEvents;
+  }
+
+  public static Map<String, Stream> createStreamsFromJson(String jsonStreamsArray)
+    throws JsonProcessingException, IOException {
+
+    JsonNode arrNode = fromJson(jsonStreamsArray).get(STREAMS_KEY);
+    Map<String, Stream> newStreams = new HashMap<String, Stream>();
+    if (arrNode.isArray()) {
+      System.out.println("streams: " + arrNode.size());
+      for (final JsonNode objNode : arrNode) {
+        // resetStreamFromJson(objNode.toString(), streamToAdd);
+        String str = objNode.toString();
+        System.out.println("deserializing: " + str);
+        Stream streamToAdd = jsonMapper.readValue(str, Stream.class);
+        newStreams.put(streamToAdd.getId(), streamToAdd);
+        System.out.println("stream created: id = " + streamToAdd.getId());
+      }
+    }
+
+    return newStreams;
   }
 
   public static void updateAttachmentFromJson(String json, Attachment toUpdate)
@@ -74,10 +97,21 @@ public class JsonConverter {
     toUpdate.merge(temp, cloner);
   }
 
-  public static void updateStreamFromJson(String json, Stream toUpdate) throws JsonParseException,
+  /**
+   * reset all fields of Stream toUpdate to values retrieved from JSON glossary
+   * json
+   *
+   * @param json
+   * @param toUpdate
+   * @throws JsonParseException
+   * @throws JsonMappingException
+   * @throws IOException
+   */
+  public static void resetStreamFromJson(String json, Stream toUpdate) throws JsonParseException,
     JsonMappingException, IOException {
-    Stream temp = jsonMapper.readValue(json, Stream.class);
-    toUpdate.merge(temp, cloner);
+    toUpdate = jsonMapper.readValue(json, Stream.class);
+    // Stream temp = jsonMapper.readValue(json, Stream.class);
+    // toUpdate.merge(temp, cloner);
   }
 
   public static Cloner getCloner() {

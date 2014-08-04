@@ -18,10 +18,8 @@ import com.pryv.Connection;
  *
  */
 public class AuthBrowserView extends Applet implements AuthView {
-  private AuthController controller;
 
-  public AuthBrowserView(AuthController pController) {
-    controller = pController;
+  public AuthBrowserView() {
   }
 
   public static void openWebpage(URI uri) {

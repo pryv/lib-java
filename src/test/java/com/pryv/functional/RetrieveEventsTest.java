@@ -36,7 +36,7 @@ public class RetrieveEventsTest {
    * test fetching of events
    */
   public void testFetchEvents() {
-    connection.get();
+    connection.getEvents();
   }
 
 }

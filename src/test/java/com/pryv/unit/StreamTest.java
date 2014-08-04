@@ -37,7 +37,7 @@ public class StreamTest {
   private final String name = "testStream";
   private final String parentId = "ABC";
   private final Boolean singleActivity = true;
-  private final Map<String, String> clientData = new HashMap<String, String>();
+  private final Map<String, Object> clientData = new HashMap<String, Object>();
   private final String clientKey = "testKey";
   private final String clientValue = "testValue";
   private final List<Stream> children = new ArrayList<Stream>();
@@ -95,7 +95,7 @@ public class StreamTest {
     Stream streamToUpdate = new Stream();
     Stream baseStreamRef = streamToUpdate;
     try {
-      JsonConverter.updateStreamFromJson(jsonStream, streamToUpdate);
+      JsonConverter.resetStreamFromJson(jsonStream, streamToUpdate);
       assertTrue(baseStreamRef == streamToUpdate);
       assertTrue(streamToUpdate.getId().equals(testStream.getId()));
       assertTrue(streamToUpdate.getName().equals(testStream.getName()));
