@@ -1,5 +1,6 @@
 package com.pryv.functional;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
@@ -36,7 +37,7 @@ public class RetrieveEventsTest {
    * test fetching of events
    */
   public void testFetchEvents() {
-    connection.getEvents();
+    connection.getEvents(new HashMap<String, String>());
   }
 
 }

@@ -4,21 +4,26 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Callback;
 
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 
-public class StreamsController {
+public class AppController {
   @FXML
   private TableView<Stream> streamsTable;
   @FXML
   private TableColumn<Stream, String> idColumn;
   @FXML
   private TableColumn<Stream, String> nameColumn;
+
+  @FXML
+  private ListView<Stream> streamsList;
 
   @FXML
   private ListView<Event> eventsList;
@@ -46,7 +51,7 @@ public class StreamsController {
   /**
    * The constructor. The constructor is called before the initialize() method.
    */
-  public StreamsController() {
+  public AppController() {
   }
 
   /**
@@ -58,6 +63,46 @@ public class StreamsController {
     // Initialize the person table
     idColumn.setCellValueFactory(new PropertyValueFactory<Stream, String>("id"));
     nameColumn.setCellValueFactory(new PropertyValueFactory<Stream, String>("name"));
+    // streamsList.setCellFactory(new Callback<ListView<Stream>,
+    // ListCell<Stream>>() {
+    //
+    // public ListCell<Stream> call(ListView<Stream> p) {
+    //
+    // ListCell<Stream> cell = new ListCell<Stream>() {
+    //
+    // @Override
+    // protected void updateItem(Stream t, boolean bln) {
+    // super.updateItem(t, bln);
+    // if (t != null) {
+    // setText(t.getName());
+    // }
+    // }
+    //
+    // };
+    //
+    // return cell;
+    // }
+    // });
+
+    eventsList.setCellFactory(new Callback<ListView<Event>, ListCell<Event>>() {
+
+      public ListCell<Event> call(ListView<Event> p) {
+
+        ListCell<Event> cell = new ListCell<Event>() {
+
+          @Override
+          protected void updateItem(Event t, boolean bln) {
+            super.updateItem(t, bln);
+            if (t != null) {
+              setText(t.getId());
+            }
+          }
+
+        };
+
+        return cell;
+      }
+    });
 
     streamsTable.getSelectionModel().selectedItemProperty()
       .addListener(new ChangeListener<Stream>() {
@@ -73,11 +118,14 @@ public class StreamsController {
     idLabel.setText(stream.getId());
     nameLabel.setText(stream.getName());
     parentIdLabel.setText(stream.getParentId());
-    String childrenIDs = "";
+    StringBuilder sb = new StringBuilder();
+    String separator = "";
     for (Stream child : stream.getChildren()) {
-      childrenIDs = childrenIDs + child.getId() + ", ";
+      sb.append(separator);
+      sb.append(child.getId());
+      separator = ", ";
     }
-    // childrenIDs.substring(0, childrenIDs.length() - 2);
+    String childrenIDs = sb.toString();
     childrenLabel.setText(childrenIDs);
     singleActivityLabel.setText(String.valueOf(stream.getSingleActivity()));
     if (stream.getClientData() != null) {
@@ -85,7 +133,7 @@ public class StreamsController {
     }
     createdLabel.setText(String.valueOf(stream.getCreated()));
     createdByLabel.setText(stream.getCreatedBy());
-
+    exampleApp.getEvents(stream.getId());
   }
 
   /**
@@ -98,5 +146,7 @@ public class StreamsController {
 
     // Add observable list data to the table
     streamsTable.setItems(mainApp.getStreamsData());
+    eventsList.setItems(exampleApp.getEventsList());
+    // streams
   }
 }

@@ -2,6 +2,8 @@ package com.pryv.api.model;
 
 import org.json.JSONObject;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  *
  * Attachment from Pryv API
@@ -9,12 +11,13 @@ import org.json.JSONObject;
  * @author ik
  *
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Attachment implements Cloneable {
 
   private String id;
-  private String filename;
+  private String fileName;
   private String type;
-  private int number;
+  private int size;
   private String readToken;
 
   public Attachment() {
@@ -26,14 +29,14 @@ public class Attachment implements Cloneable {
    * @param pId
    * @param pFilename
    * @param pType
-   * @param pNumber
+   * @param pSize
    * @param pReadToken
    */
-  public Attachment(String pId, String pFilename, String pType, int pNumber, String pReadToken) {
+  public Attachment(String pId, String pFilename, String pType, int pSize, String pReadToken) {
     id = pId;
-    filename = pFilename;
+    fileName = pFilename;
     type = pType;
-    number = pNumber;
+    size = pSize;
     readToken = pReadToken;
   }
 
@@ -45,9 +48,9 @@ public class Attachment implements Cloneable {
   public Attachment(String pJsonAttachmentString) {
     JSONObject jsonAttachment = new JSONObject(pJsonAttachmentString);
     id = jsonAttachment.optString(JsonFields.ID.toString(), "void");
-    filename = jsonAttachment.getString(JsonFields.FILENAME.toString());
+    fileName = jsonAttachment.getString(JsonFields.FILENAME.toString());
     type = jsonAttachment.getString(JsonFields.TYPE.toString());
-    number = jsonAttachment.getInt(JsonFields.NUMBER.toString());
+    size = jsonAttachment.getInt(JsonFields.NUMBER.toString());
     readToken = jsonAttachment.getString(JsonFields.READ_TOKEN.toString());
   }
 
@@ -56,16 +59,16 @@ public class Attachment implements Cloneable {
     return id;
   }
 
-  public String getFilename() {
-    return filename;
+  public String getFileName() {
+    return fileName;
   }
 
   public String getType() {
     return type;
   }
 
-  public int getNumber() {
-    return number;
+  public int getSize() {
+    return size;
   }
 
   public String getReadToken() {
@@ -76,18 +79,18 @@ public class Attachment implements Cloneable {
   public String toJson() {
     JSONObject jsonAttachment = new JSONObject();
     jsonAttachment.putOpt(JsonFields.ID.toString(), id);
-    jsonAttachment.putOpt(JsonFields.FILENAME.toString(), filename);
+    jsonAttachment.putOpt(JsonFields.FILENAME.toString(), fileName);
     jsonAttachment.putOpt(JsonFields.TYPE.toString(), type);
-    jsonAttachment.putOpt(JsonFields.NUMBER.toString(), number);
+    jsonAttachment.putOpt(JsonFields.NUMBER.toString(), size);
     jsonAttachment.putOpt(JsonFields.READ_TOKEN.toString(), readToken);
     return jsonAttachment.toString();
   }
 
   public void merge(Attachment temp) {
     id = temp.getId();
-    filename = temp.getFilename();
+    fileName = temp.getFileName();
     type = temp.getType();
-    number = temp.getNumber();
+    size = temp.getSize();
     readToken = temp.getReadToken();
   }
 

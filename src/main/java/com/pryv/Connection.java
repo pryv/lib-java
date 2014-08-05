@@ -70,26 +70,25 @@ public class Connection implements EventsManager<Map<String, Event>>,
    * Events management
    */
 
-  public void getEvents() {
+  @Override
+  public void getEvents(Map<String, String> params) {
     supervisor.getEvents();
-    cacheEventsManager.getEvents();
+    cacheEventsManager.getEvents(params);
   }
 
-  public void getEvents(Stream stream) {
-    // look in supervisor
-    cacheEventsManager.getEvents(stream);
-  }
-
+  @Override
   public Event createEvent(String id) {
     // TODO Auto-generated method stub
     return null;
   }
 
+  @Override
   public void deleteEvent(String id) {
     // TODO Auto-generated method stub
 
   }
 
+  @Override
   public Event updateEvent(String id) {
     // TODO Auto-generated method stub
     return null;
@@ -99,6 +98,7 @@ public class Connection implements EventsManager<Map<String, Event>>,
    * Events callback
    */
 
+  @Override
   public void onEventsSuccess(Map<String, Event> events) {
     System.out.println("Connection: onSuccess");
     for (String key : events.keySet()) {
@@ -113,11 +113,13 @@ public class Connection implements EventsManager<Map<String, Event>>,
     }
   }
 
+  @Override
   public void onEventsPartialResult(Map<String, Event> newEvents) {
     // TODO Auto-generated method stub
 
   }
 
+  @Override
   public void onEventsError(String message) {
     // TODO Auto-generated method stub
 
@@ -127,20 +129,24 @@ public class Connection implements EventsManager<Map<String, Event>>,
    * Streams management
    */
 
+  @Override
   public List<Stream> getStreams() {
     return streamsManager.getStreams();
   }
 
+  @Override
   public Stream createStream(String id) {
     // TODO Auto-generated method stub
     return null;
   }
 
+  @Override
   public void deleteStream(String id) {
     // TODO Auto-generated method stub
 
   }
 
+  @Override
   public Stream updateStream(String id) {
     // TODO Auto-generated method stub
     return null;
@@ -149,6 +155,7 @@ public class Connection implements EventsManager<Map<String, Event>>,
   /**
    * Streams callback
    */
+  @Override
   public void onStreamsSuccess(Map<String, Stream> streams) {
     supervisor.setStreams(streams);
     for (StreamsCallback<Map<String, Stream>> streamsCallback : streamsCallbackList) {
@@ -156,16 +163,19 @@ public class Connection implements EventsManager<Map<String, Event>>,
     }
   }
 
+  @Override
   public void onStreamsPartialResult(Map newStreams) {
     // TODO Auto-generated method stub
 
   }
 
+  @Override
   public void onStreamsError(String message) {
     // TODO Auto-generated method stub
 
   }
 
+  @Override
   public void addEventsCallback(EventsCallback<Map<String, Event>> eCallback) {
     eventsCallbackList.add(eCallback);
   }
@@ -173,7 +183,5 @@ public class Connection implements EventsManager<Map<String, Event>>,
   public void addStreamsCallback(StreamsCallback<Map<String, Stream>> sCallback) {
     streamsCallbackList.add(sCallback);
   }
-
-
 
 }

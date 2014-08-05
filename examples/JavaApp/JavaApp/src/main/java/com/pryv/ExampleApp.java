@@ -2,10 +2,12 @@ package com.pryv;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -16,6 +18,7 @@ import javafx.stage.Stage;
 
 import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsManager;
+import com.pryv.api.Filter;
 import com.pryv.api.StreamsCallback;
 import com.pryv.api.StreamsManager;
 import com.pryv.api.model.Event;
@@ -29,14 +32,14 @@ import com.pryv.auth.AuthView;
 public class ExampleApp extends Application implements AuthView,
   EventsCallback<Map<String, Event>>, StreamsCallback<Map<String, Stream>> {
 
-  private Stage primaryStage;
-  private BorderPane rootLayout;
-
   private final static String REQUESTING_APP_ID = "web-app-test";
   private EventsManager<Map<String, Event>> eventsManager;
   private StreamsManager streamsManager;
 
+  private Stage primaryStage;
+  private BorderPane rootLayout;
   private ObservableList<Stream> streamsList = FXCollections.observableArrayList();
+  private ObservableList<Event> eventsList = FXCollections.observableArrayList();
 
   @Override
   public void start(Stage primaryStage) {
@@ -88,7 +91,7 @@ public class ExampleApp extends Application implements AuthView,
       rootLayout.setCenter(overviewPage);
 
       // Give the controller access to the main app
-      StreamsController controller = loader.getController();
+      AppController controller = loader.getController();
       controller.setMainApp(this);
 
     } catch (IOException e) {
@@ -104,7 +107,7 @@ public class ExampleApp extends Application implements AuthView,
   public void onStreamsSuccess(Map<String, Stream> streams) {
     System.out.println("JavaApp: onSuccess()");
     for (Stream stream : streams.values()) {
-      System.out.println("id: " + stream.getId());
+      System.out.println("ExampleApp - id: " + stream.getId());
       streamsList.add(stream);
     }
 
@@ -120,8 +123,15 @@ public class ExampleApp extends Application implements AuthView,
 
   }
 
-  public void onEventsSuccess(Map<String, Event> events) {
-    // TODO Auto-generated method stub
+  public void onEventsSuccess(final Map<String, Event> events) {
+    Platform.runLater(new Runnable() {
+
+      public void run() {
+        for (Event event : events.values()) {
+          eventsList.add(event);
+        }
+      }
+    });
 
   }
 
@@ -141,7 +151,6 @@ public class ExampleApp extends Application implements AuthView,
   public void displayLoginVew(String loginURL) {
     new AuthBrowserView().displayLoginVew(loginURL);
   }
-
 
   /**
    * auth success
@@ -188,6 +197,18 @@ public class ExampleApp extends Application implements AuthView,
 
   public ObservableList<Stream> getStreamsData() {
     return streamsList;
+  }
+
+  public ObservableList<Event> getEventsList() {
+    return eventsList;
+  }
+
+  public void getEvents(String streamId) {
+    eventsList.clear();
+    Map<String, String> streams = new HashMap<String, String>();
+    streams.put(Filter.STREAMS_KEY, streamId);
+    eventsManager.getEvents(streams);
+
   }
 
 }

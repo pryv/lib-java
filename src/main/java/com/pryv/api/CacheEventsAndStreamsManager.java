@@ -44,28 +44,28 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
    * Events management
    */
 
-  public void getEvents() {
+  @Override
+  public void getEvents(Map<String, String> params) {
     // look in cache and send it onPartialResult
     dbHelper.getEvents();
     eventsCallback.onEventsPartialResult(new HashMap<String, Event>());
-    onlineEventsManager.getEvents(); // fetch online and compare modified fields
+    onlineEventsManager.getEvents(params); // fetch online and compare modified
+                                           // fields
   }
 
-  public void getEvents(Stream stream) {
-    // look in cache
-    onlineEventsManager.getEvents(stream);
-  }
-
+  @Override
   public Event createEvent(String id) {
     // TODO Auto-generated method stub
     return null;
   }
 
+  @Override
   public void deleteEvent(String id) {
     // TODO Auto-generated method stub
 
   }
 
+  @Override
   public Event updateEvent(String id) {
     // TODO Auto-generated method stub
     return null;
@@ -75,6 +75,7 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
    * Events callback
    */
 
+  @Override
   public void onEventsSuccess(String jsonEvents) {
     System.out.println("cache: onSuccess");
     try {
@@ -89,11 +90,13 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
 
   }
 
+  @Override
   public void onEventsPartialResult(Map<String, Event> newEvents) {
     // TODO Auto-generated method stub
 
   }
 
+  @Override
   public void onEventsError(String message) {
 
   }
@@ -102,22 +105,26 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
    * Streams management
    */
 
+  @Override
   public List<Stream> getStreams() {
     // look in cache?
 
     return onlineStreamsManager.getStreams();
   }
 
+  @Override
   public Stream createStream(String id) {
     // TODO Auto-generated method stub
     return null;
   }
 
+  @Override
   public void deleteStream(String id) {
     // TODO Auto-generated method stub
 
   }
 
+  @Override
   public Stream updateStream(String id) {
     // TODO Auto-generated method stub
     return null;
@@ -127,6 +134,7 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
    * Streams callback
    */
 
+  @Override
   public void onStreamsSuccess(String streams) {
     System.out.println("cache stream success: " + streams);
     try {
@@ -141,11 +149,13 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
     }
   }
 
+  @Override
   public void onStreamsPartialResult(Map<String, Stream> newStreams) {
     // TODO Auto-generated method stub
 
   }
 
+  @Override
   public void onStreamsError(String message) {
     // TODO Auto-generated method stub
     System.out.println("Cache - onStreamError: " + message);
@@ -155,6 +165,7 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
    * other
    */
 
+  @Override
   public void addEventsCallback(EventsCallback<Map<String, Event>> eCallback) {
     // TODO Auto-generated method stub
 

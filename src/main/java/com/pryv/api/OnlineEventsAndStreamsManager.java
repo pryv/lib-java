@@ -2,6 +2,7 @@ package com.pryv.api;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -36,27 +37,40 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
 
   /**
    * Events management
+   *
+   * @throws IllegalAccessException
+   * @throws IllegalArgumentException
    */
 
-  public void getEvents() {
-    System.out.println("fetching events: " + eventsUrl);
-    new FetchEventsThread(null).start();
+  @Override
+  public void getEvents(Map<String, String> params) {
+    StringBuilder sb = new StringBuilder();
+    String separator = "&";
+    for (String key : params.keySet()) {
+      sb.append(separator);
+      sb.append(key + "=" + params.get(key));
+    }
+    new FetchEventsThread(sb.toString()).start();
   }
 
-  public void getEvents(Stream stream) {
-    // JsonConverter.toJson();
+  public void getE(Map<String, String> params) {
+
   }
 
+
+  @Override
   public Event createEvent(String id) {
     // TODO Auto-generated method stub
     return null;
   }
 
+  @Override
   public void deleteEvent(String id) {
     // TODO Auto-generated method stub
 
   }
 
+  @Override
   public Event updateEvent(String id) {
     // TODO Auto-generated method stub
     return null;
@@ -66,6 +80,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
    * Streams management
    */
 
+  @Override
   public List<Stream> getStreams() {
     try {
       Request.Get(streamsUrl).execute().handleResponse(streamsResponseHandler);
@@ -81,6 +96,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
 
   private ResponseHandler<String> streamsResponseHandler = new ResponseHandler<String>() {
 
+    @Override
     public String handleResponse(HttpResponse response) throws ClientProtocolException,
       IOException {
       String textResponse = EntityUtils.toString(response.getEntity());
@@ -90,16 +106,19 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
     }
   };
 
+  @Override
   public Stream createStream(String id) {
     // TODO Auto-generated method stub
     return null;
   }
 
+  @Override
   public void deleteStream(String id) {
     // TODO Auto-generated method stub
 
   }
 
+  @Override
   public Stream updateStream(String id) {
     // TODO Auto-generated method stub
     return null;
@@ -112,7 +131,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
    *
    */
   private class FetchEventsThread extends Thread {
-    private String params;
+    private String params = "";
 
     public FetchEventsThread(String pParams) {
       params = pParams;
@@ -120,8 +139,10 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
 
     @Override
     public void run() {
+      System.out.println("fetching events: " + eventsUrl + params);
       try {
-        Request.Get(eventsUrl).execute().handleResponse(eventsResponseHandler);
+        Request.Get(eventsUrl + params).execute()
+          .handleResponse(eventsResponseHandler);
       } catch (ClientProtocolException e) {
         eventsCallback.onEventsError(e.getMessage());
         e.printStackTrace();
@@ -134,6 +155,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
 
   private ResponseHandler<String> eventsResponseHandler = new ResponseHandler<String>() {
 
+    @Override
     public String handleResponse(HttpResponse reply) throws ClientProtocolException, IOException {
       String response = EntityUtils.toString(reply.getEntity());
       System.out.println("received: " + response);
@@ -146,6 +168,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
    * other
    */
 
+  @Override
   public void addEventsCallback(EventsCallback<String> eCallback) {
     // TODO Auto-generated method stub
 

@@ -32,9 +32,9 @@ public class AttachmentTest {
   @Test
   public void testCreateAttachmentWithParams() {
     assertEquals(id, attachment.getId());
-    assertEquals(filename, attachment.getFilename());
+    assertEquals(filename, attachment.getFileName());
     assertEquals(type, attachment.getType());
-    assertEquals(number, attachment.getNumber());
+    assertEquals(number, attachment.getSize());
     assertEquals(readToken, attachment.getReadToken());
   }
 
@@ -49,9 +49,9 @@ public class AttachmentTest {
     Attachment attachmentFromJson = new Attachment(jsonAttachment.toString());
 
     assertEquals(id, attachmentFromJson.getId());
-    assertEquals(filename, attachmentFromJson.getFilename());
+    assertEquals(filename, attachmentFromJson.getFileName());
     assertEquals(type, attachmentFromJson.getType());
-    assertEquals(number, attachmentFromJson.getNumber());
+    assertEquals(number, attachmentFromJson.getSize());
     assertEquals(readToken, attachmentFromJson.getReadToken());
   }
 
