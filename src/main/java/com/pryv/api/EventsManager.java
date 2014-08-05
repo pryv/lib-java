@@ -1,6 +1,7 @@
 package com.pryv.api;
 
 import com.pryv.api.model.Event;
+import com.pryv.api.model.Stream;
 
 /**
  *
@@ -18,9 +19,15 @@ public interface EventsManager<T> {
    * retrieve events
    *
    * @param id
-   * @return
    */
   void getEvents();
+
+  /**
+   * retrieve events of a particular Stream
+   *
+   * @param stream
+   */
+  void getEvents(Stream stream);
 
   Event createEvent(String id);
 

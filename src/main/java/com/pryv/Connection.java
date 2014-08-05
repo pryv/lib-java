@@ -75,6 +75,11 @@ public class Connection implements EventsManager<Map<String, Event>>,
     cacheEventsManager.getEvents();
   }
 
+  public void getEvents(Stream stream) {
+    // look in supervisor
+    cacheEventsManager.getEvents(stream);
+  }
+
   public Event createEvent(String id) {
     // TODO Auto-generated method stub
     return null;

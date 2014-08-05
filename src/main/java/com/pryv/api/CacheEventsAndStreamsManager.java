@@ -51,6 +51,11 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
     onlineEventsManager.getEvents(); // fetch online and compare modified fields
   }
 
+  public void getEvents(Stream stream) {
+    // look in cache
+    onlineEventsManager.getEvents(stream);
+  }
+
   public Event createEvent(String id) {
     // TODO Auto-generated method stub
     return null;

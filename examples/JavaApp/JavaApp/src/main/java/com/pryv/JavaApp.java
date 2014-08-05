@@ -67,7 +67,7 @@ public class JavaApp extends Application implements AuthView, EventsCallback<Map
   }
 
   /**
-   * 3rd
+   *
    */
   public void displayLoginVew(String loginURL) {
     new AuthBrowserView().displayLoginVew(loginURL);

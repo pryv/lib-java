@@ -40,7 +40,11 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
 
   public void getEvents() {
     System.out.println("fetching events: " + eventsUrl);
-    new FetchEventsThread().start();
+    new FetchEventsThread(null).start();
+  }
+
+  public void getEvents(Stream stream) {
+    // JsonConverter.toJson();
   }
 
   public Event createEvent(String id) {
@@ -108,6 +112,12 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
    *
    */
   private class FetchEventsThread extends Thread {
+    private String params;
+
+    public FetchEventsThread(String pParams) {
+      params = pParams;
+    }
+
     @Override
     public void run() {
       try {
