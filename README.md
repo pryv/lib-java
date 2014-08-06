@@ -43,10 +43,13 @@ Install [Maven](http://books.sonatype.com/mvnref-book/reference/installation-sec
 
 ## Examples
 
-### ExampleApp
+### Java Demo App
 
-This is a Java demo JavaFX Application.
+This is a Java demo JavaFX Application located in the examples/JavaApp/JavaApp subdirectory.
 
+- `mvn package` to generate the executable JAR.
+
+- `java -jar target/JavaApp-1.0-SNAPSHOT-jar-with-dependencies` to run the JAR.
 
 ## License
 
