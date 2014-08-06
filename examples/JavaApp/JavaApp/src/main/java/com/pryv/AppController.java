@@ -6,24 +6,18 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.TreeCell;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.util.Callback;
 
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 
 public class AppController {
-  @FXML
-  private TableView<Stream> streamsTable;
-  @FXML
-  private TableColumn<Stream, String> idColumn;
-  @FXML
-  private TableColumn<Stream, String> nameColumn;
 
   @FXML
-  private ListView<Stream> streamsList;
+  private TreeView<Stream> streamsTreeView;
 
   @FXML
   private ListView<Event> eventsList;
@@ -60,29 +54,27 @@ public class AppController {
    */
   @FXML
   private void initialize() {
-    // Initialize the person table
-    idColumn.setCellValueFactory(new PropertyValueFactory<Stream, String>("id"));
-    nameColumn.setCellValueFactory(new PropertyValueFactory<Stream, String>("name"));
-    // streamsList.setCellFactory(new Callback<ListView<Stream>,
-    // ListCell<Stream>>() {
-    //
-    // public ListCell<Stream> call(ListView<Stream> p) {
-    //
-    // ListCell<Stream> cell = new ListCell<Stream>() {
-    //
-    // @Override
-    // protected void updateItem(Stream t, boolean bln) {
-    // super.updateItem(t, bln);
-    // if (t != null) {
-    // setText(t.getName());
-    // }
-    // }
-    //
-    // };
-    //
-    // return cell;
-    // }
-    // });
+    streamsTreeView.setShowRoot(false);
+    streamsTreeView.setCellFactory(new Callback<TreeView<Stream>, TreeCell<Stream>>() {
+
+
+      public TreeCell<Stream> call(TreeView<Stream> p) {
+
+        TreeCell<Stream> cell = new TreeCell<Stream>() {
+
+          @Override
+          protected void updateItem(Stream t, boolean bln) {
+            super.updateItem(t, bln);
+            if (t != null) {
+              setText(t.getName());
+            }
+          }
+
+        };
+
+        return cell;
+      }
+    });
 
     eventsList.setCellFactory(new Callback<ListView<Event>, ListCell<Event>>() {
 
@@ -104,17 +96,20 @@ public class AppController {
       }
     });
 
-    streamsTable.getSelectionModel().selectedItemProperty()
-      .addListener(new ChangeListener<Stream>() {
+    streamsTreeView.getSelectionModel().selectedItemProperty()
+      .addListener(new ChangeListener<TreeItem<Stream>>() {
 
-        public void changed(ObservableValue<? extends Stream> observable, Stream oldValue,
-          Stream newValue) {
-          showStreamDetails(newValue);
+        public void changed(ObservableValue<? extends TreeItem<Stream>> observable,
+          TreeItem<Stream> oldValue, TreeItem<Stream> newValue) {
+          showStreamDetails(newValue.getValue());
+
         }
       });
   }
 
   private void showStreamDetails(Stream stream) {
+
+    // stream details
     idLabel.setText(stream.getId());
     nameLabel.setText(stream.getName());
     parentIdLabel.setText(stream.getParentId());
@@ -140,6 +135,8 @@ public class AppController {
     }
     createdLabel.setText(String.valueOf(stream.getCreated()));
     createdByLabel.setText(stream.getCreatedBy());
+
+    // fetch events
     exampleApp.getEvents(stream.getId());
   }
 
@@ -152,8 +149,15 @@ public class AppController {
     this.exampleApp = mainApp;
 
     // Add observable list data to the table
-    streamsTable.setItems(mainApp.getStreamsData());
     eventsList.setItems(exampleApp.getEventsList());
-    // streams
+
+  }
+
+  public void showStreams(TreeItem<Stream> rootStream) {
+    System.out.println("AppController: treeView created");
+    streamsTreeView.setRoot(rootStream);
+    for (TreeItem<Stream> strItem : rootStream.getChildren()) {
+      System.out.println("nodes: " + strItem.getValue().getId());
+    }
   }
 }

@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.TreeItem;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -32,6 +33,8 @@ import com.pryv.auth.AuthView;
 public class ExampleApp extends Application implements AuthView,
   EventsCallback<Map<String, Event>>, StreamsCallback<Map<String, Stream>> {
 
+  private AppController controller;
+
   private final static String REQUESTING_APP_ID = "web-app-test";
   private EventsManager<Map<String, Event>> eventsManager;
   private StreamsManager streamsManager;
@@ -40,6 +43,8 @@ public class ExampleApp extends Application implements AuthView,
   private BorderPane rootLayout;
   private ObservableList<Stream> streamsList = FXCollections.observableArrayList();
   private ObservableList<Event> eventsList = FXCollections.observableArrayList();
+
+  private ObservableList<TreeItem<Stream>> streamTreeItems = FXCollections.observableArrayList();
 
   @Override
   public void start(Stage primaryStage) {
@@ -59,7 +64,6 @@ public class ExampleApp extends Application implements AuthView,
     }
 
     showAuthView();
-    // showStreamsView();
 
     Permission testPermission = new Permission("*", Permission.Level.manage, null);
     List<Permission> permissions = new ArrayList<Permission>();
@@ -83,15 +87,15 @@ public class ExampleApp extends Application implements AuthView,
   /**
    * Shows the person overview scene.
    */
-  public void showStreamsView() {
+  public void showMainView() {
     try {
       // Load the fxml file and set into the center of the main layout
-      FXMLLoader loader = new FXMLLoader(ExampleApp.class.getResource("view/StreamsView.fxml"));
+      FXMLLoader loader = new FXMLLoader(ExampleApp.class.getResource("view/MainView.fxml"));
       AnchorPane overviewPage = (AnchorPane) loader.load();
       rootLayout.setCenter(overviewPage);
 
       // Give the controller access to the main app
-      AppController controller = loader.getController();
+      controller = loader.getController();
       controller.setMainApp(this);
 
     } catch (IOException e) {
@@ -100,18 +104,16 @@ public class ExampleApp extends Application implements AuthView,
     }
   }
 
+  /**
+   * Displays simple view during auth phase.
+   */
   public void showAuthView() {
 
     try {
       FXMLLoader loader =
         new FXMLLoader(ExampleApp.class.getResource("view/AuthenticationView.fxml"));
       BorderPane overviewPage = (BorderPane) loader.load();
-      // FXMLLoader loader = new
-      // FXMLLoader(ExampleApp.class.getResource("view/StreamsView.fxml"));
-      // AnchorPane overviewPage = (AnchorPane) loader.load();
       rootLayout.setCenter(overviewPage);
-      // AppController controller = loader.getController();
-      // controller.setMainApp(this);
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -122,13 +124,30 @@ public class ExampleApp extends Application implements AuthView,
     launch(args);
   }
 
-  public void onStreamsSuccess(Map<String, Stream> streams) {
+  public void onStreamsSuccess(final Map<String, Stream> streams) {
     System.out.println("JavaApp: onSuccess()");
-    for (Stream stream : streams.values()) {
-      System.out.println("ExampleApp - id: " + stream.getId());
-      streamsList.add(stream);
-    }
 
+
+    Platform.runLater(new Runnable() {
+
+      public void run() {
+        TreeItem<Stream> root = new TreeItem<Stream>();
+        root.setExpanded(true);
+        for (Stream stream : streams.values()) {
+          streamsList.add(stream);
+
+          TreeItem<Stream> streamTreeItem = new TreeItem<Stream>(stream);
+          if (stream.getChildren() != null) {
+            for (Stream childStream : stream.getChildren()) {
+              streamTreeItem.getChildren().add(new TreeItem<Stream>(childStream));
+            }
+          }
+          root.getChildren().add(streamTreeItem);
+        }
+        streamTreeItems.add(root);
+        controller.showStreams(root);
+      }
+    });
   }
 
   public void onStreamsPartialResult(Map<String, Stream> newStreams) {
@@ -179,7 +198,7 @@ public class ExampleApp extends Application implements AuthView,
     Platform.runLater(new Runnable() {
 
       public void run() {
-        showStreamsView();
+        showMainView();
       }
     });
     eventsManager = newConnection;
@@ -209,7 +228,7 @@ public class ExampleApp extends Application implements AuthView,
 
   }
 
-  public ObservableList<Stream> getStreamsData() {
+  public ObservableList<Stream> getStreamsList() {
     return streamsList;
   }
 
