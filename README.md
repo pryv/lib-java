@@ -13,3 +13,7 @@ Java and Android library to authorize, authenticate and access Pryv users data.
 ### Build and tests
 
 - `mvn package`
+
+## Examples
+
+- to make the SDK available for other Maven projects, execute `mvn install` at root.
