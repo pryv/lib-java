@@ -58,7 +58,8 @@ public class ExampleApp extends Application implements AuthView,
       e.printStackTrace();
     }
 
-    showStreamsView();
+    showAuthView();
+    // showStreamsView();
 
     Permission testPermission = new Permission("*", Permission.Level.manage, null);
     List<Permission> permissions = new ArrayList<Permission>();
@@ -96,6 +97,24 @@ public class ExampleApp extends Application implements AuthView,
 
     } catch (IOException e) {
       // Exception gets thrown if the fxml file could not be loaded
+      e.printStackTrace();
+    }
+  }
+
+  public void showAuthView() {
+
+    try {
+      FXMLLoader loader =
+        new FXMLLoader(ExampleApp.class.getResource("view/AuthenticationView.fxml"));
+      BorderPane overviewPage = (BorderPane) loader.load();
+      // FXMLLoader loader = new
+      // FXMLLoader(ExampleApp.class.getResource("view/StreamsView.fxml"));
+      // AnchorPane overviewPage = (AnchorPane) loader.load();
+      rootLayout.setCenter(overviewPage);
+      // AppController controller = loader.getController();
+      // controller.setMainApp(this);
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
@@ -157,23 +176,19 @@ public class ExampleApp extends Application implements AuthView,
    */
   public void onDisplaySuccess(Connection newConnection) {
     System.out.println("JavaApp: onSignInSuccess");
-    // Platform.runLater(new Runnable() {
-    //
-    // public void run() {
-    // Scene scene = new Scene(new Group());
-    // Label text = new Label("authentication complete");
-    // text.setAlignment(Pos.CENTER);
-    // scene.setRoot(text);
-    // stage.setScene(scene);
-    // stage.show();
-    // }
-    // });
+
+    Platform.runLater(new Runnable() {
+
+      public void run() {
+        showStreamsView();
+      }
+    });
     eventsManager = newConnection;
     streamsManager = newConnection;
     eventsManager.addEventsCallback(this);
     newConnection.addStreamsCallback(this);
-    // connection.getEvents();
     streamsManager.getStreams();
+    eventsManager.getEvents(null);
   }
 
   /**

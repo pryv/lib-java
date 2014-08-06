@@ -46,9 +46,11 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
   public void getEvents(Map<String, String> params) {
     StringBuilder sb = new StringBuilder();
     String separator = "&";
-    for (String key : params.keySet()) {
-      sb.append(separator);
-      sb.append(key + "=" + params.get(key));
+    if (params != null) {
+      for (String key : params.keySet()) {
+        sb.append(separator);
+        sb.append(key + "=" + params.get(key));
+      }
     }
     new FetchEventsThread(sb.toString()).start();
   }
@@ -56,7 +58,6 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
   public void getE(Map<String, String> params) {
 
   }
-
 
   @Override
   public Event createEvent(String id) {
@@ -141,8 +142,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
     public void run() {
       System.out.println("fetching events: " + eventsUrl + params);
       try {
-        Request.Get(eventsUrl + params).execute()
-          .handleResponse(eventsResponseHandler);
+        Request.Get(eventsUrl + params).execute().handleResponse(eventsResponseHandler);
       } catch (ClientProtocolException e) {
         eventsCallback.onEventsError(e.getMessage());
         e.printStackTrace();

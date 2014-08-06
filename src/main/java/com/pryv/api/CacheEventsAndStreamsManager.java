@@ -49,8 +49,7 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
     // look in cache and send it onPartialResult
     dbHelper.getEvents();
     eventsCallback.onEventsPartialResult(new HashMap<String, Event>());
-    onlineEventsManager.getEvents(params); // fetch online and compare modified
-                                           // fields
+    onlineEventsManager.getEvents(params);
   }
 
   @Override

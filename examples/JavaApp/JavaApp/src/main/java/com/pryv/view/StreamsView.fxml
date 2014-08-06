@@ -17,7 +17,14 @@
                       <TableColumn fx:id="nameColumn" minWidth="6.0" prefWidth="214.0" text="name" />
                     </columns>
                   </TableView>
-                  <Label layoutX="35.0" layoutY="14.0" prefHeight="26.0" prefWidth="112.0" text="Streams" />
+                  <Label layoutX="35.0" layoutY="14.0" prefHeight="26.0" prefWidth="112.0" text="Streams:" />
+                  <HBox layoutX="310.0" layoutY="8.0" spacing="10.0">
+                     <children>
+                        <Button layoutX="46.0" layoutY="348.0" mnemonicParsing="false" text="New" />
+                        <Button layoutX="126.0" layoutY="348.0" mnemonicParsing="false" text="Edit" />
+                        <Button layoutX="203.0" layoutY="348.0" mnemonicParsing="false" text="Delete" />
+                     </children>
+                  </HBox>
                </children>
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
@@ -57,14 +64,8 @@
                         <Label fx:id="idLabel" text="label" GridPane.columnIndex="1" />
                      </children>
                   </GridPane>
-                  <HBox layoutX="253.0" layoutY="348.0" spacing="10.0">
-                     <children>
-                        <Button layoutX="46.0" layoutY="348.0" mnemonicParsing="false" text="New" />
-                        <Button layoutX="126.0" layoutY="348.0" mnemonicParsing="false" text="Edit" />
-                        <Button layoutX="203.0" layoutY="348.0" mnemonicParsing="false" text="Delete" />
-                     </children>
-                  </HBox>
-                  <ListView fx:id="eventsList" layoutX="30.0" layoutY="400.0" prefHeight="361.0" prefWidth="396.0" />
+                  <ListView fx:id="eventsList" layoutX="30.0" layoutY="414.0" prefHeight="361.0" prefWidth="396.0" />
+                  <Label layoutX="36.0" layoutY="373.0" text="Events:" />
                </children>
             </AnchorPane>
         </items>
