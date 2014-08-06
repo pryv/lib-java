@@ -47,6 +47,10 @@ Install [Maven](http://books.sonatype.com/mvnref-book/reference/installation-sec
 
 This is a Java demo JavaFX Application located in the examples/JavaApp/JavaApp subdirectory.
 
+This App connects to the "web-app-test" application, requiring permissions to access all streams with "manage" level. After a successful login, the app allows to manipulate Streams and Events in a simple way.
+
+to run it:
+
 - `mvn package` to generate the executable JAR.
 
 - `java -jar target/JavaApp-1.0-SNAPSHOT-jar-with-dependencies` to run the JAR.
