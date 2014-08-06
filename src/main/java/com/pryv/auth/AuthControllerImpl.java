@@ -43,17 +43,20 @@ public class AuthControllerImpl implements AuthController {
   }
 
   public AuthControllerImpl(String pRequestingAppId, List<Permission> pPermissions, String pLang,
-    String pReturnURL) {
+    String pReturnURL, AuthView pView) {
     requestingAppId = pRequestingAppId;
     permissions = pPermissions;
     language = pLang;
     returnURL = pReturnURL;
+    view = pView;
   }
 
+  @Override
   public void setView(AuthView pView) {
     view = pView;
   }
 
+  @Override
   public void signIn() {
     model = new AuthModelImpl(this, requestingAppId, permissions, language, returnURL);
     try {
@@ -67,12 +70,14 @@ public class AuthControllerImpl implements AuthController {
     }
   }
 
+  @Override
   public void onSuccess(Connection newConnection) {
     state = State.ACCEPTED;
     view.onDisplaySuccess(newConnection);
     // acquire ref to new Connection, instanciated
   }
 
+  @Override
   public void onFailure(int errorId, String jsonMessage, String detail) {
     state = State.REFUSED;
     System.out.println("failure: id=" + errorId + ", message=" + jsonMessage);
@@ -84,6 +89,7 @@ public class AuthControllerImpl implements AuthController {
     return state;
   }
 
+  @Override
   public void displayLoginView(String url) {
     view.displayLoginVew(url);
   }

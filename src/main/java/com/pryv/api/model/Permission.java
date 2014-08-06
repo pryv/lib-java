@@ -24,8 +24,24 @@ public class Permission {
     defaultName = pDefaultName;
   }
 
+  public Permission() {
+
+  }
+
+  public String getStreamId() {
+    return streamId;
+  }
+
+  public Level getLevel() {
+    return level;
+  }
+
+  public String getDefaultName() {
+    return defaultName;
+  }
+
   /**
-   * represents the requested level of
+   * represents the requested level of Permission
    */
   public enum Level {
     read("read"), contribute("contribute"), manage("manage");
@@ -41,18 +57,6 @@ public class Permission {
       return field;
     }
 
-  }
-
-  public String getStreamId() {
-    return streamId;
-  }
-
-  public Level getLevel() {
-    return level;
-  }
-
-  public String getDefaultName() {
-    return defaultName;
   }
 
 }

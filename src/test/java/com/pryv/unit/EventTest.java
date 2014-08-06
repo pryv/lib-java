@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,7 +19,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pryv.api.model.Attachment;
 import com.pryv.api.model.Event;
-import com.pryv.api.model.JsonFields;
 import com.pryv.utils.JsonConverter;
 
 /**
@@ -163,41 +160,7 @@ public class EventTest {
 
   }
 
-  @Test
-  public void testCreateJsonFromEvent() {
-    JSONObject jsonEvent = new JSONObject(jsonTestEvent);
-    assertEquals(id, jsonEvent.get(JsonFields.ID.toString()));
-    assertEquals(type, jsonEvent.get(JsonFields.TYPE.toString()));
-    assertEquals(streamID, jsonEvent.get(JsonFields.STREAM_ID.toString()));
-    assertEquals(time, jsonEvent.getLong(JsonFields.TIME.toString()));
-    assertEquals(duration, jsonEvent.getLong(JsonFields.DURATION.toString()));
-    assertEquals(content, jsonEvent.get(JsonFields.CONTENT.toString()));
-    assertEquals(description, jsonEvent.get(JsonFields.DESCRIPTION.toString()));
-    JSONObject cData = (JSONObject) jsonEvent.get(JsonFields.CLIENT_DATA.toString());
-    assertTrue(cData.has(clientKey));
-    assertEquals(clientValue, cData.get(clientKey));
 
-    JSONArray jsonAttachments = jsonEvent.getJSONArray(JsonFields.ATTACHMENTS.toString());
-    List<Attachment> attachs = new ArrayList<Attachment>();
-    for (int i = 0; i < jsonAttachments.length(); i++) {
-      attachs.add(new Attachment(jsonAttachments.getJSONObject(i).toString()));
-    }
-
-    JSONArray jsonRefsArray = jsonEvent.getJSONArray(JsonFields.REFERENCES.toString());
-    List<String> refs = new ArrayList<String>();
-    for (int i = 0; i < jsonRefsArray.length(); i++) {
-      refs.add(jsonRefsArray.getString(i));
-    }
-    assertTrue(refs.contains(testReference));
-
-    JSONArray jsonTagsArray = jsonEvent.getJSONArray(JsonFields.TAGS.toString());
-    List<String> tagsList = new ArrayList<String>();
-    for (int i = 0; i < jsonTagsArray.length(); i++) {
-      tagsList.add(jsonTagsArray.getString(i));
-    }
-    assertTrue("test for " + tagTest + " failed", tagsList.contains(tagTest));
-    assertTrue("test for " + tagBasicTest + " failed", tagsList.contains(tagBasicTest));
-  }
 
   @Test
   public void testCreateEventFromJson() {

@@ -109,9 +109,8 @@ public class JsonConverter {
    */
   public static void resetStreamFromJson(String json, Stream toUpdate) throws JsonParseException,
     JsonMappingException, IOException {
-    toUpdate = jsonMapper.readValue(json, Stream.class);
-    // Stream temp = jsonMapper.readValue(json, Stream.class);
-    // toUpdate.merge(temp, cloner);
+    Stream temp = jsonMapper.readValue(json, Stream.class);
+    toUpdate.merge(temp, cloner);
   }
 
   public static Cloner getCloner() {

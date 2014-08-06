@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import com.rits.cloning.Cloner;
 
 /**
@@ -46,56 +43,6 @@ public class Stream {
     modified = pModified;
     modifiedBy = pModifiedBy;
   }
-
-  /**
-   * Construct a Stream from a JSON
-   *
-   * @param pJsonStream
-   */
-  public Stream(String pJsonStream) {
-    JSONObject jsonStream = new JSONObject(pJsonStream);
-    id = jsonStream.getString(JsonFields.ID.toString());
-    name = jsonStream.optString(JsonFields.NAME.toString());
-    parentId = jsonStream.optString(JsonFields.PARENT_ID.toString());
-    singleActivity = jsonStream.optBoolean(JsonFields.SINGLE_ACTIVITY.toString());
-    JSONObject jsonClientData = jsonStream.optJSONObject(JsonFields.CLIENT_DATA.toString());
-    if (jsonClientData != null) {
-      String cdKey = (String) jsonClientData.keySet().toArray()[0];
-      clientData = new HashMap<String, Object>();
-      clientData.put(cdKey, jsonClientData.optString(cdKey));
-    }
-    JSONArray jsonChildren = jsonStream.optJSONArray(JsonFields.CHILDREN.toString());
-    if (jsonChildren != null) {
-      children = new ArrayList<Stream>();
-      for (int i = 0; i < jsonChildren.length(); i++) {
-        children.add(new Stream(jsonChildren.optJSONObject(i).toString()));
-      }
-    }
-    trashed = jsonStream.optBoolean(JsonFields.TRASHED.toString());
-    created = jsonStream.optLong(JsonFields.CREATED.toString());
-    createdBy = jsonStream.optString(JsonFields.CREATED_BY.toString());
-    modified = jsonStream.optLong(JsonFields.MODIFIED.toString());
-    modifiedBy = jsonStream.optString(JsonFields.MODIFIED_BY.toString());
-  }
-
-  //
-  // public String toJson() {
-  // JSONObject jsonStream = new JSONObject();
-  // jsonStream.put(JsonFields.ID.toString(), id);
-  // jsonStream.put(JsonFields.NAME.toString(), name);
-  // jsonStream.putOpt(JsonFields.PARENT_ID.toString(), parentId);
-  // jsonStream.putOpt(JsonFields.SINGLE_ACTIVITY.toString(), singleActivity);
-  // jsonStream.putOpt(JsonFields.CLIENT_DATA.toString(), new
-  // JSONObject(clientData));
-  // JSONArray jsonChildren = new JSONArray(children);
-  // jsonStream.putOpt(JsonFields.CHILDREN.toString(), jsonChildren);
-  // jsonStream.putOpt(JsonFields.TRASHED.toString(), trashed);
-  // jsonStream.putOpt(JsonFields.CREATED.toString(), created);
-  // jsonStream.putOpt(JsonFields.CREATED_BY.toString(), createdBy);
-  // jsonStream.putOpt(JsonFields.MODIFIED.toString(), modified);
-  // jsonStream.putOpt(JsonFields.MODIFIED_BY.toString(), modifiedBy);
-  // return jsonStream.toString();
-  // }
 
   public Stream() {
   }

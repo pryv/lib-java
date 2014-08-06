@@ -41,7 +41,8 @@ public class AuthenticationTest {
   @Test
   public void testStartLoginAndPoll() {
     Pryv.setStaging();
-    AuthControllerImpl authenticator = new AuthControllerImpl(reqAppId, permissions, lang, returnURL);
+    AuthControllerImpl authenticator =
+      new AuthControllerImpl(reqAppId, permissions, lang, returnURL, new FakeAuthView());
     authenticator.signIn();
   }
 
