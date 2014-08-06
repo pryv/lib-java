@@ -129,7 +129,14 @@ public class AppController {
     childrenLabel.setText(childrenIDs);
     singleActivityLabel.setText(String.valueOf(stream.getSingleActivity()));
     if (stream.getClientData() != null) {
-      clientDataLabel.setText(stream.getClientData().keySet().toString());
+      sb.setLength(0);
+      separator = "";
+      for (String key : stream.getClientData().keySet()) {
+        sb.append(separator);
+        separator = ", ";
+        sb.append(key + ": " + stream.getClientData().get(key));
+      }
+      clientDataLabel.setText(sb.toString());
     }
     createdLabel.setText(String.valueOf(stream.getCreated()));
     createdByLabel.setText(stream.getCreatedBy());

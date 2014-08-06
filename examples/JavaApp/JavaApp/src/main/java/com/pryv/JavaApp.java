@@ -60,8 +60,7 @@ public class JavaApp extends Application implements AuthView, EventsCallback<Map
     stage.show();
 
     AuthController authenticator =
-      new AuthControllerImpl(REQUESTING_APP_ID, permissions, "en", "");
-    authenticator.setView(this);
+      new AuthControllerImpl(REQUESTING_APP_ID, permissions, "en", "", this);
     authenticator.signIn();
 
   }

@@ -66,8 +66,7 @@ public class ExampleApp extends Application implements AuthView,
     permissions.add(testPermission);
 
     AuthController authenticator =
-      new AuthControllerImpl(REQUESTING_APP_ID, permissions, "en", "");
-    authenticator.setView(this);
+      new AuthControllerImpl(REQUESTING_APP_ID, permissions, "en", "", this);
     authenticator.signIn();
 
   }
