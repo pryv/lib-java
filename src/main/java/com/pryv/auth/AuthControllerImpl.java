@@ -35,24 +35,37 @@ public class AuthControllerImpl implements AuthController {
   private AuthView view;
   private AuthModel model;
   // optional
-  private String language;
-  private String returnURL;
+  private String language = "en";
+  private String returnURL = "";
 
   public AuthControllerImpl() {
 
   }
 
+  /**
+   *
+   * @param pRequestingAppId
+   *          Your app's identifier
+   * @param pPermissions
+   *          Array of permission request objects
+   * @param pLang
+   *          optional: The two-letter ISO (639-1) code of the language in which
+   *          to display user instructions, if possible. Default: en.
+   * @param pReturnURL
+   *          optional: The URL to redirect the user to after auth completes
+   * @param pView
+   *          the view in which the URL for login is dislpayed
+   */
   public AuthControllerImpl(String pRequestingAppId, List<Permission> pPermissions, String pLang,
     String pReturnURL, AuthView pView) {
     requestingAppId = pRequestingAppId;
     permissions = pPermissions;
-    language = pLang;
-    returnURL = pReturnURL;
-    view = pView;
-  }
-
-  @Override
-  public void setView(AuthView pView) {
+    if (pLang != null) {
+      language = pLang;
+    }
+    if (pReturnURL != null) {
+      returnURL = pReturnURL;
+    }
     view = pView;
   }
 

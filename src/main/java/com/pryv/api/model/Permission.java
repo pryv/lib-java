@@ -18,6 +18,16 @@ public class Permission {
   private Level level;
   private String defaultName; // only used when requesting permission
 
+  /**
+   *
+   *
+   * @param pStreamId
+   *          id of requested Stream, use "*" for all Streams
+   * @param pLevel
+   *          The required permission level
+   * @param pDefaultName
+   *          optional: The name to create the Stream if needed
+   */
   public Permission(String pStreamId, Level pLevel, String pDefaultName) {
     streamId = pStreamId;
     level = pLevel;
