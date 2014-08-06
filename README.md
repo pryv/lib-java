@@ -4,7 +4,9 @@ Java and Android library to authorize, authenticate and access Pryv users data a
 
 ## Usage
 
-### Maven Project
+### imports
+
+#### Maven Project
 
 ```
 <dependency>
@@ -16,9 +18,20 @@ Java and Android library to authorize, authenticate and access Pryv users data a
 
 If the library is not yet deployed to the remote repository, you first need to install Maven and execute `mvn install`.
 
-### JAR
+#### JAR
 
 After running `mvn package`, include the `lib-java-1.0-SNAPSHOT-jar-with-dependencies.jar` file in your classpath.
+
+### Examples
+
+```
+// connect to the API
+
+Permission testPermission = new Permission("*", Permission.Level.manage, null);
+List<Permission> permissions = new ArrayList<Permission>();
+    
+AuthController authenticator = new AuthControllerImpl(REQUESTING_APP_ID, permissions, null, null, this);
+```
 
 
 ## Contribute
