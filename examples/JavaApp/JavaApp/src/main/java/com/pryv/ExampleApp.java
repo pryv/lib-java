@@ -41,7 +41,6 @@ public class ExampleApp extends Application implements AuthView,
 
   private Stage primaryStage;
   private BorderPane rootLayout;
-  private ObservableList<Stream> streamsList = FXCollections.observableArrayList();
   private ObservableList<Event> eventsList = FXCollections.observableArrayList();
 
   private ObservableList<TreeItem<Stream>> streamTreeItems = FXCollections.observableArrayList();
@@ -134,7 +133,6 @@ public class ExampleApp extends Application implements AuthView,
         TreeItem<Stream> root = new TreeItem<Stream>();
         root.setExpanded(true);
         for (Stream stream : streams.values()) {
-          streamsList.add(stream);
 
           TreeItem<Stream> streamTreeItem = new TreeItem<Stream>(stream);
           if (stream.getChildren() != null) {
@@ -226,10 +224,6 @@ public class ExampleApp extends Application implements AuthView,
     // }
     // });
 
-  }
-
-  public ObservableList<Stream> getStreamsList() {
-    return streamsList;
   }
 
   public ObservableList<Event> getEventsList() {

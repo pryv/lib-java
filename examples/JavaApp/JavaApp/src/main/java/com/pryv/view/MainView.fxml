@@ -24,8 +24,8 @@
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="798.0" prefWidth="523.0">
                <children>
-                  <Label layoutX="36.0" layoutY="33.0" prefHeight="13.0" prefWidth="64.0" text="Details:" />
-                  <GridPane layoutX="28.0" layoutY="116.0" prefHeight="138.0" prefWidth="538.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="50.0">
+                  <Label layoutX="36.0" layoutY="33.0" prefHeight="13.0" prefWidth="64.0" text="Details:" AnchorPane.leftAnchor="35.0" AnchorPane.topAnchor="15.0" />
+                  <GridPane layoutX="28.0" layoutY="116.0" prefHeight="138.0" prefWidth="538.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="40.0">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="186.0" minWidth="10.0" prefWidth="120.0" />
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="265.0" minWidth="10.0" prefWidth="265.0" />
@@ -59,8 +59,8 @@
                         <Label fx:id="idLabel" text="label" GridPane.columnIndex="1" />
                      </children>
                   </GridPane>
-                  <ListView fx:id="eventsList" layoutX="30.0" layoutY="236.0" prefHeight="539.0" prefWidth="425.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
-                  <Label layoutX="36.0" layoutY="209.0" text="Events:" />
+                  <ListView fx:id="eventsList" layoutX="30.0" layoutY="236.0" prefHeight="549.0" prefWidth="457.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+                  <Label layoutX="35.0" layoutY="208.0" text="Events:" AnchorPane.leftAnchor="35.0" />
                </children>
             </AnchorPane>
         </items>
