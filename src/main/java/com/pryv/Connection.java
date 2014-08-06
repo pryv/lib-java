@@ -121,8 +121,9 @@ public class Connection implements EventsManager<Map<String, Event>>,
 
   @Override
   public void onEventsError(String message) {
-    // TODO Auto-generated method stub
-
+    for (EventsCallback<Map<String, Event>> eventsCallback : eventsCallbackList) {
+      eventsCallback.onEventsError(message);
+    }
   }
 
   /**
@@ -171,8 +172,9 @@ public class Connection implements EventsManager<Map<String, Event>>,
 
   @Override
   public void onStreamsError(String message) {
-    // TODO Auto-generated method stub
-
+    for (StreamsCallback<Map<String, Stream>> streamsCallback : streamsCallbackList) {
+      streamsCallback.onStreamsError(message);
+    }
   }
 
   @Override

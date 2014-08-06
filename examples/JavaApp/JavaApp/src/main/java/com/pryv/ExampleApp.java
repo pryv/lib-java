@@ -17,6 +17,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+import org.controlsfx.dialog.Dialogs;
+
 import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsManager;
 import com.pryv.api.Filter;
@@ -126,7 +128,6 @@ public class ExampleApp extends Application implements AuthView,
   public void onStreamsSuccess(final Map<String, Stream> streams) {
     System.out.println("JavaApp: onSuccess()");
 
-
     Platform.runLater(new Runnable() {
 
       public void run() {
@@ -154,8 +155,7 @@ public class ExampleApp extends Application implements AuthView,
   }
 
   public void onStreamsError(String message) {
-    // TODO Auto-generated method stub
-
+    displayError(message);
   }
 
   public void onEventsSuccess(final Map<String, Event> events) {
@@ -176,8 +176,17 @@ public class ExampleApp extends Application implements AuthView,
   }
 
   public void onEventsError(String message) {
-    // TODO Auto-generated method stub
+    displayError(message);
+  }
 
+  private void displayError(final String message) {
+    Platform.runLater(new Runnable() {
+
+      public void run() {
+        Dialogs.create().owner(getPrimaryStage()).title("error").message(message)
+          .showInformation();
+      }
+    });
   }
 
   /**
@@ -212,17 +221,7 @@ public class ExampleApp extends Application implements AuthView,
    */
   public void onDisplayFailure() {
     System.out.println("JavaApp: onDisplayFailure");
-    // Platform.runLater(new Runnable() {
-    //
-    // public void run() {
-    // Scene scene = new Scene(new Group());
-    // Label text = new Label("authentication failed");
-    // text.setAlignment(Pos.CENTER);
-    // scene.setRoot(text);
-    // stage.setScene(scene);
-    // stage.show();
-    // }
-    // });
+    displayError("auth failure");
 
   }
 

@@ -97,7 +97,7 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
 
   @Override
   public void onEventsError(String message) {
-
+    eventsCallback.onEventsError(message);
   }
 
   /**
@@ -156,8 +156,7 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
 
   @Override
   public void onStreamsError(String message) {
-    // TODO Auto-generated method stub
-    System.out.println("Cache - onStreamError: " + message);
+    streamsCallback.onStreamsError(message);
   }
 
   /**
