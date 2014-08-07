@@ -18,6 +18,8 @@ public class Supervisor {
   private Map<String, Event> events;
   private Map<String, Stream> streams;
 
+  private Logger logger = Logger.getInstance();
+
   public Supervisor() {
     events = new HashMap<String, Event>();
     streams = new HashMap<String, Stream>();
@@ -25,7 +27,19 @@ public class Supervisor {
 
   public Map<String, Event> getEvents(Map<String, String> params) {
     // use params
+
+    for (String eventID : events.keySet()) {
+      logger.log("Supervisor: returning event from main memory: " + eventID);
+    }
     return events;
+  }
+
+  public Event getEventById(String id) {
+    return events.get(id);
+  }
+
+  public void addEvent(Event newEvent) {
+    events.put(newEvent.getId(), newEvent);
   }
 
   public Map<String, Stream> getStreams() {

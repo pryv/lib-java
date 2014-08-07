@@ -67,9 +67,14 @@ public class Connection implements EventsManager<Map<String, Event>>,
    * Events management
    */
 
+  /**
+   * wdawdwa
+   */
   @Override
   public void getEvents(Map<String, String> params,
     final EventsCallback<Map<String, Event>> eventsCallback) {
+
+    // send
     eventsCallback.onEventsPartialResult(supervisor.getEvents(params));
 
     cacheEventsManager.getEvents(params, new EventsCallback<Map<String, Event>>() {
@@ -77,18 +82,17 @@ public class Connection implements EventsManager<Map<String, Event>>,
       @Override
       public void onEventsSuccess(Map<String, Event> events) {
         logger.log("Connection: onEventsSuccess");
-        for (String key : events.keySet()) {
-          if (supervisor.getEvents(null).get(key) != null) {
-            supervisor.getEvents(null).get(key).merge(events.get(key), JsonConverter.getCloner());
-          } else {
-            supervisor.getEvents(null).put(key, events.get(key));
-          }
-        }
+
+        // update existing references with JSON received from online
+        updateSupervisor(events);
+
+        // return merged events from main memory
         eventsCallback.onEventsSuccess(supervisor.getEvents(null));
       }
 
       @Override
       public void onEventsPartialResult(Map<String, Event> newEvents) {
+        // add them to Supervisor
         eventsCallback.onEventsPartialResult(newEvents);
       }
 
@@ -97,6 +101,16 @@ public class Connection implements EventsManager<Map<String, Event>>,
         eventsCallback.onEventsError(message);
       }
     });
+  }
+
+  private void updateSupervisor(Map<String, Event> newEvents) {
+    for (String key : newEvents.keySet()) {
+      if (supervisor.getEventById(key) != null) {
+        supervisor.getEventById(key).merge(newEvents.get(key), JsonConverter.getCloner());
+      } else {
+        supervisor.addEvent(newEvents.get(key));
+      }
+    }
   }
 
   @Override

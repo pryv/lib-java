@@ -44,6 +44,7 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
     final EventsCallback<Map<String, Event>> eventsCallback) {
     // look in cache and send it onPartialResult
     dbHelper.getEvents();
+    logger.log("Cache: retrieved Events from cache: ");
     eventsCallback.onEventsPartialResult(new HashMap<String, Event>());
 
     // forward call to online module
@@ -53,7 +54,12 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
       public void onEventsSuccess(String jsonEvents) {
         logger.log("Cache: Events retrieval success");
         try {
-          eventsCallback.onEventsSuccess(JsonConverter.createEventsFromJson(jsonEvents));
+          Map<String, Event> receivedEvents = JsonConverter.createEventsFromJson(jsonEvents);
+          eventsCallback.onEventsSuccess(receivedEvents);
+
+          // update Cache with receivedEvents
+          updateCache(receivedEvents);
+
         } catch (JsonProcessingException e) {
           eventsCallback.onEventsError(e.getMessage());
           e.printStackTrace();
@@ -74,6 +80,10 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
         eventsCallback.onEventsError(message);
       }
     });
+  }
+
+  private void updateCache(Map<String, Event> newEvents) {
+
   }
 
   @Override

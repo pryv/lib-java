@@ -60,11 +60,11 @@ public class JsonConverter {
     JsonNode arrNode = fromJson(jsonStreamsArray).get(STREAMS_KEY);
     Map<String, Stream> newStreams = new HashMap<String, Stream>();
     if (arrNode.isArray()) {
-      logger.log("JsonConverter: streams: " + arrNode.size());
+      logger.log("JsonConverter: number of received streams: " + arrNode.size());
       for (final JsonNode objNode : arrNode) {
         // resetStreamFromJson(objNode.toString(), streamToAdd);
         String str = objNode.toString();
-        logger.log("JsonConverter: deserializing: " + str);
+        logger.log("JsonConverter: deserializing stream: " + str);
         Stream streamToAdd = jsonMapper.readValue(str, Stream.class);
         newStreams.put(streamToAdd.getId(), streamToAdd);
         logger.log("JsonConverter: stream created: id = " + streamToAdd.getId());
