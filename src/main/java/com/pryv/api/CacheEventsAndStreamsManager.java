@@ -55,10 +55,12 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
         logger.log("Cache: Events retrieval success");
         try {
           Map<String, Event> receivedEvents = JsonConverter.createEventsFromJson(jsonEvents);
-          eventsCallback.onEventsSuccess(receivedEvents);
 
           // update Cache with receivedEvents
-          updateCache(receivedEvents);
+          updateEvents(receivedEvents);
+
+          // SEND UPDATED EVENTS FROM CACHE
+          eventsCallback.onEventsSuccess(receivedEvents);
 
         } catch (JsonProcessingException e) {
           eventsCallback.onEventsError(e.getMessage());
@@ -82,9 +84,32 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
     });
   }
 
-  private void updateCache(Map<String, Event> newEvents) {
-
+  /**
+   * Store most recently modified Event in Cache
+   *
+   * @param newEvents
+   *          Events received from online module
+   */
+  private void updateEvents(Map<String, Event> newEvents) {
+    for (Event event : newEvents.values()) {
+      // case exists: compare modified field
+//      if (events.containsKey(event.getId())) {
+//        updateEvent(event);
+      // // case new Event: simply add
+      // } else {
+      // // addEvent(event);
+      // }
+    }
   }
+
+  // private void updateEvent(Event event) {
+  // Event memEvent = events.get(event.getId());
+  // if (memEvent.getModified() > event.getModified()) {
+  // // do nothing
+  // } else {
+  // memEvent.merge(event, JsonConverter.getCloner());
+  // }
+  // }
 
   @Override
   public Event createEvent(String id) {

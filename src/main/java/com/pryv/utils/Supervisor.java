@@ -32,8 +32,10 @@ public class Supervisor {
     if (params.get(Filter.STREAMS_KEY) != null) {
       for (Event event : events.values()) {
         if (event.getStreamId().equals(params.get(Filter.STREAMS_KEY))) {
-          returnEvents.put(event.getId(), event);
-          logger.log("Supervisor: returning event from main memory: " + event.getId());
+          if (event.getTrashed() == false) {
+            returnEvents.put(event.getId(), event);
+            logger.log("Supervisor: returning event from main memory: " + event.getId());
+          }
         }
       }
     }
@@ -60,8 +62,24 @@ public class Supervisor {
     this.streams = pStreams;
   }
 
-  public void addEvents(Map<String, Event> newEvents) {
-    events.putAll(newEvents);
+  public void updateEvents(Map<String, Event> newEvents) {
+    for (Event event : newEvents.values()) {
+      // case exists: compare modified field
+      if (events.containsKey(event.getId())) {
+        updateEvent(event);
+        // case new Event: simply add
+      } else {
+        addEvent(event);
+      }
+    }
   }
 
+  private void updateEvent(Event event) {
+    Event memEvent = events.get(event.getId());
+    if (memEvent.getModified() > event.getModified()) {
+      // do nothing
+    } else {
+      memEvent.merge(event, JsonConverter.getCloner());
+    }
+  }
 }

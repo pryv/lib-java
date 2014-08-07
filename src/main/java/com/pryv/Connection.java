@@ -92,8 +92,8 @@ public class Connection implements EventsManager<Map<String, Event>>,
 
       @Override
       public void onEventsPartialResult(Map<String, Event> newEvents) {
-        // add them to Supervisor
-        eventsCallback.onEventsPartialResult(newEvents);
+        supervisor.updateEvents(newEvents);
+        eventsCallback.onEventsPartialResult(supervisor.getEvents(params));
       }
 
       @Override
