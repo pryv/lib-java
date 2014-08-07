@@ -23,7 +23,7 @@ public class Logger {
    *
    * @return
    */
-  public Logger getInstance() {
+  public static Logger getInstance() {
     return logger;
   }
 
@@ -31,7 +31,7 @@ public class Logger {
    * writes message in the defined PrintStream (system.out by default)
    */
   public void log(String message) {
-    stream.print(message);
+    stream.println(message);
   }
 
   /**
