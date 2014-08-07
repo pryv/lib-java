@@ -150,6 +150,7 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
           Map<String, Stream> streams = JsonConverter.createStreamsFromJson(onlineStreams);
           updateCache(streams);
 
+          // SEND UPDATED STREAMS FROM CACHE
           streamsCallback.onStreamsSuccess(streams);
         } catch (JsonProcessingException e) {
           e.printStackTrace();

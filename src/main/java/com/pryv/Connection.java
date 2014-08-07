@@ -148,6 +148,7 @@ public class Connection implements EventsManager<Map<String, Event>>,
 
       @Override
       public void onStreamsPartialResult(Map<String, Stream> newStreams) {
+        supervisor.updateStreams(newStreams);
         streamsCallback.onStreamsPartialResult(newStreams);
       }
 

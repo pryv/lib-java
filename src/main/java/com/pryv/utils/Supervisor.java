@@ -60,7 +60,28 @@ public class Supervisor {
   }
 
   public void updateStreams(Map<String, Stream> pStreams) {
-    this.streams = pStreams;
+    for (Stream stream : pStreams.values()) {
+      // case exists: compare modified field
+      if (events.containsKey(stream.getId())) {
+        updateStream(stream);
+        // case new Event: simply add
+      } else {
+        addStream(stream);
+      }
+    }
+  }
+
+  private void updateStream(Stream stream) {
+    Stream memStream = streams.get(stream.getId());
+    if (memStream.getModified() > stream.getModified()) {
+      // do nothing
+    } else {
+      memStream.merge(stream, JsonConverter.getCloner());
+    }
+  }
+
+  private void addStream(Stream stream) {
+    streams.put(stream.getId(), stream);
   }
 
   public void updateEvents(Map<String, Event> newEvents) {
