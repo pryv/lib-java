@@ -29,6 +29,7 @@ public class Supervisor {
   public Map<String, Event> getEvents(Map<String, String> params) {
     // use params
     Map<String, Event> returnEvents = new HashMap<String, Event>();
+
     if (params.get(Filter.STREAMS_KEY) != null) {
       for (Event event : events.values()) {
         if (event.getStreamId().equals(params.get(Filter.STREAMS_KEY))) {
