@@ -25,6 +25,7 @@ public class JsonConverter {
 
   private static ObjectMapper jsonMapper = new ObjectMapper();
   private static Cloner cloner = new Cloner();
+  private static Logger logger = Logger.getInstance();
 
   private final static String EVENTS_KEY = "events";
   private final static String STREAMS_KEY = "streams";
@@ -46,7 +47,7 @@ public class JsonConverter {
         Event eventToAdd = new Event();
         resetEventFromJson(objNode.toString(), eventToAdd);
         newEvents.put(eventToAdd.getId(), eventToAdd);
-        System.out.println("event created: id = " + eventToAdd.getId());
+        logger.log("JsonConverter: event created: id = " + eventToAdd.getId());
       }
     }
 
@@ -59,14 +60,14 @@ public class JsonConverter {
     JsonNode arrNode = fromJson(jsonStreamsArray).get(STREAMS_KEY);
     Map<String, Stream> newStreams = new HashMap<String, Stream>();
     if (arrNode.isArray()) {
-      System.out.println("streams: " + arrNode.size());
+      logger.log("JsonConverter: streams: " + arrNode.size());
       for (final JsonNode objNode : arrNode) {
         // resetStreamFromJson(objNode.toString(), streamToAdd);
         String str = objNode.toString();
-        System.out.println("deserializing: " + str);
+        logger.log("JsonConverter: deserializing: " + str);
         Stream streamToAdd = jsonMapper.readValue(str, Stream.class);
         newStreams.put(streamToAdd.getId(), streamToAdd);
-        System.out.println("stream created: id = " + streamToAdd.getId());
+        logger.log("JsonConverter: stream created: id = " + streamToAdd.getId());
       }
     }
 

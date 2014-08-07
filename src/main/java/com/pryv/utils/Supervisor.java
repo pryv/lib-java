@@ -23,7 +23,8 @@ public class Supervisor {
     streams = new HashMap<String, Stream>();
   }
 
-  public Map<String, Event> getEvents() {
+  public Map<String, Event> getEvents(Map<String, String> params) {
+    // use params
     return events;
   }
 

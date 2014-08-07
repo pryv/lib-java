@@ -31,11 +31,13 @@ import com.pryv.auth.AuthBrowserView;
 import com.pryv.auth.AuthController;
 import com.pryv.auth.AuthControllerImpl;
 import com.pryv.auth.AuthView;
+import com.pryv.utils.Logger;
 
 public class ExampleApp extends Application implements AuthView,
   EventsCallback<Map<String, Event>>, StreamsCallback<Map<String, Stream>> {
 
   private AppController controller;
+  private Logger logger = Logger.getInstance();
 
   private final static String REQUESTING_APP_ID = "web-app-test";
   private EventsManager<Map<String, Event>> eventsManager;
@@ -126,7 +128,7 @@ public class ExampleApp extends Application implements AuthView,
   }
 
   public void onStreamsSuccess(final Map<String, Stream> streams) {
-    System.out.println("JavaApp: onSuccess()");
+    logger.log("JavaApp: onSuccess()");
 
     Platform.runLater(new Runnable() {
 
@@ -200,7 +202,7 @@ public class ExampleApp extends Application implements AuthView,
    * auth success
    */
   public void onDisplaySuccess(Connection newConnection) {
-    System.out.println("JavaApp: onSignInSuccess");
+    logger.log("JavaApp: onSignInSuccess");
 
     Platform.runLater(new Runnable() {
 
@@ -210,17 +212,16 @@ public class ExampleApp extends Application implements AuthView,
     });
     eventsManager = newConnection;
     streamsManager = newConnection;
-    eventsManager.addEventsCallback(this);
     newConnection.addStreamsCallback(this);
     streamsManager.getStreams();
-    eventsManager.getEvents(null);
+    eventsManager.getEvents(null, this);
   }
 
   /**
    * auth failure
    */
   public void onDisplayFailure() {
-    System.out.println("JavaApp: onDisplayFailure");
+    logger.log("JavaApp: onDisplayFailure");
     displayError("auth failure");
 
   }
@@ -233,7 +234,7 @@ public class ExampleApp extends Application implements AuthView,
     eventsList.clear();
     Map<String, String> streams = new HashMap<String, String>();
     streams.put(Filter.STREAMS_KEY, streamId);
-    eventsManager.getEvents(streams);
+    eventsManager.getEvents(streams, this);
 
   }
 

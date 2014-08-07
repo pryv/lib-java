@@ -6,6 +6,8 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.fluent.Request;
 
+import com.pryv.utils.Logger;
+
 /**
  *
  * Polling thread that polls the URL for login sequence state.
@@ -17,9 +19,10 @@ public class PollingThread extends Thread {
   private String pollURL;
   private long pollRate;
   private ResponseHandler<String> responseHandler;
+  private Logger logger = Logger.getInstance();
 
   public PollingThread(String url, long rate, ResponseHandler<String> handler) {
-    System.out.println("PollingThread instanciated");
+    logger.log("PollingThread instanciated");
     pollURL = url;
     pollRate = rate;
     responseHandler = handler;
@@ -29,11 +32,12 @@ public class PollingThread extends Thread {
   public void run() {
 
     try {
-      System.out.println("sending poll request on thread: " + Thread.currentThread().getName());
+      logger.log("PollingThread: sending poll request on thread: "
+        + Thread.currentThread().getName());
       sleep(pollRate);
       Request.Get(pollURL).execute().handleResponse(responseHandler);
 
-      System.out.println("PollingThread: polling request sent by thread: "
+      logger.log("PollingThread: polling request sent by thread: "
         + Thread.currentThread().getName());
 
     } catch (ClientProtocolException e) {

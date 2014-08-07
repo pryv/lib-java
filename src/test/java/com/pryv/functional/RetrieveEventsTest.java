@@ -10,6 +10,7 @@ import resources.TestCredentials;
 
 import com.pryv.Connection;
 import com.pryv.Pryv;
+import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsManager;
 import com.pryv.api.model.Event;
 
@@ -37,7 +38,26 @@ public class RetrieveEventsTest {
    * test fetching of events
    */
   public void testFetchEvents() {
-    connection.getEvents(new HashMap<String, String>());
+    connection.getEvents(new HashMap<String, String>(), new EventsCallback<Map<String, Event>>() {
+
+      @Override
+      public void onEventsSuccess(Map<String, Event> events) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void onEventsPartialResult(Map<String, Event> newEvents) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void onEventsError(String message) {
+        // TODO Auto-generated method stub
+
+      }
+    });
   }
 
 }

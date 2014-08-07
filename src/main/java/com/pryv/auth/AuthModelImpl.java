@@ -17,6 +17,7 @@ import com.pryv.Connection;
 import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
 import com.pryv.utils.JsonConverter;
+import com.pryv.utils.Logger;
 
 /**
  *
@@ -30,6 +31,7 @@ public class AuthModelImpl implements AuthModel {
   private AuthController controller;
   private AuthenticationRequest authRequest;
   private Boolean first = true;
+  private Logger logger = Logger.getInstance();
 
   public AuthModelImpl(AuthController pController, String requestingAppId,
     List<Permission> permissions, String language, String returnURL) {
@@ -37,14 +39,15 @@ public class AuthModelImpl implements AuthModel {
     authRequest = new AuthenticationRequest(requestingAppId, permissions, language, returnURL);
   }
 
+  @Override
   public void startLogin() throws ClientProtocolException, IOException {
 
     String jsonRequest;
     try {
       jsonRequest = JsonConverter.toJson(authRequest);
-      System.out.println("start login request: " + jsonRequest);
+      logger.log("AuthController: start login request: " + jsonRequest);
       Request.Post(Pryv.REGISTRATION_URL).bodyString(jsonRequest, ContentType.APPLICATION_JSON)
-        .execute().handleResponse(loginResponseHandler);
+        .execute().handleResponse(signInResponseHandler);
     } catch (JsonProcessingException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -55,7 +58,7 @@ public class AuthModelImpl implements AuthModel {
   /**
    * handles response to initial authorization request and to polling replies
    */
-  private ResponseHandler<String> loginResponseHandler = new ResponseHandler<String>() {
+  private ResponseHandler<String> signInResponseHandler = new ResponseHandler<String>() {
 
     private final static String SERVER_URL_KEY = "url";
     private final static String STATUS_KEY = "status";
@@ -75,32 +78,32 @@ public class AuthModelImpl implements AuthModel {
      * unique class method that retrieves HttpResponse's components and calls
      * the appropriate controller's methods
      */
+    @Override
     public String handleResponse(HttpResponse response) throws ClientProtocolException,
       IOException {
 
       int statusCode = response.getStatusLine().getStatusCode();
       String reply = EntityUtils.toString(response.getEntity());
-      System.out.println("handling reply entity : " + reply);
-      System.out.println("response status code: " + statusCode);
+      logger.log("signInResponseHandler: response status code: " + statusCode);
+      logger.log("signInResponseHandler: handling reply entity : " + reply);
       if (statusCode == HttpStatus.SC_CREATED || statusCode == HttpStatus.SC_OK) {
 
         JsonNode jsonResponse = JsonConverter.fromJson(reply);
 
         if (first) {
-          System.out.println("first if case");
           String loginUrl = jsonResponse.get(SERVER_URL_KEY).textValue();
           controller.displayLoginView(loginUrl);
           first = false;
-          System.out.println("start view of address : \'" + loginUrl + "\'");
+          logger.log("signInResponseHandler: start view of address : \'" + loginUrl + "\'");
         }
         String state = jsonResponse.get(STATUS_KEY).textValue();
-        System.out.println("state retrieved: " + state);
+        logger.log("signInResponseHandler: state retrieved: " + state);
 
         if (state.equals(NEED_SIGNIN_VALUE)) {
           long rate = jsonResponse.get(POLL_RATE_MS_KEY).longValue();
           String pollURL = jsonResponse.get(POLL_URL_KEY).textValue();
-          System.out.println("polling at address: " + pollURL);
-          new PollingThread(pollURL, rate, loginResponseHandler).start();
+          logger.log("signInResponseHandler: polling at address: " + pollURL);
+          new PollingThread(pollURL, rate, signInResponseHandler).start();
 
         } else if (state.equals(ACCEPTED_VALUE)) {
           String username = jsonResponse.get(USERNAME_KEY).textValue();
@@ -118,7 +121,6 @@ public class AuthModelImpl implements AuthModel {
           controller.onFailure(errorId, message, detail);
 
         } else {
-          System.out.println("LoginResponseHandler: state hit the else block");
           controller.onFailure(0, "unknown-error", null);
         }
 

@@ -10,6 +10,7 @@ import com.pryv.api.database.SQLiteDBHelper;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 import com.pryv.utils.JsonConverter;
+import com.pryv.utils.Logger;
 
 /**
  *
@@ -20,22 +21,21 @@ import com.pryv.utils.JsonConverter;
  *
  */
 public class CacheEventsAndStreamsManager implements EventsManager<Map<String, Event>>,
-  EventsCallback<String>, StreamsManager, StreamsCallback<String> {
+  StreamsManager, StreamsCallback<String> {
 
   private EventsManager<String> onlineEventsManager;
-  private EventsCallback<Map<String, Event>> eventsCallback;
 
   private StreamsManager onlineStreamsManager;
   private StreamsCallback<Map<String, Stream>> streamsCallback;
 
   private SQLiteDBHelper dbHelper;
 
+  private Logger logger = Logger.getInstance();
+
   public CacheEventsAndStreamsManager(String url, String token,
-    EventsCallback<Map<String, Event>> pEventsCallback,
     StreamsCallback<Map<String, Stream>> pStreamsCallback) {
-    onlineEventsManager = new OnlineEventsAndStreamsManager(url, token, this, this);
+    onlineEventsManager = new OnlineEventsAndStreamsManager(url, token, this);
     onlineStreamsManager = (StreamsManager) onlineEventsManager;
-    eventsCallback = pEventsCallback;
     streamsCallback = pStreamsCallback;
     dbHelper = new SQLiteDBHelper();
   }
@@ -45,11 +45,40 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
    */
 
   @Override
-  public void getEvents(Map<String, String> params) {
+  public void getEvents(Map<String, String> params,
+    final EventsCallback<Map<String, Event>> eventsCallback) {
     // look in cache and send it onPartialResult
     dbHelper.getEvents();
     eventsCallback.onEventsPartialResult(new HashMap<String, Event>());
-    onlineEventsManager.getEvents(params);
+
+    // forward call to online module
+    onlineEventsManager.getEvents(params, new EventsCallback<String>() {
+
+      @Override
+      public void onEventsSuccess(String jsonEvents) {
+        logger.log("Cache: Events retrieval success");
+        try {
+          eventsCallback.onEventsSuccess(JsonConverter.createEventsFromJson(jsonEvents));
+        } catch (JsonProcessingException e) {
+          this.onEventsError(e.getMessage());
+          e.printStackTrace();
+        } catch (IOException e) {
+          this.onEventsError(e.getMessage());
+          e.printStackTrace();
+        }
+
+      }
+
+      // unused
+      @Override
+      public void onEventsPartialResult(Map<String, Event> newEvents) {
+      }
+
+      @Override
+      public void onEventsError(String message) {
+        eventsCallback.onEventsError(message);
+      }
+    });
   }
 
   @Override
@@ -68,36 +97,6 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
   public Event updateEvent(String id) {
     // TODO Auto-generated method stub
     return null;
-  }
-
-  /**
-   * Events callback
-   */
-
-  @Override
-  public void onEventsSuccess(String jsonEvents) {
-    System.out.println("cache: onSuccess");
-    try {
-      eventsCallback.onEventsSuccess(JsonConverter.createEventsFromJson(jsonEvents));
-    } catch (JsonProcessingException e) {
-      this.onEventsError(e.getMessage());
-      e.printStackTrace();
-    } catch (IOException e) {
-      this.onEventsError(e.getMessage());
-      e.printStackTrace();
-    }
-
-  }
-
-  @Override
-  public void onEventsPartialResult(Map<String, Event> newEvents) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void onEventsError(String message) {
-    eventsCallback.onEventsError(message);
   }
 
   /**
@@ -135,7 +134,7 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
 
   @Override
   public void onStreamsSuccess(String streams) {
-    System.out.println("cache stream success: " + streams);
+    logger.log("Cache: Streams retrieval success");
     try {
       streamsCallback.onStreamsSuccess(JsonConverter.createStreamsFromJson(streams));
     } catch (JsonProcessingException e) {
@@ -157,16 +156,6 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
   @Override
   public void onStreamsError(String message) {
     streamsCallback.onStreamsError(message);
-  }
-
-  /**
-   * other
-   */
-
-  @Override
-  public void addEventsCallback(EventsCallback<Map<String, Event>> eCallback) {
-    // TODO Auto-generated method stub
-
   }
 
 }

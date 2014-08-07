@@ -20,16 +20,14 @@ public interface EventsManager<T> {
    * retrieve events
    *
    * @param params
-   *          optional parameters
+   *          optional filter parameters
    */
-  void getEvents(Map<String, String> params);
+  void getEvents(Map<String, String> params, EventsCallback<T> eventsCallback);
 
   Event createEvent(String id);
 
   void deleteEvent(String id);
 
   Event updateEvent(String id);
-
-  void addEventsCallback(EventsCallback<T> eCallback);
 
 }

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.pryv.api.model.Event;
+import com.pryv.utils.Logger;
 
 /**
  *
@@ -24,6 +25,8 @@ public class SQLiteDBHelper {
   private Connection dbConnection;
   private Statement statement;
 
+  private Logger logger = Logger.getInstance();
+
   private List<String> eventFields;
 
   private List<String> streamFields;
@@ -36,7 +39,7 @@ public class SQLiteDBHelper {
     try {
       Class.forName("org.sqlite.JDBC");
       dbConnection = DriverManager.getConnection("jdbc:sqlite:sqlite-db/test.db");
-      System.out.println("Opened database successfully");
+      logger.log("Opened database successfully");
 
       statement = dbConnection.createStatement();
 

@@ -12,6 +12,7 @@ import com.pryv.api.StreamsManager;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 import com.pryv.utils.JsonConverter;
+import com.pryv.utils.Logger;
 import com.pryv.utils.Supervisor;
 
 /**
@@ -21,8 +22,8 @@ import com.pryv.utils.Supervisor;
  * @author ik
  *
  */
-public class Connection implements EventsManager<Map<String, Event>>,
-  EventsCallback<Map<String, Event>>, StreamsManager, StreamsCallback<Map<String, Stream>> {
+public class Connection implements EventsManager<Map<String, Event>>, StreamsManager,
+  StreamsCallback<Map<String, Stream>> {
 
   private String username;
   private String token;
@@ -32,17 +33,17 @@ public class Connection implements EventsManager<Map<String, Event>>,
   private EventsManager<Map<String, Event>> cacheEventsManager;
   private StreamsManager streamsManager;
   private Supervisor supervisor;
-  private List<EventsCallback<Map<String, Event>>> eventsCallbackList;
   private List<StreamsCallback<Map<String, Stream>>> streamsCallbackList;
+
+  private Logger logger = Logger.getInstance();
 
   public Connection(String pUsername, String pToken) {
     username = pUsername;
     token = pToken;
     url = apiScheme + "://" + username + "." + apiDomain + "/";
     supervisor = new Supervisor();
-    cacheEventsManager = new CacheEventsAndStreamsManager(url, token, this, this);
+    cacheEventsManager = new CacheEventsAndStreamsManager(url, token, this);
     streamsManager = (StreamsManager) cacheEventsManager;
-    eventsCallbackList = new ArrayList<EventsCallback<Map<String, Event>>>();
     streamsCallbackList = new ArrayList<StreamsCallback<Map<String, Stream>>>();
   }
 
@@ -71,9 +72,34 @@ public class Connection implements EventsManager<Map<String, Event>>,
    */
 
   @Override
-  public void getEvents(Map<String, String> params) {
-    supervisor.getEvents();
-    cacheEventsManager.getEvents(params);
+  public void getEvents(Map<String, String> params,
+    final EventsCallback<Map<String, Event>> eventsCallback) {
+    eventsCallback.onEventsPartialResult(supervisor.getEvents(params));
+    cacheEventsManager.getEvents(params, new EventsCallback<Map<String, Event>>() {
+
+      @Override
+      public void onEventsSuccess(Map<String, Event> events) {
+        logger.log("Connection: onSuccess");
+        for (String key : events.keySet()) {
+          if (supervisor.getEvents(null).get(key) != null) {
+            supervisor.getEvents(null).get(key).merge(events.get(key), JsonConverter.getCloner());
+          } else {
+            supervisor.getEvents(null).put(key, events.get(key));
+          }
+        }
+        eventsCallback.onEventsSuccess(supervisor.getEvents(null));
+      }
+
+      @Override
+      public void onEventsPartialResult(Map<String, Event> newEvents) {
+        eventsCallback.onEventsPartialResult(newEvents);
+      }
+
+      @Override
+      public void onEventsError(String message) {
+        eventsCallback.onEventsError(message);
+      }
+    });
   }
 
   @Override
@@ -92,38 +118,6 @@ public class Connection implements EventsManager<Map<String, Event>>,
   public Event updateEvent(String id) {
     // TODO Auto-generated method stub
     return null;
-  }
-
-  /**
-   * Events callback
-   */
-
-  @Override
-  public void onEventsSuccess(Map<String, Event> events) {
-    System.out.println("Connection: onSuccess");
-    for (String key : events.keySet()) {
-      if (supervisor.getEvents().get(key) != null) {
-        supervisor.getEvents().get(key).merge(events.get(key), JsonConverter.getCloner());
-      } else {
-        supervisor.getEvents().put(key, events.get(key));
-      }
-    }
-    for (EventsCallback<Map<String, Event>> ecb : eventsCallbackList) {
-      ecb.onEventsSuccess(supervisor.getEvents());
-    }
-  }
-
-  @Override
-  public void onEventsPartialResult(Map<String, Event> newEvents) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void onEventsError(String message) {
-    for (EventsCallback<Map<String, Event>> eventsCallback : eventsCallbackList) {
-      eventsCallback.onEventsError(message);
-    }
   }
 
   /**
@@ -165,7 +159,7 @@ public class Connection implements EventsManager<Map<String, Event>>,
   }
 
   @Override
-  public void onStreamsPartialResult(Map newStreams) {
+  public void onStreamsPartialResult(Map<String, Stream> newStreams) {
     // TODO Auto-generated method stub
 
   }
@@ -175,11 +169,6 @@ public class Connection implements EventsManager<Map<String, Event>>,
     for (StreamsCallback<Map<String, Stream>> streamsCallback : streamsCallbackList) {
       streamsCallback.onStreamsError(message);
     }
-  }
-
-  @Override
-  public void addEventsCallback(EventsCallback<Map<String, Event>> eCallback) {
-    eventsCallbackList.add(eCallback);
   }
 
   public void addStreamsCallback(StreamsCallback<Map<String, Stream>> sCallback) {

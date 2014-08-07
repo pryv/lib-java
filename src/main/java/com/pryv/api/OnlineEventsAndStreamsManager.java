@@ -12,6 +12,7 @@ import org.apache.http.util.EntityUtils;
 
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
+import com.pryv.utils.Logger;
 
 /**
  *
@@ -24,14 +25,13 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
 
   private String eventsUrl;
   private String streamsUrl;
-  private EventsCallback<String> eventsCallback;
   private StreamsCallback<String> streamsCallback;
 
-  public OnlineEventsAndStreamsManager(String pUrl, String token,
-    EventsCallback<String> eCallback, StreamsCallback<String> sCallback) {
+  private Logger logger = Logger.getInstance();
+
+  public OnlineEventsAndStreamsManager(String pUrl, String token, StreamsCallback<String> sCallback) {
     eventsUrl = pUrl + "events?auth=" + token;
     streamsUrl = pUrl + "streams?auth=" + token;
-    eventsCallback = eCallback;
     streamsCallback = sCallback;
   }
 
@@ -43,7 +43,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
    */
 
   @Override
-  public void getEvents(Map<String, String> params) {
+  public void getEvents(Map<String, String> params, EventsCallback<String> eventsCallback) {
     StringBuilder sb = new StringBuilder();
     String separator = "&";
     if (params != null) {
@@ -52,7 +52,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
         sb.append(key + "=" + params.get(key));
       }
     }
-    new FetchEventsThread(sb.toString()).start();
+    new FetchEventsThread(sb.toString(), eventsCallback).start();
   }
 
   public void getE(Map<String, String> params) {
@@ -98,10 +98,9 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
   private ResponseHandler<String> streamsResponseHandler = new ResponseHandler<String>() {
 
     @Override
-    public String handleResponse(HttpResponse response) throws ClientProtocolException,
-      IOException {
+    public String handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
       String textResponse = EntityUtils.toString(response.getEntity());
-      System.out.println("received: " + textResponse);
+      logger.log("Online received streams: " + textResponse);
       streamsCallback.onStreamsSuccess(textResponse);
       return null;
     }
@@ -133,14 +132,16 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
    */
   private class FetchEventsThread extends Thread {
     private String params = "";
+    private EventsCallback<String> eventsCallback;
 
-    public FetchEventsThread(String pParams) {
+    public FetchEventsThread(String pParams, EventsCallback<String> pEventsCallback) {
       params = pParams;
+      eventsCallback = pEventsCallback;
     }
 
     @Override
     public void run() {
-      System.out.println("fetching events: " + eventsUrl + params);
+      logger.log("Online: fetching events at " + eventsUrl + params);
       try {
         Request.Get(eventsUrl + params).execute().handleResponse(eventsResponseHandler);
       } catch (ClientProtocolException e) {
@@ -151,27 +152,17 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
         e.printStackTrace();
       }
     }
-  }
 
-  private ResponseHandler<String> eventsResponseHandler = new ResponseHandler<String>() {
+    private ResponseHandler<String> eventsResponseHandler = new ResponseHandler<String>() {
 
-    @Override
-    public String handleResponse(HttpResponse reply) throws ClientProtocolException, IOException {
-      String response = EntityUtils.toString(reply.getEntity());
-      System.out.println("received: " + response);
-      eventsCallback.onEventsSuccess(response);
-      return null;
-    }
-  };
-
-  /**
-   * other
-   */
-
-  @Override
-  public void addEventsCallback(EventsCallback<String> eCallback) {
-    // TODO Auto-generated method stub
-
+      @Override
+      public String handleResponse(HttpResponse reply) throws ClientProtocolException, IOException {
+        String response = EntityUtils.toString(reply.getEntity());
+        logger.log("Online: received events: " + response);
+        eventsCallback.onEventsSuccess(response);
+        return null;
+      }
+    };
   }
 
 }

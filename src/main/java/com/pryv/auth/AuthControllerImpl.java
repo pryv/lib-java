@@ -7,6 +7,7 @@ import org.apache.http.client.ClientProtocolException;
 
 import com.pryv.Connection;
 import com.pryv.api.model.Permission;
+import com.pryv.utils.Logger;
 
 /**
  *
@@ -37,6 +38,8 @@ public class AuthControllerImpl implements AuthController {
   // optional
   private String language = "en";
   private String returnURL = "";
+
+  private Logger logger = Logger.getInstance();
 
   public AuthControllerImpl() {
 
@@ -93,7 +96,7 @@ public class AuthControllerImpl implements AuthController {
   @Override
   public void onFailure(int errorId, String jsonMessage, String detail) {
     state = State.REFUSED;
-    System.out.println("failure: id=" + errorId + ", message=" + jsonMessage);
+    logger.log("AuthController: failure: id=" + errorId + ", message=" + jsonMessage);
     view.onDisplayFailure();
     // display error/reason
   }

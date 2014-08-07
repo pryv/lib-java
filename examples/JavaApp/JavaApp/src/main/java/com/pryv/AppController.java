@@ -13,6 +13,7 @@ import javafx.util.Callback;
 
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
+import com.pryv.utils.Logger;
 
 public class AppController {
 
@@ -41,6 +42,8 @@ public class AppController {
 
   // Reference to the main application
   private ExampleApp exampleApp;
+
+  private Logger logger = Logger.getInstance();
 
   /**
    * The constructor. The constructor is called before the initialize() method.
@@ -154,10 +157,10 @@ public class AppController {
   }
 
   public void showStreams(TreeItem<Stream> rootStream) {
-    System.out.println("AppController: treeView created");
+    logger.log("AppController: treeView created");
     streamsTreeView.setRoot(rootStream);
     for (TreeItem<Stream> strItem : rootStream.getChildren()) {
-      System.out.println("nodes: " + strItem.getValue().getId());
+      logger.log("AppController: nodes: " + strItem.getValue().getId());
     }
   }
 }
