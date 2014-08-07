@@ -33,6 +33,7 @@ public class AuthBrowserView extends Applet implements AuthView {
     }
   }
 
+  @Override
   public void displayLoginVew(String loginURL) {
     try {
       URL url = new URL(loginURL);
@@ -40,16 +41,18 @@ public class AuthBrowserView extends Applet implements AuthView {
     } catch (URISyntaxException e) {
       e.printStackTrace();
     } catch (MalformedURLException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
 
   }
 
   // unused
+  @Override
   public void onDisplaySuccess(Connection c) {
   }
 
+  // unused
+  @Override
   public void onDisplayFailure() {
   }
 
