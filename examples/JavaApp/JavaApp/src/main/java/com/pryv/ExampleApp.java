@@ -213,7 +213,9 @@ public class ExampleApp extends Application implements AuthView,
     eventsManager = newConnection;
     streamsManager = newConnection;
     streamsManager.getStreams(this);
-    eventsManager.getEvents(null, this);
+    Map<String, String> random20 = new HashMap<String, String>();
+    random20.put(Filter.LIMIT_KEY, "20");
+    eventsManager.getEvents(random20, this);
   }
 
   /**

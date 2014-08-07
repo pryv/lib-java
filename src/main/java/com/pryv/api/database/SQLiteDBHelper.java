@@ -91,4 +91,9 @@ public class SQLiteDBHelper {
 
     return new HashMap<String, Event>();
   }
+
+  public void getStreams() {
+    // TODO Auto-generated method stub
+
+  }
 }

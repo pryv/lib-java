@@ -3,6 +3,7 @@ package com.pryv.utils;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.pryv.api.Filter;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 
@@ -27,11 +28,16 @@ public class Supervisor {
 
   public Map<String, Event> getEvents(Map<String, String> params) {
     // use params
-
-    for (String eventID : events.keySet()) {
-      logger.log("Supervisor: returning event from main memory: " + eventID);
+    Map<String, Event> returnEvents = new HashMap<String, Event>();
+    if (params.get(Filter.STREAMS_KEY) != null) {
+      for (Event event : events.values()) {
+        if (event.getStreamId().equals(params.get(Filter.STREAMS_KEY))) {
+          returnEvents.put(event.getId(), event);
+          logger.log("Supervisor: returning event from main memory: " + event.getId());
+        }
+      }
     }
-    return events;
+    return returnEvents;
   }
 
   public Event getEventById(String id) {
@@ -50,7 +56,7 @@ public class Supervisor {
     this.events = pEvents;
   }
 
-  public void setStreams(Map<String, Stream> pStreams) {
+  public void updateStreams(Map<String, Stream> pStreams) {
     this.streams = pStreams;
   }
 

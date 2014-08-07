@@ -71,7 +71,7 @@ public class Connection implements EventsManager<Map<String, Event>>,
    * wdawdwa
    */
   @Override
-  public void getEvents(Map<String, String> params,
+  public void getEvents(final Map<String, String> params,
     final EventsCallback<Map<String, Event>> eventsCallback) {
 
     // send
@@ -87,7 +87,7 @@ public class Connection implements EventsManager<Map<String, Event>>,
         updateSupervisor(events);
 
         // return merged events from main memory
-        eventsCallback.onEventsSuccess(supervisor.getEvents(null));
+        eventsCallback.onEventsSuccess(supervisor.getEvents(params));
       }
 
       @Override
@@ -142,7 +142,7 @@ public class Connection implements EventsManager<Map<String, Event>>,
 
       @Override
       public void onStreamsSuccess(Map<String, Stream> streams) {
-        supervisor.setStreams(streams);
+        supervisor.updateStreams(streams);
         streamsCallback.onStreamsSuccess(supervisor.getStreams());
       }
 

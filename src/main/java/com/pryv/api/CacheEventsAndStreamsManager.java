@@ -110,15 +110,22 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
 
   @Override
   public void getStreams(final StreamsCallback<Map<String, Stream>> streamsCallback) {
-    // look in cache?
+    // look in cache and send it onPartialResult
+    dbHelper.getStreams();
+    logger.log("Cache: retrieved Events from cache: ");
+    streamsCallback.onStreamsPartialResult(new HashMap<String, Stream>());
 
     onlineStreamsManager.getStreams(new StreamsCallback<String>() {
 
       @Override
-      public void onStreamsSuccess(String streams) {
+      public void onStreamsSuccess(String onlineStreams) {
         logger.log("Cache: Streams retrieval success");
         try {
-          streamsCallback.onStreamsSuccess(JsonConverter.createStreamsFromJson(streams));
+          // update Cache with onlineStreams
+          Map<String, Stream> streams = JsonConverter.createStreamsFromJson(onlineStreams);
+          updateCache(streams);
+
+          streamsCallback.onStreamsSuccess(streams);
         } catch (JsonProcessingException e) {
           e.printStackTrace();
           streamsCallback.onStreamsError(e.getMessage());
@@ -127,6 +134,11 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
           streamsCallback.onStreamsError(e.getMessage());
           e.printStackTrace();
         }
+      }
+
+      private void updateCache(Map<String, Stream> streams) {
+        // TODO Auto-generated method stub
+
       }
 
       @Override
