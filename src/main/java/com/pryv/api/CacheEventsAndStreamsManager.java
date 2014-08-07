@@ -2,7 +2,6 @@ package com.pryv.api;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,22 +20,18 @@ import com.pryv.utils.Logger;
  *
  */
 public class CacheEventsAndStreamsManager implements EventsManager<Map<String, Event>>,
-  StreamsManager, StreamsCallback<String> {
+  StreamsManager<Map<String, Stream>> {
 
   private EventsManager<String> onlineEventsManager;
-
-  private StreamsManager onlineStreamsManager;
-  private StreamsCallback<Map<String, Stream>> streamsCallback;
+  private StreamsManager<String> onlineStreamsManager;
 
   private SQLiteDBHelper dbHelper;
 
   private Logger logger = Logger.getInstance();
 
-  public CacheEventsAndStreamsManager(String url, String token,
-    StreamsCallback<Map<String, Stream>> pStreamsCallback) {
-    onlineEventsManager = new OnlineEventsAndStreamsManager(url, token, this);
-    onlineStreamsManager = (StreamsManager) onlineEventsManager;
-    streamsCallback = pStreamsCallback;
+  public CacheEventsAndStreamsManager(String url, String token) {
+    onlineEventsManager = new OnlineEventsAndStreamsManager(url, token);
+    onlineStreamsManager = (StreamsManager<String>) onlineEventsManager;
     dbHelper = new SQLiteDBHelper();
   }
 
@@ -60,10 +55,10 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
         try {
           eventsCallback.onEventsSuccess(JsonConverter.createEventsFromJson(jsonEvents));
         } catch (JsonProcessingException e) {
-          this.onEventsError(e.getMessage());
+          eventsCallback.onEventsError(e.getMessage());
           e.printStackTrace();
         } catch (IOException e) {
-          this.onEventsError(e.getMessage());
+          eventsCallback.onEventsError(e.getMessage());
           e.printStackTrace();
         }
 
@@ -104,10 +99,37 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
    */
 
   @Override
-  public List<Stream> getStreams() {
+  public void getStreams(final StreamsCallback<Map<String, Stream>> streamsCallback) {
     // look in cache?
 
-    return onlineStreamsManager.getStreams();
+    onlineStreamsManager.getStreams(new StreamsCallback<String>() {
+
+      @Override
+      public void onStreamsSuccess(String streams) {
+        logger.log("Cache: Streams retrieval success");
+        try {
+          streamsCallback.onStreamsSuccess(JsonConverter.createStreamsFromJson(streams));
+        } catch (JsonProcessingException e) {
+          e.printStackTrace();
+          streamsCallback.onStreamsError(e.getMessage());
+        } catch (IOException e) {
+          e.printStackTrace();
+          streamsCallback.onStreamsError(e.getMessage());
+          e.printStackTrace();
+        }
+      }
+
+      @Override
+      public void onStreamsPartialResult(Map<String, Stream> newStreams) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void onStreamsError(String message) {
+        streamsCallback.onStreamsError(message);
+      }
+    });
   }
 
   @Override
@@ -126,36 +148,6 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
   public Stream updateStream(String id) {
     // TODO Auto-generated method stub
     return null;
-  }
-
-  /**
-   * Streams callback
-   */
-
-  @Override
-  public void onStreamsSuccess(String streams) {
-    logger.log("Cache: Streams retrieval success");
-    try {
-      streamsCallback.onStreamsSuccess(JsonConverter.createStreamsFromJson(streams));
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
-      this.onStreamsError(e.getMessage());
-    } catch (IOException e) {
-      e.printStackTrace();
-      this.onStreamsError(e.getMessage());
-      e.printStackTrace();
-    }
-  }
-
-  @Override
-  public void onStreamsPartialResult(Map<String, Stream> newStreams) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void onStreamsError(String message) {
-    streamsCallback.onStreamsError(message);
   }
 
 }

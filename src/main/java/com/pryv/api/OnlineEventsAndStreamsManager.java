@@ -1,7 +1,6 @@
 package com.pryv.api;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpResponse;
@@ -21,18 +20,16 @@ import com.pryv.utils.Logger;
  * @author ik
  *
  */
-public class OnlineEventsAndStreamsManager implements EventsManager<String>, StreamsManager {
+public class OnlineEventsAndStreamsManager implements EventsManager<String>, StreamsManager<String> {
 
   private String eventsUrl;
   private String streamsUrl;
-  private StreamsCallback<String> streamsCallback;
 
   private Logger logger = Logger.getInstance();
 
-  public OnlineEventsAndStreamsManager(String pUrl, String token, StreamsCallback<String> sCallback) {
+  public OnlineEventsAndStreamsManager(String pUrl, String token) {
     eventsUrl = pUrl + "events?auth=" + token;
     streamsUrl = pUrl + "streams?auth=" + token;
-    streamsCallback = sCallback;
   }
 
   /**
@@ -44,6 +41,8 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
 
   @Override
   public void getEvents(Map<String, String> params, EventsCallback<String> eventsCallback) {
+
+    // format parameters for URL
     StringBuilder sb = new StringBuilder();
     String separator = "&";
     if (params != null) {
@@ -53,10 +52,6 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
       }
     }
     new FetchEventsThread(sb.toString(), eventsCallback).start();
-  }
-
-  public void getE(Map<String, String> params) {
-
   }
 
   @Override
@@ -82,29 +77,9 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
    */
 
   @Override
-  public List<Stream> getStreams() {
-    try {
-      Request.Get(streamsUrl).execute().handleResponse(streamsResponseHandler);
-    } catch (ClientProtocolException e) {
-      streamsCallback.onStreamsError(e.getMessage());
-      e.printStackTrace();
-    } catch (IOException e) {
-      streamsCallback.onStreamsError(e.getMessage());
-      e.printStackTrace();
-    }
-    return null;
+  public void getStreams(StreamsCallback<String> streamsCallback) {
+    new FetchStreamsThread(streamsCallback).start();
   }
-
-  private ResponseHandler<String> streamsResponseHandler = new ResponseHandler<String>() {
-
-    @Override
-    public String handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
-      String textResponse = EntityUtils.toString(response.getEntity());
-      logger.log("Online received streams: " + textResponse);
-      streamsCallback.onStreamsSuccess(textResponse);
-      return null;
-    }
-  };
 
   @Override
   public Stream createStream(String id) {
@@ -125,7 +100,49 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
   }
 
   /**
-   * Thread that executes the Get request to the Pryv server.
+   * Thread that executes the Get Streams request to the Pryv server and returns
+   * the response to the StreamsCallback as a String.
+   *
+   * @author ik
+   *
+   */
+  private class FetchStreamsThread extends Thread {
+
+    private StreamsCallback<String> streamsCallback;
+
+    public FetchStreamsThread(StreamsCallback<String> pStreamsCallback) {
+      streamsCallback = pStreamsCallback;
+    }
+
+    @Override
+    public void run() {
+      try {
+        Request.Get(streamsUrl).execute().handleResponse(streamsResponseHandler);
+      } catch (ClientProtocolException e) {
+        streamsCallback.onStreamsError(e.getMessage());
+        e.printStackTrace();
+      } catch (IOException e) {
+        streamsCallback.onStreamsError(e.getMessage());
+        e.printStackTrace();
+      }
+    }
+
+    private ResponseHandler<String> streamsResponseHandler = new ResponseHandler<String>() {
+
+      @Override
+      public String handleResponse(HttpResponse response) throws ClientProtocolException,
+        IOException {
+        String textResponse = EntityUtils.toString(response.getEntity());
+        logger.log("Online received streams: " + textResponse);
+        streamsCallback.onStreamsSuccess(textResponse);
+        return null;
+      }
+    };
+  }
+
+  /**
+   * Thread that executes the Get Events request to the Pryv server and returns
+   * the response to the EventsCallback as a String.
    *
    * @author ik
    *

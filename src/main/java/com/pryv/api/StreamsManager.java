@@ -1,19 +1,18 @@
 package com.pryv.api;
 
-import java.util.List;
-
 import com.pryv.api.model.Stream;
 
 /**
- *
  * interface used by Connection, Online and Cache to fetch Streams
  *
  * @author ik
  *
+ * @param <T>
+ *          format of returned Streams
  */
-public interface StreamsManager {
+public interface StreamsManager<T> {
 
-  List<Stream> getStreams();
+  void getStreams(StreamsCallback<T> streams);
 
   Stream createStream(String id);
 

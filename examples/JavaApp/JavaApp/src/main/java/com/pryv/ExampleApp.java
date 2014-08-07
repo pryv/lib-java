@@ -41,7 +41,7 @@ public class ExampleApp extends Application implements AuthView,
 
   private final static String REQUESTING_APP_ID = "web-app-test";
   private EventsManager<Map<String, Event>> eventsManager;
-  private StreamsManager streamsManager;
+  private StreamsManager<Map<String, Stream>> streamsManager;
 
   private Stage primaryStage;
   private BorderPane rootLayout;
@@ -212,8 +212,7 @@ public class ExampleApp extends Application implements AuthView,
     });
     eventsManager = newConnection;
     streamsManager = newConnection;
-    newConnection.addStreamsCallback(this);
-    streamsManager.getStreams();
+    streamsManager.getStreams(this);
     eventsManager.getEvents(null, this);
   }
 

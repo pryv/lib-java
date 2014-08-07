@@ -1,7 +1,5 @@
 package com.pryv;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import com.pryv.api.CacheEventsAndStreamsManager;
@@ -22,8 +20,8 @@ import com.pryv.utils.Supervisor;
  * @author ik
  *
  */
-public class Connection implements EventsManager<Map<String, Event>>, StreamsManager,
-  StreamsCallback<Map<String, Stream>> {
+public class Connection implements EventsManager<Map<String, Event>>,
+  StreamsManager<Map<String, Stream>> {
 
   private String username;
   private String token;
@@ -31,9 +29,8 @@ public class Connection implements EventsManager<Map<String, Event>>, StreamsMan
   private String apiScheme = "https";
   private String url;
   private EventsManager<Map<String, Event>> cacheEventsManager;
-  private StreamsManager streamsManager;
+  private StreamsManager<Map<String, Stream>> cacheStreamsManager;
   private Supervisor supervisor;
-  private List<StreamsCallback<Map<String, Stream>>> streamsCallbackList;
 
   private Logger logger = Logger.getInstance();
 
@@ -42,9 +39,8 @@ public class Connection implements EventsManager<Map<String, Event>>, StreamsMan
     token = pToken;
     url = apiScheme + "://" + username + "." + apiDomain + "/";
     supervisor = new Supervisor();
-    cacheEventsManager = new CacheEventsAndStreamsManager(url, token, this);
-    streamsManager = (StreamsManager) cacheEventsManager;
-    streamsCallbackList = new ArrayList<StreamsCallback<Map<String, Stream>>>();
+    cacheEventsManager = new CacheEventsAndStreamsManager(url, token);
+    cacheStreamsManager = (StreamsManager) cacheEventsManager;
   }
 
   public String getUsername() {
@@ -75,11 +71,12 @@ public class Connection implements EventsManager<Map<String, Event>>, StreamsMan
   public void getEvents(Map<String, String> params,
     final EventsCallback<Map<String, Event>> eventsCallback) {
     eventsCallback.onEventsPartialResult(supervisor.getEvents(params));
+
     cacheEventsManager.getEvents(params, new EventsCallback<Map<String, Event>>() {
 
       @Override
       public void onEventsSuccess(Map<String, Event> events) {
-        logger.log("Connection: onSuccess");
+        logger.log("Connection: onEventsSuccess");
         for (String key : events.keySet()) {
           if (supervisor.getEvents(null).get(key) != null) {
             supervisor.getEvents(null).get(key).merge(events.get(key), JsonConverter.getCloner());
@@ -125,8 +122,26 @@ public class Connection implements EventsManager<Map<String, Event>>, StreamsMan
    */
 
   @Override
-  public List<Stream> getStreams() {
-    return streamsManager.getStreams();
+  public void getStreams(final StreamsCallback<Map<String, Stream>> streamsCallback) {
+
+    cacheStreamsManager.getStreams(new StreamsCallback<Map<String, Stream>>() {
+
+      @Override
+      public void onStreamsSuccess(Map<String, Stream> streams) {
+        supervisor.setStreams(streams);
+        streamsCallback.onStreamsSuccess(supervisor.getStreams());
+      }
+
+      @Override
+      public void onStreamsPartialResult(Map<String, Stream> newStreams) {
+        streamsCallback.onStreamsPartialResult(newStreams);
+      }
+
+      @Override
+      public void onStreamsError(String message) {
+        streamsCallback.onStreamsError(message);
+      }
+    });
   }
 
   @Override
@@ -145,34 +160,6 @@ public class Connection implements EventsManager<Map<String, Event>>, StreamsMan
   public Stream updateStream(String id) {
     // TODO Auto-generated method stub
     return null;
-  }
-
-  /**
-   * Streams callback
-   */
-  @Override
-  public void onStreamsSuccess(Map<String, Stream> streams) {
-    supervisor.setStreams(streams);
-    for (StreamsCallback<Map<String, Stream>> streamsCallback : streamsCallbackList) {
-      streamsCallback.onStreamsSuccess(supervisor.getStreams());
-    }
-  }
-
-  @Override
-  public void onStreamsPartialResult(Map<String, Stream> newStreams) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void onStreamsError(String message) {
-    for (StreamsCallback<Map<String, Stream>> streamsCallback : streamsCallbackList) {
-      streamsCallback.onStreamsError(message);
-    }
-  }
-
-  public void addStreamsCallback(StreamsCallback<Map<String, Stream>> sCallback) {
-    streamsCallbackList.add(sCallback);
   }
 
 }
