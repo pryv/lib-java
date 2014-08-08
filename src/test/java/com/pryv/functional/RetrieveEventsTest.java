@@ -42,7 +42,7 @@ public class RetrieveEventsTest {
 
       @Override
       public void onEventsSuccess(Map<String, Event> events) {
-        assertTrue();
+        // assertTrue();
 
       }
 
