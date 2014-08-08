@@ -2,9 +2,10 @@ package com.pryv;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -213,9 +214,9 @@ public class ExampleApp extends Application implements AuthView,
     eventsManager = newConnection;
     streamsManager = newConnection;
     streamsManager.getStreams(this);
-    Map<String, String> random20 = new HashMap<String, String>();
-    random20.put(Filter.LIMIT_KEY, "20");
-    eventsManager.getEvents(random20, this);
+    Filter filter = new Filter();
+    filter.setLimit(20);
+    eventsManager.getEvents(filter, this);
   }
 
   /**
@@ -233,9 +234,12 @@ public class ExampleApp extends Application implements AuthView,
 
   public void getEvents(String streamId) {
     eventsList.clear();
-    Map<String, String> streams = new HashMap<String, String>();
-    streams.put(Filter.STREAMS_KEY, streamId);
-    eventsManager.getEvents(streams, this);
+
+    Set<String> streamIds = new HashSet<String>();
+    streamIds.add(streamId);
+    Filter filter = new Filter();
+    filter.setStreamIds(streamIds);
+    eventsManager.getEvents(filter, this);
 
   }
 
