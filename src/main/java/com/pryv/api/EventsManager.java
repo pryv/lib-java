@@ -1,7 +1,5 @@
 package com.pryv.api;
 
-import java.util.Map;
-
 import com.pryv.api.model.Event;
 
 /**
@@ -22,7 +20,7 @@ public interface EventsManager<T> {
    * @param params
    *          optional filter parameters
    */
-  void getEvents(Map<String, String> params, EventsCallback<T> eventsCallback);
+  void getEvents(Filter filter, EventsCallback<T> eventsCallback);
 
   Event createEvent(String id);
 

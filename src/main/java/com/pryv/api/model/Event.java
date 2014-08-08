@@ -1,9 +1,9 @@
 package com.pryv.api.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.rits.cloning.Cloner;
 
@@ -17,21 +17,21 @@ public class Event {
 
   private String id;
   private String streamId;
-  private long time;
+  private Long time;
   private String type;
-  private long created;
+  private Long created;
   private String createdBy;
-  private long modified;
+  private Long modified;
   private String modifiedBy;
 
   // optional
-  private long duration;
+  private Long duration;
   private Object content;
-  private List<String> tags;
-  private List<String> references;
+  private Set<String> tags;
+  private Set<String> references;
   private String description;
-  private List<Attachment> attachments;
-  private Map<String, String> clientData;
+  private Set<Attachment> attachments;
+  private Map<String, Object> clientData;
   private Boolean trashed;
   private String tempRefId;
 
@@ -66,10 +66,10 @@ public class Event {
    * @param pTempRefId
    *          optional
    */
-  public Event(String pId, String pStreamId, long pTime, long pDuration, String pType,
-    String pContent, List<String> pTags, List<String> pReferences, String pDescription,
-    List<Attachment> pAttachments, Map<String, String> pClientData, Boolean pTrashed,
-    long pCreated, String pCreatedBy, long pModified, String pModifiedBy, String pTempRefId) {
+  public Event(String pId, String pStreamId, Long pTime, Long pDuration, String pType,
+    String pContent, Set<String> pTags, Set<String> pReferences, String pDescription,
+    Set<Attachment> pAttachments, Map<String, Object> pClientData, Boolean pTrashed,
+    Long pCreated, String pCreatedBy, Long pModified, String pModifiedBy, String pTempRefId) {
     id = pId;
     streamId = pStreamId;
     time = pTime;
@@ -110,26 +110,26 @@ public class Event {
     duration = temp.duration;
     type = temp.type;
     content = temp.content;
-    tags = new ArrayList<String>();
+    tags = new HashSet<String>();
     for (String tag : temp.tags) {
       tags.add(tag);
     }
 
     if (temp.references != null) {
-      references = new ArrayList<String>();
+      references = new HashSet<String>();
       for (String ref : temp.references) {
         references.add(ref);
       }
     }
     description = temp.description;
     if (temp.attachments != null) {
-      attachments = new ArrayList<Attachment>();
+      attachments = new HashSet<Attachment>();
       for (Attachment attachment : temp.attachments) {
         attachments.add(cloner.deepClone(attachment));
       }
     }
     if (temp.clientData != null) {
-      clientData = new HashMap<String, String>();
+      clientData = new HashMap<String, Object>();
       for (String key : temp.clientData.keySet()) {
         clientData.put(key, temp.clientData.get(key));
       }
@@ -145,7 +145,7 @@ public class Event {
     return description;
   }
 
-  public List<Attachment> getAttachments() {
+  public Set<Attachment> getAttachments() {
     return attachments;
   }
 
@@ -157,11 +157,11 @@ public class Event {
     return streamId;
   }
 
-  public long getTime() {
+  public Long getTime() {
     return time;
   }
 
-  public long getDuration() {
+  public Long getDuration() {
     return duration;
   }
 
@@ -173,15 +173,15 @@ public class Event {
     return content;
   }
 
-  public List<String> getTags() {
+  public Set<String> getTags() {
     return tags;
   }
 
-  public List<String> getReferences() {
+  public Set<String> getReferences() {
     return references;
   }
 
-  public Map<String, String> getClientData() {
+  public Map<String, Object> getClientData() {
     return clientData;
   }
 
@@ -189,7 +189,7 @@ public class Event {
     return trashed;
   }
 
-  public long getCreated() {
+  public Long getCreated() {
     return created;
   }
 
@@ -197,7 +197,7 @@ public class Event {
     return createdBy;
   }
 
-  public long getModified() {
+  public Long getModified() {
     return modified;
   }
 

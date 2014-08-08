@@ -3,6 +3,8 @@ package com.pryv.utils;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.pryv.api.Filter;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
@@ -26,19 +28,19 @@ public class Supervisor {
     streams = new HashMap<String, Stream>();
   }
 
-  public Map<String, Event> getEvents(Map<String, String> params) {
-    // use params
+  public Map<String, Event> getEvents(Filter filter) {
     Map<String, Event> returnEvents = new HashMap<String, Event>();
 
-    if (params.get(Filter.STREAMS_KEY) != null) {
-      for (Event event : events.values()) {
-        if (event.getStreamId().equals(params.get(Filter.STREAMS_KEY))) {
-          if (event.getTrashed() == false) {
-            returnEvents.put(event.getId(), event);
-            logger.log("Supervisor: returning event from main memory: " + event.getId());
-          }
-        }
+    for (Event event : events.values()) {
+      if (filter.match(event)) {
+        returnEvents.put(event.getId(), event);
+        logger.log("Supervisor: matched id=" + event.getId() + ", streamId=" + event.getStreamId());
       }
+    }
+
+    if (filter.getLimit() != null) {
+      returnEvents.keySet().retainAll(
+        ImmutableSet.copyOf(Iterables.limit(returnEvents.keySet(), filter.getLimit())));
     }
     return returnEvents;
   }
@@ -48,6 +50,10 @@ public class Supervisor {
   }
 
   public void addEvent(Event newEvent) {
+    logger.log("Supervisor: adding new event: id="
+      + newEvent.getId()
+        + ", streamId="
+        + newEvent.getStreamId());
     events.put(newEvent.getId(), newEvent);
   }
 

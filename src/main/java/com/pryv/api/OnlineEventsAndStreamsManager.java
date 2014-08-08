@@ -1,7 +1,6 @@
 package com.pryv.api;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -40,18 +39,18 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
    */
 
   @Override
-  public void getEvents(Map<String, String> params, EventsCallback<String> eventsCallback) {
+  public void getEvents(Filter filter, EventsCallback<String> eventsCallback) {
 
     // format parameters for URL
-    StringBuilder sb = new StringBuilder();
-    String separator = "&";
-    if (params != null) {
-      for (String key : params.keySet()) {
-        sb.append(separator);
-        sb.append(key + "=" + params.get(key));
-      }
-    }
-    new FetchEventsThread(sb.toString(), eventsCallback).start();
+    // StringBuilder sb = new StringBuilder();
+    // String separator = "&";
+    // if (params != null) {
+    // for (String key : params.keySet()) {
+    // sb.append(separator);
+    // sb.append(key + "=" + params.get(key));
+    // }
+    // }
+    new FetchEventsThread(filter.toUrl(), eventsCallback).start();
   }
 
   @Override

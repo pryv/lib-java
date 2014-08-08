@@ -5,11 +5,11 @@ import java.util.Map;
 import com.pryv.api.CacheEventsAndStreamsManager;
 import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsManager;
+import com.pryv.api.Filter;
 import com.pryv.api.StreamsCallback;
 import com.pryv.api.StreamsManager;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
-import com.pryv.utils.JsonConverter;
 import com.pryv.utils.Logger;
 import com.pryv.utils.Supervisor;
 
@@ -68,32 +68,32 @@ public class Connection implements EventsManager<Map<String, Event>>,
    */
 
   /**
-   * wdawdwa
+   *
    */
   @Override
-  public void getEvents(final Map<String, String> params,
-    final EventsCallback<Map<String, Event>> eventsCallback) {
+  public void
+    getEvents(final Filter filter, final EventsCallback<Map<String, Event>> eventsCallback) {
 
     // send
-    eventsCallback.onEventsPartialResult(supervisor.getEvents(params));
+    eventsCallback.onEventsPartialResult(supervisor.getEvents(filter));
 
-    cacheEventsManager.getEvents(params, new EventsCallback<Map<String, Event>>() {
+    cacheEventsManager.getEvents(filter, new EventsCallback<Map<String, Event>>() {
 
       @Override
       public void onEventsSuccess(Map<String, Event> events) {
         logger.log("Connection: onEventsSuccess");
 
         // update existing references with JSON received from online
-        updateSupervisor(events);
+        supervisor.updateEvents(events);
 
         // return merged events from main memory
-        eventsCallback.onEventsSuccess(supervisor.getEvents(params));
+        eventsCallback.onEventsSuccess(supervisor.getEvents(filter));
       }
 
       @Override
       public void onEventsPartialResult(Map<String, Event> newEvents) {
         supervisor.updateEvents(newEvents);
-        eventsCallback.onEventsPartialResult(supervisor.getEvents(params));
+        eventsCallback.onEventsPartialResult(supervisor.getEvents(filter));
       }
 
       @Override
@@ -101,16 +101,6 @@ public class Connection implements EventsManager<Map<String, Event>>,
         eventsCallback.onEventsError(message);
       }
     });
-  }
-
-  private void updateSupervisor(Map<String, Event> newEvents) {
-    for (String key : newEvents.keySet()) {
-      if (supervisor.getEventById(key) != null) {
-        supervisor.getEventById(key).merge(newEvents.get(key), JsonConverter.getCloner());
-      } else {
-        supervisor.addEvent(newEvents.get(key));
-      }
-    }
   }
 
   @Override

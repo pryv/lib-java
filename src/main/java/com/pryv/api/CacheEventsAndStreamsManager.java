@@ -40,7 +40,7 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
    */
 
   @Override
-  public void getEvents(Map<String, String> params,
+  public void getEvents(Filter filter,
     final EventsCallback<Map<String, Event>> eventsCallback) {
     // look in cache and send it onPartialResult
     dbHelper.getEvents();
@@ -48,11 +48,10 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
     eventsCallback.onEventsPartialResult(new HashMap<String, Event>());
 
     // forward call to online module
-    onlineEventsManager.getEvents(params, new EventsCallback<String>() {
+    onlineEventsManager.getEvents(filter, new EventsCallback<String>() {
 
       @Override
       public void onEventsSuccess(String jsonEvents) {
-        logger.log("Cache: Events retrieval success");
         try {
           Map<String, Event> receivedEvents = JsonConverter.createEventsFromJson(jsonEvents);
 

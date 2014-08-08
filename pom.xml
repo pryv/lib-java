@@ -71,6 +71,13 @@
 			<version>3.7.2</version>
 		</dependency>
 
+		<!-- collections filter library -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>17.0</version>
+		</dependency>
+
 
 		<!-- library to manage time items - not used yet -->
 		<dependency>

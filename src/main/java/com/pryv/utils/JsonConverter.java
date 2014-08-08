@@ -47,7 +47,10 @@ public class JsonConverter {
         Event eventToAdd = new Event();
         resetEventFromJson(objNode.toString(), eventToAdd);
         newEvents.put(eventToAdd.getId(), eventToAdd);
-        logger.log("JsonConverter: event created: id = " + eventToAdd.getId());
+        // logger.log("JsonConverter: event created: id = "
+        // + eventToAdd.getId()
+        // + ", streamId = "
+        // + eventToAdd.getStreamId());
       }
     }
 
