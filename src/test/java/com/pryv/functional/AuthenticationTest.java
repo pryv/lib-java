@@ -2,10 +2,12 @@ package com.pryv.functional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.jayway.awaitility.Awaitility;
 import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
 import com.pryv.auth.AuthControllerImpl;
@@ -32,6 +34,8 @@ public class AuthenticationTest {
   private String lang = "en";
   private String returnURL = "fakeURL";
 
+  private FakeAuthView fakeAuthView;
+
   @Before
   public void setUp() throws Exception {
     permissions.add(testPermission1);
@@ -41,9 +45,21 @@ public class AuthenticationTest {
   @Test
   public void testStartLoginAndPoll() {
     Pryv.setStaging();
+    fakeAuthView = new FakeAuthView();
     AuthControllerImpl authenticator =
-      new AuthControllerImpl(reqAppId, permissions, lang, returnURL, new FakeAuthView());
+      new AuthControllerImpl(reqAppId, permissions, lang, returnURL, fakeAuthView);
     authenticator.signIn();
+    Awaitility.await().until(hasDisplayedLoginView());
+  }
+
+  private Callable<Boolean> hasDisplayedLoginView() {
+    return new Callable<Boolean>() {
+
+      @Override
+      public Boolean call() throws Exception {
+        return fakeAuthView.getDisplayLoginViewExecuted();
+      }
+    };
   }
 
 }

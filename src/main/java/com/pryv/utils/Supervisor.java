@@ -34,7 +34,7 @@ public class Supervisor {
     for (Event event : events.values()) {
       if (filter.match(event)) {
         returnEvents.put(event.getId(), event);
-        logger.log("Supervisor: matched id=" + event.getId() + ", streamId=" + event.getStreamId());
+        logger.log("Supervisor: streamId=" + event.getStreamId() + ", id=" + event.getId());
       }
     }
 

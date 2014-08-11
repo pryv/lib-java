@@ -11,22 +11,35 @@ import com.pryv.auth.AuthView;
  */
 public class FakeAuthView implements AuthView {
 
+  private Boolean displayLoginViewExecuted = false;
+  private Boolean displaySuccessExecuted = false;
+  private Boolean displayFailureExecuted = false;
+
   @Override
   public void displayLoginVew(String loginURL) {
-    // TODO Auto-generated method stub
-
+    displayLoginViewExecuted = true;
   }
 
   @Override
   public void onDisplaySuccess(Connection connection) {
-    // TODO Auto-generated method stub
-
+    displaySuccessExecuted = true;
   }
 
   @Override
   public void onDisplayFailure() {
-    // TODO Auto-generated method stub
+    displayFailureExecuted = true;
+  }
 
+  public Boolean getDisplayLoginViewExecuted() {
+    return displayLoginViewExecuted;
+  }
+
+  public Boolean getDisplaySuccessExecuted() {
+    return displaySuccessExecuted;
+  }
+
+  public Boolean getDisplayFailureExecuted() {
+    return displayFailureExecuted;
   }
 
 }
