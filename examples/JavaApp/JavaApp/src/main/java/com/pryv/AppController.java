@@ -1,5 +1,7 @@
 package com.pryv;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javafx.beans.value.ChangeListener;
@@ -22,15 +24,18 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class AppController {
 
+  // fields with @FXML annotations correspond to Views names in .fxml files. If
+  // they are refactored, their id need to be manually changed in the .fxml
   @FXML
   private TreeView<Stream> streamsTreeView;
 
   @FXML
-  private ListView<Event> eventsList;
+  private ListView<Event> eventsListView;
 
   /**
    * Streams info labels
    */
+  private List<Label> streamsLabels;
   @FXML
   private Label idLabel;
   @FXML
@@ -51,6 +56,7 @@ public class AppController {
   /**
    * Events info labels
    */
+  private List<Label> eventsLabels;
   @FXML
   private Label eIdLabel;
   @FXML
@@ -99,17 +105,21 @@ public class AppController {
 
   /**
    * Initializes the controller class. This method is automatically called after
-   * the fxml file has been loaded.
+   * the fxml file has been loaded. assigns the listeners on Streams' TreeView
+   * and Events' ListView.
    */
   @FXML
   private void initialize() {
+
+    bindEventsLabels();
+    bindStreamsLabels();
+
     streamsTreeView.setShowRoot(false);
+
+    // display Stream name in TreeView elements
     streamsTreeView.setCellFactory(new Callback<TreeView<Stream>, TreeCell<Stream>>() {
-
       public TreeCell<Stream> call(TreeView<Stream> p) {
-
         TreeCell<Stream> cell = new TreeCell<Stream>() {
-
           @Override
           protected void updateItem(Stream t, boolean bln) {
             super.updateItem(t, bln);
@@ -117,29 +127,24 @@ public class AppController {
               setText(t.getName());
             }
           }
-
         };
-
         return cell;
       }
     });
 
+    // load Stream's details on selection
     streamsTreeView.getSelectionModel().selectedItemProperty()
       .addListener(new ChangeListener<TreeItem<Stream>>() {
-
         public void changed(ObservableValue<? extends TreeItem<Stream>> observable,
           TreeItem<Stream> oldValue, TreeItem<Stream> newValue) {
           showStreamDetails(newValue.getValue());
-
         }
       });
 
-    eventsList.setCellFactory(new Callback<ListView<Event>, ListCell<Event>>() {
-
+    // display Events' id in ListView rows
+    eventsListView.setCellFactory(new Callback<ListView<Event>, ListCell<Event>>() {
       public ListCell<Event> call(ListView<Event> p) {
-
         ListCell<Event> cell = new ListCell<Event>() {
-
           @Override
           protected void updateItem(Event t, boolean bln) {
             super.updateItem(t, bln);
@@ -147,41 +152,31 @@ public class AppController {
               setText(t.getId());
             }
           }
-
         };
-
         return cell;
       }
     });
 
-    eventsList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Event>() {
-
-      public void changed(ObservableValue<? extends Event> observable, Event oldValue,
-        Event newValue) {
-        if (newValue != null) {
-          showEventDetails(newValue);
+    // load Event's details on selection
+    eventsListView.getSelectionModel().selectedItemProperty()
+      .addListener(new ChangeListener<Event>() {
+        public void changed(ObservableValue<? extends Event> observable, Event oldValue,
+          Event newValue) {
+          if (newValue != null) {
+            showEventDetails(newValue);
+          }
         }
-      }
-
-    });
+      });
   }
 
-  private String printClientData(Map<String, Object> clientData) {
-    StringBuilder sb = new StringBuilder();
-    if (clientData != null) {
-      sb.setLength(0);
-      String separator = "";
-      for (String key : clientData.keySet()) {
-        sb.append(separator);
-        separator = ", ";
-        sb.append(key + ": " + clientData.get(key));
-      }
-
-    }
-    return sb.toString();
-  }
-
+  /**
+   * display Events details in labels
+   *
+   * @param event
+   */
   private void showEventDetails(Event event) {
+
+    clearEventsLabels();
     eIdLabel.setText(event.getId());
     eStreamIdLabel.setText(event.getStreamId());
     if (event.getTime() != null) {
@@ -228,7 +223,30 @@ public class AppController {
     }
   }
 
+  /**
+   *
+   * Streams
+   *
+   */
+
+  /**
+   * set rootStream as root TreeItem of TreeView
+   *
+   * @param rootStream
+   */
+  public void showStreams(TreeItem<Stream> rootStream) {
+    logger.log("AppController: treeView created");
+    streamsTreeView.setRoot(rootStream);
+  }
+
+  /**
+   * load stream's details in label and load stream's Events
+   *
+   * @param stream
+   */
   private void showStreamDetails(Stream stream) {
+
+    clearStreamLabels();
 
     // stream details
     idLabel.setText(stream.getId());
@@ -249,7 +267,57 @@ public class AppController {
     createdByLabel.setText(stream.getCreatedBy());
 
     // fetch events
-    exampleApp.getEvents(stream.getId());
+    exampleApp.getEventsForStreamId(stream.getId());
+    clearEventsLabels();
+  }
+
+  /**
+   * clear Labels
+   */
+
+  private void clearEventsLabels() {
+    for (Label label : eventsLabels) {
+      label.setText("empty");
+    }
+  }
+
+  private void clearStreamLabels() {
+    for (Label label : streamsLabels) {
+      label.setText("empty");
+    }
+  }
+
+  private void bindEventsLabels() {
+    eventsLabels = new ArrayList<Label>();
+    eventsLabels.add(eAttachmentsLabel);
+    eventsLabels.add(eClientDataLabel);
+    eventsLabels.add(eContentLabel);
+    eventsLabels.add(eCreatedByLabel);
+    eventsLabels.add(eCreatedLabel);
+    eventsLabels.add(eDescriptionLabel);
+    eventsLabels.add(eDurationLabel);
+    eventsLabels.add(eIdLabel);
+    eventsLabels.add(eModifiedByLabel);
+    eventsLabels.add(eModifiedLabel);
+    eventsLabels.add(eReferencesLabel);
+    eventsLabels.add(eStreamIdLabel);
+    eventsLabels.add(eTagsLabel);
+    eventsLabels.add(eTempRefIdLabel);
+    eventsLabels.add(eTimeLabel);
+    eventsLabels.add(eTrashedLabel);
+    eventsLabels.add(eTypeLabel);
+  }
+
+  private void bindStreamsLabels() {
+    streamsLabels = new ArrayList<Label>();
+    streamsLabels.add(idLabel);
+    streamsLabels.add(nameLabel);
+    streamsLabels.add(parentIdLabel);
+    streamsLabels.add(childrenLabel);
+    streamsLabels.add(singleActivityLabel);
+    streamsLabels.add(clientDataLabel);
+    streamsLabels.add(createdByLabel);
+    streamsLabels.add(createdLabel);
   }
 
   /**
@@ -261,15 +329,29 @@ public class AppController {
     this.exampleApp = mainApp;
 
     // Add observable list data to the table
-    eventsList.setItems(exampleApp.getEventsList());
+    eventsListView.setItems(exampleApp.getEventsList());
 
   }
 
-  public void showStreams(TreeItem<Stream> rootStream) {
-    logger.log("AppController: treeView created");
-    streamsTreeView.setRoot(rootStream);
-    for (TreeItem<Stream> strItem : rootStream.getChildren()) {
-      logger.log("AppController: nodes: " + strItem.getValue().getId());
+  /**
+   * format client data to printable.
+   *
+   * @param clientData
+   *          the client data to format
+   * @return client data in readable form as a String.
+   */
+  private String printClientData(Map<String, Object> clientData) {
+    StringBuilder sb = new StringBuilder();
+    if (clientData != null) {
+      sb.setLength(0);
+      String separator = "";
+      for (String key : clientData.keySet()) {
+        sb.append(separator);
+        separator = ", ";
+        sb.append(key + ": " + clientData.get(key));
+      }
+
     }
+    return sb.toString();
   }
 }

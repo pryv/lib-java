@@ -28,43 +28,26 @@ public class Supervisor {
     streams = new HashMap<String, Stream>();
   }
 
-  public Map<String, Event> getEvents(Filter filter) {
-    Map<String, Event> returnEvents = new HashMap<String, Event>();
+  /**
+   *
+   * Streams Management
+   *
+   */
 
-    for (Event event : events.values()) {
-      if (filter.match(event)) {
-        returnEvents.put(event.getId(), event);
-        logger.log("Supervisor: streamId=" + event.getStreamId() + ", id=" + event.getId());
-      }
-    }
-
-    if (filter.getLimit() != null) {
-      returnEvents.keySet().retainAll(
-        ImmutableSet.copyOf(Iterables.limit(returnEvents.keySet(), filter.getLimit())));
-    }
-    return returnEvents;
-  }
-
-  public Event getEventById(String id) {
-    return events.get(id);
-  }
-
-  public void addEvent(Event newEvent) {
-    logger.log("Supervisor: adding new event: id="
-      + newEvent.getId()
-        + ", streamId="
-        + newEvent.getStreamId());
-    events.put(newEvent.getId(), newEvent);
-  }
-
+  /**
+   * Returns the local memory streams
+   *
+   * @return
+   */
   public Map<String, Stream> getStreams() {
     return streams;
   }
 
-  public void setEvents(Map<String, Event> pEvents) {
-    this.events = pEvents;
-  }
-
+  /**
+   * Update Streams map with pStreams.
+   *
+   * @param pStreams
+   */
   public void updateStreams(Map<String, Stream> pStreams) {
     for (Stream stream : pStreams.values()) {
       // case exists: compare modified field
@@ -90,16 +73,64 @@ public class Supervisor {
     streams.put(stream.getId(), stream);
   }
 
-  public void updateEvents(Map<String, Event> newEvents) {
-    for (Event event : newEvents.values()) {
-      // case exists: compare modified field
-      if (events.containsKey(event.getId())) {
-        updateEvent(event);
-        // case new Event: simply add
-      } else {
-        addEvent(event);
+  /**
+   *
+   * Events Management
+   *
+   */
+
+  /**
+   * Returns the events matching the provided filter.
+   *
+   * @param filter
+   *          the filter object used to filter the Events.
+   * @return returns the events matching the filter or an empty Map<String,
+   *         Event>.
+   */
+  public Map<String, Event> getEvents(Filter filter) {
+    Map<String, Event> returnEvents = new HashMap<String, Event>();
+
+    for (Event event : events.values()) {
+      if (filter.match(event)) {
+        returnEvents.put(event.getId(), event);
+        logger
+          .log("Supervisor: matched: streamId=" + event.getStreamId() + ", id=" + event.getId());
       }
     }
+
+    // apply limit argument
+    if (filter.getLimit() != null) {
+      returnEvents.keySet().retainAll(
+        ImmutableSet.copyOf(Iterables.limit(returnEvents.keySet(), filter.getLimit())));
+    }
+    return returnEvents;
+  }
+
+  /**
+   * updates events with newEvents.
+   *
+   * @param newEvents
+   */
+  public void updateEvents(Map<String, Event> newEvents) {
+    if (newEvents != null) {
+      for (Event event : newEvents.values()) {
+        // case exists: compare modified field
+        if (events.containsKey(event.getId())) {
+          updateEvent(event);
+          // case new Event: simply add
+        } else {
+          addEvent(event);
+        }
+      }
+    }
+  }
+
+  private void addEvent(Event newEvent) {
+    logger.log("Supervisor: adding new event: id="
+      + newEvent.getId()
+        + ", streamId="
+        + newEvent.getStreamId());
+    events.put(newEvent.getId(), newEvent);
   }
 
   private void updateEvent(Event event) {
@@ -107,7 +138,26 @@ public class Supervisor {
     if (memEvent.getModified() > event.getModified()) {
       // do nothing
     } else {
+      logger.log("Supervisor: updating event: id="
+        + event.getId()
+          + ", streamId="
+          + event.getStreamId()
+          + ". Old time="
+          + memEvent.getTime()
+          + ", new Time="
+          + event.getTime());
       memEvent.merge(event, JsonConverter.getCloner());
     }
+  }
+
+  /**
+   * Returns the Event with eventId id or null if such event does not exist.
+   *
+   * @param id
+   *          the id of the event to be retrieved
+   * @return the Event with the requested id or null
+   */
+  public Event getEventById(String id) {
+    return events.get(id);
   }
 }

@@ -59,7 +59,7 @@
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="798.0" prefWidth="520.0">
                <children>
-                  <ListView fx:id="eventsList" layoutX="30.0" layoutY="236.0" prefHeight="549.0" prefWidth="457.0" AnchorPane.bottomAnchor="400.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0" />
+                  <ListView fx:id="eventsListView" layoutX="30.0" layoutY="236.0" prefHeight="549.0" prefWidth="457.0" AnchorPane.bottomAnchor="400.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0" />
                   <Label layoutX="24.0" layoutY="21.0" text="Events:" AnchorPane.leftAnchor="24.0" />
                   <GridPane layoutX="10.0" layoutY="408.0" prefHeight="368.0" prefWidth="450.0">
                     <columnConstraints>
@@ -109,7 +109,7 @@
                         <Label fx:id="eStreamIdLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <Label text="streamId" GridPane.rowIndex="1" />
                         <Label fx:id="eIdLabel" text="empty" GridPane.columnIndex="1" />
-                        <Label text="empty" GridPane.columnIndex="1" GridPane.rowIndex="15" />
+                        <Label fx:id="eTrashedLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="15" />
                         <Label fx:id="eModifiedByLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                         <Label fx:id="eDurationLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="8" />
                         <Label text="tempRefId" GridPane.rowIndex="16" />
@@ -118,8 +118,8 @@
                         <Label fx:id="eReferencesLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="11" />
                         <Label fx:id="eDescriptionLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="12" />
                         <Label fx:id="eAttachmentsLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="13" />
-                        <Label fx:id="eClientData" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="14" />
-                        <Label text="empty" GridPane.columnIndex="1" GridPane.rowIndex="16" />
+                        <Label fx:id="eClientDataLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="14" />
+                        <Label fx:id="eTempRefIdLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="16" />
                      </children>
                   </GridPane>
                </children>

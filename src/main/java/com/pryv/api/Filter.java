@@ -98,7 +98,6 @@ public class Filter {
 
     // streamIds
     Boolean streamIdMatch = true;
-
     if (streamIds != null) {
       if (!streamIds.contains(event.getStreamId())) {
         streamIdMatch = false;

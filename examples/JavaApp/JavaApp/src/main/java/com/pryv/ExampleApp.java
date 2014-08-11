@@ -46,9 +46,13 @@ public class ExampleApp extends Application implements AuthView,
 
   private Stage primaryStage;
   private BorderPane rootLayout;
-  private ObservableList<Event> eventsList = FXCollections.observableArrayList();
 
+  private ObservableList<Event> eventsList = FXCollections.observableArrayList();
   private ObservableList<TreeItem<Stream>> streamTreeItems = FXCollections.observableArrayList();
+
+  public static void main(String[] args) {
+    launch(args);
+  }
 
   @Override
   public void start(Stage primaryStage) {
@@ -56,17 +60,17 @@ public class ExampleApp extends Application implements AuthView,
     this.primaryStage.setTitle("Example App");
 
     try {
-      // Load the root layout from the fxml file
       FXMLLoader loader = new FXMLLoader(ExampleApp.class.getResource("view/RootLayout.fxml"));
       rootLayout = (BorderPane) loader.load();
       Scene scene = new Scene(rootLayout);
       primaryStage.setScene(scene);
       primaryStage.show();
     } catch (IOException e) {
-      // Exception gets thrown if the fxml file could not be loaded
+      displayError(e.getMessage());
       e.printStackTrace();
     }
 
+    // authentication
     showAuthView();
 
     Permission testPermission = new Permission("*", Permission.Level.manage, null);
@@ -80,16 +84,76 @@ public class ExampleApp extends Application implements AuthView,
   }
 
   /**
-   * Returns the main stage.
    *
-   * @return
+   *
+   * Authentication
+   *
+   *
    */
-  public Stage getPrimaryStage() {
-    return primaryStage;
+
+  /**
+   * Displays simple view during auth phase.
+   */
+  public void showAuthView() {
+
+    try {
+      FXMLLoader loader =
+        new FXMLLoader(ExampleApp.class.getResource("view/AuthenticationView.fxml"));
+      BorderPane overviewPage = (BorderPane) loader.load();
+      rootLayout.setCenter(overviewPage);
+    } catch (IOException e) {
+      displayError(e.getMessage());
+      e.printStackTrace();
+    }
   }
 
   /**
-   * Shows the person overview scene.
+   * load auth in browser
+   */
+  public void displayLoginVew(String loginURL) {
+    new AuthBrowserView().displayLoginVew(loginURL);
+  }
+
+  /**
+   * auth success, start main view, load all Streams and 20 random Events
+   */
+  public void onDisplaySuccess(Connection newConnection) {
+    logger.log("JavaApp: onSignInSuccess");
+
+    Platform.runLater(new Runnable() {
+
+      public void run() {
+        showMainView();
+      }
+    });
+
+    eventsManager = newConnection;
+    streamsManager = newConnection;
+    streamsManager.getStreams(this);
+    Filter filter = new Filter();
+    filter.setLimit(20);
+    eventsManager.getEvents(filter, this);
+  }
+
+  /**
+   * auth failure
+   */
+  public void onDisplayFailure() {
+    logger.log("JavaApp: onDisplayFailure");
+    displayError("auth failure");
+
+  }
+
+  /**
+   *
+   *
+   * Main components of Example App
+   *
+   *
+   */
+
+  /**
+   * Shows the main View, sets the controller.
    */
   public void showMainView() {
     try {
@@ -108,25 +172,12 @@ public class ExampleApp extends Application implements AuthView,
     }
   }
 
+
   /**
-   * Displays simple view during auth phase.
+   *
+   * Streams Callbacks
+   *
    */
-  public void showAuthView() {
-
-    try {
-      FXMLLoader loader =
-        new FXMLLoader(ExampleApp.class.getResource("view/AuthenticationView.fxml"));
-      BorderPane overviewPage = (BorderPane) loader.load();
-      rootLayout.setCenter(overviewPage);
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-  }
-
-  public static void main(String[] args) {
-    launch(args);
-  }
 
   public void onStreamsSuccess(final Map<String, Stream> streams) {
     logger.log("JavaApp: onSuccess()");
@@ -161,79 +212,13 @@ public class ExampleApp extends Application implements AuthView,
     displayError(message);
   }
 
-  public void onEventsSuccess(final Map<String, Event> events) {
-    Platform.runLater(new Runnable() {
-
-      public void run() {
-        for (Event event : events.values()) {
-          eventsList.add(event);
-        }
-      }
-    });
-
-  }
-
-  public void onEventsPartialResult(Map<String, Event> newEvents) {
-    // TODO Auto-generated method stub
-
-  }
-
-  public void onEventsError(String message) {
-    displayError(message);
-  }
-
-  private void displayError(final String message) {
-    Platform.runLater(new Runnable() {
-
-      public void run() {
-        Dialogs.create().owner(getPrimaryStage()).title("error").message(message)
-          .showInformation();
-      }
-    });
-  }
-
   /**
-   * load auth in browser
+   * Fetch Events for a specific streamId
+   *
+   * @param streamId
    */
-  public void displayLoginVew(String loginURL) {
-    new AuthBrowserView().displayLoginVew(loginURL);
-  }
-
-  /**
-   * auth success
-   */
-  public void onDisplaySuccess(Connection newConnection) {
-    logger.log("JavaApp: onSignInSuccess");
-
-    Platform.runLater(new Runnable() {
-
-      public void run() {
-        showMainView();
-      }
-    });
-    eventsManager = newConnection;
-    streamsManager = newConnection;
-    streamsManager.getStreams(this);
-    Filter filter = new Filter();
-    filter.setLimit(20);
-    eventsManager.getEvents(filter, this);
-  }
-
-  /**
-   * auth failure
-   */
-  public void onDisplayFailure() {
-    logger.log("JavaApp: onDisplayFailure");
-    displayError("auth failure");
-
-  }
-
-  public ObservableList<Event> getEventsList() {
-    return eventsList;
-  }
-
-  public void getEvents(String streamId) {
-    eventsList.clear();
+  public void getEventsForStreamId(String streamId) {
+    eventsList.removeAll(eventsList);
 
     Set<String> streamIds = new HashSet<String>();
     streamIds.add(streamId);
@@ -241,6 +226,71 @@ public class ExampleApp extends Application implements AuthView,
     filter.setStreamIds(streamIds);
     eventsManager.getEvents(filter, this);
 
+  }
+
+  /**
+   *
+   * Events Callbacks
+   *
+   */
+
+  public void onEventsSuccess(final Map<String, Event> newEvents) {
+    addEventsToList(newEvents);
+  }
+
+  public void onEventsPartialResult(Map<String, Event> newEvents) {
+    addEventsToList(newEvents);
+  }
+
+  public void onEventsError(String message) {
+    displayError(message);
+  }
+
+
+  private void addEventsToList(final Map<String, Event> newEvents) {
+    logger.log("ExampleApp: adding events to List: " + newEvents.values().size());
+    Platform.runLater(new Runnable() {
+
+      public void run() {
+        eventsList.removeAll(eventsList);
+        eventsList.addAll(newEvents.values());
+      }
+    });
+  }
+
+  /**
+   * Returns the ObservableList<Events
+   *
+   * @return
+   */
+  public ObservableList<Event> getEventsList() {
+    return eventsList;
+  }
+
+  /**
+   * displays error message in custom Alert Dialog.
+   *
+   * @param message
+   *          the message to display
+   */
+  private void displayError(final String message) {
+    Platform.runLater(new Runnable() {
+
+      public void run() {
+        Dialogs.create().owner(getPrimaryStage()).title("error").message(message).showInformation();
+      }
+    });
+  }
+
+
+
+  /**
+   * Returns the main stage.
+   *
+   * @return
+   */
+  public Stage getPrimaryStage() {
+    return primaryStage;
   }
 
 }
