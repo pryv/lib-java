@@ -11,7 +11,7 @@ import java.io.PrintStream;
  */
 public class Logger {
 
-  private static Logger logger = new Logger();
+  private static Logger logger;
   private PrintStream stream;
 
   public Logger() {
@@ -24,6 +24,11 @@ public class Logger {
    * @return
    */
   public static Logger getInstance() {
+    System.out.println("Logger: getinstance");
+    if (logger == null) {
+      System.out.println("Logger: instanciate!");
+      logger = new Logger();
+    }
     return logger;
   }
 
