@@ -24,9 +24,7 @@ public class Logger {
    * @return
    */
   public static Logger getInstance() {
-    System.out.println("Logger: getinstance");
     if (logger == null) {
-      System.out.println("Logger: instanciate!");
       logger = new Logger();
     }
     return logger;
