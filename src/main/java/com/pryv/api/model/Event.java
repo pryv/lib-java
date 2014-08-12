@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.rits.cloning.Cloner;
 
 /**
@@ -13,6 +14,7 @@ import com.rits.cloning.Cloner;
  * @author ik
  *
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Event {
 
   private String id;
@@ -68,8 +70,8 @@ public class Event {
    */
   public Event(String pId, String pStreamId, Long pTime, Long pDuration, String pType,
     String pContent, Set<String> pTags, Set<String> pReferences, String pDescription,
-    Set<Attachment> pAttachments, Map<String, Object> pClientData, Boolean pTrashed,
-    Long pCreated, String pCreatedBy, Long pModified, String pModifiedBy, String pTempRefId) {
+    Set<Attachment> pAttachments, Map<String, Object> pClientData, Boolean pTrashed, Long pCreated,
+    String pCreatedBy, Long pModified, String pModifiedBy, String pTempRefId) {
     id = pId;
     streamId = pStreamId;
     time = pTime;
@@ -90,6 +92,9 @@ public class Event {
     tempRefId = pTempRefId;
   }
 
+  /**
+   * empty Event constructor
+   */
   public Event() {
 
   }
@@ -139,6 +144,179 @@ public class Event {
     createdBy = temp.createdBy;
     modified = temp.modified;
     modifiedBy = temp.modifiedBy;
+  }
+
+  public String toSQL() {
+    String listSeparator = "";
+    StringBuilder sb = new StringBuilder();
+
+    primitiveAsSQL(sb, id);
+    primitiveAsSQL(sb, streamId);
+    longAsSQL(sb, time);
+    primitiveAsSQL(sb, type);
+    longAsSQL(sb, created);
+    primitiveAsSQL(sb, createdBy);
+    longAsSQL(sb, modified);
+    primitiveAsSQL(sb, modifiedBy);
+    longAsSQL(sb, duration);
+    primitiveAsSQL(sb, content);
+    setAsSQL(sb, tags);
+    setAsSQL(sb, references);
+    primitiveAsSQL(sb, description);
+    // attachments need to go in their own table
+    primitiveAsSQL(sb, getClientDataAsString());
+    primitiveAsSQL(sb, trashed);
+    primitiveAsSQL(sb, tempRefId);
+    sb.setLength(sb.length() - 1);
+
+    // // id
+    // sb.append("\'" + id + "\',");
+    //
+    // // streamId
+    // sb.append("\'" + streamId + "\',");
+    //
+    // // time
+    // if (time != null) {
+    // sb.append(time + ",");
+    // } else {
+    // sb.append("null,");
+    // }
+    //
+    // // type
+    // sb.append("\'" + type + "\',");
+    //
+    // // created
+    // if (created != null) {
+    // sb.append(created.toString() + ",");
+    // } else {
+    // sb.append("null,");
+    // }
+    //
+    // // createdBy
+    // sb.append("\'" + createdBy + "\',");
+    //
+    // // modified
+    // if (modified != null) {
+    // sb.append(modified.toString() + ",");
+    //
+    // } else {
+    // sb.append("null,");
+    // }
+    //
+    // // modifiedBy
+    // sb.append("\'" + modifiedBy + "\',");
+    //
+    // // duration
+    // if (duration != null) {
+    // sb.append(duration.toString() + ",");
+    // } else {
+    // sb.append("null,");
+    // }
+    //
+    // // content
+    // if (content != null) {
+    // sb.append("\'" + content.toString() + "\',");
+    //
+    // } else {
+    // sb.append("null,");
+    // }
+    //
+    // // tags
+    // sb.append("\'");
+    // if (tags != null) {
+    // for (String tag : tags) {
+    // sb.append(listSeparator + tag);
+    // listSeparator = ",";
+    // }
+    // }
+    // sb.append("\',");
+    // listSeparator = "";
+    //
+    // // refs
+    // sb.append("\'");
+    // if (references != null) {
+    // for (String ref : references) {
+    // sb.append(listSeparator + ref);
+    // listSeparator = ",";
+    // }
+    // }
+    // sb.append("\',");
+    // listSeparator = "";
+    //
+    // sb.append("\'" + description + "\',");
+    //
+    // // attachments
+    // sb.append("\'");
+    // if (attachments != null) {
+    // for (Attachment attachment : attachments) {
+    // sb.append(listSeparator + attachment.getId());
+    // listSeparator = ",";
+    // }
+    // } else {
+    // sb.append("null");
+    // }
+    // sb.append("\',");
+    // listSeparator = "";
+    //
+    // // clientData
+    // sb.append("\'" + getClientDataAsString() + "\',");
+    // sb.append("\'" + trashed + "\',");
+    // sb.append("\'" + tempRefId + "\'");
+
+    return sb.toString();
+  }
+
+  private void longAsSQL(StringBuilder sb, Long toAdd) {
+    if (toAdd != null) {
+      sb.append(toAdd);
+    } else {
+      sb.append("NULL");
+    }
+    sb.append(",");
+  }
+
+  private void primitiveAsSQL(StringBuilder sb, Object prim) {
+    if (prim != null) {
+      sb.append("\'" + prim + "\'");
+    } else {
+      sb.append("NULL");
+    }
+    sb.append(",");
+  }
+
+  private void setAsSQL(StringBuilder sb, Set<?> set) {
+    String listSeparator = "";
+    if (set != null) {
+      sb.append("\'");
+      for (Object setItem : set) {
+        sb.append(listSeparator + setItem);
+        listSeparator = ",";
+      }
+      sb.append("\'");
+    } else {
+      sb.append("NULL");
+    }
+    sb.append(",");
+  }
+
+  /**
+   * format client data to printable.
+   *
+   * @return client data in readable form as a String.
+   */
+  public String getClientDataAsString() {
+    StringBuilder sb = new StringBuilder();
+    if (clientData != null) {
+      String separator = "";
+      for (String key : clientData.keySet()) {
+        sb.append(separator);
+        separator = ", ";
+        sb.append(key + ": " + clientData.get(key));
+      }
+      return sb.toString();
+    } else {
+      return null;
+    }
   }
 
   public String getDescription() {

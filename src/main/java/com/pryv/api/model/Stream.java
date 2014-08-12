@@ -68,6 +68,27 @@ public class Stream {
     modifiedBy = temp.modifiedBy;
   }
 
+  /**
+   * format client data to printable.
+   *
+   * @param clientData
+   *          the client data to format
+   * @return client data in readable form as a String.
+   */
+  public String getClientDataAsString() {
+    StringBuilder sb = new StringBuilder();
+    if (clientData != null) {
+      String separator = "";
+      for (String key : clientData.keySet()) {
+        sb.append(separator);
+        separator = ", ";
+        sb.append(key + ": " + clientData.get(key));
+      }
+
+    }
+    return sb.toString();
+  }
+
   public String getId() {
     return id;
   }

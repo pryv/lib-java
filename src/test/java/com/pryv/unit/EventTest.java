@@ -59,7 +59,6 @@ public class EventTest {
 
   @Before
   public void setUp() throws Exception {
-    // gson = new Gson();
     tags.add(tagTest);
     tags.add(tagBasicTest);
     references.add(testReference);
@@ -69,8 +68,6 @@ public class EventTest {
       new Event(null, streamID, time, duration, type, content, tags, references, description,
         attachments, clientData, trashed, created, createdBy, modified, modifiedBy, null);
     testEvent.setId(id);
-    // jsonTestEvent = gson.toJson(testEvent);
-    // jsonTestEvent = new JSONObject(testEvent.toJson());
     jsonTestEvent = JsonConverter.toJson(testEvent);
   }
 
@@ -185,6 +182,17 @@ public class EventTest {
       e.printStackTrace();
     }
     checkEventParams(eventFromJson);
+  }
+
+  @Test
+  public void testEventInSQLFormat() {
+    System.out.println("testevent: " + testEvent.toSQL());
+  }
+
+  @Test
+  public void testEmptyEventInSQLFormat() {
+    Event emptyEvent = new Event();
+    System.out.println("emptyEvent: " + emptyEvent.toSQL());
   }
 
 }
