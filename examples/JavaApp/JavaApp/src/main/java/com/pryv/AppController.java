@@ -330,7 +330,6 @@ public class AppController {
 
     // Add observable list data to the table
     eventsListView.setItems(exampleApp.getEventsList());
-
   }
 
   /**
@@ -353,5 +352,9 @@ public class AppController {
 
     }
     return sb.toString();
+  }
+
+  public ListView<Event> getEventsListView() {
+    return eventsListView;
   }
 }

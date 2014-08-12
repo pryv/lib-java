@@ -218,7 +218,8 @@ public class ExampleApp extends Application implements AuthView,
    * @param streamId
    */
   public void getEventsForStreamId(String streamId) {
-    eventsList.removeAll(eventsList);
+    // eventsList.removeAll(eventsList);
+    // eventsSet.removeAll(eventsSet);
 
     Set<String> streamIds = new HashSet<String>();
     streamIds.add(streamId);
@@ -252,14 +253,24 @@ public class ExampleApp extends Application implements AuthView,
     Platform.runLater(new Runnable() {
 
       public void run() {
+        logger.log("ExampleApp: Number of events in obsList before adding: " + eventsList.size());
         eventsList.removeAll(eventsList);
+        controller.getEventsListView().setItems(null);
+        logger.log("ExampleApp: Number of events in obsList after removeAll().");
         eventsList.addAll(newEvents.values());
+        controller.getEventsListView().setItems(eventsList);
+        logger.log("ExampleApp: Number of events in obsList after addAll(): " + eventsList.size());
+        // logger.log("ExampleApp: num events in ListView before setItems to null: "
+        // + controller.getEventsListView());
+        controller.getEventsListView().setItems(null);
+        controller.getEventsListView().setItems(eventsList);
+
       }
     });
   }
 
   /**
-   * Returns the ObservableList<Events
+   * Returns the ObservableList<Event>
    *
    * @return
    */
