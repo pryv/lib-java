@@ -32,7 +32,7 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
   public CacheEventsAndStreamsManager(String url, String token) {
     onlineEventsManager = new OnlineEventsAndStreamsManager(url, token);
     onlineStreamsManager = (StreamsManager<String>) onlineEventsManager;
-    dbHelper = new SQLiteDBHelper();
+    // dbHelper = new SQLiteDBHelper();
   }
 
   /**
@@ -43,7 +43,7 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
   public void getEvents(Filter filter,
     final EventsCallback<Map<String, Event>> eventsCallback) {
     // look in cache and send it onPartialResult
-    dbHelper.getEvents();
+    // dbHelper.getEvents();
     logger.log("Cache: retrieved Events from cache: ");
     eventsCallback.onEventsPartialResult(new HashMap<String, Event>());
 
@@ -135,7 +135,7 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
   @Override
   public void getStreams(final StreamsCallback<Map<String, Stream>> streamsCallback) {
     // look in cache and send it onPartialResult
-    dbHelper.getStreams();
+    // dbHelper.getStreams();
     logger.log("Cache: retrieved Events from cache: ");
     streamsCallback.onStreamsPartialResult(new HashMap<String, Stream>());
 

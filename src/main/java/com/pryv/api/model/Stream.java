@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.rits.cloning.Cloner;
 
 /**
@@ -14,6 +15,7 @@ import com.rits.cloning.Cloner;
  * @author ik
  *
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Stream {
 
   private String id;
@@ -71,8 +73,6 @@ public class Stream {
   /**
    * format client data to printable.
    *
-   * @param clientData
-   *          the client data to format
    * @return client data in readable form as a String.
    */
   public String getClientDataAsString() {
@@ -84,9 +84,10 @@ public class Stream {
         separator = ", ";
         sb.append(key + ": " + clientData.get(key));
       }
-
+      return sb.toString();
+    } else {
+      return null;
     }
-    return sb.toString();
   }
 
   public String getId() {

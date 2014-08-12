@@ -116,6 +116,11 @@
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.7.1.201405082137</version>
+				<configuration>
+					<excludes>
+						<exclude>**org.sqlite*</exclude>
+					</excludes>
+				</configuration>
 				<executions>
 					<!-- Prepares the property pointing to the JaCoCo runtime agent which 
 						is passed as VM argument when Maven the Surefire plugin is executed. -->
