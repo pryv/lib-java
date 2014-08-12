@@ -150,6 +150,8 @@ public class AppController {
             super.updateItem(t, bln);
             if (t != null) {
               setText(t.getId());
+            } else {
+              setText("");
             }
           }
         };
