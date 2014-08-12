@@ -2,7 +2,6 @@ package com.pryv;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -215,7 +214,7 @@ public class AppController {
       }
     }
     if (event.getClientData() != null) {
-      eClientDataLabel.setText(printClientData(event.getClientData()));
+      eClientDataLabel.setText(event.getClientDataAsString());
     }
     if (event.getTrashed() != null) {
       eTrashedLabel.setText(event.getTrashed().toString());
@@ -264,7 +263,7 @@ public class AppController {
     String childrenIDs = sb.toString();
     childrenLabel.setText(childrenIDs);
     singleActivityLabel.setText(String.valueOf(stream.getSingleActivity()));
-    clientDataLabel.setText(printClientData(stream.getClientData()));
+    clientDataLabel.setText(stream.getClientDataAsString());
     createdLabel.setText(String.valueOf(stream.getCreated()));
     createdByLabel.setText(stream.getCreatedBy());
 
@@ -272,6 +271,7 @@ public class AppController {
     exampleApp.getEventsForStreamId(stream.getId());
     clearEventsLabels();
   }
+
 
   /**
    * clear Labels
@@ -341,20 +341,19 @@ public class AppController {
    *          the client data to format
    * @return client data in readable form as a String.
    */
-  private String printClientData(Map<String, Object> clientData) {
-    StringBuilder sb = new StringBuilder();
-    if (clientData != null) {
-      sb.setLength(0);
-      String separator = "";
-      for (String key : clientData.keySet()) {
-        sb.append(separator);
-        separator = ", ";
-        sb.append(key + ": " + clientData.get(key));
-      }
-
-    }
-    return sb.toString();
-  }
+  // private String printClientData(Map<String, Object> clientData) {
+  // StringBuilder sb = new StringBuilder();
+  // if (clientData != null) {
+  // String separator = "";
+  // for (String key : clientData.keySet()) {
+  // sb.append(separator);
+  // separator = ", ";
+  // sb.append(key + ": " + clientData.get(key));
+  // }
+  //
+  // }
+  // return sb.toString();
+  // }
 
   public ListView<Event> getEventsListView() {
     return eventsListView;

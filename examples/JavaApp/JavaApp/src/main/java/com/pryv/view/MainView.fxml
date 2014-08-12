@@ -59,7 +59,7 @@
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="798.0" prefWidth="520.0">
                <children>
-                  <ListView fx:id="eventsListView" layoutX="30.0" layoutY="236.0" prefHeight="549.0" prefWidth="457.0" AnchorPane.bottomAnchor="400.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0" />
+                  <ListView fx:id="eventsListView" cacheShape="false" layoutX="30.0" layoutY="236.0" prefHeight="549.0" prefWidth="457.0" AnchorPane.bottomAnchor="400.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0" />
                   <Label layoutX="24.0" layoutY="21.0" text="Events:" AnchorPane.leftAnchor="24.0" />
                   <GridPane layoutX="10.0" layoutY="408.0" prefHeight="368.0" prefWidth="450.0">
                     <columnConstraints>

@@ -40,15 +40,15 @@ public class ExampleApp extends Application implements AuthView,
   private AppController controller;
   private Logger logger = Logger.getInstance();
 
-  private final static String REQUESTING_APP_ID = "web-app-test";
+  private final static String REQUESTING_APP_ID = "pryv-lib-java-example";
   private EventsManager<Map<String, Event>> eventsManager;
   private StreamsManager<Map<String, Stream>> streamsManager;
 
   private Stage primaryStage;
   private BorderPane rootLayout;
 
-  private ObservableList<Event> eventsList = FXCollections.observableArrayList();
-  private ObservableList<TreeItem<Stream>> streamTreeItems = FXCollections.observableArrayList();
+  private ObservableList<Event> eventsObservableList = FXCollections.observableArrayList();
+  private ObservableList<TreeItem<Stream>> streamTreeItemsObservableList = FXCollections.observableArrayList();
 
   public static void main(String[] args) {
     launch(args);
@@ -196,7 +196,7 @@ public class ExampleApp extends Application implements AuthView,
           }
           root.getChildren().add(streamTreeItem);
         }
-        streamTreeItems.add(root);
+        streamTreeItemsObservableList.add(root);
         controller.showStreams(root);
       }
     });
@@ -217,15 +217,11 @@ public class ExampleApp extends Application implements AuthView,
    * @param streamId
    */
   public void getEventsForStreamId(String streamId) {
-    // eventsList.removeAll(eventsList);
-    // eventsSet.removeAll(eventsSet);
-
     Set<String> streamIds = new HashSet<String>();
     streamIds.add(streamId);
     Filter filter = new Filter();
     filter.setStreamIds(streamIds);
     eventsManager.getEvents(filter, this);
-
   }
 
   /**
@@ -247,23 +243,21 @@ public class ExampleApp extends Application implements AuthView,
   }
 
 
+  /**
+   * Add Events to ObservableList<Event> eventsObservableList
+   *
+   * @param newEvents
+   */
   private void addEventsToList(final Map<String, Event> newEvents) {
     logger.log("ExampleApp: adding events to List: " + newEvents.values().size());
     Platform.runLater(new Runnable() {
-
       public void run() {
-        logger.log("ExampleApp: Number of events in obsList before adding: " + eventsList.size());
-        eventsList.removeAll(eventsList);
+        eventsObservableList.removeAll(eventsObservableList);
         controller.getEventsListView().setItems(null);
-        logger.log("ExampleApp: Number of events in obsList after removeAll().");
-        eventsList.addAll(newEvents.values());
-        controller.getEventsListView().setItems(eventsList);
-        logger.log("ExampleApp: Number of events in obsList after addAll(): " + eventsList.size());
-        // logger.log("ExampleApp: num events in ListView before setItems to null: "
-        // + controller.getEventsListView());
+        eventsObservableList.addAll(newEvents.values());
+        controller.getEventsListView().setItems(eventsObservableList);
         controller.getEventsListView().setItems(null);
-        controller.getEventsListView().setItems(eventsList);
-
+        controller.getEventsListView().setItems(eventsObservableList);
       }
     });
   }
@@ -274,7 +268,7 @@ public class ExampleApp extends Application implements AuthView,
    * @return
    */
   public ObservableList<Event> getEventsList() {
-    return eventsList;
+    return eventsObservableList;
   }
 
   /**
