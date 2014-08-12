@@ -141,7 +141,6 @@ public class ExampleApp extends Application implements AuthView,
   public void onDisplayFailure() {
     logger.log("JavaApp: onDisplayFailure");
     displayError("auth failure");
-
   }
 
   /**
