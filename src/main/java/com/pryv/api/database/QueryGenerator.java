@@ -182,58 +182,65 @@ public class QueryGenerator {
 
     if (filter != null) {
       sb.append("WHERE ");
+      String andSeparator = "";
       // fromTime
       if (filter.getFromTime() != null) {
-        sb.append(TIME_KEY + ">" + filter.getFromTime() + " AND ");
+        sb.append(andSeparator + TIME_KEY + ">" + filter.getFromTime());
+        andSeparator = " AND ";
       }
 
       // toTime
       if (filter.getToTime() != null) {
-        sb.append(TIME_KEY + "<" + filter.getToTime() + " AND ");
+        sb.append(andSeparator + TIME_KEY + "<" + filter.getToTime());
+        andSeparator = " AND ";
       }
 
       // streamIds
-      formatFilterSet(sb, filter.getStreamIds(), STREAM_ID_KEY);
+      formatFilterSet(andSeparator, sb, filter.getStreamIds(), STREAM_ID_KEY);
 
       // tags
-      formatFilterSet(sb, filter.getTags(), TAGS_KEY);
+      formatFilterSet(andSeparator, sb, filter.getTags(), TAGS_KEY);
 
       // types
-      formatFilterSet(sb, filter.getTypes(), TYPE_KEY);
+      formatFilterSet(andSeparator, sb, filter.getTypes(), TYPE_KEY);
 
       // TODO handle running parameter
 
       // modifiedSince
       if (filter.getModifiedSince() != null) {
-        sb.append(MODIFIED_KEY + ">" + filter.getModifiedSince() + " AND ");
+        sb.append(andSeparator + MODIFIED_KEY + ">" + filter.getModifiedSince());
+        andSeparator = " AND ";
       }
 
       // state
       if (filter.getState() != null) {
+        sb.append(andSeparator);
         if (filter.getState().equals(Filter.State.DEFAULT)) {
-          sb.append(TRASHED_KEY + "=" + "\'false\'" + " AND ");
+          sb.append(TRASHED_KEY + "=" + "\'false\'");
         } else if (filter.getState().equals(Filter.State.TRASHED)) {
-          sb.append(TRASHED_KEY + "=" + "\'true\'" + " AND ");
+          sb.append(TRASHED_KEY + "=" + "\'true\'");
         } else {
-          // do nothing
+          sb.append("(" + TRASHED_KEY + "=\'false\' OR " + TRASHED_KEY + "=\'true\')");
         }
+        andSeparator = " AND ";
       }
-      sb.setLength(sb.length() - " AND ".length());
     }
     sb.append(";");
     return sb.toString();
   }
 
-  private static void formatFilterSet(StringBuilder sb, Set<String> set, String key) {
+  private static void formatFilterSet(String andSeparator, StringBuilder sb, Set<String> set,
+    String key) {
     if (set != null) {
-      sb.append("(");
+      sb.append(andSeparator + "(");
       String separator = "";
       for (String item : set) {
         sb.append(separator);
-        sb.append(key + "=" + formatTextValue(item) + " ");
-        separator = "OR ";
+        sb.append(key + "=" + formatTextValue(item));
+        separator = " OR ";
       }
-      sb.append(") AND ");
+      sb.append(")");
+      andSeparator = " AND ";
     }
   }
 
