@@ -6,17 +6,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pryv.api.model.Stream;
 import com.pryv.utils.JsonConverter;
 
@@ -30,30 +25,28 @@ public class StreamTest {
 
   private Stream testStream;
   private String jsonStream;
-  private final String id = "abc";
-  private final String name = "testStream";
-  private final String parentId = "ABC";
-  private final Boolean singleActivity = true;
-  private final Map<String, Object> clientData = new HashMap<String, Object>();
-  private final String clientKey = "testKey";
-  private final String clientValue = "testValue";
-  private final List<Stream> children = new ArrayList<Stream>();
-  private final Boolean trashed = false;
-  private final long created = 1000;
-  private final String createdBy = "Bob";
-  private final long modified = 1500;
-  private final String modifiedBy = "Bill";
-  private final String childID = "aaa";
-  private ObjectMapper mapper = new ObjectMapper();
+
+  // private final String id = "abc";
+  // private final String name = "testStream";
+  // private final String parentId = "ABC";
+  // private final Boolean singleActivity = true;
+  // private final Map<String, Object> clientData = new HashMap<String,
+  // Object>();
+  // private final String clientKey = "testKey";
+  // private final String clientValue = "testValue";
+  // private final List<Stream> children = new ArrayList<Stream>();
+  // private final Boolean trashed = false;
+  // private final Long created = new Long(1000);
+  // private final String createdBy = "Bob";
+  // private final Long modified = new Long(1500);
+  // private final String modifiedBy = "Bill";
+  // private final String childID = "aaa";
+  // private ObjectMapper mapper = new ObjectMapper();
 
   @Before
   public void setUp() throws Exception {
-    clientData.put(clientKey, clientValue);
-    children.add(new Stream(childID, null, null, null, null, null, false, 0, null, 0, null));
-    testStream =
-        new Stream(id, name, parentId, singleActivity, clientData, children, trashed, created,
-            createdBy, modified, modifiedBy);
-    jsonStream = JsonConverter.toJson(testStream);
+    testStream = DummyData.generateFullStream();
+    jsonStream = DummyData.generateJsonStream();
   }
 
   @Test
@@ -87,9 +80,9 @@ public class StreamTest {
             .equals(testStream.getChildren().get(i).getId()));
       }
       assertTrue(streamToUpdate.getTrashed() == testStream.getTrashed());
-      assertTrue(streamToUpdate.getCreated() == testStream.getCreated());
+      assertTrue(streamToUpdate.getCreated().equals(testStream.getCreated()));
       assertTrue(streamToUpdate.getCreatedBy().equals(testStream.getCreatedBy()));
-      assertTrue(streamToUpdate.getModified() == testStream.getModified());
+      assertTrue(streamToUpdate.getModified().equals(testStream.getModified()));
       assertTrue(streamToUpdate.getModifiedBy().equals(testStream.getModifiedBy()));
     } catch (JsonParseException e) {
       // TODO Auto-generated catch block
@@ -104,19 +97,19 @@ public class StreamTest {
   }
 
   private void checkStreamParams(Stream pStream) {
-    assertEquals(id, pStream.getId());
-    assertEquals(name, pStream.getName());
-    assertEquals(parentId, pStream.getParentId());
-    assertEquals(singleActivity, pStream.getSingleActivity());
-    assertEquals(clientData, pStream.getClientData());
+    assertEquals(DummyData.getStreamId(), pStream.getId());
+    assertEquals(DummyData.getStreamName(), pStream.getName());
+    assertEquals(DummyData.getStreamParentId(), pStream.getParentId());
+    assertEquals(DummyData.getStreamSingleActivity(), pStream.getSingleActivity());
+    assertEquals(DummyData.getStreamClientData(), pStream.getClientData());
     for (Stream child : pStream.getChildren()) {
-      assertEquals(childID, child.getId());
+      assertEquals(DummyData.getStreamChildId(), child.getId());
     }
-    assertEquals(trashed, pStream.getTrashed());
-    assertEquals(created, pStream.getCreated());
-    assertEquals(createdBy, pStream.getCreatedBy());
-    assertEquals(modified, pStream.getModified());
-    assertEquals(modifiedBy, pStream.getModifiedBy());
+    assertEquals(DummyData.getStreamTrashed(), pStream.getTrashed());
+    assertEquals(DummyData.getStreamCreated(), pStream.getCreated());
+    assertEquals(DummyData.getStreamCreatedBy(), pStream.getCreatedBy());
+    assertEquals(DummyData.getStreamModified(), pStream.getModified());
+    assertEquals(DummyData.getStreamModifiedBy(), pStream.getModifiedBy());
   }
 
 }
