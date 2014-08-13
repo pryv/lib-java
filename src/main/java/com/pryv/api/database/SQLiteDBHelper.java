@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.pryv.api.Filter;
 import com.pryv.api.model.Event;
+import com.pryv.api.model.Stream;
 import com.pryv.utils.Logger;
 
 /**
@@ -47,6 +48,7 @@ public class SQLiteDBHelper {
       dbConnection = DriverManager.getConnection("jdbc:sqlite:" + path);
       logger.log("Opened database successfully");
       createEventsTable();
+      createSteamsTable();
     } catch (ClassNotFoundException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -132,7 +134,20 @@ public class SQLiteDBHelper {
     Statement statement = dbConnection.createStatement();
     String cmd = QueryGenerator.createEventsTable();
     logger.log("SQLiteDBHelper: createEventsTable: " + cmd);
-    statement.executeUpdate(cmd);
+    statement.execute(cmd);
+    statement.close();
+  }
+
+  /**
+   * Create Streams table in the SQLite database.
+   *
+   * @throws SQLException
+   */
+  private void createSteamsTable() throws SQLException {
+    Statement statement = dbConnection.createStatement();
+    String cmd = QueryGenerator.createStreamsTable();
+    logger.log("SQLiteDBHelper: createStreamsTable: " + cmd);
+    statement.execute(cmd);
     statement.close();
   }
 
@@ -143,5 +158,20 @@ public class SQLiteDBHelper {
   public void getStreams() {
     // TODO Auto-generated method stub
 
+  }
+
+  /**
+   * Insert Stream into the SQLite database.
+   *
+   * @param streamToCache
+   *          the stream to insert
+   * @throws SQLException
+   */
+  public void addStream(Stream streamToCache) throws SQLException {
+    String cmd = QueryGenerator.createStream(streamToCache);
+    logger.log("SQLiteDBHelper: addStream: " + cmd);
+    Statement statement = dbConnection.createStatement();
+    statement.execute(cmd);
+    statement.close();
   }
 }

@@ -4,6 +4,7 @@ import java.util.Set;
 
 import com.pryv.api.Filter;
 import com.pryv.api.model.Event;
+import com.pryv.api.model.Stream;
 
 /**
  * Class containing methods to generate SQLite queries
@@ -18,64 +19,84 @@ public class QueryGenerator {
    */
   private static final String EVENTS_TABLE_NAME = "EVENTS";
   private static final String STREAMS_TABLE_NAME = "STREAMS";
-  private static final String ATTACHMENTS_TABLE_NAME = "ATTACHMENTS";
+  // private static final String ATTACHMENTS_TABLE_NAME = "ATTACHMENTS";
 
   /**
    * Events Table keys
    */
-  public static final String ID_KEY = "ID";
-  public static final String STREAM_ID_KEY = "STREAM_ID";
-  public static final String TIME_KEY = "TIME";
-  public static final String TYPE_KEY = "TYPE";
-  public static final String CREATED_KEY = "CREATED";
-  public static final String CREATED_BY_KEY = "CREATED_BY";
-  public static final String MODIFIED_KEY = "MODIFIED";
-  public static final String MODIFIED_BY_KEY = "MODIFIED_BY";
-  public static final String DURATION_KEY = "DURATION";
-  public static final String CONTENT_KEY = "CONTENT";
-  public static final String TAGS_KEY = "TAGS";
-  public static final String REFS_KEY = "REFS";
-  public static final String DESCRIPTION_KEY = "DESCRIPTION";
-  public static final String CLIENT_DATA_KEY = "CLIENT_DATA";
-  public static final String TRASHED_KEY = "TRASHED";
-  public static final String TEMP_REF_ID_KEY = "TEMP_REF_ID";
+  public static final String EVENTS_ID_KEY = "ID";
+  public static final String EVENTS_STREAM_ID_KEY = "STREAM_ID";
+  public static final String EVENTS_TIME_KEY = "TIME";
+  public static final String EVENTS_TYPE_KEY = "TYPE";
+  public static final String EVENTS_CREATED_KEY = "CREATED";
+  public static final String EVENTS_CREATED_BY_KEY = "CREATED_BY";
+  public static final String EVENTS_MODIFIED_KEY = "MODIFIED";
+  public static final String EVENTS_MODIFIED_BY_KEY = "MODIFIED_BY";
+  public static final String EVENTS_DURATION_KEY = "DURATION";
+  public static final String EVENTS_CONTENT_KEY = "CONTENT";
+  public static final String EVENTS_TAGS_KEY = "TAGS";
+  public static final String EVENTS_REFS_KEY = "REFS";
+  public static final String EVENTS_DESCRIPTION_KEY = "DESCRIPTION";
+  public static final String EVENTS_CLIENT_DATA_KEY = "CLIENT_DATA";
+  public static final String EVENTS_TRASHED_KEY = "TRASHED";
+  public static final String EVENTS_TEMP_REF_ID_KEY = "TEMP_REF_ID";
 
+  /**
+   * Streams Table keys
+   */
+  public static final String STREAMS_ID_KEY = "ID";
+  public static final String STREAMS_NAME_KEY = "NAME";
+  public static final String STREAMS_PARENT_ID_KEY = "PARENT_ID";
+  public static final String STREAMS_SINGLE_ACTIVITY_KEY = "SINGLE_ACTIVITY";
+  public static final String STREAMS_CLIENT_DATA_KEY = "CLIENT_DATA";
+  public static final String STREAMS_TRASHED_KEY = "TRASHED";
+  public static final String STREAMS_CREATED_KEY = "CREATED";
+  public static final String STREAMS_CREATED_BY_KEY = "CREATED_BEY";
+  public static final String STREAMS_MODIFIED_KEY = "MODIFIED";
+  public static final String STREAMS_MODIFIED_BY_KEY = "MODIFIED_BY";
+
+  /**
+   * Create Event query
+   *
+   * @param eventToCache
+   * @return
+   */
   public static String createEvent(Event eventToCache) {
     StringBuilder sb = new StringBuilder();
     sb.append("INSERT INTO "
       + EVENTS_TABLE_NAME
         + " ("
-        + ID_KEY
+        + EVENTS_ID_KEY
         + ", "
-        + STREAM_ID_KEY
+        + EVENTS_STREAM_ID_KEY
         + ", "
-        + TIME_KEY
+        + EVENTS_TIME_KEY
         + ", "
-        + TYPE_KEY
+        + EVENTS_TYPE_KEY
         + ", "
-        + CREATED_KEY
+        + EVENTS_CREATED_KEY
         + ", "
-        + CREATED_BY_KEY
+        + EVENTS_CREATED_BY_KEY
         + ", "
-        + MODIFIED_KEY
+        + EVENTS_MODIFIED_KEY
         + ", "
-        + MODIFIED_BY_KEY
+        + EVENTS_MODIFIED_BY_KEY
         + ", "
-        + DURATION_KEY
+        + EVENTS_DURATION_KEY
         + ", "
-        + CONTENT_KEY
+        + EVENTS_CONTENT_KEY
         + ", "
-        + TAGS_KEY
+        + EVENTS_TAGS_KEY
         + ", "
-        + REFS_KEY
+        + EVENTS_REFS_KEY
         + ", "
-        + DESCRIPTION_KEY
+        + EVENTS_DESCRIPTION_KEY
         + ", "
-        + CLIENT_DATA_KEY
+        + EVENTS_CLIENT_DATA_KEY
         + ", "
-        + TRASHED_KEY
+        + EVENTS_TRASHED_KEY
         + ", "
-        + TEMP_REF_ID_KEY
+        + EVENTS_TEMP_REF_ID_KEY
         + ")"
         + " VALUES (");
     sb.append(formatTextValue(eventToCache.getId()) + ",");
@@ -94,8 +115,7 @@ public class QueryGenerator {
     // attachments need to be added in their own table
     sb.append(formatTextValue(eventToCache.getClientDataAsString()) + ",");
     sb.append(formatTextValue(eventToCache.getTrashed()) + ",");
-    sb.append(formatTextValue(eventToCache.getTempRefId()) + ",");
-    sb.setLength(sb.length() - 1);
+    sb.append(formatTextValue(eventToCache.getTempRefId()));
     sb.append(");");
     return sb.toString();
   }
@@ -105,70 +125,70 @@ public class QueryGenerator {
     sb.append("UPDATE "
       + EVENTS_TABLE_NAME
         + " SET "
-        + ID_KEY
+        + EVENTS_ID_KEY
         + "="
         + formatTextValue(eventToUpdate.getId())
         + ", "
-        + STREAM_ID_KEY
+        + EVENTS_STREAM_ID_KEY
         + "="
         + formatTextValue(eventToUpdate.getStreamId())
         + ", "
-        + TIME_KEY
+        + EVENTS_TIME_KEY
         + "="
         + formatLongValue(eventToUpdate.getTime())
         + ", "
-        + TYPE_KEY
+        + EVENTS_TYPE_KEY
         + "="
         + formatTextValue(eventToUpdate.getType())
         + ", "
-        + CREATED_KEY
+        + EVENTS_CREATED_KEY
         + "="
         + formatLongValue(eventToUpdate.getCreated())
         + ", "
-        + CREATED_BY_KEY
+        + EVENTS_CREATED_BY_KEY
         + "="
         + formatTextValue(eventToUpdate.getCreatedBy())
         + ", "
-        + MODIFIED_KEY
+        + EVENTS_MODIFIED_KEY
         + "="
         + formatLongValue(eventToUpdate.getModified())
         + ", "
-        + MODIFIED_BY_KEY
+        + EVENTS_MODIFIED_BY_KEY
         + "="
         + formatTextValue(eventToUpdate.getModifiedBy())
         + ", "
-        + DURATION_KEY
+        + EVENTS_DURATION_KEY
         + "="
         + formatLongValue(eventToUpdate.getDuration())
         + ", "
-        + CONTENT_KEY
+        + EVENTS_CONTENT_KEY
         + "="
         + formatTextValue(eventToUpdate.getContent())
         + ", "
-        + TAGS_KEY
+        + EVENTS_TAGS_KEY
         + "="
         + formatSetValue(eventToUpdate.getTags())
         + ", "
-        + REFS_KEY
+        + EVENTS_REFS_KEY
         + "="
         + formatSetValue(eventToUpdate.getReferences())
         + ", "
-        + DESCRIPTION_KEY
+        + EVENTS_DESCRIPTION_KEY
         + "="
         + formatTextValue(eventToUpdate.getDescription())
         + ", "
-        + CLIENT_DATA_KEY
+        + EVENTS_CLIENT_DATA_KEY
         + "="
         + formatTextValue(eventToUpdate.getClientDataAsString())
         + ", "
-        + TRASHED_KEY
+        + EVENTS_TRASHED_KEY
         + "="
         + formatTextValue(eventToUpdate.getTrashed())
         + ", "
-        + TEMP_REF_ID_KEY
+        + EVENTS_TEMP_REF_ID_KEY
         + "="
         + formatTextValue(eventToUpdate.getTempRefId()));
-    sb.append(" WHERE " + ID_KEY + "=\'" + eventToUpdate.getId() + "\';");
+    sb.append(" WHERE " + EVENTS_ID_KEY + "=\'" + eventToUpdate.getId() + "\';");
     return sb.toString();
   }
 
@@ -185,30 +205,30 @@ public class QueryGenerator {
       String andSeparator = "";
       // fromTime
       if (filter.getFromTime() != null) {
-        sb.append(andSeparator + TIME_KEY + ">" + filter.getFromTime());
+        sb.append(andSeparator + EVENTS_TIME_KEY + ">" + filter.getFromTime());
         andSeparator = " AND ";
       }
 
       // toTime
       if (filter.getToTime() != null) {
-        sb.append(andSeparator + TIME_KEY + "<" + filter.getToTime());
+        sb.append(andSeparator + EVENTS_TIME_KEY + "<" + filter.getToTime());
         andSeparator = " AND ";
       }
 
       // streamIds
-      formatFilterSet(andSeparator, sb, filter.getStreamIds(), STREAM_ID_KEY);
+      formatFilterSet(andSeparator, sb, filter.getStreamIds(), EVENTS_STREAM_ID_KEY);
 
       // tags
-      formatFilterSet(andSeparator, sb, filter.getTags(), TAGS_KEY);
+      formatFilterSet(andSeparator, sb, filter.getTags(), EVENTS_TAGS_KEY);
 
       // types
-      formatFilterSet(andSeparator, sb, filter.getTypes(), TYPE_KEY);
+      formatFilterSet(andSeparator, sb, filter.getTypes(), EVENTS_TYPE_KEY);
 
       // TODO handle running parameter
 
       // modifiedSince
       if (filter.getModifiedSince() != null) {
-        sb.append(andSeparator + MODIFIED_KEY + ">" + filter.getModifiedSince());
+        sb.append(andSeparator + EVENTS_MODIFIED_KEY + ">" + filter.getModifiedSince());
         andSeparator = " AND ";
       }
 
@@ -216,11 +236,11 @@ public class QueryGenerator {
       if (filter.getState() != null) {
         sb.append(andSeparator);
         if (filter.getState().equals(Filter.State.DEFAULT)) {
-          sb.append(TRASHED_KEY + "=" + "\'false\'");
+          sb.append(EVENTS_TRASHED_KEY + "=" + "\'false\'");
         } else if (filter.getState().equals(Filter.State.TRASHED)) {
-          sb.append(TRASHED_KEY + "=" + "\'true\'");
+          sb.append(EVENTS_TRASHED_KEY + "=" + "\'true\'");
         } else {
-          sb.append("(" + TRASHED_KEY + "=\'false\' OR " + TRASHED_KEY + "=\'true\')");
+          sb.append("(" + EVENTS_TRASHED_KEY + "=\'false\' OR " + EVENTS_TRASHED_KEY + "=\'true\')");
         }
         andSeparator = " AND ";
       }
@@ -280,25 +300,113 @@ public class QueryGenerator {
     return sb.toString();
   }
 
+  /**
+   * Create Events Table Query
+   *
+   * @return
+   */
   public static String createEventsTable() {
     return "CREATE TABLE IF NOT EXISTS "
       + EVENTS_TABLE_NAME
-        + "(ID TEXT PRIMARY KEY       NOT NULL,"
-        + " STREAM_ID       TEXT      NOT NULL,"
-        + " TIME            INTEGER   NOT NULL,"
-        + " TYPE            TEXT      NOT NULL,"
-        + " CREATED         INTEGER   NOT NULL,"
-        + " CREATED_BY      TEXT      NOT NULL,"
-        + " MODIFIED        INTEGER   NOT NULL,"
-        + " MODIFIED_BY     TEXT      NOT NULL,"
-        + " DURATION        INTEGER,"
-        + " CONTENT         BLOB,"
-        + " TAGS            TEXT,"
-        + " REFS            TEXT,"
-        + " DESCRIPTION     TEXT,"
-        + " CLIENT_DATA     TEXT,"
-        + " TRASHED         INTEGER,"
-        + " TEMP_REF_ID     TEXT)";
+        + "("
+        + EVENTS_ID_KEY
+        + " TEXT PRIMARY KEY  NOT NULL, "
+        + EVENTS_STREAM_ID_KEY
+        + " TEXT              NOT NULL, "
+        + EVENTS_TIME_KEY
+        + " INTEGER           NOT NULL, "
+        + EVENTS_TYPE_KEY
+        + " TEXT              NOT NULL, "
+        + EVENTS_CREATED_KEY
+        + " INTEGER           NOT NULL, "
+        + EVENTS_CREATED_BY_KEY
+        + " TEXT              NOT NULL, "
+        + EVENTS_MODIFIED_KEY
+        + " INTEGER           NOT NULL, "
+        + EVENTS_MODIFIED_BY_KEY
+        + " TEXT              NOT NULL, "
+        + EVENTS_DURATION_KEY
+        + " INTEGER, "
+        + EVENTS_CONTENT_KEY
+        + " BLOB, "
+        + EVENTS_TAGS_KEY
+        + " TEXT, "
+        + EVENTS_REFS_KEY
+        + " TEXT, "
+        + EVENTS_DESCRIPTION_KEY
+        + " TEXT, "
+        + EVENTS_CLIENT_DATA_KEY
+        + " TEXT, "
+        + EVENTS_TRASHED_KEY
+        + " INTEGER, "
+        + EVENTS_TEMP_REF_ID_KEY
+        + " TEXT)";
+  }
+
+  public static String createStreamsTable() {
+    return "CREATE TABLE IF NOT EXISTS "
+      + STREAMS_TABLE_NAME
+        + "("
+        + STREAMS_ID_KEY
+        + " TEXT PRIMARY KEY  NOT NULL, "
+        + STREAMS_NAME_KEY
+        + " TEXT              NOT NULL, "
+        + STREAMS_CREATED_KEY
+        + " INTEGER           NOT NULL, "
+        + STREAMS_CREATED_BY_KEY
+        + " TEXT              NOT NULL, "
+        + STREAMS_MODIFIED_KEY
+        + " INTEGER           NOT NULL, "
+        + STREAMS_MODIFIED_BY_KEY
+        + " TEXT              NOT NULL, "
+        + STREAMS_PARENT_ID_KEY
+        + " TEXT, "
+        + STREAMS_SINGLE_ACTIVITY_KEY
+        + " INTEGER, "
+        + STREAMS_CLIENT_DATA_KEY
+        + " TEXT, "
+        + STREAMS_TRASHED_KEY
+        + " INTEGER)";
+  }
+
+  public static String createStream(Stream streamToCache) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("INSERT INTO "
+      + STREAMS_TABLE_NAME
+        + " ("
+        + STREAMS_ID_KEY
+        + ", "
+        + STREAMS_NAME_KEY
+        + ", "
+        + STREAMS_PARENT_ID_KEY
+        + ", "
+        + STREAMS_SINGLE_ACTIVITY_KEY
+        + ", "
+        + STREAMS_CLIENT_DATA_KEY
+        + ", "
+        + STREAMS_TRASHED_KEY
+        + ", "
+        + STREAMS_CREATED_KEY
+        + ", "
+        + STREAMS_CREATED_BY_KEY
+        + ", "
+        + STREAMS_MODIFIED_KEY
+        + ", "
+        + STREAMS_MODIFIED_BY_KEY
+        + ")"
+        + " VALUES (");
+    sb.append(formatTextValue(streamToCache.getId()) + ",");
+    sb.append(formatTextValue(streamToCache.getName()) + ",");
+    sb.append(formatTextValue(streamToCache.getParentId()) + ",");
+    sb.append(formatTextValue(streamToCache.getSingleActivity()) + ",");
+    sb.append(formatTextValue(streamToCache.getClientDataAsString()) + ",");
+    sb.append(formatTextValue(streamToCache.getTrashed()) + ",");
+    sb.append(formatLongValue(streamToCache.getCreated()) + ",");
+    sb.append(formatTextValue(streamToCache.getCreatedBy()) + ",");
+    sb.append(formatLongValue(streamToCache.getModified()) + ",");
+    sb.append(formatTextValue(streamToCache.getModifiedBy()));
+    sb.append(");");
+    return sb.toString();
   }
 
 }

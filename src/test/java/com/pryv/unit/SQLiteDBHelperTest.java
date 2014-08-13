@@ -13,6 +13,7 @@ import org.junit.runners.MethodSorters;
 import com.pryv.api.Filter;
 import com.pryv.api.database.SQLiteDBHelper;
 import com.pryv.api.model.Event;
+import com.pryv.api.model.Stream;
 
 /**
  * unit tests for SQLiteDBHelper class
@@ -28,7 +29,7 @@ public class SQLiteDBHelperTest {
   private static Event testEvent;
 
   @BeforeClass
-  public static void setUp() throws Exception {
+  public static void beforeClass() throws Exception {
     testEvent = DummyData.generateFullEvent();
     db = new SQLiteDBHelper();
   }
@@ -50,6 +51,7 @@ public class SQLiteDBHelperTest {
       db.addEvent(testEvent);
     } catch (SQLException e) {
       e.printStackTrace();
+      fail("fail insert full event");
     }
   }
 
@@ -79,6 +81,7 @@ public class SQLiteDBHelperTest {
       db.deleteEvent(testEvent);
     } catch (SQLException e) {
       e.printStackTrace();
+      fail("fail remove full event");
     }
   }
 
@@ -89,6 +92,7 @@ public class SQLiteDBHelperTest {
       db.getEvents(filter);
     } catch (SQLException e) {
       e.printStackTrace();
+      fail("fail retrieve event with full filter");
     }
   }
 
@@ -100,12 +104,27 @@ public class SQLiteDBHelperTest {
       db.getEvents(filter);
     } catch (SQLException e) {
       e.printStackTrace();
+      fail("fail retrieve event with state=all filter");
     }
   }
 
   @Test
-  public void testRetrieveFullEvent() {
-    // db.g
+  public void test07InsertEmptyStream() {
+    try {
+      db.addStream(new Stream());
+      fail("adding empty Event to SQLite database did not throw any Exception!");
+    } catch (SQLException e) {
+    }
+  }
+
+  @Test
+  public void test08InsertFullStream() {
+    try {
+      db.addStream(DummyData.generateFullStream());
+    } catch (SQLException e) {
+      e.printStackTrace();
+      fail("fail insert full stream");
+    }
   }
 
 }

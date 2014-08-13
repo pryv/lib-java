@@ -115,23 +115,23 @@ public class Event {
    * @throws SQLException
    */
   public Event(ResultSet result) throws SQLException {
-    id = result.getString(QueryGenerator.ID_KEY);
-    streamId = result.getString(QueryGenerator.STREAM_ID_KEY);
-    time = result.getLong(QueryGenerator.TIME_KEY);
-    type = result.getString(QueryGenerator.TYPE_KEY);
-    created = result.getLong(QueryGenerator.CREATED_KEY);
-    createdBy = result.getString(QueryGenerator.CREATED_BY_KEY);
-    modified = result.getLong(QueryGenerator.MODIFIED_KEY);
-    modifiedBy = result.getString(QueryGenerator.MODIFIED_BY_KEY);
-    duration = result.getLong(QueryGenerator.DURATION_KEY);
-    tags = new HashSet<String>(Arrays.asList(result.getString(QueryGenerator.TAGS_KEY).split(",")));
+    id = result.getString(QueryGenerator.EVENTS_ID_KEY);
+    streamId = result.getString(QueryGenerator.EVENTS_STREAM_ID_KEY);
+    time = result.getLong(QueryGenerator.EVENTS_TIME_KEY);
+    type = result.getString(QueryGenerator.EVENTS_TYPE_KEY);
+    created = result.getLong(QueryGenerator.EVENTS_CREATED_KEY);
+    createdBy = result.getString(QueryGenerator.EVENTS_CREATED_BY_KEY);
+    modified = result.getLong(QueryGenerator.EVENTS_MODIFIED_KEY);
+    modifiedBy = result.getString(QueryGenerator.EVENTS_MODIFIED_BY_KEY);
+    duration = result.getLong(QueryGenerator.EVENTS_DURATION_KEY);
+    tags = new HashSet<String>(Arrays.asList(result.getString(QueryGenerator.EVENTS_TAGS_KEY).split(",")));
     references =
-      new HashSet<String>(Arrays.asList(result.getString(QueryGenerator.REFS_KEY).split(",")));
-    description = result.getString(QueryGenerator.DESCRIPTION_KEY);
+      new HashSet<String>(Arrays.asList(result.getString(QueryGenerator.EVENTS_REFS_KEY).split(",")));
+    description = result.getString(QueryGenerator.EVENTS_DESCRIPTION_KEY);
     // TODO fetch Attachments elsewhere
-    String cd = result.getString(QueryGenerator.CLIENT_DATA_KEY);
-    trashed = result.getBoolean(QueryGenerator.TRASHED_KEY);
-    tempRefId = result.getString(QueryGenerator.TEMP_REF_ID_KEY);
+    String cd = result.getString(QueryGenerator.EVENTS_CLIENT_DATA_KEY);
+    trashed = result.getBoolean(QueryGenerator.EVENTS_TRASHED_KEY);
+    tempRefId = result.getString(QueryGenerator.EVENTS_TEMP_REF_ID_KEY);
   }
 
   // private

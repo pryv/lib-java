@@ -20,19 +20,21 @@ public class Stream {
 
   private String id;
   private String name;
+  private List<Stream> children;
+  private Boolean trashed;
+  private Long created;
+  private String createdBy;
+  private Long modified;
+  private String modifiedBy;
+
+  // optional
   private String parentId;
   private Boolean singleActivity;
   private Map<String, Object> clientData;
-  private List<Stream> children;
-  private Boolean trashed;
-  private long created;
-  private String createdBy;
-  private long modified;
-  private String modifiedBy;
 
   public Stream(String pId, String pName, String pParentId, Boolean pSingleActivity,
-    Map<String, Object> pClientData, List<Stream> pChildren, Boolean pTrashed, long pCreated,
-    String pCreatedBy, long pModified, String pModifiedBy) {
+    Map<String, Object> pClientData, List<Stream> pChildren, Boolean pTrashed, Long pCreated,
+    String pCreatedBy, Long pModified, String pModifiedBy) {
     id = pId;
     name = pName;
     parentId = pParentId;
@@ -118,7 +120,7 @@ public class Stream {
     return trashed;
   }
 
-  public long getCreated() {
+  public Long getCreated() {
     return created;
   }
 
@@ -126,7 +128,7 @@ public class Stream {
     return createdBy;
   }
 
-  public long getModified() {
+  public Long getModified() {
     return modified;
   }
 
@@ -162,7 +164,7 @@ public class Stream {
     this.trashed = pTrashed;
   }
 
-  public void setCreated(long pCreated) {
+  public void setCreated(Long pCreated) {
     this.created = pCreated;
   }
 
@@ -170,7 +172,7 @@ public class Stream {
     this.createdBy = pCreatedBy;
   }
 
-  public void setModified(long pModified) {
+  public void setModified(Long pModified) {
     this.modified = pModified;
   }
 
