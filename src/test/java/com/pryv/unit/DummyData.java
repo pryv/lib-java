@@ -23,7 +23,7 @@ public class DummyData {
   private static final Long TIME = new Long(10000);
   private static final Long DURATION = new Long(20); // opt
   private static final String TYPE = "testType";
-  private static final String CONTENT = "testContent it's a string"; // opt
+  private static final String CONTENT = "testContent its a string"; // opt
   private static Set<String> tags = new HashSet<String>();
   private static final String TAGTEST = "test";
   private static final String TAGBASIC = "basic test";

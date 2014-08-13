@@ -15,6 +15,7 @@ import com.pryv.api.model.Event;
  */
 public class Filter {
 
+  // keys to filter online requests
   public final static String FROM_TIME_KEY = "fromTime";
   public final static String TO_TIME_KEY = "toTime";
   public final static String STREAMS_KEY = "streams[]";
@@ -28,6 +29,7 @@ public class Filter {
   public final static String MODIFIED_SINCE_KEY = "modifiedSince";
   public final static String PARENT_ID_KEY = "parentId";
 
+  // filter fields
   private Long fromTime;
   private Long toTime;
   private Set<String> streamIds;

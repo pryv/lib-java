@@ -4,8 +4,10 @@ import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import com.pryv.api.database.SQLiteDBHelper;
 import com.pryv.api.model.Event;
@@ -16,34 +18,27 @@ import com.pryv.api.model.Event;
  * @author ik
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SQLiteDBHelperTest {
 
-  private SQLiteDBHelper db;
+  private static SQLiteDBHelper db;
 
-  private Event testEvent;
+  private static Event testEvent;
 
-  @Before
-  public void setUp() throws Exception {
-    db = new SQLiteDBHelper();
+  @BeforeClass
+  public static void setUp() throws Exception {
     testEvent = DummyData.generateFullEvent();
+    db = new SQLiteDBHelper();
   }
 
   @Test
-  public void testEventsFields() {
-    testEvent.publishValues();
+  public void test01InitDB() {
+    System.out.println("test1");
   }
 
   @Test
-  public void testCreateEventsTable() {
-    try {
-      db.createEventsTable();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-  }
-
-  @Test
-  public void testInsertEmpyEvent() {
+  public void test02InsertEmpyEvent() {
+    System.out.println("test2");
     Event emptyEvent = new Event();
     try {
       db.addEvent(emptyEvent);
@@ -53,9 +48,28 @@ public class SQLiteDBHelperTest {
   }
 
   @Test
-  public void testInsertFullEvent() {
+  public void test03InsertFullEvent() {
     try {
       db.addEvent(testEvent);
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  public void test04UpdateEvent() {
+    testEvent.setStreamId("otherStream");
+    try {
+      db.updateEvent(testEvent);
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  public void test05RemoveFullEvent() {
+    try {
+      db.deleteEvent(testEvent);
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -66,12 +80,4 @@ public class SQLiteDBHelperTest {
     // db.g
   }
 
-  @Test
-  public void testRemoveFullEvent() {
-    try {
-      db.deleteEvent(testEvent);
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-  }
 }

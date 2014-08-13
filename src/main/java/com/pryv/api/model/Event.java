@@ -1,7 +1,11 @@
 package com.pryv.api.model;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -146,158 +150,34 @@ public class Event {
     modifiedBy = temp.modifiedBy;
   }
 
-  public String toSQL() {
-    String listSeparator = "";
-    StringBuilder sb = new StringBuilder();
+  public void publishValues() {
+    List<String> eventFields = new ArrayList<String>();
+    Field[] fields = Event.class.getDeclaredFields();
+    for (Field field : fields) {
+      eventFields.add(field.getName().toUpperCase());
+      try {
+        System.out.print(field.getName().toUpperCase() + ": ");
+        if (String.class.isAssignableFrom(field.getType())) {
+          System.out.print("\'" + field.get(this) + "\'");
+        } else if (Long.class.isAssignableFrom(field.getType())) {
+          System.out.print(field.get(this));
+        } else if (Collection.class.isAssignableFrom(field.getType())) {
+          for (Object item : (Iterable) field.get(this)) {
+            System.out.print(field.get(this) + ",");
+          }
+        } else {
+          System.out.print(field.get(this));
+        }
 
-    primitiveAsSQL(sb, id);
-    primitiveAsSQL(sb, streamId);
-    longAsSQL(sb, time);
-    primitiveAsSQL(sb, type);
-    longAsSQL(sb, created);
-    primitiveAsSQL(sb, createdBy);
-    longAsSQL(sb, modified);
-    primitiveAsSQL(sb, modifiedBy);
-    longAsSQL(sb, duration);
-    primitiveAsSQL(sb, content);
-    setAsSQL(sb, tags);
-    setAsSQL(sb, references);
-    primitiveAsSQL(sb, description);
-    // attachments need to go in their own table
-    primitiveAsSQL(sb, getClientDataAsString());
-    primitiveAsSQL(sb, trashed);
-    primitiveAsSQL(sb, tempRefId);
-    sb.setLength(sb.length() - 1);
-
-    // // id
-    // sb.append("\'" + id + "\',");
-    //
-    // // streamId
-    // sb.append("\'" + streamId + "\',");
-    //
-    // // time
-    // if (time != null) {
-    // sb.append(time + ",");
-    // } else {
-    // sb.append("null,");
-    // }
-    //
-    // // type
-    // sb.append("\'" + type + "\',");
-    //
-    // // created
-    // if (created != null) {
-    // sb.append(created.toString() + ",");
-    // } else {
-    // sb.append("null,");
-    // }
-    //
-    // // createdBy
-    // sb.append("\'" + createdBy + "\',");
-    //
-    // // modified
-    // if (modified != null) {
-    // sb.append(modified.toString() + ",");
-    //
-    // } else {
-    // sb.append("null,");
-    // }
-    //
-    // // modifiedBy
-    // sb.append("\'" + modifiedBy + "\',");
-    //
-    // // duration
-    // if (duration != null) {
-    // sb.append(duration.toString() + ",");
-    // } else {
-    // sb.append("null,");
-    // }
-    //
-    // // content
-    // if (content != null) {
-    // sb.append("\'" + content.toString() + "\',");
-    //
-    // } else {
-    // sb.append("null,");
-    // }
-    //
-    // // tags
-    // sb.append("\'");
-    // if (tags != null) {
-    // for (String tag : tags) {
-    // sb.append(listSeparator + tag);
-    // listSeparator = ",";
-    // }
-    // }
-    // sb.append("\',");
-    // listSeparator = "";
-    //
-    // // refs
-    // sb.append("\'");
-    // if (references != null) {
-    // for (String ref : references) {
-    // sb.append(listSeparator + ref);
-    // listSeparator = ",";
-    // }
-    // }
-    // sb.append("\',");
-    // listSeparator = "";
-    //
-    // sb.append("\'" + description + "\',");
-    //
-    // // attachments
-    // sb.append("\'");
-    // if (attachments != null) {
-    // for (Attachment attachment : attachments) {
-    // sb.append(listSeparator + attachment.getId());
-    // listSeparator = ",";
-    // }
-    // } else {
-    // sb.append("null");
-    // }
-    // sb.append("\',");
-    // listSeparator = "";
-    //
-    // // clientData
-    // sb.append("\'" + getClientDataAsString() + "\',");
-    // sb.append("\'" + trashed + "\',");
-    // sb.append("\'" + tempRefId + "\'");
-
-    return sb.toString();
-  }
-
-  private void longAsSQL(StringBuilder sb, Long toAdd) {
-    if (toAdd != null) {
-      sb.append(toAdd);
-    } else {
-      sb.append("NULL");
-    }
-    sb.append(",");
-  }
-
-  private void primitiveAsSQL(StringBuilder sb, Object prim) {
-    if (prim != null) {
-      sb.append("\'" + prim + "\'");
-    } else {
-      sb.append("NULL");
-    }
-    sb.append(",");
-  }
-
-  private void setAsSQL(StringBuilder sb, Set<?> set) {
-    String listSeparator = "";
-    if (set != null) {
-      sb.append("\'");
-      for (Object setItem : set) {
-        sb.append(listSeparator + setItem);
-        listSeparator = ",";
+        System.out.println("");
+      } catch (IllegalArgumentException | IllegalAccessException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
       }
-      sb.append("\'");
-    } else {
-      sb.append("NULL");
     }
-    sb.append(",");
   }
+
+
 
   /**
    * format client data to printable.
@@ -319,14 +199,6 @@ public class Event {
     }
   }
 
-  public String getDescription() {
-    return description;
-  }
-
-  public Set<Attachment> getAttachments() {
-    return attachments;
-  }
-
   public String getId() {
     return id;
   }
@@ -339,32 +211,8 @@ public class Event {
     return time;
   }
 
-  public Long getDuration() {
-    return duration;
-  }
-
   public String getType() {
     return type;
-  }
-
-  public Object getContent() {
-    return content;
-  }
-
-  public Set<String> getTags() {
-    return tags;
-  }
-
-  public Set<String> getReferences() {
-    return references;
-  }
-
-  public Map<String, Object> getClientData() {
-    return clientData;
-  }
-
-  public Boolean getTrashed() {
-    return trashed;
   }
 
   public Long getCreated() {
@@ -383,12 +231,109 @@ public class Event {
     return modifiedBy;
   }
 
-  public void setId(String pId) {
-    this.id = pId;
+  public Long getDuration() {
+    return duration;
+  }
+
+  public Object getContent() {
+    return content;
+  }
+
+  public Set<String> getTags() {
+    return tags;
+  }
+
+  public Set<String> getReferences() {
+    return references;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public Set<Attachment> getAttachments() {
+    return attachments;
+  }
+
+  public Map<String, Object> getClientData() {
+    return clientData;
+  }
+
+  public Boolean getTrashed() {
+    return trashed;
   }
 
   public String getTempRefId() {
     return tempRefId;
   }
+
+  public void setId(String pid) {
+    this.id = pid;
+  }
+
+  public void setStreamId(String pstreamId) {
+    this.streamId = pstreamId;
+  }
+
+  public void setTime(Long ptime) {
+    this.time = ptime;
+  }
+
+  public void setType(String ptype) {
+    this.type = ptype;
+  }
+
+  public void setCreated(Long pcreated) {
+    this.created = pcreated;
+  }
+
+  public void setCreatedBy(String pcreatedBy) {
+    this.createdBy = pcreatedBy;
+  }
+
+  public void setModified(Long pmodified) {
+    this.modified = pmodified;
+  }
+
+  public void setModifiedBy(String pmodifiedBy) {
+    this.modifiedBy = pmodifiedBy;
+  }
+
+  public void setDuration(Long pduration) {
+    this.duration = pduration;
+  }
+
+  public void setContent(Object pcontent) {
+    this.content = pcontent;
+  }
+
+  public void setTags(Set<String> ptags) {
+    this.tags = ptags;
+  }
+
+  public void setReferences(Set<String> preferences) {
+    this.references = preferences;
+  }
+
+  public void setDescription(String pdescription) {
+    this.description = pdescription;
+  }
+
+  public void setAttachments(Set<Attachment> pattachments) {
+    this.attachments = pattachments;
+  }
+
+  public void setClientData(Map<String, Object> pclientData) {
+    this.clientData = pclientData;
+  }
+
+  public void setTrashed(Boolean ptrashed) {
+    this.trashed = ptrashed;
+  }
+
+  public void setTempRefId(String ptempRefId) {
+    this.tempRefId = ptempRefId;
+  }
+
 
 }

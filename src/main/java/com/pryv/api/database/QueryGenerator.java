@@ -153,7 +153,7 @@ public class QueryGenerator {
         + "="
         + formatTextValue(eventToUpdate.getTempRefId()));
     sb.setLength(sb.length() - 1);
-    sb.append(" WHERE " + ID_KEY + "=" + eventToUpdate.getId() + ";");
+    sb.append(" WHERE " + ID_KEY + "=\'" + eventToUpdate.getId() + "\';");
     return sb.toString();
   }
 
@@ -198,6 +198,27 @@ public class QueryGenerator {
     }
     sb.append(",");
     return sb.toString();
+  }
+
+  public static String createEventsTable() {
+    return "CREATE TABLE IF NOT EXISTS "
+      + EVENTS_TABLE_NAME
+        + "(ID TEXT PRIMARY KEY       NOT NULL,"
+        + " STREAM_ID       TEXT      NOT NULL,"
+        + " TIME            INTEGER   NOT NULL,"
+        + " TYPE            TEXT      NOT NULL,"
+        + " CREATED         INTEGER   NOT NULL,"
+        + " CREATED_BY      TEXT      NOT NULL,"
+        + " MODIFIED        INTEGER   NOT NULL,"
+        + " MODIFIED_BY     TEXT      NOT NULL,"
+        + " DURATION        INTEGER,"
+        + " CONTENT         BLOB,"
+        + " TAGS            TEXT,"
+        + " REFS            TEXT,"
+        + " DESCRIPTION     TEXT,"
+        + " CLIENT_DATA     TEXT,"
+        + " TRASHED         INTEGER,"
+        + " TEMP_REF_ID     TEXT)";
   }
 
 }
