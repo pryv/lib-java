@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pryv.api.model.Permission;
+import com.pryv.utils.JsonConverter;
 
 /**
  *
@@ -30,7 +31,7 @@ public class PermissionTest {
   @Before
   public void setUp() throws Exception {
     testPermission = new Permission(streamId, perm, defaultName);
-    stringTestPermission = mapper.writeValueAsString(testPermission);
+    stringTestPermission = JsonConverter.toJson(testPermission);
   }
 
   @Test

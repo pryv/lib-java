@@ -32,7 +32,7 @@ public class OnlineRetrieveStreamsTest {
   @Before
   public void setUp() throws Exception {
     instanciateCallback();
-
+    Pryv.setStaging();
     String url = "https://" + TestCredentials.USERNAME + "." + Pryv.API_DOMAIN + "/";
     online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN);
   }
@@ -85,6 +85,7 @@ public class OnlineRetrieveStreamsTest {
       public void onStreamsSuccess(String receivedStreams) {
         stringStreams = receivedStreams;
         try {
+          System.out.println("############ TEST: " + receivedStreams + " #########");
           streams = JsonConverter.createStreamsFromJson(receivedStreams);
         } catch (IOException e) {
           // TODO Auto-generated catch block
@@ -100,7 +101,6 @@ public class OnlineRetrieveStreamsTest {
       @Override
       public void onStreamsError(String message) {
         // TODO Auto-generated method stub
-
       }
 
     };
