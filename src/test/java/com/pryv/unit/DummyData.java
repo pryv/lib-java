@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.pryv.api.Filter;
 import com.pryv.api.model.Attachment;
 import com.pryv.api.model.Event;
 import com.pryv.utils.JsonConverter;
@@ -62,6 +63,14 @@ public class DummyData {
       e.printStackTrace();
       return null;
     }
+  }
+
+  public static Filter generateFullFilter() {
+    Set<String> dummyStringSet = new HashSet<String>();
+    dummyStringSet.add("dummyValue1");
+    dummyStringSet.add("dummyValue2");
+    return new Filter(new Long(0), new Long(1000), dummyStringSet, dummyStringSet, dummyStringSet,
+      false, true, new Integer(0), new Integer(10), Filter.State.ALL, new Long(500));
   }
 
   public static String getId() {

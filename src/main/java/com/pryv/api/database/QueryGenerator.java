@@ -2,6 +2,7 @@ package com.pryv.api.database;
 
 import java.util.Set;
 
+import com.pryv.api.Filter;
 import com.pryv.api.model.Event;
 
 /**
@@ -22,22 +23,22 @@ public class QueryGenerator {
   /**
    * Events Table keys
    */
-  private static final String ID_KEY = "ID";
-  private static final String STREAM_ID_KEY = "STREAM_ID";
-  private static final String TIME_KEY = "TIME";
-  private static final String TYPE_KEY = "TYPE";
-  private static final String CREATED_KEY = "CREATED";
-  private static final String CREATED_BY_KEY = "CREATED_BY";
-  private static final String MODIFIED_KEY = "MODIFIED";
-  private static final String MODIFIED_BY_KEY = "MODIFIED_BY";
-  private static final String DURATION_KEY = "DURATION";
-  private static final String CONTENT_KEY = "CONTENT";
-  private static final String TAGS_KEY = "TAGS";
-  private static final String REFS_KEY = "REFS";
-  private static final String DESCRIPTION_KEY = "DESCRIPTION";
-  private static final String CLIENT_DATA_KEY = "CLIENT_DATA";
-  private static final String TRASHED_KEY = "TRASHED";
-  private static final String TEMP_REF_ID_KEY = "TEMP_REF_ID";
+  public static final String ID_KEY = "ID";
+  public static final String STREAM_ID_KEY = "STREAM_ID";
+  public static final String TIME_KEY = "TIME";
+  public static final String TYPE_KEY = "TYPE";
+  public static final String CREATED_KEY = "CREATED";
+  public static final String CREATED_BY_KEY = "CREATED_BY";
+  public static final String MODIFIED_KEY = "MODIFIED";
+  public static final String MODIFIED_BY_KEY = "MODIFIED_BY";
+  public static final String DURATION_KEY = "DURATION";
+  public static final String CONTENT_KEY = "CONTENT";
+  public static final String TAGS_KEY = "TAGS";
+  public static final String REFS_KEY = "REFS";
+  public static final String DESCRIPTION_KEY = "DESCRIPTION";
+  public static final String CLIENT_DATA_KEY = "CLIENT_DATA";
+  public static final String TRASHED_KEY = "TRASHED";
+  public static final String TEMP_REF_ID_KEY = "TEMP_REF_ID";
 
   public static String createEvent(Event eventToCache) {
     StringBuilder sb = new StringBuilder();
@@ -77,23 +78,23 @@ public class QueryGenerator {
         + TEMP_REF_ID_KEY
         + ")"
         + " VALUES (");
-    sb.append(formatTextValue(eventToCache.getId()));
-    sb.append(formatTextValue(eventToCache.getStreamId()));
-    sb.append(formatLongValue(eventToCache.getTime()));
-    sb.append(formatTextValue(eventToCache.getType()));
-    sb.append(formatLongValue(eventToCache.getCreated()));
-    sb.append(formatTextValue(eventToCache.getCreatedBy()));
-    sb.append(formatLongValue(eventToCache.getModified()));
-    sb.append(formatTextValue(eventToCache.getModifiedBy()));
-    sb.append(formatLongValue(eventToCache.getDuration()));
-    sb.append(formatTextValue(eventToCache.getContent()));
-    sb.append(formatSetValue(eventToCache.getTags()));
-    sb.append(formatSetValue(eventToCache.getReferences()));
-    sb.append(formatTextValue(eventToCache.getDescription()));
+    sb.append(formatTextValue(eventToCache.getId()) + ",");
+    sb.append(formatTextValue(eventToCache.getStreamId()) + ",");
+    sb.append(formatLongValue(eventToCache.getTime()) + ",");
+    sb.append(formatTextValue(eventToCache.getType()) + ",");
+    sb.append(formatLongValue(eventToCache.getCreated()) + ",");
+    sb.append(formatTextValue(eventToCache.getCreatedBy()) + ",");
+    sb.append(formatLongValue(eventToCache.getModified()) + ",");
+    sb.append(formatTextValue(eventToCache.getModifiedBy()) + ",");
+    sb.append(formatLongValue(eventToCache.getDuration()) + ",");
+    sb.append(formatTextValue(eventToCache.getContent()) + ",");
+    sb.append(formatSetValue(eventToCache.getTags()) + ",");
+    sb.append(formatSetValue(eventToCache.getReferences()) + ",");
+    sb.append(formatTextValue(eventToCache.getDescription()) + ",");
     // attachments need to be added in their own table
-    sb.append(formatTextValue(eventToCache.getClientDataAsString()));
-    sb.append(formatTextValue(eventToCache.getTrashed()));
-    sb.append(formatTextValue(eventToCache.getTempRefId()));
+    sb.append(formatTextValue(eventToCache.getClientDataAsString()) + ",");
+    sb.append(formatTextValue(eventToCache.getTrashed()) + ",");
+    sb.append(formatTextValue(eventToCache.getTempRefId()) + ",");
     sb.setLength(sb.length() - 1);
     sb.append(");");
     return sb.toString();
@@ -107,58 +108,133 @@ public class QueryGenerator {
         + ID_KEY
         + "="
         + formatTextValue(eventToUpdate.getId())
+        + ", "
         + STREAM_ID_KEY
         + "="
         + formatTextValue(eventToUpdate.getStreamId())
+        + ", "
         + TIME_KEY
         + "="
         + formatLongValue(eventToUpdate.getTime())
+        + ", "
         + TYPE_KEY
         + "="
         + formatTextValue(eventToUpdate.getType())
+        + ", "
         + CREATED_KEY
         + "="
         + formatLongValue(eventToUpdate.getCreated())
+        + ", "
         + CREATED_BY_KEY
         + "="
         + formatTextValue(eventToUpdate.getCreatedBy())
+        + ", "
         + MODIFIED_KEY
         + "="
         + formatLongValue(eventToUpdate.getModified())
+        + ", "
         + MODIFIED_BY_KEY
         + "="
         + formatTextValue(eventToUpdate.getModifiedBy())
+        + ", "
         + DURATION_KEY
         + "="
         + formatLongValue(eventToUpdate.getDuration())
+        + ", "
         + CONTENT_KEY
         + "="
         + formatTextValue(eventToUpdate.getContent())
+        + ", "
         + TAGS_KEY
         + "="
         + formatSetValue(eventToUpdate.getTags())
+        + ", "
         + REFS_KEY
         + "="
         + formatSetValue(eventToUpdate.getReferences())
+        + ", "
         + DESCRIPTION_KEY
         + "="
         + formatTextValue(eventToUpdate.getDescription())
+        + ", "
         + CLIENT_DATA_KEY
         + "="
         + formatTextValue(eventToUpdate.getClientDataAsString())
+        + ", "
         + TRASHED_KEY
         + "="
         + formatTextValue(eventToUpdate.getTrashed())
+        + ", "
         + TEMP_REF_ID_KEY
         + "="
         + formatTextValue(eventToUpdate.getTempRefId()));
-    sb.setLength(sb.length() - 1);
     sb.append(" WHERE " + ID_KEY + "=\'" + eventToUpdate.getId() + "\';");
     return sb.toString();
   }
 
   public static String deleteEvent(Event eventToDelete) {
     return "DELETE FROM " + EVENTS_TABLE_NAME + " WHERE ID=\'" + eventToDelete.getId() + "\';";
+  }
+
+  public static String retrieveEvents(Filter filter) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("SELECT * FROM " + EVENTS_TABLE_NAME + " ");
+
+    if (filter != null) {
+      sb.append("WHERE ");
+      // fromTime
+      if (filter.getFromTime() != null) {
+        sb.append(TIME_KEY + ">" + filter.getFromTime() + " AND ");
+      }
+
+      // toTime
+      if (filter.getToTime() != null) {
+        sb.append(TIME_KEY + "<" + filter.getToTime() + " AND ");
+      }
+
+      // streamIds
+      formatFilterSet(sb, filter.getStreamIds(), STREAM_ID_KEY);
+
+      // tags
+      formatFilterSet(sb, filter.getTags(), TAGS_KEY);
+
+      // types
+      formatFilterSet(sb, filter.getTypes(), TYPE_KEY);
+
+      // TODO handle running parameter
+
+      // modifiedSince
+      if (filter.getModifiedSince() != null) {
+        sb.append(MODIFIED_KEY + ">" + filter.getModifiedSince() + " AND ");
+      }
+
+      // state
+      if (filter.getState() != null) {
+        if (filter.getState().equals(Filter.State.DEFAULT)) {
+          sb.append(TRASHED_KEY + "=" + "\'false\'" + " AND ");
+        } else if (filter.getState().equals(Filter.State.TRASHED)) {
+          sb.append(TRASHED_KEY + "=" + "\'true\'" + " AND ");
+        } else {
+          // do nothing
+        }
+      }
+      sb.setLength(sb.length() - " AND ".length());
+    }
+    sb.append(";");
+    return sb.toString();
+  }
+
+  private static void formatFilterSet(StringBuilder sb, Set<String> set, String key) {
+    if (set != null) {
+      sb.append("(");
+      String separator = "";
+      for (String item : set) {
+        sb.append(separator);
+        sb.append(key + "=" + formatTextValue(item) + " ");
+        separator = "OR ";
+      }
+      sb.append(") AND ");
+    }
   }
 
   private static String formatLongValue(Long toAdd) {
@@ -168,7 +244,6 @@ public class QueryGenerator {
     } else {
       sb.append("NULL");
     }
-    sb.append(",");
     return sb.toString();
   }
 
@@ -179,7 +254,6 @@ public class QueryGenerator {
     } else {
       sb.append("NULL");
     }
-    sb.append(",");
     return sb.toString();
   }
 
@@ -196,7 +270,6 @@ public class QueryGenerator {
     } else {
       sb.append("NULL");
     }
-    sb.append(",");
     return sb.toString();
   }
 

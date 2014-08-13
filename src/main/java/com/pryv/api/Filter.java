@@ -16,18 +16,18 @@ import com.pryv.api.model.Event;
 public class Filter {
 
   // keys to filter online requests
-  public final static String FROM_TIME_KEY = "fromTime";
-  public final static String TO_TIME_KEY = "toTime";
-  public final static String STREAMS_KEY = "streams[]";
-  public final static String TAGS_KEY = "tags[]";
-  public final static String TYPES_KEY = "types[]";
-  public final static String RUNNING_KEY = "running";
-  public final static String SORT_ASCENDING_KEY = "sortAscending";
-  public final static String SKIP_KEY = "skip";
-  public final static String LIMIT_KEY = "limit";
-  public final static String STATE_KEY = "state";
-  public final static String MODIFIED_SINCE_KEY = "modifiedSince";
-  public final static String PARENT_ID_KEY = "parentId";
+  public final static String FROM_TIME_URL_KEY = "fromTime";
+  public final static String TO_TIME_URL_KEY = "toTime";
+  public final static String STREAMS_URL_KEY = "streams[]";
+  public final static String TAGS_URL_KEY = "tags[]";
+  public final static String TYPES_URL_KEY = "types[]";
+  public final static String RUNNING_URL_KEY = "running";
+  public final static String SORT_ASCENDING_URL_KEY = "sortAscending";
+  public final static String SKIP_URL_KEY = "skip";
+  public final static String LIMIT_URL_KEY = "limit";
+  public final static String STATE_URL_KEY = "state";
+  public final static String MODIFIED_SINCE_URL_KEY = "modifiedSince";
+  public final static String PARENT_ID_URL_KEY = "parentId";
 
   // filter fields
   private Long fromTime;
@@ -163,52 +163,58 @@ public class Filter {
         && modifiedSinceMatch;
   }
 
-  public String toUrl() {
+  public void addStreamId(String pStreamId) {
+    if (streamIds == null) {
+      streamIds = new HashSet<>();
+    }
+    streamIds.add(pStreamId);
+  }
+
+  public String toUrlParameters() {
     StringBuilder sb = new StringBuilder();
     if (fromTime != null) {
       sb.append("&");
-      sb.append(FROM_TIME_KEY + "=" + fromTime);
+      sb.append(FROM_TIME_URL_KEY + "=" + fromTime);
     }
     if (toTime != null) {
       sb.append("&");
-      sb.append(TO_TIME_KEY + "=" + toTime);
+      sb.append(TO_TIME_URL_KEY + "=" + toTime);
     }
     if (streamIds != null) {
       for (String string : streamIds) {
         sb.append("&");
-        sb.append(STREAMS_KEY + "=" + string);
+        sb.append(STREAMS_URL_KEY + "=" + string);
       }
     }
     if (tags != null) {
       for (String string : tags) {
-        sb.append("&" + TAGS_KEY + "=" + string);
+        sb.append("&" + TAGS_URL_KEY + "=" + string);
       }
     }
     if (types != null) {
       for (String string : types) {
-        sb.append("&" + TYPES_KEY + "=" + string);
+        sb.append("&" + TYPES_URL_KEY + "=" + string);
       }
     }
     if (running != null) {
-      sb.append("&" + RUNNING_KEY + "=" + running);
+      sb.append("&" + RUNNING_URL_KEY + "=" + running);
     }
     if (sortAscending != null) {
-      sb.append("&" + SORT_ASCENDING_KEY + "=" + sortAscending);
+      sb.append("&" + SORT_ASCENDING_URL_KEY + "=" + sortAscending);
     }
     if (skip != null) {
-      sb.append("&" + SKIP_KEY + "=" + skip);
+      sb.append("&" + SKIP_URL_KEY + "=" + skip);
     }
     if (limit != null) {
-      sb.append("&" + LIMIT_KEY + "=" + limit);
+      sb.append("&" + LIMIT_URL_KEY + "=" + limit);
     }
     if (state != null) {
-      sb.append("&" + STATE_KEY + "=" + state);
+      sb.append("&" + STATE_URL_KEY + "=" + state);
     }
     if (modifiedSince != null) {
-      sb.append("&" + MODIFIED_SINCE_KEY + "=" + modifiedSince);
+      sb.append("&" + MODIFIED_SINCE_URL_KEY + "=" + modifiedSince);
     }
     return sb.toString();
-    // return ReflectionToStringBuilder.toString(this);
   }
 
   public Long getFromTime() {
@@ -255,16 +261,6 @@ public class Filter {
     return modifiedSince;
   }
 
-  /**
-   * State parameter
-   *
-   * @author ik
-   *
-   */
-  public enum State {
-    DEFAULT, TRASHED, ALL
-  }
-
   public void setFromTime(Long pFromTime) {
     this.fromTime = pFromTime;
   }
@@ -308,4 +304,14 @@ public class Filter {
   public void setModifiedSince(Long pModifiedSince) {
     this.modifiedSince = pModifiedSince;
   };
+
+  /**
+   * State parameter
+   *
+   * @author ik
+   *
+   */
+  public enum State {
+    DEFAULT, TRASHED, ALL
+  }
 }

@@ -50,7 +50,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
     // sb.append(key + "=" + params.get(key));
     // }
     // }
-    new FetchEventsThread(filter.toUrl(), eventsCallback).start();
+    new FetchEventsThread(filter.toUrlParameters(), eventsCallback).start();
   }
 
   @Override

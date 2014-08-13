@@ -1,6 +1,8 @@
 package com.pryv.api.model;
 
 import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,7 +12,10 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.pryv.api.database.QueryGenerator;
 import com.rits.cloning.Cloner;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * Event data structure from Pryv
@@ -104,6 +109,34 @@ public class Event {
   }
 
   /**
+   * build Event when retrieved from cache
+   *
+   * @param result
+   * @throws SQLException
+   */
+  public Event(ResultSet result) throws SQLException {
+    id = result.getString(QueryGenerator.ID_KEY);
+    streamId = result.getString(QueryGenerator.STREAM_ID_KEY);
+    time = result.getLong(QueryGenerator.TIME_KEY);
+    type = result.getString(QueryGenerator.TYPE_KEY);
+    created = result.getLong(QueryGenerator.CREATED_KEY);
+    createdBy = result.getString(QueryGenerator.CREATED_BY_KEY);
+    modified = result.getLong(QueryGenerator.MODIFIED_KEY);
+    modifiedBy = result.getString(QueryGenerator.MODIFIED_BY_KEY);
+    duration = result.getLong(QueryGenerator.DURATION_KEY);
+    tags = new HashSet<String>(Arrays.asList(result.getString(QueryGenerator.TAGS_KEY).split(",")));
+    references =
+      new HashSet<String>(Arrays.asList(result.getString(QueryGenerator.REFS_KEY).split(",")));
+    description = result.getString(QueryGenerator.DESCRIPTION_KEY);
+    // TODO fetch Attachments elsewhere
+    String cd = result.getString(QueryGenerator.CLIENT_DATA_KEY);
+    trashed = result.getBoolean(QueryGenerator.TRASHED_KEY);
+    tempRefId = result.getString(QueryGenerator.TEMP_REF_ID_KEY);
+  }
+
+  // private
+
+  /**
    * make deep copy of Event fields, used when updating values of an Event in
    * memory
    *
@@ -150,6 +183,9 @@ public class Event {
     modifiedBy = temp.modifiedBy;
   }
 
+  /**
+   * used for testing purposes
+   */
   public void publishValues() {
     List<String> eventFields = new ArrayList<String>();
     Field[] fields = Event.class.getDeclaredFields();
@@ -162,8 +198,10 @@ public class Event {
         } else if (Long.class.isAssignableFrom(field.getType())) {
           System.out.print(field.get(this));
         } else if (Collection.class.isAssignableFrom(field.getType())) {
-          for (Object item : (Iterable) field.get(this)) {
-            System.out.print(field.get(this) + ",");
+          if (field.get(this) != null) {
+            for (Object item : (Iterable) field.get(this)) {
+              System.out.print(field.get(this) + ",");
+            }
           }
         } else {
           System.out.print(field.get(this));
@@ -176,8 +214,6 @@ public class Event {
       }
     }
   }
-
-
 
   /**
    * format client data to printable.
@@ -334,6 +370,5 @@ public class Event {
   public void setTempRefId(String ptempRefId) {
     this.tempRefId = ptempRefId;
   }
-
 
 }

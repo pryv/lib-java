@@ -1,5 +1,6 @@
 package com.pryv.unit;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
@@ -9,6 +10,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.pryv.api.Filter;
 import com.pryv.api.database.SQLiteDBHelper;
 import com.pryv.api.model.Event;
 
@@ -32,12 +34,7 @@ public class SQLiteDBHelperTest {
   }
 
   @Test
-  public void test01InitDB() {
-    System.out.println("test1");
-  }
-
-  @Test
-  public void test02InsertEmpyEvent() {
+  public void test01InsertEmpyEvent() {
     System.out.println("test2");
     Event emptyEvent = new Event();
     try {
@@ -48,7 +45,7 @@ public class SQLiteDBHelperTest {
   }
 
   @Test
-  public void test03InsertFullEvent() {
+  public void test02InsertFullEvent() {
     try {
       db.addEvent(testEvent);
     } catch (SQLException e) {
@@ -57,19 +54,50 @@ public class SQLiteDBHelperTest {
   }
 
   @Test
-  public void test04UpdateEvent() {
-    testEvent.setStreamId("otherStream");
+  public void test03UpdateEvent() {
+    String newStreamId = "otherStream";
+    testEvent.setStreamId(newStreamId);
     try {
       db.updateEvent(testEvent);
+      Filter filter = new Filter();
+      filter.addStreamId(newStreamId);
+      Event retrievedEvent = db.getEvents(filter).get(testEvent.getId());
+      if (retrievedEvent != null) {
+        assertEquals(newStreamId, retrievedEvent.getStreamId());
+        retrievedEvent.publishValues();
+      } else {
+        fail("fail update event");
+      }
     } catch (SQLException e) {
       e.printStackTrace();
     }
   }
 
   @Test
-  public void test05RemoveFullEvent() {
+  public void test04RemoveFullEvent() {
     try {
       db.deleteEvent(testEvent);
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  public void test05RetrieveEventsForFullFilter() {
+    Filter filter = DummyData.generateFullFilter();
+    try {
+      db.getEvents(filter);
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  public void test06RetrieveEventForStateAllFilter() {
+    Filter filter = new Filter();
+    filter.setState(Filter.State.ALL);
+    try {
+      db.getEvents(filter);
     } catch (SQLException e) {
       e.printStackTrace();
     }
