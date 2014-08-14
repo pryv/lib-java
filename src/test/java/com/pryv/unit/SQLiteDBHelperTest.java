@@ -29,9 +29,14 @@ public class SQLiteDBHelperTest {
   private static Event testEvent;
 
   @BeforeClass
-  public static void beforeClass() throws Exception {
+  public static void beforeClass() {
     testEvent = DummyData.generateFullEvent();
-    db = new SQLiteDBHelper();
+
+    try {
+      db = new SQLiteDBHelper();
+    } catch (ClassNotFoundException | SQLException e) {
+      e.printStackTrace();
+    }
   }
 
   @Test
@@ -124,6 +129,16 @@ public class SQLiteDBHelperTest {
     } catch (SQLException e) {
       e.printStackTrace();
       fail("fail insert full stream");
+    }
+  }
+
+  @Test
+  public void test09RemoveFullStream() {
+    try {
+      db.deleteStream(DummyData.generateFullStream());
+    } catch (SQLException e) {
+      e.printStackTrace();
+      fail("fail delete full stream");
     }
   }
 
