@@ -60,11 +60,18 @@ public class DummyData {
   private static final Long STREAM_MODIFIED = new Long(1500);
   private static final String STREAM_MODIFIED_BY = "Bill";
   private static final String STREAM_CHILD_ID = "aaa";
+  private static final String STREAM_CHILD_NAME = "childname";
+  private static final Boolean STREAM_CHILD_TRASHED = false;
+  private static final Long STREAM_CHILD_CREATED = new Long(200);
+  private static final String STREAM_CHILD_CREATED_BY = "creator of child";
+  private static final Long STREAM_CHILD_MODIFIED = new Long(300);
+  private static final String STREAM_CHILD_MODIFIED_BY = "modified of child";
 
   public static Stream generateFullStream() {
     STREAM_CLIENT_DATA.put(STREAM_CLIENT_KEY, STREAM_CLIENT_VALUE);
-    STREAM_CHILDREN.add(new Stream(STREAM_CHILD_ID, null, null, null, null, null, false, null,
-      null, null, null));
+    STREAM_CHILDREN.add(new Stream(STREAM_CHILD_ID, STREAM_CHILD_NAME, STREAM_ID, null, null, null,
+      STREAM_CHILD_TRASHED, STREAM_CHILD_CREATED, STREAM_CHILD_CREATED_BY, STREAM_CHILD_MODIFIED,
+      STREAM_CHILD_MODIFIED_BY));
     return new Stream(STREAM_ID, STREAM_NAME, STREAM_PARENT_ID, STREAM_SINGLE_ACTIVITY,
       STREAM_CLIENT_DATA, STREAM_CHILDREN, STREAM_TRASHED, STREAM_CREATED, STREAM_CREATED_BY,
       STREAM_MODIFIED, STREAM_MODIFIED_BY);
@@ -85,8 +92,10 @@ public class DummyData {
     EVENT_REFS.add(EVENT_REF);
     EVENT_ATTACHMENTS.add(new Attachment(EVENT_ATTACH_ID, "testfile", "test", 0, "abc132"));
     EVENT_CLIENTDATA.put(EVENT_CLIENTKEY, EVENT_CLIENTVALUE);
-    return new Event(EVENT_ID, EVENT_STREAMID, EVENT_TIME, EVENT_DURATION, EVENT_TYPE, EVENT_CONTENT, EVENT_TAGS, EVENT_REFS, EVENT_DESCRIPTION,
-      EVENT_ATTACHMENTS, EVENT_CLIENTDATA, EVENT_TRASHED, EVENT_CREATED, EVENT_CREATEDBY, EVENT_MODIFIED, EVENT_MODIFIED_BY, EVENT_TEMP_REF_ID);
+    return new Event(EVENT_ID, EVENT_STREAMID, EVENT_TIME, EVENT_DURATION, EVENT_TYPE,
+      EVENT_CONTENT, EVENT_TAGS, EVENT_REFS, EVENT_DESCRIPTION, EVENT_ATTACHMENTS,
+      EVENT_CLIENTDATA, EVENT_TRASHED, EVENT_CREATED, EVENT_CREATEDBY, EVENT_MODIFIED,
+      EVENT_MODIFIED_BY, EVENT_TEMP_REF_ID);
   }
 
   public static String generateJsonEvent() {
