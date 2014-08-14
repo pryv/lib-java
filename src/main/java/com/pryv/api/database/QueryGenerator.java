@@ -51,7 +51,7 @@ public class QueryGenerator {
   public static final String STREAMS_CLIENT_DATA_KEY = "CLIENT_DATA";
   public static final String STREAMS_TRASHED_KEY = "TRASHED";
   public static final String STREAMS_CREATED_KEY = "CREATED";
-  public static final String STREAMS_CREATED_BY_KEY = "CREATED_BEY";
+  public static final String STREAMS_CREATED_BY_KEY = "CREATED_BY";
   public static final String STREAMS_MODIFIED_KEY = "MODIFIED";
   public static final String STREAMS_MODIFIED_BY_KEY = "MODIFIED_BY";
 
@@ -193,7 +193,13 @@ public class QueryGenerator {
   }
 
   public static String deleteEvent(Event eventToDelete) {
-    return "DELETE FROM " + EVENTS_TABLE_NAME + " WHERE ID=\'" + eventToDelete.getId() + "\';";
+    return "DELETE FROM "
+      + EVENTS_TABLE_NAME
+        + " WHERE "
+        + EVENTS_ID_KEY
+        + "=\'"
+        + eventToDelete.getId()
+        + "\';";
   }
 
   public static String retrieveEvents(Filter filter) {
@@ -360,7 +366,12 @@ public class QueryGenerator {
         + STREAMS_MODIFIED_BY_KEY
         + " TEXT              NOT NULL, "
         + STREAMS_PARENT_ID_KEY
-        + " TEXT, "
+        // + " TEXT, "
+        + " TEXT REFERENCES "
+        + STREAMS_TABLE_NAME
+        + "("
+        + STREAMS_ID_KEY
+        + "), "
         + STREAMS_SINGLE_ACTIVITY_KEY
         + " INTEGER, "
         + STREAMS_CLIENT_DATA_KEY
@@ -407,6 +418,16 @@ public class QueryGenerator {
     sb.append(formatTextValue(streamToCache.getModifiedBy()));
     sb.append(");");
     return sb.toString();
+  }
+
+  public static String deleteStream(Stream streamToDelete) {
+    return "DELETE FROM "
+      + STREAMS_TABLE_NAME
+        + " WHERE "
+        + STREAMS_ID_KEY
+        + "=\'"
+        + streamToDelete.getId()
+        + "\';";
   }
 
 }

@@ -15,7 +15,9 @@ import com.pryv.utils.Logger;
 
 /**
  *
- * Utilitary helper class to manipulate SQLite database
+ * Utilitary helper class to manipulate SQLite database. Instanciating an
+ * SQLiteDBHelper object will establish a connection to the SQLite database and
+ * create the tables if required.
  *
  * @author ik
  *
@@ -31,8 +33,11 @@ public class SQLiteDBHelper {
   /**
    * SQLiteDBHelper constructor. Connects to the SQLite database. Creates tables
    * if required.
+   *
+   * @throws SQLException
+   * @throws ClassNotFoundException
    */
-  public SQLiteDBHelper() {
+  public SQLiteDBHelper() throws ClassNotFoundException, SQLException {
     System.out.println("dbpath: " + dbPath);
     initDB(dbPath);
   }
@@ -41,21 +46,15 @@ public class SQLiteDBHelper {
    * Connects to the SQLite database. Creates tables if required.
    *
    * @param path
+   * @throws SQLException
+   * @throws ClassNotFoundException
    */
-  private void initDB(String path) {
-    try {
-      Class.forName("org.sqlite.JDBC");
-      dbConnection = DriverManager.getConnection("jdbc:sqlite:" + path);
-      logger.log("Opened database successfully");
-      createEventsTable();
-      createSteamsTable();
-    } catch (ClassNotFoundException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (SQLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+  private void initDB(String path) throws SQLException, ClassNotFoundException {
+    Class.forName("org.sqlite.JDBC");
+    dbConnection = DriverManager.getConnection("jdbc:sqlite:" + path);
+    logger.log("Opened database successfully");
+    createEventsTable();
+    createSteamsTable();
   }
 
   /**
@@ -69,7 +68,7 @@ public class SQLiteDBHelper {
     String cmd = QueryGenerator.createEvent(eventToCache);
     logger.log("SQLiteDBHelper: addEvent: " + cmd);
     Statement statement = dbConnection.createStatement();
-    statement.execute(cmd);
+    statement.executeUpdate(cmd);
     statement.close();
   }
 
@@ -84,7 +83,7 @@ public class SQLiteDBHelper {
     String cmd = QueryGenerator.updateEvent(eventToUpdate);
     logger.log("SQLiteDBHelper: updateEvent: " + cmd);
     Statement statement = dbConnection.createStatement();
-    statement.execute(cmd);
+    statement.executeUpdate(cmd);
     statement.close();
   }
 
@@ -98,7 +97,7 @@ public class SQLiteDBHelper {
     String cmd = QueryGenerator.deleteEvent(eventToDelete);
     logger.log("SQLiteDBHelper: deleteEvent: " + cmd);
     Statement statement = dbConnection.createStatement();
-    statement.execute(cmd);
+    statement.executeUpdate(cmd);
     statement.close();
   }
 
@@ -151,6 +150,11 @@ public class SQLiteDBHelper {
     statement.close();
   }
 
+  /**
+   * closes connection to SQLite database.
+   *
+   * @throws SQLException
+   */
   public void closeDb() throws SQLException {
     dbConnection.close();
   }
@@ -161,17 +165,49 @@ public class SQLiteDBHelper {
   }
 
   /**
-   * Insert Stream into the SQLite database.
+   * Insert Stream and its children Streamsinto the SQLite database.
    *
    * @param streamToCache
    *          the stream to insert
    * @throws SQLException
    */
   public void addStream(Stream streamToCache) throws SQLException {
+    Statement statement = dbConnection.createStatement();
     String cmd = QueryGenerator.createStream(streamToCache);
     logger.log("SQLiteDBHelper: addStream: " + cmd);
+    statement.executeUpdate(cmd);
+    if (streamToCache.getChildren() != null) {
+      for (Stream childStream : streamToCache.getChildren()) {
+        cmd = QueryGenerator.createStream(childStream);
+        statement.execute(cmd);
+        logger.log("SQLiteDBHelper: add child Stream: " + cmd);
+      }
+    }
+    statement.close();
+  }
+
+  /**
+   * Delete Stream and all its children Streams from the SQLite database.
+   *
+   * @param streamToDelete
+   * @throws SQLException
+   */
+  public void deleteStream(Stream streamToDelete) throws SQLException {
+    String cmd;
     Statement statement = dbConnection.createStatement();
-    statement.execute(cmd);
+    if (streamToDelete.getChildren() != null) {
+      for (Stream childStream : streamToDelete.getChildren()) {
+        cmd = QueryGenerator.deleteStream(childStream);
+        statement.executeUpdate(cmd);
+        logger.log("SQLiteDBHelper: delete child Stream with name "
+          + childStream.getName()
+            + ": "
+            + cmd);
+      }
+    }
+    cmd = QueryGenerator.deleteStream(streamToDelete);
+    logger.log("SQLiteDBHelper: deleteStream: " + cmd);
+    statement.executeUpdate(cmd);
     statement.close();
   }
 }

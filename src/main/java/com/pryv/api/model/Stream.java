@@ -32,6 +32,24 @@ public class Stream {
   private Boolean singleActivity;
   private Map<String, Object> clientData;
 
+  /**
+   * Stream object Constructor with all fields
+   *
+   * @param pId
+   * @param pName
+   * @param pParentId
+   *          optional
+   * @param pSingleActivity
+   *          optional
+   * @param pClientData
+   *          optional
+   * @param pChildren
+   * @param pTrashed
+   * @param pCreated
+   * @param pCreatedBy
+   * @param pModified
+   * @param pModifiedBy
+   */
   public Stream(String pId, String pName, String pParentId, Boolean pSingleActivity,
     Map<String, Object> pClientData, List<Stream> pChildren, Boolean pTrashed, Long pCreated,
     String pCreatedBy, Long pModified, String pModifiedBy) {
