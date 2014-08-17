@@ -58,25 +58,26 @@ public class SQLiteDBHelper {
   }
 
   /**
-   * Insert event into the SQLite database.
+   * Inserts Event into the SQLite database.
    *
    * @param eventToCache
    *          the event to insert
    * @throws SQLException
+   *           if an Event with the same ID already exists in the database.
    */
-  public void addEvent(Event eventToCache) throws SQLException {
-    String cmd = QueryGenerator.createEvent(eventToCache);
+  public void createEvent(Event eventToCache) throws SQLException {
+    String cmd = QueryGenerator.insertEvent(eventToCache);
     logger.log("SQLiteDBHelper: addEvent: " + cmd);
     Statement statement = dbConnection.createStatement();
-    statement.executeUpdate(cmd);
+    statement.execute(cmd);
     statement.close();
   }
 
   /**
-   * Update event in the SQLite database.
+   * Updates Event in the SQLite database. The "modified" fields are compared in
+   * order to determine if an update is necessary.
    *
    * @param eventToUpdate
-   *          the event to update
    * @throws SQLException
    */
   public void updateEvent(Event eventToUpdate) throws SQLException {
@@ -125,6 +126,91 @@ public class SQLiteDBHelper {
   }
 
   /**
+   * Insert Stream and its children Streamsinto the SQLite database.
+   *
+   * @param streamToCache
+   *          the stream to insert
+   * @throws SQLException
+   */
+  public void addStream(Stream streamToCache) throws SQLException {
+    Statement statement = dbConnection.createStatement();
+    String cmd = QueryGenerator.insertStream(streamToCache);
+    logger.log("SQLiteDBHelper: addStream: " + cmd);
+    statement.executeUpdate(cmd);
+    if (streamToCache.getChildren() != null) {
+      for (Stream childStream : streamToCache.getChildren()) {
+        cmd = QueryGenerator.insertStream(childStream);
+        statement.execute(cmd);
+        logger.log("SQLiteDBHelper: add child Stream: " + cmd);
+      }
+    }
+    statement.close();
+  }
+
+  /**
+   * Updates Stream in the SQLite database. The "modified" fields are compared
+   * in order to determine if an update is necessary.
+   *
+   * @param streamToUpdate
+   * @throws SQLException
+   */
+  public void updateStream(Stream streamToUpdate) throws SQLException {
+    String cmd = QueryGenerator.updateStream(streamToUpdate);
+    logger.log("SQLiteDBHelper: updateStream: " + cmd);
+    Statement statement = dbConnection.createStatement();
+    statement.executeUpdate(cmd);
+    statement.close();
+  }
+
+  /**
+   * Delete Stream and all its children Streams from the SQLite database.
+   *
+   * @param streamToDelete
+   * @throws SQLException
+   */
+  public void deleteStream(Stream streamToDelete) throws SQLException {
+    String cmd;
+    Statement statement = dbConnection.createStatement();
+    if (streamToDelete.getChildren() != null) {
+      for (Stream childStream : streamToDelete.getChildren()) {
+        cmd = QueryGenerator.deleteStream(childStream);
+        statement.executeUpdate(cmd);
+        logger.log("SQLiteDBHelper: delete child Stream with name "
+          + childStream.getName()
+            + ": "
+            + cmd);
+      }
+    }
+    cmd = QueryGenerator.deleteStream(streamToDelete);
+    logger.log("SQLiteDBHelper: deleteStream: " + cmd);
+    statement.executeUpdate(cmd);
+    statement.close();
+  }
+
+  public Map<String, Stream> getStreams() throws SQLException {
+    String cmd = QueryGenerator.retrieveStreams();
+    logger.log("SQLiteDBHelper: getStreams: " + cmd);
+    Statement statement = dbConnection.createStatement();
+    ResultSet result = statement.executeQuery(cmd);
+    Map<String, Stream> retrievedStreams = new HashMap<String, Stream>();
+    while (result.next()) {
+      // get the requested Streams
+      Stream retrievedStream = new Stream(result);
+      retrievedStreams.put(retrievedStream.getId(), retrievedStream);
+    }
+    for (Stream stream : retrievedStreams.values()) {
+      String pid = stream.getParentId();
+      if (pid != null) {
+        // add this stream as a child
+        retrievedStreams.get(pid).addChildStream(stream);
+        // remove it from retrievedStreams.
+        retrievedStreams.remove(stream.getId());
+      }
+    }
+    return retrievedStreams;
+  }
+
+  /**
    * Create Events table in the SQLite database.
    *
    * @throws SQLException
@@ -157,57 +243,5 @@ public class SQLiteDBHelper {
    */
   public void closeDb() throws SQLException {
     dbConnection.close();
-  }
-
-  public void getStreams() {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * Insert Stream and its children Streamsinto the SQLite database.
-   *
-   * @param streamToCache
-   *          the stream to insert
-   * @throws SQLException
-   */
-  public void addStream(Stream streamToCache) throws SQLException {
-    Statement statement = dbConnection.createStatement();
-    String cmd = QueryGenerator.createStream(streamToCache);
-    logger.log("SQLiteDBHelper: addStream: " + cmd);
-    statement.executeUpdate(cmd);
-    if (streamToCache.getChildren() != null) {
-      for (Stream childStream : streamToCache.getChildren()) {
-        cmd = QueryGenerator.createStream(childStream);
-        statement.execute(cmd);
-        logger.log("SQLiteDBHelper: add child Stream: " + cmd);
-      }
-    }
-    statement.close();
-  }
-
-  /**
-   * Delete Stream and all its children Streams from the SQLite database.
-   *
-   * @param streamToDelete
-   * @throws SQLException
-   */
-  public void deleteStream(Stream streamToDelete) throws SQLException {
-    String cmd;
-    Statement statement = dbConnection.createStatement();
-    if (streamToDelete.getChildren() != null) {
-      for (Stream childStream : streamToDelete.getChildren()) {
-        cmd = QueryGenerator.deleteStream(childStream);
-        statement.executeUpdate(cmd);
-        logger.log("SQLiteDBHelper: delete child Stream with name "
-          + childStream.getName()
-            + ": "
-            + cmd);
-      }
-    }
-    cmd = QueryGenerator.deleteStream(streamToDelete);
-    logger.log("SQLiteDBHelper: deleteStream: " + cmd);
-    statement.executeUpdate(cmd);
-    statement.close();
   }
 }

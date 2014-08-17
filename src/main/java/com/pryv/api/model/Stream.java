@@ -1,11 +1,14 @@
 package com.pryv.api.model;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.pryv.api.database.QueryGenerator;
 import com.rits.cloning.Cloner;
 
 /**
@@ -66,9 +69,37 @@ public class Stream {
     modifiedBy = pModifiedBy;
   }
 
+  /**
+   * build Stream when retrieved from cache
+   *
+   * @param result
+   * @throws SQLException
+   */
+  public Stream(ResultSet result) throws SQLException {
+    id = result.getString(QueryGenerator.STREAMS_ID_KEY);
+    name = result.getString(QueryGenerator.STREAMS_NAME_KEY);
+    trashed = result.getBoolean(QueryGenerator.STREAMS_TRASHED_KEY);
+    created = result.getLong(QueryGenerator.STREAMS_CREATED_KEY);
+    createdBy = result.getString(QueryGenerator.STREAMS_CREATED_BY_KEY);
+    modified = result.getLong(QueryGenerator.STREAMS_MODIFIED_KEY);
+    modifiedBy = result.getString(QueryGenerator.STREAMS_MODIFIED_BY_KEY);
+    parentId = result.getString(QueryGenerator.STREAMS_PARENT_ID_KEY);
+    singleActivity = result.getBoolean(QueryGenerator.STREAMS_SINGLE_ACTIVITY_KEY);
+    setClientDataFromAstring(result.getString(QueryGenerator.EVENTS_DESCRIPTION_KEY));
+  }
+
+  /**
+   * Empty Constructor
+   */
   public Stream() {
   }
 
+  /**
+   * Copy all temp Stream's values into caller Stream.
+   *
+   * @param temp
+   * @param cloner
+   */
   public void merge(Stream temp, Cloner cloner) {
     id = temp.id;
     name = temp.name;
@@ -91,7 +122,7 @@ public class Stream {
   }
 
   /**
-   * format client data to printable.
+   * format client data to printable. eg.: "keyA:valueA,keyB:valueB, ..."
    *
    * @return client data in readable form as a String.
    */
@@ -101,13 +132,42 @@ public class Stream {
       String separator = "";
       for (String key : clientData.keySet()) {
         sb.append(separator);
-        separator = ", ";
-        sb.append(key + ": " + clientData.get(key));
+        separator = ",";
+        sb.append(key + ":" + clientData.get(key));
       }
       return sb.toString();
     } else {
       return null;
     }
+  }
+
+  /**
+   * setter for client data previously formatted using getClientDataAsString()
+   * method.
+   *
+   * @param source
+   */
+  public void setClientDataFromAstring(String source) {
+    if (source != null) {
+      String[] cdPairs = source.split(":");
+      if (clientData == null) {
+        clientData = new HashMap<String, Object>();
+      }
+      clientData.put(cdPairs[0], cdPairs[1]);
+    }
+  }
+
+  /**
+   * Add a stream as child to caller. If children list doesn't exists yet,
+   * instanciates it.
+   *
+   * @param childStream
+   */
+  public void addChildStream(Stream childStream) {
+    if (children == null) {
+      children = new ArrayList<Stream>();
+    }
+    children.add(childStream);
   }
 
   public String getId() {

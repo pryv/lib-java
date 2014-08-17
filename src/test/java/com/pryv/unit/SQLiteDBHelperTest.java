@@ -1,6 +1,7 @@
 package com.pryv.unit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
@@ -27,11 +28,12 @@ public class SQLiteDBHelperTest {
   private static SQLiteDBHelper db;
 
   private static Event testEvent;
+  private static Stream testStream;
 
   @BeforeClass
   public static void beforeClass() {
     testEvent = DummyData.generateFullEvent();
-
+    testStream = DummyData.generateFullStream();
     try {
       db = new SQLiteDBHelper();
     } catch (ClassNotFoundException | SQLException e) {
@@ -44,8 +46,8 @@ public class SQLiteDBHelperTest {
     System.out.println("test2");
     Event emptyEvent = new Event();
     try {
-      db.addEvent(emptyEvent);
-      fail("adding empty Event to SQLite database did not throw any Exception!");
+      db.createEvent(emptyEvent);
+      fail("inserting event without the required fields should throw an exception");
     } catch (SQLException e) {
     }
   }
@@ -53,7 +55,7 @@ public class SQLiteDBHelperTest {
   @Test
   public void test02InsertFullEvent() {
     try {
-      db.addEvent(testEvent);
+      db.createEvent(testEvent);
     } catch (SQLException e) {
       e.printStackTrace();
       fail("fail insert full event");
@@ -64,18 +66,48 @@ public class SQLiteDBHelperTest {
   public void test03UpdateEvent() {
     String newStreamId = "otherStream";
     testEvent.setStreamId(newStreamId);
+    testEvent.setModified(testEvent.getModified() + 50);
     try {
       db.updateEvent(testEvent);
-      Filter filter = new Filter();
-      filter.addStreamId(newStreamId);
-      Event retrievedEvent = db.getEvents(filter).get(testEvent.getId());
-      if (retrievedEvent != null) {
-        assertEquals(newStreamId, retrievedEvent.getStreamId());
-        retrievedEvent.publishValues();
+      Event modifiedEvent = db.getEvents(null).get(testEvent.getId());
+      if (modifiedEvent != null) {
+        assertEquals(
+          "new sid: " + modifiedEvent.getStreamId() + " should be : " + testEvent.getStreamId(),
+          newStreamId, modifiedEvent.getStreamId());
       } else {
         fail("fail update event");
       }
     } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  public void test03UpdateEventIfNewerShouldDoNothing() {
+    testEvent.setModified(testEvent.getModified());
+    try {
+      db.updateEvent(testEvent);
+      Event notModifiedEvent = db.getEvents(null).get(testEvent.getId());
+      assertEquals(notModifiedEvent.getModified(), testEvent.getModified());
+    } catch (SQLException e) {
+      fail("fail update if newer");
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  public void test03UpdateEventIfNewerShouldModify() {
+    testEvent.setModified(DummyData.getModified() + 50);
+    System.out.println("modified value is : " + testEvent.getModified());
+    try {
+      db.updateEvent(testEvent);
+      Event modifiedEvent = db.getEvents(null).get(testEvent.getId());
+      assertTrue("new value: "
+        + modifiedEvent.getModified()
+          + " should be higher than old value: "
+          + DummyData.getModified(), modifiedEvent.getModified() > DummyData.getModified());
+    } catch (SQLException e) {
+      fail("fail update if newer modified");
       e.printStackTrace();
     }
   }
@@ -125,7 +157,7 @@ public class SQLiteDBHelperTest {
   @Test
   public void test08InsertFullStream() {
     try {
-      db.addStream(DummyData.generateFullStream());
+      db.addStream(testStream);
     } catch (SQLException e) {
       e.printStackTrace();
       fail("fail insert full stream");
@@ -133,12 +165,47 @@ public class SQLiteDBHelperTest {
   }
 
   @Test
+  public void test09UpdateFullStream() {
+    testStream.setTrashed(!testStream.getTrashed());
+    testStream.setModified(testStream.getModified() + 50);
+    try {
+      db.updateStream(testStream);
+
+    } catch (SQLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  public void test10retrieveStream() {
+    try {
+      db.getStreams();
+    } catch (SQLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+  @Test
   public void test09RemoveFullStream() {
     try {
-      db.deleteStream(DummyData.generateFullStream());
+      db.deleteStream(testStream);
     } catch (SQLException e) {
       e.printStackTrace();
       fail("fail delete full stream");
+    }
+  }
+
+  @Test
+  public void testRemoveAllEvents() {
+    try {
+      for (Event event : db.getEvents(null).values()) {
+        db.deleteEvent(event);
+      }
+    } catch (SQLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
     }
   }
 

@@ -129,7 +129,7 @@ public class Event {
       new HashSet<String>(Arrays.asList(result.getString(QueryGenerator.EVENTS_REFS_KEY).split(",")));
     description = result.getString(QueryGenerator.EVENTS_DESCRIPTION_KEY);
     // TODO fetch Attachments elsewhere
-    String cd = result.getString(QueryGenerator.EVENTS_CLIENT_DATA_KEY);
+    setClientDataFromAstring(result.getString(QueryGenerator.EVENTS_CLIENT_DATA_KEY));
     trashed = result.getBoolean(QueryGenerator.EVENTS_TRASHED_KEY);
     tempRefId = result.getString(QueryGenerator.EVENTS_TEMP_REF_ID_KEY);
   }
@@ -137,8 +137,7 @@ public class Event {
   // private
 
   /**
-   * make deep copy of Event fields, used when updating values of an Event in
-   * memory
+   * Copy all temp Event's values into caller Event.
    *
    * @param temp
    *          the Event from which the fields are merged
@@ -216,7 +215,7 @@ public class Event {
   }
 
   /**
-   * format client data to printable.
+   * format client data to printable. eg.: "keyA:valueA,keyB:valueB, ..."
    *
    * @return client data in readable form as a String.
    */
@@ -226,12 +225,28 @@ public class Event {
       String separator = "";
       for (String key : clientData.keySet()) {
         sb.append(separator);
-        separator = ", ";
-        sb.append(key + ": " + clientData.get(key));
+        separator = ",";
+        sb.append(key + ":" + clientData.get(key));
       }
       return sb.toString();
     } else {
       return null;
+    }
+  }
+
+  /**
+   * setter for client data previously formatted using getClientDataAsString()
+   * method.
+   *
+   * @param source
+   */
+  public void setClientDataFromAstring(String source) {
+    if (source != null) {
+      String[] cdPairs = source.split(":");
+      if (clientData == null) {
+        clientData = new HashMap<String, Object>();
+      }
+      clientData.put(cdPairs[0], cdPairs[1]);
     }
   }
 

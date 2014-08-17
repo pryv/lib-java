@@ -40,9 +40,9 @@ public class DummyData {
   private static final String EVENT_CLIENTVALUE = "value";
   private static final Boolean EVENT_TRASHED = false;
   private static final Long EVENT_CREATED = new Long(10);
-  private static final String EVENT_CREATEDBY = "Bob";
+  private static final String EVENT_CREATEDBY = "event creator";
   private static final Long EVENT_MODIFIED = new Long(50);
-  private static final String EVENT_MODIFIED_BY = "Tom";
+  private static final String EVENT_MODIFIED_BY = "event modifier";
   private static final String EVENT_ATTACH_ID = "abc";
   private static final String EVENT_TEMP_REF_ID = "temp ref id";
 
@@ -59,7 +59,7 @@ public class DummyData {
   private static final String STREAM_CREATED_BY = "Bob";
   private static final Long STREAM_MODIFIED = new Long(1500);
   private static final String STREAM_MODIFIED_BY = "Bill";
-  private static final String STREAM_CHILD_ID = "aaa";
+  private static final String STREAM_CHILD_ID = "childid";
   private static final String STREAM_CHILD_NAME = "childname";
   private static final Boolean STREAM_CHILD_TRASHED = false;
   private static final Long STREAM_CHILD_CREATED = new Long(200);

@@ -1,5 +1,6 @@
 package com.pryv.api.database;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.pryv.api.Filter;
@@ -7,7 +8,7 @@ import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 
 /**
- * Class containing methods to generate SQLite queries
+ * Class containing methods to generate SQLite queries.
  *
  * @author ik
  *
@@ -36,6 +37,7 @@ public class QueryGenerator {
   public static final String EVENTS_CONTENT_KEY = "CONTENT";
   public static final String EVENTS_TAGS_KEY = "TAGS";
   public static final String EVENTS_REFS_KEY = "REFS";
+  // "REFERENCES" is a reserved command in SQLite
   public static final String EVENTS_DESCRIPTION_KEY = "DESCRIPTION";
   public static final String EVENTS_CLIENT_DATA_KEY = "CLIENT_DATA";
   public static final String EVENTS_TRASHED_KEY = "TRASHED";
@@ -54,14 +56,15 @@ public class QueryGenerator {
   public static final String STREAMS_CREATED_BY_KEY = "CREATED_BY";
   public static final String STREAMS_MODIFIED_KEY = "MODIFIED";
   public static final String STREAMS_MODIFIED_BY_KEY = "MODIFIED_BY";
+  public static final String STREAMS_CHILDREN_KEY = "CHILDREN";
 
   /**
-   * Create Event query
+   * Create Event query.
    *
    * @param eventToCache
    * @return
    */
-  public static String createEvent(Event eventToCache) {
+  public static String insertEvent(Event eventToCache) {
     StringBuilder sb = new StringBuilder();
     sb.append("INSERT INTO "
       + EVENTS_TABLE_NAME
@@ -120,6 +123,12 @@ public class QueryGenerator {
     return sb.toString();
   }
 
+  /**
+   * Create query to update Event if modified field is higher.
+   *
+   * @param eventToUpdate
+   * @return
+   */
   public static String updateEvent(Event eventToUpdate) {
     StringBuilder sb = new StringBuilder();
     sb.append("UPDATE "
@@ -188,10 +197,24 @@ public class QueryGenerator {
         + EVENTS_TEMP_REF_ID_KEY
         + "="
         + formatTextValue(eventToUpdate.getTempRefId()));
-    sb.append(" WHERE " + EVENTS_ID_KEY + "=\'" + eventToUpdate.getId() + "\';");
+    sb.append(" WHERE "
+      + EVENTS_ID_KEY
+        + "=\'"
+        + eventToUpdate.getId()
+        + "\' AND "
+        + EVENTS_MODIFIED_KEY
+        + "<"
+        + eventToUpdate.getModified()
+        + ";");
     return sb.toString();
   }
 
+  /**
+   * Creates the query to delete an Event. It's id is used in the request.
+   *
+   * @param eventToDelete
+   * @return the SQLite query
+   */
   public static String deleteEvent(Event eventToDelete) {
     return "DELETE FROM "
       + EVENTS_TABLE_NAME
@@ -202,6 +225,13 @@ public class QueryGenerator {
         + "\';";
   }
 
+  /**
+   * creates the query to retrieve Events from DB according to the provided
+   * filter.
+   *
+   * @param filter
+   * @return the SQLite query
+   */
   public static String retrieveEvents(Filter filter) {
     StringBuilder sb = new StringBuilder();
     sb.append("SELECT * FROM " + EVENTS_TABLE_NAME + " ");
@@ -247,6 +277,8 @@ public class QueryGenerator {
           sb.append(EVENTS_TRASHED_KEY + "=" + "\'true\'");
         } else {
           sb.append("(" + EVENTS_TRASHED_KEY + "=\'false\' OR " + EVENTS_TRASHED_KEY + "=\'true\')");
+          // alternative implementation
+          // sb.setLength(sb.length() - andSeparator.length());
         }
         andSeparator = " AND ";
       }
@@ -255,6 +287,19 @@ public class QueryGenerator {
     return sb.toString();
   }
 
+  /**
+   * format Set values to be used in retrieval query. eg.: [AND] (key=itemA OR
+   * key=itemB OR ...)
+   *
+   * @param andSeparator
+   *          " AND " or ""
+   * @param sb
+   *          current StringBuilder used in the request
+   * @param set
+   *          the set of conditions
+   * @param key
+   *          the column on which the conditions are tested in the DB
+   */
   private static void formatFilterSet(String andSeparator, StringBuilder sb, Set<String> set,
     String key) {
     if (set != null) {
@@ -270,6 +315,12 @@ public class QueryGenerator {
     }
   }
 
+  /**
+   * format Long for insert/update in DB, if toAdd == null, returns NULL
+   *
+   * @param toAdd
+   * @return
+   */
   private static String formatLongValue(Long toAdd) {
     StringBuilder sb = new StringBuilder();
     if (toAdd != null) {
@@ -280,16 +331,30 @@ public class QueryGenerator {
     return sb.toString();
   }
 
-  private static String formatTextValue(Object prim) {
+  /**
+   * format Object's value as string for insert/update in DB. eg.:
+   * 'obj.toString()'. If obj == null, returns NULL
+   *
+   * @param obj
+   * @return
+   */
+  private static String formatTextValue(Object obj) {
     StringBuilder sb = new StringBuilder();
-    if (prim != null) {
-      sb.append("\'" + prim + "\'");
+    if (obj != null) {
+      sb.append("\'" + obj + "\'");
     } else {
       sb.append("NULL");
     }
     return sb.toString();
   }
 
+  /**
+   * format Set values for insertion/update in DB. eg.: 'itemA.toString(),
+   * itemB.toString(),...'
+   *
+   * @param set
+   * @return
+   */
   private static String formatSetValue(Set<?> set) {
     StringBuilder sb = new StringBuilder();
     String listSeparator = "";
@@ -307,7 +372,162 @@ public class QueryGenerator {
   }
 
   /**
-   * Create Events Table Query
+   * Creates query to insert stream in the SQLite database.
+   *
+   * @param streamToCache
+   * @return
+   */
+  public static String insertStream(Stream streamToCache) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("INSERT INTO "
+      + STREAMS_TABLE_NAME
+        + " ("
+        + STREAMS_ID_KEY
+        + ", "
+        + STREAMS_NAME_KEY
+        + ", "
+        + STREAMS_CHILDREN_KEY
+        + ", "
+        + STREAMS_PARENT_ID_KEY
+        + ", "
+        + STREAMS_SINGLE_ACTIVITY_KEY
+        + ", "
+        + STREAMS_CLIENT_DATA_KEY
+        + ", "
+        + STREAMS_TRASHED_KEY
+        + ", "
+        + STREAMS_CREATED_KEY
+        + ", "
+        + STREAMS_CREATED_BY_KEY
+        + ", "
+        + STREAMS_MODIFIED_KEY
+        + ", "
+        + STREAMS_MODIFIED_BY_KEY
+        + ")"
+        + " VALUES (");
+    sb.append(formatTextValue(streamToCache.getId()) + ",");
+    sb.append(formatTextValue(streamToCache.getName()) + ",");
+    if (streamToCache.getChildren() != null) {
+      Set<String> childIds = new HashSet<String>();
+      for (Stream childStream : streamToCache.getChildren()) {
+        childIds.add(childStream.getId());
+      }
+      sb.append(formatSetValue(childIds) + ",");
+    } else {
+      sb.append("NULL,");
+    }
+    sb.append(formatTextValue(streamToCache.getParentId()) + ",");
+    sb.append(formatTextValue(streamToCache.getSingleActivity()) + ",");
+    sb.append(formatTextValue(streamToCache.getClientDataAsString()) + ",");
+    sb.append(formatTextValue(streamToCache.getTrashed()) + ",");
+    sb.append(formatLongValue(streamToCache.getCreated()) + ",");
+    sb.append(formatTextValue(streamToCache.getCreatedBy()) + ",");
+    sb.append(formatLongValue(streamToCache.getModified()) + ",");
+    sb.append(formatTextValue(streamToCache.getModifiedBy()));
+    sb.append(");");
+    return sb.toString();
+  }
+
+  /**
+   * Create query to update Stream if modified field is higher.
+   *
+   * @param streamToUpdate
+   * @return
+   */
+  public static String updateStream(Stream streamToUpdate) {
+    StringBuilder sb = new StringBuilder();
+    Set<String> childIds = null;
+    if (streamToUpdate.getChildren() != null) {
+      childIds = new HashSet<String>();
+      for (Stream childStream : streamToUpdate.getChildren()) {
+        childIds.add(childStream.getId());
+      }
+    }
+    sb.append("UPDATE "
+      + STREAMS_TABLE_NAME
+        + " SET "
+        + STREAMS_ID_KEY
+        + "="
+        + formatTextValue(streamToUpdate.getId())
+        + ", "
+        + STREAMS_NAME_KEY
+        + "="
+        + formatTextValue(streamToUpdate.getName())
+        + ", "
+        + STREAMS_CHILDREN_KEY
+        + "="
+        + formatSetValue(childIds)
+        + ", "
+        + STREAMS_PARENT_ID_KEY
+        + "="
+        + formatTextValue(streamToUpdate.getParentId())
+        + ", "
+        + STREAMS_SINGLE_ACTIVITY_KEY
+        + "="
+        + formatTextValue(streamToUpdate.getSingleActivity())
+        + ", "
+        + STREAMS_CLIENT_DATA_KEY
+        + "="
+        + formatTextValue(streamToUpdate.getClientDataAsString())
+        + ", "
+        + STREAMS_TRASHED_KEY
+        + "="
+        + formatTextValue(streamToUpdate.getTrashed())
+        + ", "
+        + STREAMS_CREATED_KEY
+        + "="
+        + formatLongValue(streamToUpdate.getCreated())
+        + ", "
+        + STREAMS_CREATED_BY_KEY
+        + "="
+        + formatTextValue(streamToUpdate.getCreatedBy())
+        + ", "
+        + STREAMS_MODIFIED_KEY
+        + "="
+        + formatLongValue(streamToUpdate.getModified())
+        + ", "
+        + STREAMS_MODIFIED_BY_KEY
+        + "="
+        + formatTextValue(streamToUpdate.getModifiedBy()));
+    sb.append(" WHERE "
+      + STREAMS_ID_KEY
+        + "=\'"
+        + streamToUpdate.getId()
+        + "\' AND "
+        + STREAMS_MODIFIED_KEY
+        + "<"
+        + streamToUpdate.getModified()
+        + ";");
+    return sb.toString();
+  }
+
+  /**
+   * Creates query to delete stream in the SQLite database.
+   *
+   * @param streamToDelete
+   * @return
+   */
+  public static String deleteStream(Stream streamToDelete) {
+    return "DELETE FROM "
+      + STREAMS_TABLE_NAME
+        + " WHERE "
+        + STREAMS_ID_KEY
+        + "=\'"
+        + streamToDelete.getId()
+        + "\';";
+  }
+
+  /**
+   * Creates query to retrieve all Streams from SQLite database
+   *
+   * @return
+   */
+  public static String retrieveStreams() {
+    return "SELECT * FROM " + STREAMS_TABLE_NAME;
+  }
+
+  /**
+   * Creates query to create the Events table if it doesn't exist yet.
    *
    * @return
    */
@@ -349,6 +569,11 @@ public class QueryGenerator {
         + " TEXT)";
   }
 
+  /**
+   * Creates query to create the Streams table if it doesn't exist yet.
+   *
+   * @return
+   */
   public static String createStreamsTable() {
     return "CREATE TABLE IF NOT EXISTS "
       + STREAMS_TABLE_NAME
@@ -365,8 +590,9 @@ public class QueryGenerator {
         + " INTEGER           NOT NULL, "
         + STREAMS_MODIFIED_BY_KEY
         + " TEXT              NOT NULL, "
+        + STREAMS_CHILDREN_KEY
+        + " TEXT, "
         + STREAMS_PARENT_ID_KEY
-        // + " TEXT, "
         + " TEXT REFERENCES "
         + STREAMS_TABLE_NAME
         + "("
@@ -378,56 +604,6 @@ public class QueryGenerator {
         + " TEXT, "
         + STREAMS_TRASHED_KEY
         + " INTEGER)";
-  }
-
-  public static String createStream(Stream streamToCache) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("INSERT INTO "
-      + STREAMS_TABLE_NAME
-        + " ("
-        + STREAMS_ID_KEY
-        + ", "
-        + STREAMS_NAME_KEY
-        + ", "
-        + STREAMS_PARENT_ID_KEY
-        + ", "
-        + STREAMS_SINGLE_ACTIVITY_KEY
-        + ", "
-        + STREAMS_CLIENT_DATA_KEY
-        + ", "
-        + STREAMS_TRASHED_KEY
-        + ", "
-        + STREAMS_CREATED_KEY
-        + ", "
-        + STREAMS_CREATED_BY_KEY
-        + ", "
-        + STREAMS_MODIFIED_KEY
-        + ", "
-        + STREAMS_MODIFIED_BY_KEY
-        + ")"
-        + " VALUES (");
-    sb.append(formatTextValue(streamToCache.getId()) + ",");
-    sb.append(formatTextValue(streamToCache.getName()) + ",");
-    sb.append(formatTextValue(streamToCache.getParentId()) + ",");
-    sb.append(formatTextValue(streamToCache.getSingleActivity()) + ",");
-    sb.append(formatTextValue(streamToCache.getClientDataAsString()) + ",");
-    sb.append(formatTextValue(streamToCache.getTrashed()) + ",");
-    sb.append(formatLongValue(streamToCache.getCreated()) + ",");
-    sb.append(formatTextValue(streamToCache.getCreatedBy()) + ",");
-    sb.append(formatLongValue(streamToCache.getModified()) + ",");
-    sb.append(formatTextValue(streamToCache.getModifiedBy()));
-    sb.append(");");
-    return sb.toString();
-  }
-
-  public static String deleteStream(Stream streamToDelete) {
-    return "DELETE FROM "
-      + STREAMS_TABLE_NAME
-        + " WHERE "
-        + STREAMS_ID_KEY
-        + "=\'"
-        + streamToDelete.getId()
-        + "\';";
   }
 
 }
