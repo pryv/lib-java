@@ -187,6 +187,12 @@ public class SQLiteDBHelper {
     statement.close();
   }
 
+  /**
+   * Retrieves Streams from the SQLite database
+   *
+   * @return Map<String, Event> events, with event ID as key.
+   * @throws SQLException
+   */
   public Map<String, Stream> getStreams() throws SQLException {
     String cmd = QueryGenerator.retrieveStreams();
     logger.log("SQLiteDBHelper: getStreams: " + cmd);

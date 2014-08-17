@@ -124,7 +124,7 @@ public class QueryGenerator {
   }
 
   /**
-   * Create query to update Event if modified field is higher.
+   * Create query to update Event if "modified" field is higher.
    *
    * @param eventToUpdate
    * @return
@@ -284,90 +284,6 @@ public class QueryGenerator {
       }
     }
     sb.append(";");
-    return sb.toString();
-  }
-
-  /**
-   * format Set values to be used in retrieval query. eg.: [AND] (key=itemA OR
-   * key=itemB OR ...)
-   *
-   * @param andSeparator
-   *          " AND " or ""
-   * @param sb
-   *          current StringBuilder used in the request
-   * @param set
-   *          the set of conditions
-   * @param key
-   *          the column on which the conditions are tested in the DB
-   */
-  private static void formatFilterSet(String andSeparator, StringBuilder sb, Set<String> set,
-    String key) {
-    if (set != null) {
-      sb.append(andSeparator + "(");
-      String separator = "";
-      for (String item : set) {
-        sb.append(separator);
-        sb.append(key + "=" + formatTextValue(item));
-        separator = " OR ";
-      }
-      sb.append(")");
-      andSeparator = " AND ";
-    }
-  }
-
-  /**
-   * format Long for insert/update in DB, if toAdd == null, returns NULL
-   *
-   * @param toAdd
-   * @return
-   */
-  private static String formatLongValue(Long toAdd) {
-    StringBuilder sb = new StringBuilder();
-    if (toAdd != null) {
-      sb.append(toAdd);
-    } else {
-      sb.append("NULL");
-    }
-    return sb.toString();
-  }
-
-  /**
-   * format Object's value as string for insert/update in DB. eg.:
-   * 'obj.toString()'. If obj == null, returns NULL
-   *
-   * @param obj
-   * @return
-   */
-  private static String formatTextValue(Object obj) {
-    StringBuilder sb = new StringBuilder();
-    if (obj != null) {
-      sb.append("\'" + obj + "\'");
-    } else {
-      sb.append("NULL");
-    }
-    return sb.toString();
-  }
-
-  /**
-   * format Set values for insertion/update in DB. eg.: 'itemA.toString(),
-   * itemB.toString(),...'
-   *
-   * @param set
-   * @return
-   */
-  private static String formatSetValue(Set<?> set) {
-    StringBuilder sb = new StringBuilder();
-    String listSeparator = "";
-    if (set != null) {
-      sb.append("\'");
-      for (Object setItem : set) {
-        sb.append(listSeparator + setItem);
-        listSeparator = ",";
-      }
-      sb.append("\'");
-    } else {
-      sb.append("NULL");
-    }
     return sb.toString();
   }
 
@@ -604,6 +520,90 @@ public class QueryGenerator {
         + " TEXT, "
         + STREAMS_TRASHED_KEY
         + " INTEGER)";
+  }
+
+  /**
+   * format Set values to be used in retrieval query. eg.: [AND] (key=itemA OR
+   * key=itemB OR ...)
+   *
+   * @param andSeparator
+   *          " AND " or ""
+   * @param sb
+   *          current StringBuilder used in the request
+   * @param set
+   *          the set of conditions
+   * @param key
+   *          the column on which the conditions are tested in the DB
+   */
+  private static void formatFilterSet(String andSeparator, StringBuilder sb, Set<String> set,
+    String key) {
+    if (set != null) {
+      sb.append(andSeparator + "(");
+      String separator = "";
+      for (String item : set) {
+        sb.append(separator);
+        sb.append(key + "=" + formatTextValue(item));
+        separator = " OR ";
+      }
+      sb.append(")");
+      andSeparator = " AND ";
+    }
+  }
+
+  /**
+   * format Long for insert/update in DB, if toAdd == null, returns NULL
+   *
+   * @param toAdd
+   * @return
+   */
+  private static String formatLongValue(Long toAdd) {
+    StringBuilder sb = new StringBuilder();
+    if (toAdd != null) {
+      sb.append(toAdd);
+    } else {
+      sb.append("NULL");
+    }
+    return sb.toString();
+  }
+
+  /**
+   * format Object's value as string for insert/update in DB. eg.:
+   * 'obj.toString()'. If obj == null, returns NULL
+   *
+   * @param obj
+   * @return
+   */
+  private static String formatTextValue(Object obj) {
+    StringBuilder sb = new StringBuilder();
+    if (obj != null) {
+      sb.append("\'" + obj + "\'");
+    } else {
+      sb.append("NULL");
+    }
+    return sb.toString();
+  }
+
+  /**
+   * format Set values for insertion/update in DB. eg.: 'itemA.toString(),
+   * itemB.toString(),...'
+   *
+   * @param set
+   * @return
+   */
+  private static String formatSetValue(Set<?> set) {
+    StringBuilder sb = new StringBuilder();
+    String listSeparator = "";
+    if (set != null) {
+      sb.append("\'");
+      for (Object setItem : set) {
+        sb.append(listSeparator + setItem);
+        listSeparator = ",";
+      }
+      sb.append("\'");
+    } else {
+      sb.append("NULL");
+    }
+    return sb.toString();
   }
 
 }
