@@ -48,7 +48,7 @@ public class DummyData {
 
   private static final String STREAM_ID = "abc";
   private static final String STREAM_NAME = "testStream";
-  private static final String STREAM_PARENT_ID = "ABC";
+  private static final String STREAM_PARENT_ID = STREAM_ID;
   private static final Boolean STREAM_SINGLE_ACTIVITY = true;
   private static final Map<String, Object> STREAM_CLIENT_DATA = new HashMap<String, Object>();
   private static final String STREAM_CLIENT_KEY = "testKey";
@@ -72,7 +72,7 @@ public class DummyData {
     STREAM_CHILDREN.add(new Stream(STREAM_CHILD_ID, STREAM_CHILD_NAME, STREAM_ID, null, null, null,
       STREAM_CHILD_TRASHED, STREAM_CHILD_CREATED, STREAM_CHILD_CREATED_BY, STREAM_CHILD_MODIFIED,
       STREAM_CHILD_MODIFIED_BY));
-    return new Stream(STREAM_ID, STREAM_NAME, STREAM_PARENT_ID, STREAM_SINGLE_ACTIVITY,
+    return new Stream(STREAM_ID, STREAM_NAME, null, STREAM_SINGLE_ACTIVITY,
       STREAM_CLIENT_DATA, STREAM_CHILDREN, STREAM_TRASHED, STREAM_CREATED, STREAM_CREATED_BY,
       STREAM_MODIFIED, STREAM_MODIFIED_BY);
   }

@@ -85,7 +85,7 @@ public class Stream {
     modifiedBy = result.getString(QueryGenerator.STREAMS_MODIFIED_BY_KEY);
     parentId = result.getString(QueryGenerator.STREAMS_PARENT_ID_KEY);
     singleActivity = result.getBoolean(QueryGenerator.STREAMS_SINGLE_ACTIVITY_KEY);
-    setClientDataFromAstring(result.getString(QueryGenerator.EVENTS_DESCRIPTION_KEY));
+    setClientDataFromAstring(result.getString(QueryGenerator.STREAMS_CLIENT_DATA_KEY));
   }
 
   /**

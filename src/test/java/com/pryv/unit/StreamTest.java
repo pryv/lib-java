@@ -25,27 +25,12 @@ public class StreamTest {
 
   private Stream testStream;
   private String jsonStream;
-
-  // private final String id = "abc";
-  // private final String name = "testStream";
-  // private final String parentId = "ABC";
-  // private final Boolean singleActivity = true;
-  // private final Map<String, Object> clientData = new HashMap<String,
-  // Object>();
-  // private final String clientKey = "testKey";
-  // private final String clientValue = "testValue";
-  // private final List<Stream> children = new ArrayList<Stream>();
-  // private final Boolean trashed = false;
-  // private final Long created = new Long(1000);
-  // private final String createdBy = "Bob";
-  // private final Long modified = new Long(1500);
-  // private final String modifiedBy = "Bill";
-  // private final String childID = "aaa";
-  // private ObjectMapper mapper = new ObjectMapper();
+  private Stream testChildStream;
 
   @Before
   public void setUp() throws Exception {
     testStream = DummyData.generateFullStream();
+    testChildStream = testStream.getChildren().get(0);
     jsonStream = DummyData.generateJsonStream();
   }
 
@@ -65,7 +50,6 @@ public class StreamTest {
       assertTrue(baseStreamRef == streamToUpdate);
       assertTrue(streamToUpdate.getId().equals(testStream.getId()));
       assertTrue(streamToUpdate.getName().equals(testStream.getName()));
-      assertTrue(streamToUpdate.getParentId().equals(testStream.getParentId()));
       assertTrue(streamToUpdate.getSingleActivity() == testStream.getSingleActivity());
       assertFalse(streamToUpdate.getClientData() == testStream.getClientData());
       for (String key : testStream.getClientData().keySet()) {
@@ -99,7 +83,7 @@ public class StreamTest {
   private void checkStreamParams(Stream pStream) {
     assertEquals(DummyData.getStreamId(), pStream.getId());
     assertEquals(DummyData.getStreamName(), pStream.getName());
-    assertEquals(DummyData.getStreamParentId(), pStream.getParentId());
+    assertEquals(null, pStream.getParentId());
     assertEquals(DummyData.getStreamSingleActivity(), pStream.getSingleActivity());
     assertEquals(DummyData.getStreamClientData(), pStream.getClientData());
     for (Stream child : pStream.getChildren()) {

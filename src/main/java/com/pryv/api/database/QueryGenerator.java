@@ -523,7 +523,7 @@ public class QueryGenerator {
    * @return
    */
   public static String retrieveStreams() {
-    return "SELECT * FROM " + STREAMS_TABLE_NAME;
+    return "SELECT * FROM " + STREAMS_TABLE_NAME + ";";
   }
 
   /**

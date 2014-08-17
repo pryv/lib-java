@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -38,6 +39,7 @@ public class SQLiteDBHelperTest {
       db = new SQLiteDBHelper();
     } catch (ClassNotFoundException | SQLException e) {
       e.printStackTrace();
+      fail("initialize db fail");
     }
   }
 
@@ -78,6 +80,7 @@ public class SQLiteDBHelperTest {
         fail("fail update event");
       }
     } catch (SQLException e) {
+      fail("update event fail");
       e.printStackTrace();
     }
   }
@@ -170,25 +173,26 @@ public class SQLiteDBHelperTest {
     testStream.setModified(testStream.getModified() + 50);
     try {
       db.updateStream(testStream);
-
     } catch (SQLException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
+      fail("update stream fail");
     }
   }
 
   @Test
-  public void test10retrieveStream() {
+  public void test10retrieveStreams() {
     try {
-      db.getStreams();
+      Map<String, Stream> streams = db.getStreams();
+      assertTrue(streams.get(testStream.getId()) != null);
+      assertTrue(streams.get(testStream.getId()).getChildren().size() != 0);
     } catch (SQLException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
+      fail("retrieve Streams fail");
     }
   }
 
   @Test
-  public void test09RemoveFullStream() {
+  public void test11RemoveFullStream() {
     try {
       db.deleteStream(testStream);
     } catch (SQLException e) {
@@ -198,14 +202,14 @@ public class SQLiteDBHelperTest {
   }
 
   @Test
-  public void testRemoveAllEvents() {
+  public void test12RemoveAllEvents() {
     try {
       for (Event event : db.getEvents(null).values()) {
         db.deleteEvent(event);
       }
     } catch (SQLException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
+      fail("delete events fail");
     }
   }
 
