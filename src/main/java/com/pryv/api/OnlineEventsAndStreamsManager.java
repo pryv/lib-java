@@ -37,11 +37,8 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
     streamsUrl = pUrl + "streams?auth=" + token;
   }
 
-  /**
+  /*
    * Events management
-   *
-   * @throws IllegalAccessException
-   * @throws IllegalArgumentException
    */
 
   @Override
@@ -65,7 +62,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
     // TODO Auto-generated method stub
   }
 
-  /**
+  /*
    * Streams management
    */
 
@@ -166,10 +163,10 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       try {
         Request.Get(eventsUrl + params).execute().handleResponse(eventsResponseHandler);
       } catch (ClientProtocolException e) {
-        eventsCallback.onEventsError(e.getMessage());
+        eventsCallback.onEventsRetrievalError(e.getMessage());
         e.printStackTrace();
       } catch (IOException e) {
-        eventsCallback.onEventsError(e.getMessage());
+        eventsCallback.onEventsRetrievalError(e.getMessage());
         e.printStackTrace();
       }
     }
@@ -183,18 +180,18 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
           response = EntityUtils.toString(reply.getEntity());
           logger.log("Online: received events: " + response);
           Map<String, Event> receivedEvents = JsonConverter.createEventsFromJson(response);
-          eventsCallback.onEventsSuccess(receivedEvents);
+          eventsCallback.onOnlieRetrieveEventsSuccess(receivedEvents);
         } catch (ParseException e) {
-          eventsCallback.onEventsError(e.getMessage());
+          eventsCallback.onEventsRetrievalError(e.getMessage());
           e.printStackTrace();
         } catch (JsonParseException e) {
-          eventsCallback.onEventsError(e.getMessage());
+          eventsCallback.onEventsRetrievalError(e.getMessage());
           e.printStackTrace();
         } catch (JsonMappingException e) {
-          eventsCallback.onEventsError(e.getMessage());
+          eventsCallback.onEventsRetrievalError(e.getMessage());
           e.printStackTrace();
         } catch (IOException e) {
-          eventsCallback.onEventsError(e.getMessage());
+          eventsCallback.onEventsRetrievalError(e.getMessage());
           e.printStackTrace();
         }
         return null;

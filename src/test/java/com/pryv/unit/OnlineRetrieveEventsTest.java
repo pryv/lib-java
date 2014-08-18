@@ -97,17 +97,35 @@ public class OnlineRetrieveEventsTest {
     eventsCallback = new EventsCallback() {
 
       @Override
-      public void onEventsSuccess(Map<String, Event> onlineEvents) {
+      public void onOnlieRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
         events = onlineEvents;
       }
 
       // unused
       @Override
-      public void onEventsPartialResult(Map<String, Event> newEvents) {
+      public void onCacheRetrieveEventsSuccess(Map<String, Event> newEvents) {
       }
 
       @Override
-      public void onEventsError(String message) {
+      public void onEventsRetrievalError(String message) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void onSuperVisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void onEventsSuccess(String successMessage) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void onEventsError(String errorMessage) {
         // TODO Auto-generated method stub
 
       }

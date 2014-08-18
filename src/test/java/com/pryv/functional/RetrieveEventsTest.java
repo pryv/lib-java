@@ -149,7 +149,7 @@ public class RetrieveEventsTest {
     eventsCallback = new EventsCallback() {
 
       @Override
-      public void onEventsSuccess(Map<String, Event> newEvents) {
+      public void onOnlieRetrieveEventsSuccess(Map<String, Event> newEvents) {
         System.out.println("TestEventsCallback: success with "
           + newEvents.values().size()
             + " events");
@@ -157,13 +157,31 @@ public class RetrieveEventsTest {
       }
 
       @Override
-      public void onEventsPartialResult(Map<String, Event> newEvents) {
+      public void onCacheRetrieveEventsSuccess(Map<String, Event> newEvents) {
         // TODO Auto-generated method stub
 
       }
 
       @Override
-      public void onEventsError(String message) {
+      public void onEventsRetrievalError(String message) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void onSuperVisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void onEventsSuccess(String successMessage) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void onEventsError(String errorMessage) {
         // TODO Auto-generated method stub
 
       }

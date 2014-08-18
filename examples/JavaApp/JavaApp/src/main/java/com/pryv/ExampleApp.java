@@ -84,15 +84,11 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
 
   }
 
-  /**
-   *
-   *
+  /*
    * Authentication
-   *
-   *
    */
 
-  /**
+  /*
    * Displays simple view during auth phase.
    */
   public void showAuthView() {
@@ -108,14 +104,14 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     }
   }
 
-  /**
+  /*
    * load auth in browser
    */
   public void displayLoginVew(String loginURL) {
     new AuthBrowserView().displayLoginVew(loginURL);
   }
 
-  /**
+  /*
    * auth success, start main view, load all Streams and 20 random Events
    */
   public void onDisplaySuccess(String username, String token) {
@@ -142,7 +138,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     eventsManager.getEvents(filter, this);
   }
 
-  /**
+  /*
    * auth failure
    */
   public void onDisplayFailure() {
@@ -150,12 +146,8 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     displayError("auth failure");
   }
 
-  /**
-   *
-   *
+  /*
    * Main components of Example App
-   *
-   *
    */
 
   /**
@@ -178,10 +170,9 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     }
   }
 
-  /**
+  /*
    *
    * Streams Callbacks
-   *
    */
 
   public void onStreamsSuccess(final Map<String, Stream> streams) {
@@ -230,21 +221,34 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     eventsManager.getEvents(filter, this);
   }
 
-  /**
+  /*
    *
    * Events Callbacks
-   *
    */
 
-  public void onEventsSuccess(final Map<String, Event> newEvents) {
+  public void onOnlieRetrieveEventsSuccess(final Map<String, Event> newEvents) {
     addEventsToList(newEvents);
   }
 
-  public void onEventsPartialResult(Map<String, Event> newEvents) {
+  public void onCacheRetrieveEventsSuccess(Map<String, Event> newEvents) {
     addEventsToList(newEvents);
   }
 
-  public void onEventsError(String message) {
+  public void onSuperVisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
+    addEventsToList(supervisorEvents);
+  }
+
+  public void onEventsSuccess(String successMessage) {
+    // TODO Auto-generated method stub
+
+  }
+
+  public void onEventsError(String errorMessage) {
+    // TODO Auto-generated method stub
+
+  }
+
+  public void onEventsRetrievalError(String message) {
     displayError(message);
   }
 

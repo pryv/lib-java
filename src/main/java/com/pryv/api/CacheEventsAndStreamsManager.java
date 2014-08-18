@@ -46,7 +46,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     dbHelper = new SQLiteDBHelper(Pryv.DATABASE_NAME, initCallback);
   }
 
-  /**
+  /*
    * Events management
    */
 
@@ -54,35 +54,15 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   public void getEvents(Filter filter, final EventsCallback connectionEventsCallback) {
     // look in cache and send it onPartialResult
     try {
-      connectionEventsCallback.onEventsPartialResult(dbHelper.getEvents(filter));
+      connectionEventsCallback.onCacheRetrieveEventsSuccess(dbHelper.getEvents(filter));
       logger.log("Cache: retrieved Events from cache: ");
     } catch (SQLException e) {
-      connectionEventsCallback.onEventsError("Cache: getEvents error: " + e.getMessage());
+      connectionEventsCallback.onEventsRetrievalError("Cache: getEvents error: " + e.getMessage());
       e.printStackTrace();
     }
 
     // forward call to online module
-    onlineEventsManager.getEvents(filter, new EventsCallback() {
-
-      @Override
-      public void onEventsSuccess(Map<String, Event> onlineEvents) {
-        // update Cache with receivedEvents
-        updateEvents(onlineEvents);
-
-        // SEND UPDATED EVENTS FROM CACHE
-        connectionEventsCallback.onEventsSuccess(onlineEvents);
-      }
-
-      // unused
-      @Override
-      public void onEventsPartialResult(Map<String, Event> newEvents) {
-      }
-
-      @Override
-      public void onEventsError(String message) {
-        connectionEventsCallback.onEventsError(message);
-      }
-    });
+    onlineEventsManager.getEvents(filter, new CacheEventsCallback(connectionEventsCallback));
   }
 
   /**
@@ -118,7 +98,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     // TODO Auto-generated method stub
   }
 
-  /**
+  /*
    * Streams management
    */
 
@@ -176,6 +156,58 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   public Stream updateStream(String id) {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  /**
+   * EventsCallback used by Cache
+   *
+   * @author ik
+   *
+   */
+  private class CacheEventsCallback implements EventsCallback {
+
+    private EventsCallback connectionEventsCallback;
+
+    public CacheEventsCallback(EventsCallback pConnectionEventsCallback) {
+      connectionEventsCallback = pConnectionEventsCallback;
+    }
+
+    @Override
+    public void onOnlieRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
+      // update Cache with receivedEvents
+      updateEvents(onlineEvents);
+      // SEND UPDATED EVENTS FROM CACHE
+      connectionEventsCallback.onOnlieRetrieveEventsSuccess(onlineEvents);
+    }
+
+    // unused
+    @Override
+    public void onCacheRetrieveEventsSuccess(Map<String, Event> newEvents) {
+    }
+
+    @Override
+    public void onEventsRetrievalError(String message) {
+      connectionEventsCallback.onEventsRetrievalError(message);
+    }
+
+    // unused
+    @Override
+    public void onSuperVisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
+      // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onEventsSuccess(String successMessage) {
+      // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onEventsError(String errorMessage) {
+      // TODO Auto-generated method stub
+
+    }
   }
 
 }

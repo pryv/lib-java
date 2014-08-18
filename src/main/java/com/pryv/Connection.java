@@ -72,47 +72,18 @@ public class Connection implements EventsManager, StreamsManager {
     return url;
   }
 
-  /**
+  /*
    * Events management
    */
 
-  /**
-   *
-   */
   @Override
   public void getEvents(final Filter filter, final EventsCallback userEventsCallback) {
 
     // send supervisor's events on User's callback.onEventsPartialResult()
-    userEventsCallback.onEventsPartialResult(supervisor.getEvents(filter));
+    userEventsCallback.onSuperVisorRetrieveEventsSuccess(supervisor.getEvents(filter));
 
     // forward getEvents() to Cache
-    cacheEventsManager.getEvents(filter, new EventsCallback() {
-
-      @Override
-      public void onEventsSuccess(Map<String, Event> onlineEvents) {
-        logger.log("Connection: onEventsSuccess");
-
-        // update existing references with JSON received from online
-        supervisor.updateEvents(onlineEvents);
-
-        // return merged events from Supervisor
-        userEventsCallback.onEventsSuccess(supervisor.getEvents(filter));
-      }
-
-      @Override
-      public void onEventsPartialResult(Map<String, Event> cacheEvents) {
-
-        // update existing Events with those retrieved from the cache
-        supervisor.updateEvents(cacheEvents);
-        // return merged events from Supervisor
-        userEventsCallback.onEventsPartialResult(supervisor.getEvents(filter));
-      }
-
-      @Override
-      public void onEventsError(String message) {
-        userEventsCallback.onEventsError(message);
-      }
-    });
+    cacheEventsManager.getEvents(filter, new ConnectionEventsCallback(userEventsCallback, filter));
   }
 
   @Override
@@ -131,7 +102,7 @@ public class Connection implements EventsManager, StreamsManager {
     // TODO Auto-generated method stub
   }
 
-  /**
+  /*
    * Streams management
    */
 
@@ -185,34 +156,54 @@ public class Connection implements EventsManager, StreamsManager {
    */
   private class ConnectionEventsCallback implements EventsCallback {
 
-    private EventsCallback eventsCallback;
+    private EventsCallback userEventsCallback;
     private Filter filter;
 
-    public ConnectionEventsCallback(EventsCallback pEventsCallback, Filter pFilter) {
-      eventsCallback = pEventsCallback;
+    public ConnectionEventsCallback(EventsCallback pUserEventsCallback, Filter pFilter) {
+      userEventsCallback = pUserEventsCallback;
       filter = pFilter;
     }
 
     @Override
-    public void onEventsSuccess(Map<String, Event> events) {
+    public void onOnlieRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
       logger.log("Connection: onEventsSuccess");
 
       // update existing references with JSON received from online
-      supervisor.updateEvents(events);
+      supervisor.updateEvents(onlineEvents);
 
-      // return merged events from main memory
-      eventsCallback.onEventsSuccess(supervisor.getEvents(filter));
+      // return merged events from Supervisor
+      userEventsCallback.onOnlieRetrieveEventsSuccess(supervisor.getEvents(filter));
     }
 
     @Override
-    public void onEventsPartialResult(Map<String, Event> newEvents) {
-      supervisor.updateEvents(newEvents);
-      eventsCallback.onEventsPartialResult(supervisor.getEvents(filter));
+    public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
+
+      // update existing Events with those retrieved from the cache
+      supervisor.updateEvents(cacheEvents);
+      // return merged events from Supervisor
+      userEventsCallback.onCacheRetrieveEventsSuccess(supervisor.getEvents(filter));
     }
 
     @Override
-    public void onEventsError(String message) {
-      eventsCallback.onEventsError(message);
+    public void onEventsRetrievalError(String message) {
+      userEventsCallback.onEventsRetrievalError(message);
+    }
+
+    // unused
+    @Override
+    public void onSuperVisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
+    }
+
+    @Override
+    public void onEventsSuccess(String successMessage) {
+      // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onEventsError(String errorMessage) {
+      // TODO Auto-generated method stub
+
     }
   }
 

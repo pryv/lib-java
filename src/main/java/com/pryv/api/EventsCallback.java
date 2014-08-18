@@ -18,14 +18,21 @@ public interface EventsCallback {
    *
    * @param streams
    */
-  void onEventsSuccess(Map<String, Event> events);
+  void onOnlieRetrieveEventsSuccess(Map<String, Event> onlineEvents);
 
   /**
-   * callback method for successful DB and Supervisor retrieval
+   * callback method for successful DB retrieval
    *
    * @param newStreams
    */
-  void onEventsPartialResult(Map<String, Event> newEvents);
+  void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents);
+
+  /**
+   * callback method for successful Supervisor retrieval
+   *
+   * @param supervisorEvents
+   */
+  void onSuperVisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents);
 
   /**
    * callback method called when an error occured during Event fetching.
@@ -33,6 +40,24 @@ public interface EventsCallback {
    * @param message
    *          the error message
    */
-  void onEventsError(String message);
+  void onEventsRetrievalError(String errorMessage);
+
+  /**
+   * callback method called when createEvent(), updateEvent() or deleteEvent()
+   * execution is successful.
+   *
+   * @param successMessage
+   *          the success message
+   */
+  void onEventsSuccess(String successMessage);
+
+  /**
+   * callback method called when an error occurs during createEvent(),
+   * updateEvent() or deleteEvent() execution.
+   *
+   * @param errorMessage
+   *          the error message
+   */
+  void onEventsError(String errorMessage);
 
 }
