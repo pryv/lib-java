@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
 
-import com.pryv.Connection;
 import com.pryv.api.model.Permission;
 import com.pryv.utils.Logger;
 
@@ -87,9 +86,9 @@ public class AuthControllerImpl implements AuthController {
   }
 
   @Override
-  public void onSuccess(Connection newConnection) {
+  public void onSuccess(String username, String token) {
     state = State.ACCEPTED;
-    view.onDisplaySuccess(newConnection);
+    view.onDisplaySuccess(username, token);
     // acquire ref to new Connection, instanciated
   }
 

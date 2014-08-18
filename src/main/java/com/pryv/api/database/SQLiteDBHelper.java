@@ -8,7 +8,9 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.pryv.api.EventsCallback;
 import com.pryv.api.Filter;
+import com.pryv.api.StreamsCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 import com.pryv.utils.Logger;
@@ -24,22 +26,29 @@ import com.pryv.utils.Logger;
  */
 public class SQLiteDBHelper {
 
-  private final String dbPath = "sqlite-db/test.db";
+  private final String dbPath = "sqlite-db/";
+  private final String initDBerrorMessage = "Database initialization error: ";
+
+  // callback interfaces to send async queries requests back to Cache module
+  private EventsCallback<Map<String, Event>> eventsCallback;
+  private StreamsCallback<Map<String, Stream>> streamsCallback;
 
   private Connection dbConnection;
-
   private Logger logger = Logger.getInstance();
 
   /**
-   * SQLiteDBHelper constructor. Connects to the SQLite database. Creates tables
-   * if required.
+   * SQLiteDBHelper constructor. Creates and Connects to the SQLite database
+   * located in ./sqlite-db/name. Creates the tables if required.
+   *
+   * @param name
+   *          the name of the database
    *
    * @throws SQLException
    * @throws ClassNotFoundException
    */
-  public SQLiteDBHelper() throws ClassNotFoundException, SQLException {
-    System.out.println("dbpath: " + dbPath);
-    initDB(dbPath);
+  public SQLiteDBHelper(String name, DBinitCallback initCallback) {
+    logger.log("SQLiteDBHelper: init DB in: " + dbPath + name);
+    initDB(dbPath + name, initCallback);
   }
 
   /**
@@ -49,12 +58,23 @@ public class SQLiteDBHelper {
    * @throws SQLException
    * @throws ClassNotFoundException
    */
-  private void initDB(String path) throws SQLException, ClassNotFoundException {
-    Class.forName("org.sqlite.JDBC");
-    dbConnection = DriverManager.getConnection("jdbc:sqlite:" + path);
-    logger.log("Opened database successfully");
-    createEventsTable();
-    createSteamsTable();
+  private void initDB(final String path, DBinitCallback initCallback) {
+    try {
+      Class.forName("org.sqlite.JDBC");
+    } catch (ClassNotFoundException e) {
+      initCallback.onError(initDBerrorMessage + e.getMessage());
+      e.printStackTrace();
+    }
+    try {
+      dbConnection = DriverManager.getConnection("jdbc:sqlite:" + path);
+      logger.log("Opened database successfully");
+      createEventsTable();
+      createSteamsTable();
+    } catch (SQLException e) {
+      initCallback.onError(initDBerrorMessage + e.getMessage());
+      e.printStackTrace();
+    }
+
   }
 
   /**
@@ -126,7 +146,7 @@ public class SQLiteDBHelper {
   }
 
   /**
-   * Insert Stream and its children Streamsinto the SQLite database.
+   * Insert Stream and its children Streams into the SQLite database.
    *
    * @param streamToCache
    *          the stream to insert

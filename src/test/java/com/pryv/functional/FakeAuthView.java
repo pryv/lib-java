@@ -1,6 +1,5 @@
 package com.pryv.functional;
 
-import com.pryv.Connection;
 import com.pryv.auth.AuthView;
 
 /**
@@ -21,7 +20,7 @@ public class FakeAuthView implements AuthView {
   }
 
   @Override
-  public void onDisplaySuccess(Connection connection) {
+  public void onDisplaySuccess(String username, String token) {
     displaySuccessExecuted = true;
   }
 

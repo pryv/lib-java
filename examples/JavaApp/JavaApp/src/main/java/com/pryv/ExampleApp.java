@@ -25,6 +25,7 @@ import com.pryv.api.EventsManager;
 import com.pryv.api.Filter;
 import com.pryv.api.StreamsCallback;
 import com.pryv.api.StreamsManager;
+import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Permission;
 import com.pryv.api.model.Stream;
@@ -117,7 +118,7 @@ public class ExampleApp extends Application implements AuthView,
   /**
    * auth success, start main view, load all Streams and 20 random Events
    */
-  public void onDisplaySuccess(Connection newConnection) {
+  public void onDisplaySuccess(String username, String token) {
     logger.log("JavaApp: onSignInSuccess");
 
     Platform.runLater(new Runnable() {
@@ -127,6 +128,12 @@ public class ExampleApp extends Application implements AuthView,
       }
     });
 
+    Connection newConnection = new Connection(username, token, new DBinitCallback() {
+
+      public void onError(String message) {
+        displayError(message);
+      }
+    });
     eventsManager = newConnection;
     streamsManager = newConnection;
     streamsManager.getStreams(this);

@@ -13,7 +13,6 @@ import org.apache.http.util.EntityUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.pryv.Connection;
 import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
 import com.pryv.utils.JsonConverter;
@@ -108,7 +107,7 @@ public class AuthModelImpl implements AuthModel {
         } else if (state.equals(ACCEPTED_VALUE)) {
           String username = jsonResponse.get(USERNAME_KEY).textValue();
           String token = jsonResponse.get(TOKEN_KEY).textValue();
-          controller.onSuccess(new Connection(username, token));
+          controller.onSuccess(username, token);
 
         } else if (state.equals(REFUSED_VALUE)) {
           String message = jsonResponse.get(MESSAGE_KEY).textValue();

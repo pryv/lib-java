@@ -1,6 +1,5 @@
 package com.pryv.auth;
 
-import com.pryv.Connection;
 
 /**
  *
@@ -17,9 +16,12 @@ public interface AuthController {
   void signIn();
 
   /**
-   * login successful
+   * login successfull callback, returns username and auth token
+   *
+   * @param username
+   * @param token
    */
-  void onSuccess(Connection connection);
+  void onSuccess(String username, String token);
 
   /**
    * error message

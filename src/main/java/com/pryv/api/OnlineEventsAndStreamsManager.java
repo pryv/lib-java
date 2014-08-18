@@ -40,23 +40,12 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
 
   @Override
   public void getEvents(Filter filter, EventsCallback<String> eventsCallback) {
-
-    // format parameters for URL
-    // StringBuilder sb = new StringBuilder();
-    // String separator = "&";
-    // if (params != null) {
-    // for (String key : params.keySet()) {
-    // sb.append(separator);
-    // sb.append(key + "=" + params.get(key));
-    // }
-    // }
     new FetchEventsThread(filter.toUrlParameters(), eventsCallback).start();
   }
 
   @Override
-  public Event createEvent(String id) {
+  public void createEvent(Event newEvent) {
     // TODO Auto-generated method stub
-    return null;
   }
 
   @Override

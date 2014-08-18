@@ -1,10 +1,13 @@
 package com.pryv.api;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.pryv.Pryv;
+import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.database.SQLiteDBHelper;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
@@ -29,10 +32,23 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
 
   private Logger logger = Logger.getInstance();
 
-  public CacheEventsAndStreamsManager(String url, String token) {
+  /**
+   * Cache constructor. Instanciates online module to which it passes url and
+   * token parameters.
+   *
+   * @param url
+   *          the url to which online requests are made.
+   * @param token
+   *          the token used to authenticate online requests.
+   * @throws SQLException
+   * @throws ClassNotFoundException
+   */
+  public CacheEventsAndStreamsManager(String url, String token, DBinitCallback initCallback)
+    throws ClassNotFoundException,
+    SQLException {
     onlineEventsManager = new OnlineEventsAndStreamsManager(url, token);
     onlineStreamsManager = (StreamsManager<String>) onlineEventsManager;
-    // dbHelper = new SQLiteDBHelper();
+    dbHelper = new SQLiteDBHelper(Pryv.DATABASE_NAME, initCallback);
   }
 
   /**
@@ -43,9 +59,13 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
   public void getEvents(Filter filter,
     final EventsCallback<Map<String, Event>> eventsCallback) {
     // look in cache and send it onPartialResult
-    // dbHelper.getEvents();
-    logger.log("Cache: retrieved Events from cache: ");
-    eventsCallback.onEventsPartialResult(new HashMap<String, Event>());
+    try {
+      eventsCallback.onEventsPartialResult(dbHelper.getEvents(filter));
+      logger.log("Cache: retrieved Events from cache: ");
+    } catch (SQLException e) {
+      eventsCallback.onEventsError("Cache: getEvents error: " + e.getMessage());
+      e.printStackTrace();
+    }
 
     // forward call to online module
     onlineEventsManager.getEvents(filter, new EventsCallback<String>() {
@@ -91,29 +111,18 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
    */
   private void updateEvents(Map<String, Event> newEvents) {
     for (Event event : newEvents.values()) {
-      // case exists: compare modified field
-//      if (events.containsKey(event.getId())) {
-//        updateEvent(event);
-      // // case new Event: simply add
-      // } else {
-      // // addEvent(event);
-      // }
+      try {
+        dbHelper.updateEvent(event);
+      } catch (SQLException e) {
+
+        e.printStackTrace();
+      }
     }
   }
 
-  // private void updateEvent(Event event) {
-  // Event memEvent = events.get(event.getId());
-  // if (memEvent.getModified() > event.getModified()) {
-  // // do nothing
-  // } else {
-  // memEvent.merge(event, JsonConverter.getCloner());
-  // }
-  // }
-
   @Override
-  public Event createEvent(String id) {
+  public void createEvent(Event event) {
     // TODO Auto-generated method stub
-    return null;
   }
 
   @Override

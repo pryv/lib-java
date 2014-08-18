@@ -19,10 +19,19 @@ public interface EventsManager<T> {
    *
    * @param params
    *          optional filter parameters
+   * @param eventsCallback
+   *          the callback for events retrieval
    */
   void getEvents(Filter filter, EventsCallback<T> eventsCallback);
 
-  Event createEvent(String id);
+  /**
+   * Create event
+   *
+   * @param newEvent
+   *          the event to create
+   * @return
+   */
+  void createEvent(Event newEvent);
 
   void deleteEvent(String id);
 

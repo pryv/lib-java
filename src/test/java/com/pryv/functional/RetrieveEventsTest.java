@@ -18,6 +18,7 @@ import com.pryv.api.EventsManager;
 import com.pryv.api.Filter;
 import com.pryv.api.StreamsCallback;
 import com.pryv.api.StreamsManager;
+import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 
@@ -48,7 +49,14 @@ public class RetrieveEventsTest {
     instanciateEventsCallback();
     instanciateStreamsCallback();
 
-    eventsManager = new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN);
+    eventsManager =
+      new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, new DBinitCallback() {
+
+        @Override
+        public void onError(String message) {
+          System.out.println("DB init Error: " + message);
+        }
+      });
     streamsManager = (StreamsManager<Map<String, Stream>>) eventsManager;
   }
 

@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import com.pryv.api.Filter;
+import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.database.SQLiteDBHelper;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
@@ -35,12 +36,13 @@ public class SQLiteDBHelperTest {
   public static void beforeClass() {
     testEvent = DummyData.generateFullEvent();
     testStream = DummyData.generateFullStream();
-    try {
-      db = new SQLiteDBHelper();
-    } catch (ClassNotFoundException | SQLException e) {
-      e.printStackTrace();
-      fail("initialize db fail");
-    }
+    db = new SQLiteDBHelper("test.db", new DBinitCallback() {
+
+      @Override
+      public void onError(String message) {
+        System.out.println(message);
+      }
+    });
   }
 
   @Test

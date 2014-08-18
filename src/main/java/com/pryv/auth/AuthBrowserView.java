@@ -8,8 +8,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import com.pryv.Connection;
-
 /**
  *
  * Web view that is displayed to enter credentials
@@ -48,7 +46,7 @@ public class AuthBrowserView extends Applet implements AuthView {
 
   // unused
   @Override
-  public void onDisplaySuccess(Connection c) {
+  public void onDisplaySuccess(String username, String token) {
   }
 
   // unused

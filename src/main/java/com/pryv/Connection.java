@@ -1,5 +1,6 @@
 package com.pryv;
 
+import java.sql.SQLException;
 import java.util.Map;
 
 import com.pryv.api.CacheEventsAndStreamsManager;
@@ -8,6 +9,7 @@ import com.pryv.api.EventsManager;
 import com.pryv.api.Filter;
 import com.pryv.api.StreamsCallback;
 import com.pryv.api.StreamsManager;
+import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 import com.pryv.utils.Logger;
@@ -34,13 +36,21 @@ public class Connection implements EventsManager<Map<String, Event>>,
 
   private Logger logger = Logger.getInstance();
 
-  public Connection(String pUsername, String pToken) {
+  public Connection(String pUsername, String pToken, DBinitCallback dbInitCallback) {
     username = pUsername;
     token = pToken;
     url = apiScheme + "://" + username + "." + apiDomain + "/";
     supervisor = new Supervisor();
-    cacheEventsManager = new CacheEventsAndStreamsManager(url, token);
-    cacheStreamsManager = (StreamsManager) cacheEventsManager;
+    try {
+      cacheEventsManager = new CacheEventsAndStreamsManager(url, token, dbInitCallback);
+      cacheStreamsManager = (StreamsManager) cacheEventsManager;
+    } catch (ClassNotFoundException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (SQLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 
   public String getUsername() {
@@ -104,9 +114,8 @@ public class Connection implements EventsManager<Map<String, Event>>,
   }
 
   @Override
-  public Event createEvent(String id) {
+  public void createEvent(Event event) {
     // TODO Auto-generated method stub
-    return null;
   }
 
   @Override
@@ -165,6 +174,45 @@ public class Connection implements EventsManager<Map<String, Event>>,
   public Stream updateStream(String id) {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  /**
+   * EventsCallback used on EventsManager interface method calls
+   *
+   * @author ik
+   *
+   */
+  private class MyEventsCallback implements EventsCallback<Map<String, Event>> {
+
+    private EventsCallback<Map<String, Event>> eventsCallback;
+    private Filter filter;
+
+    public MyEventsCallback(EventsCallback<Map<String, Event>> pEventsCallback, Filter pFilter) {
+      eventsCallback = pEventsCallback;
+      filter = pFilter;
+    }
+
+    @Override
+    public void onEventsSuccess(Map<String, Event> events) {
+      logger.log("Connection: onEventsSuccess");
+
+      // update existing references with JSON received from online
+      supervisor.updateEvents(events);
+
+      // return merged events from main memory
+      eventsCallback.onEventsSuccess(supervisor.getEvents(filter));
+    }
+
+    @Override
+    public void onEventsPartialResult(Map<String, Event> newEvents) {
+      supervisor.updateEvents(newEvents);
+      eventsCallback.onEventsPartialResult(supervisor.getEvents(filter));
+    }
+
+    @Override
+    public void onEventsError(String message) {
+      eventsCallback.onEventsError(message);
+    }
   }
 
 }

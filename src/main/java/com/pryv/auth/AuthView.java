@@ -1,6 +1,5 @@
 package com.pryv.auth;
 
-import com.pryv.Connection;
 
 /**
  *
@@ -11,9 +10,24 @@ import com.pryv.Connection;
  */
 public interface AuthView {
 
+  /**
+   * displays the external web page where the user inputs his username and
+   * password
+   *
+   * @param loginURL
+   */
   void displayLoginVew(String loginURL);
 
-  void onDisplaySuccess(Connection connection);
+  /**
+   * callback method when auth is successful. Displays success message.
+   *
+   * @param username
+   * @param token
+   */
+  void onDisplaySuccess(String username, String token);
 
+  /**
+   * callback method when auth failed.
+   */
   void onDisplayFailure();
 }
