@@ -32,10 +32,10 @@ import com.pryv.api.model.Stream;
 public class RetrieveEventsTest {
 
   private EventsManager eventsManager;
-  private StreamsManager<Map<String, Stream>> streamsManager;
+  private StreamsManager streamsManager;
 
   private EventsCallback eventsCallback;
-  private StreamsCallback<Map<String, Stream>> streamsCallback;
+  private StreamsCallback streamsCallback;
 
   private Map<String, Event> events;
   private Map<String, Stream> streams;
@@ -57,7 +57,7 @@ public class RetrieveEventsTest {
           System.out.println("DB init Error: " + message);
         }
       });
-    streamsManager = (StreamsManager<Map<String, Stream>>) eventsManager;
+    streamsManager = (StreamsManager) eventsManager;
   }
 
   @Test
@@ -171,7 +171,7 @@ public class RetrieveEventsTest {
   }
 
   private void instanciateStreamsCallback() {
-    streamsCallback = new StreamsCallback<Map<String, Stream>>() {
+    streamsCallback = new StreamsCallback() {
 
       @Override
       public void onStreamsSuccess(Map<String, Stream> newStreams) {

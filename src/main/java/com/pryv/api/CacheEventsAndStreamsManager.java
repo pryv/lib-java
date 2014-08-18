@@ -1,17 +1,14 @@
 package com.pryv.api;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pryv.Pryv;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.database.SQLiteDBHelper;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
-import com.pryv.utils.JsonConverter;
 import com.pryv.utils.Logger;
 
 /**
@@ -22,11 +19,10 @@ import com.pryv.utils.Logger;
  * @author ik
  *
  */
-public class CacheEventsAndStreamsManager implements EventsManager,
-  StreamsManager<Map<String, Stream>> {
+public class CacheEventsAndStreamsManager implements EventsManager, StreamsManager {
 
   private EventsManager onlineEventsManager;
-  private StreamsManager<String> onlineStreamsManager;
+  private StreamsManager onlineStreamsManager;
 
   private SQLiteDBHelper dbHelper;
 
@@ -46,7 +42,7 @@ public class CacheEventsAndStreamsManager implements EventsManager,
   public CacheEventsAndStreamsManager(String url, String token, DBinitCallback initCallback)
     throws ClassNotFoundException, SQLException {
     onlineEventsManager = new OnlineEventsAndStreamsManager(url, token);
-    onlineStreamsManager = (StreamsManager<String>) onlineEventsManager;
+    onlineStreamsManager = (StreamsManager) onlineEventsManager;
     dbHelper = new SQLiteDBHelper(Pryv.DATABASE_NAME, initCallback);
   }
 
@@ -55,8 +51,7 @@ public class CacheEventsAndStreamsManager implements EventsManager,
    */
 
   @Override
-  public void getEvents(Filter filter,
- final EventsCallback connectionEventsCallback) {
+  public void getEvents(Filter filter, final EventsCallback connectionEventsCallback) {
     // look in cache and send it onPartialResult
     try {
       connectionEventsCallback.onEventsPartialResult(dbHelper.getEvents(filter));
@@ -128,32 +123,23 @@ public class CacheEventsAndStreamsManager implements EventsManager,
    */
 
   @Override
-  public void getStreams(final StreamsCallback<Map<String, Stream>> streamsCallback) {
+  public void getStreams(final StreamsCallback streamsCallback) {
     // look in cache and send it onPartialResult
     // dbHelper.getStreams();
     logger.log("Cache: retrieved Events from cache: ");
     streamsCallback.onStreamsPartialResult(new HashMap<String, Stream>());
 
-    onlineStreamsManager.getStreams(new StreamsCallback<String>() {
+    onlineStreamsManager.getStreams(new StreamsCallback() {
 
       @Override
-      public void onStreamsSuccess(String onlineStreams) {
+      public void onStreamsSuccess(Map<String, Stream> onlineStreams) {
         logger.log("Cache: Streams retrieval success");
-        try {
-          // update Cache with onlineStreams
-          Map<String, Stream> streams = JsonConverter.createStreamsFromJson(onlineStreams);
-          updateCache(streams);
 
-          // SEND UPDATED STREAMS FROM CACHE
-          streamsCallback.onStreamsSuccess(streams);
-        } catch (JsonProcessingException e) {
-          e.printStackTrace();
-          streamsCallback.onStreamsError(e.getMessage());
-        } catch (IOException e) {
-          e.printStackTrace();
-          streamsCallback.onStreamsError(e.getMessage());
-          e.printStackTrace();
-        }
+        updateCache(onlineStreams);
+
+        // SEND UPDATED STREAMS FROM CACHE
+        streamsCallback.onStreamsSuccess(onlineStreams);
+
       }
 
       private void updateCache(Map<String, Stream> streams) {

@@ -1,6 +1,5 @@
 package com.pryv.unit;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -14,7 +13,6 @@ import com.pryv.Pryv;
 import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.api.StreamsCallback;
 import com.pryv.api.model.Stream;
-import com.pryv.utils.JsonConverter;
 
 /**
  * class used to test online module for Streams fetching
@@ -25,7 +23,7 @@ import com.pryv.utils.JsonConverter;
 public class OnlineRetrieveStreamsTest {
 
   private OnlineEventsAndStreamsManager online;
-  private StreamsCallback<String> streamsCallback;
+  private StreamsCallback streamsCallback;
   private String stringStreams;
   private Map<String, Stream> streams;
 
@@ -35,26 +33,6 @@ public class OnlineRetrieveStreamsTest {
     Pryv.setStaging();
     String url = "https://" + TestCredentials.USERNAME + "." + Pryv.API_DOMAIN + "/";
     online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN);
-  }
-
-  @Test
-  public void testRetrieveStreams() {
-    online.getStreams(streamsCallback);
-    Awaitility.await().until(hasReceivedString());
-  }
-
-  private Callable<Boolean> hasReceivedString() {
-    return new Callable<Boolean>() {
-
-      @Override
-      public Boolean call() throws Exception {
-        if (stringStreams != null) {
-          return stringStreams.length() > 0;
-        } else {
-          return false;
-        }
-      }
-    };
   }
 
   @Test
@@ -79,18 +57,11 @@ public class OnlineRetrieveStreamsTest {
   }
 
   private void instanciateCallback() {
-    streamsCallback = new StreamsCallback<String>() {
+    streamsCallback = new StreamsCallback() {
 
       @Override
-      public void onStreamsSuccess(String receivedStreams) {
-        stringStreams = receivedStreams;
-        try {
-          System.out.println("############ TEST: " + receivedStreams + " #########");
-          streams = JsonConverter.createStreamsFromJson(receivedStreams);
-        } catch (IOException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
+      public void onStreamsSuccess(Map<String, Stream> onlineStreams) {
+        streams = onlineStreams;
       }
 
       // unused

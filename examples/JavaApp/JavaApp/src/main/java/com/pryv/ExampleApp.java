@@ -35,22 +35,21 @@ import com.pryv.auth.AuthControllerImpl;
 import com.pryv.auth.AuthView;
 import com.pryv.utils.Logger;
 
-public class ExampleApp extends Application implements AuthView,
- EventsCallback,
-  StreamsCallback<Map<String, Stream>> {
+public class ExampleApp extends Application implements AuthView, EventsCallback, StreamsCallback {
 
   private AppController controller;
   private Logger logger = Logger.getInstance();
 
   private final static String REQUESTING_APP_ID = "pryv-lib-java-example";
   private EventsManager eventsManager;
-  private StreamsManager<Map<String, Stream>> streamsManager;
+  private StreamsManager streamsManager;
 
   private Stage primaryStage;
   private BorderPane rootLayout;
 
   private ObservableList<Event> eventsObservableList = FXCollections.observableArrayList();
-  private ObservableList<TreeItem<Stream>> streamTreeItemsObservableList = FXCollections.observableArrayList();
+  private ObservableList<TreeItem<Stream>> streamTreeItemsObservableList = FXCollections
+    .observableArrayList();
 
   public static void main(String[] args) {
     launch(args);
@@ -179,7 +178,6 @@ public class ExampleApp extends Application implements AuthView,
     }
   }
 
-
   /**
    *
    * Streams Callbacks
@@ -250,7 +248,6 @@ public class ExampleApp extends Application implements AuthView,
     displayError(message);
   }
 
-
   /**
    * Add Events to ObservableList<Event> eventsObservableList
    *
@@ -293,8 +290,6 @@ public class ExampleApp extends Application implements AuthView,
       }
     });
   }
-
-
 
   /**
    * Returns the main stage.

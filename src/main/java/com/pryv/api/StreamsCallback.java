@@ -8,19 +8,17 @@ import com.pryv.api.model.Stream;
  *
  * callback interface for Streams management methods
  *
- * @param <T>
- *          format of returned streams
  * @author ik
  *
  */
-public interface StreamsCallback<T> {
+public interface StreamsCallback {
 
   /**
    * callback method for successful online retrieval
    *
    * @param streams
    */
-  void onStreamsSuccess(T streams);
+  void onStreamsSuccess(Map<String, Stream> streams);
 
   /**
    * callback method for successful DB and Supervisor retrieval

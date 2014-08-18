@@ -58,8 +58,7 @@ public class JsonConverter {
   }
 
   public static Map<String, Stream> createStreamsFromJson(String jsonStreamsArray)
-    throws JsonProcessingException, IOException {
-
+    throws IOException {
     JsonNode arrNode = fromJson(jsonStreamsArray).get(STREAMS_KEY);
     Map<String, Stream> newStreams = new HashMap<String, Stream>();
     if (arrNode.isArray()) {

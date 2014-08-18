@@ -22,8 +22,7 @@ import com.pryv.utils.Supervisor;
  * @author ik
  *
  */
-public class Connection implements EventsManager,
-  StreamsManager<Map<String, Stream>> {
+public class Connection implements EventsManager, StreamsManager {
 
   private String username;
   private String token;
@@ -31,7 +30,7 @@ public class Connection implements EventsManager,
   private String apiScheme = "https";
   private String url;
   private EventsManager cacheEventsManager;
-  private StreamsManager<Map<String, Stream>> cacheStreamsManager;
+  private StreamsManager cacheStreamsManager;
   private Supervisor supervisor;
 
   private Logger logger = Logger.getInstance();
@@ -43,7 +42,7 @@ public class Connection implements EventsManager,
     supervisor = new Supervisor();
     try {
       cacheEventsManager = new CacheEventsAndStreamsManager(url, token, dbInitCallback);
-      cacheStreamsManager = (StreamsManager<Map<String, Stream>>) cacheEventsManager;
+      cacheStreamsManager = (StreamsManager) cacheEventsManager;
     } catch (ClassNotFoundException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -81,8 +80,7 @@ public class Connection implements EventsManager,
    *
    */
   @Override
-  public void
- getEvents(final Filter filter, final EventsCallback userEventsCallback) {
+  public void getEvents(final Filter filter, final EventsCallback userEventsCallback) {
 
     // send supervisor's events on User's callback.onEventsPartialResult()
     userEventsCallback.onEventsPartialResult(supervisor.getEvents(filter));
@@ -138,9 +136,9 @@ public class Connection implements EventsManager,
    */
 
   @Override
-  public void getStreams(final StreamsCallback<Map<String, Stream>> streamsCallback) {
+  public void getStreams(final StreamsCallback streamsCallback) {
 
-    cacheStreamsManager.getStreams(new StreamsCallback<Map<String, Stream>>() {
+    cacheStreamsManager.getStreams(new StreamsCallback() {
 
       @Override
       public void onStreamsSuccess(Map<String, Stream> streams) {
@@ -190,8 +188,7 @@ public class Connection implements EventsManager,
     private EventsCallback eventsCallback;
     private Filter filter;
 
-    public ConnectionEventsCallback(EventsCallback pEventsCallback,
-      Filter pFilter) {
+    public ConnectionEventsCallback(EventsCallback pEventsCallback, Filter pFilter) {
       eventsCallback = pEventsCallback;
       filter = pFilter;
     }

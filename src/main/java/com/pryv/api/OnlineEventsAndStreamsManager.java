@@ -11,6 +11,7 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.util.EntityUtils;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
@@ -24,8 +25,7 @@ import com.pryv.utils.Logger;
  * @author ik
  *
  */
-public class OnlineEventsAndStreamsManager implements EventsManager,
-  StreamsManager<String> {
+public class OnlineEventsAndStreamsManager implements EventsManager, StreamsManager {
 
   private String eventsUrl;
   private String streamsUrl;
@@ -70,7 +70,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager,
    */
 
   @Override
-  public void getStreams(StreamsCallback<String> streamsCallback) {
+  public void getStreams(StreamsCallback streamsCallback) {
     new FetchStreamsThread(streamsCallback).start();
   }
 
@@ -101,9 +101,9 @@ public class OnlineEventsAndStreamsManager implements EventsManager,
    */
   private class FetchStreamsThread extends Thread {
 
-    private StreamsCallback<String> streamsCallback;
+    private StreamsCallback streamsCallback;
 
-    public FetchStreamsThread(StreamsCallback<String> pStreamsCallback) {
+    public FetchStreamsThread(StreamsCallback pStreamsCallback) {
       streamsCallback = pStreamsCallback;
     }
 
@@ -123,11 +123,22 @@ public class OnlineEventsAndStreamsManager implements EventsManager,
     private ResponseHandler<String> streamsResponseHandler = new ResponseHandler<String>() {
 
       @Override
-      public String handleResponse(HttpResponse response) throws ClientProtocolException,
-        IOException {
-        String textResponse = EntityUtils.toString(response.getEntity());
-        logger.log("Online received streams: " + textResponse);
-        streamsCallback.onStreamsSuccess(textResponse);
+      public String handleResponse(HttpResponse response) {
+        String textResponse;
+        try {
+          textResponse = EntityUtils.toString(response.getEntity());
+          logger.log("Online received streams: " + textResponse);
+          streamsCallback.onStreamsSuccess(JsonConverter.createStreamsFromJson(textResponse));
+        } catch (ParseException e) {
+          streamsCallback.onStreamsError(e.getMessage());
+          e.printStackTrace();
+        } catch (JsonProcessingException e) {
+          streamsCallback.onStreamsError(e.getMessage());
+          e.printStackTrace();
+        } catch (IOException e) {
+          streamsCallback.onStreamsError(e.getMessage());
+          e.printStackTrace();
+        }
         return null;
       }
     };

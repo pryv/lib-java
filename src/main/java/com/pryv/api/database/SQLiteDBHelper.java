@@ -31,7 +31,7 @@ public class SQLiteDBHelper {
 
   // callback interfaces to send async queries requests back to Cache module
   private EventsCallback eventsCallback;
-  private StreamsCallback<Map<String, Stream>> streamsCallback;
+  private StreamsCallback streamsCallback;
 
   private Connection dbConnection;
   private Logger logger = Logger.getInstance();

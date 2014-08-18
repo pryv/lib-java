@@ -7,12 +7,10 @@ import com.pryv.api.model.Stream;
  *
  * @author ik
  *
- * @param <T>
- *          format of returned Streams
  */
-public interface StreamsManager<T> {
+public interface StreamsManager {
 
-  void getStreams(StreamsCallback<T> streams);
+  void getStreams(StreamsCallback streams);
 
   Stream createStream(String id);
 
