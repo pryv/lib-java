@@ -233,58 +233,66 @@ public class QueryGenerator {
    * @return the SQLite query
    */
   public static String retrieveEvents(Filter filter) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("SELECT * FROM " + EVENTS_TABLE_NAME + " ");
+    StringBuilder baseQuery = new StringBuilder();
+    baseQuery.append("SELECT * FROM " + EVENTS_TABLE_NAME + " ");
+    StringBuilder filterParams = new StringBuilder();
 
     if (filter != null) {
-      sb.append("WHERE ");
       String andSeparator = "";
       // fromTime
       if (filter.getFromTime() != null) {
-        sb.append(andSeparator + EVENTS_TIME_KEY + ">" + filter.getFromTime());
+        filterParams.append(andSeparator + EVENTS_TIME_KEY + ">" + filter.getFromTime());
         andSeparator = " AND ";
       }
 
       // toTime
       if (filter.getToTime() != null) {
-        sb.append(andSeparator + EVENTS_TIME_KEY + "<" + filter.getToTime());
+        filterParams.append(andSeparator + EVENTS_TIME_KEY + "<" + filter.getToTime());
         andSeparator = " AND ";
       }
 
       // streamIds
-      formatFilterSet(andSeparator, sb, filter.getStreamIds(), EVENTS_STREAM_ID_KEY);
+      formatFilterSet(andSeparator, filterParams, filter.getStreamIds(), EVENTS_STREAM_ID_KEY);
 
       // tags
-      formatFilterSet(andSeparator, sb, filter.getTags(), EVENTS_TAGS_KEY);
+      formatFilterSet(andSeparator, filterParams, filter.getTags(), EVENTS_TAGS_KEY);
 
       // types
-      formatFilterSet(andSeparator, sb, filter.getTypes(), EVENTS_TYPE_KEY);
+      formatFilterSet(andSeparator, filterParams, filter.getTypes(), EVENTS_TYPE_KEY);
 
       // TODO handle running parameter
 
       // modifiedSince
       if (filter.getModifiedSince() != null) {
-        sb.append(andSeparator + EVENTS_MODIFIED_KEY + ">" + filter.getModifiedSince());
+        filterParams.append(andSeparator + EVENTS_MODIFIED_KEY + ">" + filter.getModifiedSince());
         andSeparator = " AND ";
       }
 
       // state
       if (filter.getState() != null) {
-        sb.append(andSeparator);
+        filterParams.append(andSeparator);
         if (filter.getState().equals(Filter.State.DEFAULT)) {
-          sb.append(EVENTS_TRASHED_KEY + "=" + "\'false\'");
+          filterParams.append(EVENTS_TRASHED_KEY + "=" + "\'false\'");
         } else if (filter.getState().equals(Filter.State.TRASHED)) {
-          sb.append(EVENTS_TRASHED_KEY + "=" + "\'true\'");
+          filterParams.append(EVENTS_TRASHED_KEY + "=" + "\'true\'");
         } else {
-          sb.append("(" + EVENTS_TRASHED_KEY + "=\'false\' OR " + EVENTS_TRASHED_KEY + "=\'true\')");
+          filterParams.append("("
+            + EVENTS_TRASHED_KEY
+              + "=\'false\' OR "
+              + EVENTS_TRASHED_KEY
+              + "=\'true\')");
           // alternative implementation
           // sb.setLength(sb.length() - andSeparator.length());
         }
         andSeparator = " AND ";
       }
     }
-    sb.append(";");
-    return sb.toString();
+    if (filterParams.length() != 0) {
+      filterParams.insert(0, " WHERE ");
+      filterParams.append(";");
+      baseQuery.append(filterParams.toString());
+    }
+    return baseQuery.toString();
   }
 
   /**
