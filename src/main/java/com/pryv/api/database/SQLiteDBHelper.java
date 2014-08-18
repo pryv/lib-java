@@ -30,7 +30,7 @@ public class SQLiteDBHelper {
   private final String initDBerrorMessage = "Database initialization error: ";
 
   // callback interfaces to send async queries requests back to Cache module
-  private EventsCallback<Map<String, Event>> eventsCallback;
+  private EventsCallback eventsCallback;
   private StreamsCallback<Map<String, Stream>> streamsCallback;
 
   private Connection dbConnection;

@@ -22,10 +22,10 @@ import com.pryv.utils.Logger;
  * @author ik
  *
  */
-public class CacheEventsAndStreamsManager implements EventsManager<Map<String, Event>>,
+public class CacheEventsAndStreamsManager implements EventsManager,
   StreamsManager<Map<String, Stream>> {
 
-  private EventsManager<String> onlineEventsManager;
+  private EventsManager onlineEventsManager;
   private StreamsManager<String> onlineStreamsManager;
 
   private SQLiteDBHelper dbHelper;
@@ -44,8 +44,7 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
    * @throws ClassNotFoundException
    */
   public CacheEventsAndStreamsManager(String url, String token, DBinitCallback initCallback)
-    throws ClassNotFoundException,
-    SQLException {
+    throws ClassNotFoundException, SQLException {
     onlineEventsManager = new OnlineEventsAndStreamsManager(url, token);
     onlineStreamsManager = (StreamsManager<String>) onlineEventsManager;
     dbHelper = new SQLiteDBHelper(Pryv.DATABASE_NAME, initCallback);
@@ -57,38 +56,26 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
 
   @Override
   public void getEvents(Filter filter,
-    final EventsCallback<Map<String, Event>> eventsCallback) {
+ final EventsCallback connectionEventsCallback) {
     // look in cache and send it onPartialResult
     try {
-      eventsCallback.onEventsPartialResult(dbHelper.getEvents(filter));
+      connectionEventsCallback.onEventsPartialResult(dbHelper.getEvents(filter));
       logger.log("Cache: retrieved Events from cache: ");
     } catch (SQLException e) {
-      eventsCallback.onEventsError("Cache: getEvents error: " + e.getMessage());
+      connectionEventsCallback.onEventsError("Cache: getEvents error: " + e.getMessage());
       e.printStackTrace();
     }
 
     // forward call to online module
-    onlineEventsManager.getEvents(filter, new EventsCallback<String>() {
+    onlineEventsManager.getEvents(filter, new EventsCallback() {
 
       @Override
-      public void onEventsSuccess(String jsonEvents) {
-        try {
-          Map<String, Event> receivedEvents = JsonConverter.createEventsFromJson(jsonEvents);
+      public void onEventsSuccess(Map<String, Event> onlineEvents) {
+        // update Cache with receivedEvents
+        updateEvents(onlineEvents);
 
-          // update Cache with receivedEvents
-          updateEvents(receivedEvents);
-
-          // SEND UPDATED EVENTS FROM CACHE
-          eventsCallback.onEventsSuccess(receivedEvents);
-
-        } catch (JsonProcessingException e) {
-          eventsCallback.onEventsError(e.getMessage());
-          e.printStackTrace();
-        } catch (IOException e) {
-          eventsCallback.onEventsError(e.getMessage());
-          e.printStackTrace();
-        }
-
+        // SEND UPDATED EVENTS FROM CACHE
+        connectionEventsCallback.onEventsSuccess(onlineEvents);
       }
 
       // unused
@@ -98,7 +85,7 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
 
       @Override
       public void onEventsError(String message) {
-        eventsCallback.onEventsError(message);
+        connectionEventsCallback.onEventsError(message);
       }
     });
   }
@@ -132,9 +119,8 @@ public class CacheEventsAndStreamsManager implements EventsManager<Map<String, E
   }
 
   @Override
-  public Event updateEvent(String id) {
+  public void updateEvent(Event eventToUpdate) {
     // TODO Auto-generated method stub
-    return null;
   }
 
   /**

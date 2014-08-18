@@ -36,13 +36,14 @@ import com.pryv.auth.AuthView;
 import com.pryv.utils.Logger;
 
 public class ExampleApp extends Application implements AuthView,
-  EventsCallback<Map<String, Event>>, StreamsCallback<Map<String, Stream>> {
+ EventsCallback,
+  StreamsCallback<Map<String, Stream>> {
 
   private AppController controller;
   private Logger logger = Logger.getInstance();
 
   private final static String REQUESTING_APP_ID = "pryv-lib-java-example";
-  private EventsManager<Map<String, Event>> eventsManager;
+  private EventsManager eventsManager;
   private StreamsManager<Map<String, Stream>> streamsManager;
 
   private Stage primaryStage;

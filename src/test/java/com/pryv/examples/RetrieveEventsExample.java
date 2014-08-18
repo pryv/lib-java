@@ -1,14 +1,11 @@
 package com.pryv.examples;
 
-import java.util.Map;
-
 import resources.TestCredentials;
 
 import com.pryv.Connection;
 import com.pryv.Pryv;
 import com.pryv.api.EventsManager;
 import com.pryv.api.database.DBinitCallback;
-import com.pryv.api.model.Event;
 
 /**
  * test retrieval of events online
@@ -28,7 +25,7 @@ public class RetrieveEventsExample {
           System.out.println(message);
         }
       });
-    EventsManager<Map<String, Event>> eventsFetcher = connection;
+    EventsManager eventsFetcher = connection;
 
     Pryv.setStaging();
 

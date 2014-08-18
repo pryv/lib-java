@@ -22,7 +22,7 @@ import com.pryv.utils.Supervisor;
  * @author ik
  *
  */
-public class Connection implements EventsManager<Map<String, Event>>,
+public class Connection implements EventsManager,
   StreamsManager<Map<String, Stream>> {
 
   private String username;
@@ -30,7 +30,7 @@ public class Connection implements EventsManager<Map<String, Event>>,
   private String apiDomain = Pryv.API_DOMAIN; // pryv.io or pryv.in
   private String apiScheme = "https";
   private String url;
-  private EventsManager<Map<String, Event>> cacheEventsManager;
+  private EventsManager cacheEventsManager;
   private StreamsManager<Map<String, Stream>> cacheStreamsManager;
   private Supervisor supervisor;
 
@@ -43,7 +43,7 @@ public class Connection implements EventsManager<Map<String, Event>>,
     supervisor = new Supervisor();
     try {
       cacheEventsManager = new CacheEventsAndStreamsManager(url, token, dbInitCallback);
-      cacheStreamsManager = (StreamsManager) cacheEventsManager;
+      cacheStreamsManager = (StreamsManager<Map<String, Stream>>) cacheEventsManager;
     } catch (ClassNotFoundException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -82,39 +82,43 @@ public class Connection implements EventsManager<Map<String, Event>>,
    */
   @Override
   public void
-    getEvents(final Filter filter, final EventsCallback<Map<String, Event>> eventsCallback) {
+ getEvents(final Filter filter, final EventsCallback userEventsCallback) {
 
-    // send
-    eventsCallback.onEventsPartialResult(supervisor.getEvents(filter));
+    // send supervisor's events on User's callback.onEventsPartialResult()
+    userEventsCallback.onEventsPartialResult(supervisor.getEvents(filter));
 
-    cacheEventsManager.getEvents(filter, new EventsCallback<Map<String, Event>>() {
+    // forward getEvents() to Cache
+    cacheEventsManager.getEvents(filter, new EventsCallback() {
 
       @Override
-      public void onEventsSuccess(Map<String, Event> events) {
+      public void onEventsSuccess(Map<String, Event> onlineEvents) {
         logger.log("Connection: onEventsSuccess");
 
         // update existing references with JSON received from online
-        supervisor.updateEvents(events);
+        supervisor.updateEvents(onlineEvents);
 
-        // return merged events from main memory
-        eventsCallback.onEventsSuccess(supervisor.getEvents(filter));
+        // return merged events from Supervisor
+        userEventsCallback.onEventsSuccess(supervisor.getEvents(filter));
       }
 
       @Override
-      public void onEventsPartialResult(Map<String, Event> newEvents) {
-        supervisor.updateEvents(newEvents);
-        eventsCallback.onEventsPartialResult(supervisor.getEvents(filter));
+      public void onEventsPartialResult(Map<String, Event> cacheEvents) {
+
+        // update existing Events with those retrieved from the cache
+        supervisor.updateEvents(cacheEvents);
+        // return merged events from Supervisor
+        userEventsCallback.onEventsPartialResult(supervisor.getEvents(filter));
       }
 
       @Override
       public void onEventsError(String message) {
-        eventsCallback.onEventsError(message);
+        userEventsCallback.onEventsError(message);
       }
     });
   }
 
   @Override
-  public void createEvent(Event event) {
+  public void createEvent(Event newEvent) {
     // TODO Auto-generated method stub
   }
 
@@ -125,9 +129,8 @@ public class Connection implements EventsManager<Map<String, Event>>,
   }
 
   @Override
-  public Event updateEvent(String id) {
+  public void updateEvent(Event eventToUpdate) {
     // TODO Auto-generated method stub
-    return null;
   }
 
   /**
@@ -182,12 +185,13 @@ public class Connection implements EventsManager<Map<String, Event>>,
    * @author ik
    *
    */
-  private class MyEventsCallback implements EventsCallback<Map<String, Event>> {
+  private class ConnectionEventsCallback implements EventsCallback {
 
-    private EventsCallback<Map<String, Event>> eventsCallback;
+    private EventsCallback eventsCallback;
     private Filter filter;
 
-    public MyEventsCallback(EventsCallback<Map<String, Event>> pEventsCallback, Filter pFilter) {
+    public ConnectionEventsCallback(EventsCallback pEventsCallback,
+      Filter pFilter) {
       eventsCallback = pEventsCallback;
       filter = pFilter;
     }

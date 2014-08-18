@@ -1,15 +1,20 @@
 package com.pryv.api;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.util.EntityUtils;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
+import com.pryv.utils.JsonConverter;
 import com.pryv.utils.Logger;
 
 /**
@@ -19,7 +24,8 @@ import com.pryv.utils.Logger;
  * @author ik
  *
  */
-public class OnlineEventsAndStreamsManager implements EventsManager<String>, StreamsManager<String> {
+public class OnlineEventsAndStreamsManager implements EventsManager,
+  StreamsManager<String> {
 
   private String eventsUrl;
   private String streamsUrl;
@@ -39,7 +45,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
    */
 
   @Override
-  public void getEvents(Filter filter, EventsCallback<String> eventsCallback) {
+  public void getEvents(Filter filter, EventsCallback eventsCallback) {
     new FetchEventsThread(filter.toUrlParameters(), eventsCallback).start();
   }
 
@@ -55,9 +61,8 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
   }
 
   @Override
-  public Event updateEvent(String id) {
+  public void updateEvent(Event eventToUpdate) {
     // TODO Auto-generated method stub
-    return null;
   }
 
   /**
@@ -137,9 +142,9 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
    */
   private class FetchEventsThread extends Thread {
     private String params = "";
-    private EventsCallback<String> eventsCallback;
+    private EventsCallback eventsCallback;
 
-    public FetchEventsThread(String pParams, EventsCallback<String> pEventsCallback) {
+    public FetchEventsThread(String pParams, EventsCallback pEventsCallback) {
       params = pParams;
       eventsCallback = pEventsCallback;
     }
@@ -161,10 +166,26 @@ public class OnlineEventsAndStreamsManager implements EventsManager<String>, Str
     private ResponseHandler<String> eventsResponseHandler = new ResponseHandler<String>() {
 
       @Override
-      public String handleResponse(HttpResponse reply) throws ClientProtocolException, IOException {
-        String response = EntityUtils.toString(reply.getEntity());
-        logger.log("Online: received events: " + response);
-        eventsCallback.onEventsSuccess(response);
+      public String handleResponse(HttpResponse reply) {
+        String response;
+        try {
+          response = EntityUtils.toString(reply.getEntity());
+          logger.log("Online: received events: " + response);
+          Map<String, Event> receivedEvents = JsonConverter.createEventsFromJson(response);
+          eventsCallback.onEventsSuccess(receivedEvents);
+        } catch (ParseException e) {
+          eventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        } catch (JsonParseException e) {
+          eventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        } catch (JsonMappingException e) {
+          eventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        } catch (IOException e) {
+          eventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        }
         return null;
       }
     };

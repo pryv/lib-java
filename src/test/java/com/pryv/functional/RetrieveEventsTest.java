@@ -31,10 +31,10 @@ import com.pryv.api.model.Stream;
  */
 public class RetrieveEventsTest {
 
-  private EventsManager<Map<String, Event>> eventsManager;
+  private EventsManager eventsManager;
   private StreamsManager<Map<String, Stream>> streamsManager;
 
-  private EventsCallback<Map<String, Event>> eventsCallback;
+  private EventsCallback eventsCallback;
   private StreamsCallback<Map<String, Stream>> streamsCallback;
 
   private Map<String, Event> events;
@@ -146,7 +146,7 @@ public class RetrieveEventsTest {
   }
 
   private void instanciateEventsCallback() {
-    eventsCallback = new EventsCallback<Map<String, Event>>() {
+    eventsCallback = new EventsCallback() {
 
       @Override
       public void onEventsSuccess(Map<String, Event> newEvents) {

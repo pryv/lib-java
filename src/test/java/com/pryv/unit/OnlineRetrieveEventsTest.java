@@ -1,6 +1,5 @@
 package com.pryv.unit;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -17,7 +16,6 @@ import com.pryv.api.EventsCallback;
 import com.pryv.api.Filter;
 import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.api.model.Event;
-import com.pryv.utils.JsonConverter;
 
 /**
  * Test of Retrieval of Events by Online module
@@ -29,9 +27,8 @@ public class OnlineRetrieveEventsTest {
 
   private OnlineEventsAndStreamsManager online;
 
-  private EventsCallback<String> eventsCallback;
+  private EventsCallback eventsCallback;
 
-  private String receivedEvents;
   private Map<String, Event> events;
   private String streamId;
 
@@ -43,28 +40,6 @@ public class OnlineRetrieveEventsTest {
 
     String url = "https://" + TestCredentials.USERNAME + "." + Pryv.API_DOMAIN + "/";
     online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN);
-  }
-
-  @Test
-  public void testFetchEventsWithEmptyFilterAndReceiveNonEmptyReply() {
-    online.getEvents(new Filter(), eventsCallback);
-    // Awaitility.
-    Awaitility.await().until(hasReceivedString());
-  }
-
-  private Callable<Boolean> hasReceivedString() {
-    return new Callable<Boolean>() {
-
-      @Override
-      public Boolean call() throws Exception {
-        // TODO Auto-generated method stub
-        if (receivedEvents != null) {
-          return receivedEvents.length() > 0;
-        } else {
-          return false;
-        }
-      }
-    };
   }
 
   @Test
@@ -119,17 +94,11 @@ public class OnlineRetrieveEventsTest {
   }
 
   private void instanciateCallback() {
-    eventsCallback = new EventsCallback<String>() {
+    eventsCallback = new EventsCallback() {
 
       @Override
-      public void onEventsSuccess(String stringEvents) {
-        receivedEvents = stringEvents;
-        try {
-          events = JsonConverter.createEventsFromJson(stringEvents);
-        } catch (IOException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
+      public void onEventsSuccess(Map<String, Event> onlineEvents) {
+        events = onlineEvents;
       }
 
       // unused

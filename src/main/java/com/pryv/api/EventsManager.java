@@ -8,11 +8,8 @@ import com.pryv.api.model.Event;
  *
  * @author ik
  *
- * @param <T>
- *          the format in which the events are returned
- *
  */
-public interface EventsManager<T> {
+public interface EventsManager {
 
   /**
    * retrieve events
@@ -22,7 +19,7 @@ public interface EventsManager<T> {
    * @param eventsCallback
    *          the callback for events retrieval
    */
-  void getEvents(Filter filter, EventsCallback<T> eventsCallback);
+  void getEvents(Filter filter, EventsCallback eventsCallback);
 
   /**
    * Create event
@@ -33,8 +30,21 @@ public interface EventsManager<T> {
    */
   void createEvent(Event newEvent);
 
+  /**
+   * Delete Event with event ID id
+   *
+   * @param id
+   *          the ID of the Event to delete.
+   */
   void deleteEvent(String id);
 
-  Event updateEvent(String id);
+  /**
+   * Update Event.
+   *
+   * @param eventToUpdate
+   *          Event object containing the new fields.
+   * @return
+   */
+  void updateEvent(Event eventToUpdate);
 
 }

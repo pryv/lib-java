@@ -10,16 +10,29 @@ import com.pryv.api.model.Event;
  *
  * @author ik
  *
- * @param <T>
- *          the format in which the events are returned
- *
  */
-public interface EventsCallback<T> {
+public interface EventsCallback {
 
-  void onEventsSuccess(T events);
+  /**
+   * callback method for successful online retrieval
+   *
+   * @param streams
+   */
+  void onEventsSuccess(Map<String, Event> events);
 
+  /**
+   * callback method for successful DB and Supervisor retrieval
+   *
+   * @param newStreams
+   */
   void onEventsPartialResult(Map<String, Event> newEvents);
 
+  /**
+   * callback method called when an error occured during Event fetching.
+   *
+   * @param message
+   *          the error message
+   */
   void onEventsError(String message);
 
 }

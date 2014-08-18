@@ -15,10 +15,26 @@ import com.pryv.api.model.Stream;
  */
 public interface StreamsCallback<T> {
 
+  /**
+   * callback method for successful online retrieval
+   *
+   * @param streams
+   */
   void onStreamsSuccess(T streams);
 
+  /**
+   * callback method for successful DB and Supervisor retrieval
+   *
+   * @param newStreams
+   */
   void onStreamsPartialResult(Map<String, Stream> newStreams);
 
+  /**
+   * callback method called when an error occured during Streams fetching.
+   *
+   * @param message
+   *          the error message
+   */
   void onStreamsError(String message);
 
 }
