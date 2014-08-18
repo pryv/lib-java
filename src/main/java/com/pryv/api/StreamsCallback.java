@@ -16,23 +16,46 @@ public interface StreamsCallback {
   /**
    * callback method for successful online retrieval
    *
-   * @param streams
+   * @param onlineStreams
    */
-  void onStreamsSuccess(Map<String, Stream> streams);
+  void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams);
 
   /**
-   * callback method for successful DB and Supervisor retrieval
+   * callback method for successful DB retrieval
    *
-   * @param newStreams
+   * @param cacheStreams
    */
-  void onStreamsPartialResult(Map<String, Stream> newStreams);
+  void onCacheRetrievePartialResult(Map<String, Stream> cacheStreams);
+
+  /**
+   * callback method for successful Supervisor retrieval
+   *
+   * @param supervisorStreams
+   */
+  void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams);
 
   /**
    * callback method called when an error occured during Streams fetching.
    *
-   * @param message
+   * @param errorMessage
    *          the error message
    */
-  void onStreamsError(String message);
+  void onStreamsRetrievalError(String errorMessage);
+
+  /**
+   * callback method called when createStream(), updateStream() or
+   * deleteStream() execution is successful.
+   *
+   * @param successMessage
+   */
+  void onStreamsSuccess(String successMessage);
+
+  /**
+   * callback method called when an error occurs during createStream(),
+   * updateStream() or deleteStream() execution.
+   *
+   * @param errorMessage
+   */
+  void onStreamError(String errorMessage);
 
 }

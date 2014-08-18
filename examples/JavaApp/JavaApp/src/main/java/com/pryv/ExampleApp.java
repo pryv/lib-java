@@ -171,11 +171,10 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   }
 
   /*
-   *
    * Streams Callbacks
    */
 
-  public void onStreamsSuccess(final Map<String, Stream> streams) {
+  public void onOnlineRetrieveStreamsSuccess(final Map<String, Stream> streams) {
     logger.log("JavaApp: onSuccess()");
 
     Platform.runLater(new Runnable() {
@@ -199,13 +198,28 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     });
   }
 
-  public void onStreamsPartialResult(Map<String, Stream> newStreams) {
+  public void onCacheRetrievePartialResult(Map<String, Stream> newStreams) {
     // TODO Auto-generated method stub
 
   }
 
-  public void onStreamsError(String message) {
+  public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
+    // TODO Auto-generated method stub
+
+  }
+
+  public void onStreamsRetrievalError(String message) {
     displayError(message);
+  }
+
+  public void onStreamsSuccess(String successMessage) {
+    // TODO Auto-generated method stub
+
+  }
+
+  public void onStreamError(String errorMessage) {
+    // TODO Auto-generated method stub
+
   }
 
   /**
@@ -222,11 +236,10 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   }
 
   /*
-   *
    * Events Callbacks
    */
 
-  public void onOnlieRetrieveEventsSuccess(final Map<String, Event> newEvents) {
+  public void onOnlineRetrieveEventsSuccess(final Map<String, Event> newEvents) {
     addEventsToList(newEvents);
   }
 
@@ -234,7 +247,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     addEventsToList(newEvents);
   }
 
-  public void onSuperVisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
+  public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
     addEventsToList(supervisorEvents);
   }
 

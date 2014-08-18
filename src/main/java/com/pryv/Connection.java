@@ -1,6 +1,5 @@
 package com.pryv;
 
-import java.sql.SQLException;
 import java.util.Map;
 
 import com.pryv.api.CacheEventsAndStreamsManager;
@@ -35,21 +34,23 @@ public class Connection implements EventsManager, StreamsManager {
 
   private Logger logger = Logger.getInstance();
 
+  /**
+   * Connection constructor. builds the Url to which the online requests are
+   * done using the provided username and API domain and Scheme from the Pryv
+   * object. Instanciates Supervisor and CacheEventsAndStreamsManager.
+   *
+   * @param pUsername
+   *          username used
+   * @param pToken
+   * @param dbInitCallback
+   */
   public Connection(String pUsername, String pToken, DBinitCallback dbInitCallback) {
     username = pUsername;
     token = pToken;
     url = apiScheme + "://" + username + "." + apiDomain + "/";
     supervisor = new Supervisor();
-    try {
-      cacheEventsManager = new CacheEventsAndStreamsManager(url, token, dbInitCallback);
-      cacheStreamsManager = (StreamsManager) cacheEventsManager;
-    } catch (ClassNotFoundException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (SQLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+    cacheEventsManager = new CacheEventsAndStreamsManager(url, token, dbInitCallback);
+    cacheStreamsManager = (StreamsManager) cacheEventsManager;
   }
 
   public String getUsername() {
@@ -80,7 +81,7 @@ public class Connection implements EventsManager, StreamsManager {
   public void getEvents(final Filter filter, final EventsCallback userEventsCallback) {
 
     // send supervisor's events on User's callback.onEventsPartialResult()
-    userEventsCallback.onSuperVisorRetrieveEventsSuccess(supervisor.getEvents(filter));
+    userEventsCallback.onSupervisorRetrieveEventsSuccess(supervisor.getEvents(filter));
 
     // forward getEvents() to Cache
     cacheEventsManager.getEvents(filter, new ConnectionEventsCallback(userEventsCallback, filter));
@@ -107,27 +108,12 @@ public class Connection implements EventsManager, StreamsManager {
    */
 
   @Override
-  public void getStreams(final StreamsCallback streamsCallback) {
+  public void getStreams(final StreamsCallback userStreamsCallback) {
 
-    cacheStreamsManager.getStreams(new StreamsCallback() {
+    // send Streams retrieved from Supervisor
+    userStreamsCallback.onSupervisorRetrieveStreamsSuccess(supervisor.getStreams());
 
-      @Override
-      public void onStreamsSuccess(Map<String, Stream> streams) {
-        supervisor.updateStreams(streams);
-        streamsCallback.onStreamsSuccess(supervisor.getStreams());
-      }
-
-      @Override
-      public void onStreamsPartialResult(Map<String, Stream> newStreams) {
-        supervisor.updateStreams(newStreams);
-        streamsCallback.onStreamsPartialResult(newStreams);
-      }
-
-      @Override
-      public void onStreamsError(String message) {
-        streamsCallback.onStreamsError(message);
-      }
-    });
+    cacheStreamsManager.getStreams(new ConnectionStreamsCallback(userStreamsCallback));
   }
 
   @Override
@@ -149,7 +135,7 @@ public class Connection implements EventsManager, StreamsManager {
   }
 
   /**
-   * EventsCallback used on EventsManager interface method calls
+   * EventsCallback used in Connection class
    *
    * @author ik
    *
@@ -165,14 +151,14 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onOnlieRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
+    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
       logger.log("Connection: onEventsSuccess");
 
       // update existing references with JSON received from online
       supervisor.updateEvents(onlineEvents);
 
       // return merged events from Supervisor
-      userEventsCallback.onOnlieRetrieveEventsSuccess(supervisor.getEvents(filter));
+      userEventsCallback.onOnlineRetrieveEventsSuccess(supervisor.getEvents(filter));
     }
 
     @Override
@@ -191,7 +177,7 @@ public class Connection implements EventsManager, StreamsManager {
 
     // unused
     @Override
-    public void onSuperVisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
+    public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
     }
 
     @Override
@@ -205,6 +191,57 @@ public class Connection implements EventsManager, StreamsManager {
       // TODO Auto-generated method stub
 
     }
+  }
+
+  /**
+   * StreamsCallback used in Connection class
+   *
+   * @author ik
+   *
+   */
+  private class ConnectionStreamsCallback implements StreamsCallback {
+
+    private StreamsCallback userStreamsCallback;
+
+    public ConnectionStreamsCallback(StreamsCallback pUserStreamsCallback) {
+      userStreamsCallback = pUserStreamsCallback;
+    }
+
+    @Override
+    public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> streams) {
+      supervisor.updateStreams(streams);
+      userStreamsCallback.onOnlineRetrieveStreamsSuccess(supervisor.getStreams());
+    }
+
+    @Override
+    public void onCacheRetrievePartialResult(Map<String, Stream> newStreams) {
+      supervisor.updateStreams(newStreams);
+      userStreamsCallback.onCacheRetrievePartialResult(newStreams);
+    }
+
+    @Override
+    public void onStreamsRetrievalError(String message) {
+      userStreamsCallback.onStreamsRetrievalError(message);
+    }
+
+    @Override
+    public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
+      // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onStreamsSuccess(String successMessage) {
+      // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onStreamError(String errorMessage) {
+      // TODO Auto-generated method stub
+
+    }
+
   }
 
 }

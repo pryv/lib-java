@@ -39,8 +39,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
    * @throws SQLException
    * @throws ClassNotFoundException
    */
-  public CacheEventsAndStreamsManager(String url, String token, DBinitCallback initCallback)
-    throws ClassNotFoundException, SQLException {
+  public CacheEventsAndStreamsManager(String url, String token, DBinitCallback initCallback) {
     onlineEventsManager = new OnlineEventsAndStreamsManager(url, token);
     onlineStreamsManager = (StreamsManager) onlineEventsManager;
     dbHelper = new SQLiteDBHelper(Pryv.DATABASE_NAME, initCallback);
@@ -103,41 +102,13 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
    */
 
   @Override
-  public void getStreams(final StreamsCallback streamsCallback) {
+  public void getStreams(final StreamsCallback connectionStreamsCallback) {
     // look in cache and send it onPartialResult
     // dbHelper.getStreams();
     logger.log("Cache: retrieved Events from cache: ");
-    streamsCallback.onStreamsPartialResult(new HashMap<String, Stream>());
+    connectionStreamsCallback.onCacheRetrievePartialResult(new HashMap<String, Stream>());
 
-    onlineStreamsManager.getStreams(new StreamsCallback() {
-
-      @Override
-      public void onStreamsSuccess(Map<String, Stream> onlineStreams) {
-        logger.log("Cache: Streams retrieval success");
-
-        updateCache(onlineStreams);
-
-        // SEND UPDATED STREAMS FROM CACHE
-        streamsCallback.onStreamsSuccess(onlineStreams);
-
-      }
-
-      private void updateCache(Map<String, Stream> streams) {
-        // TODO Auto-generated method stub
-
-      }
-
-      @Override
-      public void onStreamsPartialResult(Map<String, Stream> newStreams) {
-        // TODO Auto-generated method stub
-
-      }
-
-      @Override
-      public void onStreamsError(String message) {
-        streamsCallback.onStreamsError(message);
-      }
-    });
+    onlineStreamsManager.getStreams(new CacheStreamsCallback(connectionStreamsCallback));
   }
 
   @Override
@@ -173,11 +144,11 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onOnlieRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
+    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
       // update Cache with receivedEvents
       updateEvents(onlineEvents);
       // SEND UPDATED EVENTS FROM CACHE
-      connectionEventsCallback.onOnlieRetrieveEventsSuccess(onlineEvents);
+      connectionEventsCallback.onOnlineRetrieveEventsSuccess(onlineEvents);
     }
 
     // unused
@@ -192,7 +163,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
     // unused
     @Override
-    public void onSuperVisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
+    public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
       // TODO Auto-generated method stub
 
     }
@@ -208,6 +179,67 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       // TODO Auto-generated method stub
 
     }
+  }
+
+  /**
+   * StreamsCallback used by cache class
+   *
+   * @author ik
+   *
+   */
+  private class CacheStreamsCallback implements StreamsCallback {
+
+    private StreamsCallback connectionStreamsCallback;
+
+    public CacheStreamsCallback(StreamsCallback pConnectionStreamsCallback) {
+      connectionStreamsCallback = pConnectionStreamsCallback;
+    }
+
+    @Override
+    public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams) {
+      logger.log("Cache: Streams retrieval success");
+
+      updateCache(onlineStreams);
+
+      // SEND UPDATED STREAMS FROM CACHE
+      connectionStreamsCallback.onOnlineRetrieveStreamsSuccess(onlineStreams);
+
+    }
+
+    private void updateCache(Map<String, Stream> streams) {
+      // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onCacheRetrievePartialResult(Map<String, Stream> newStreams) {
+      // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onStreamsRetrievalError(String message) {
+      connectionStreamsCallback.onStreamsRetrievalError(message);
+    }
+
+    @Override
+    public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
+      // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onStreamsSuccess(String successMessage) {
+      // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onStreamError(String errorMessage) {
+      // TODO Auto-generated method stub
+
+    }
+
   }
 
 }

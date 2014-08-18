@@ -18,7 +18,7 @@ public interface EventsCallback {
    *
    * @param streams
    */
-  void onOnlieRetrieveEventsSuccess(Map<String, Event> onlineEvents);
+  void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents);
 
   /**
    * callback method for successful DB retrieval
@@ -32,7 +32,7 @@ public interface EventsCallback {
    *
    * @param supervisorEvents
    */
-  void onSuperVisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents);
+  void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents);
 
   /**
    * callback method called when an error occured during Event fetching.

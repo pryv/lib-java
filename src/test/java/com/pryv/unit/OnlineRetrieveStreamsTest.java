@@ -60,18 +60,36 @@ public class OnlineRetrieveStreamsTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void onStreamsSuccess(Map<String, Stream> onlineStreams) {
+      public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams) {
         streams = onlineStreams;
       }
 
       // unused
       @Override
-      public void onStreamsPartialResult(Map<String, Stream> newStreams) {
+      public void onCacheRetrievePartialResult(Map<String, Stream> newStreams) {
       }
 
       @Override
-      public void onStreamsError(String message) {
+      public void onStreamsRetrievalError(String message) {
         // TODO Auto-generated method stub
+      }
+
+      @Override
+      public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void onStreamsSuccess(String successMessage) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void onStreamError(String errorMessage) {
+        // TODO Auto-generated method stub
+
       }
 
     };

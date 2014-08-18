@@ -149,7 +149,7 @@ public class RetrieveEventsTest {
     eventsCallback = new EventsCallback() {
 
       @Override
-      public void onOnlieRetrieveEventsSuccess(Map<String, Event> newEvents) {
+      public void onOnlineRetrieveEventsSuccess(Map<String, Event> newEvents) {
         System.out.println("TestEventsCallback: success with "
           + newEvents.values().size()
             + " events");
@@ -169,7 +169,7 @@ public class RetrieveEventsTest {
       }
 
       @Override
-      public void onSuperVisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
+      public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
         // TODO Auto-generated method stub
 
       }
@@ -192,7 +192,7 @@ public class RetrieveEventsTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void onStreamsSuccess(Map<String, Stream> newStreams) {
+      public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> newStreams) {
         System.out.println("TestStreamsCallback: success for "
           + newStreams.values().size()
             + " streams");
@@ -201,13 +201,31 @@ public class RetrieveEventsTest {
       }
 
       @Override
-      public void onStreamsPartialResult(Map<String, Stream> newStreams) {
+      public void onCacheRetrievePartialResult(Map<String, Stream> newStreams) {
         // TODO Auto-generated method stub
 
       }
 
       @Override
-      public void onStreamsError(String message) {
+      public void onStreamsRetrievalError(String message) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void onStreamsSuccess(String successMessage) {
+        // TODO Auto-generated method stub
+
+      }
+
+      @Override
+      public void onStreamError(String errorMessage) {
         // TODO Auto-generated method stub
 
       }

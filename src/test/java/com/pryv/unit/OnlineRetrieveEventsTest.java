@@ -97,7 +97,7 @@ public class OnlineRetrieveEventsTest {
     eventsCallback = new EventsCallback() {
 
       @Override
-      public void onOnlieRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
+      public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
         events = onlineEvents;
       }
 
@@ -113,7 +113,7 @@ public class OnlineRetrieveEventsTest {
       }
 
       @Override
-      public void onSuperVisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
+      public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
         // TODO Auto-generated method stub
 
       }

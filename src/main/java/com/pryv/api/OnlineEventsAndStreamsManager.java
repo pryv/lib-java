@@ -109,10 +109,10 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       try {
         Request.Get(streamsUrl).execute().handleResponse(streamsResponseHandler);
       } catch (ClientProtocolException e) {
-        streamsCallback.onStreamsError(e.getMessage());
+        streamsCallback.onStreamsRetrievalError(e.getMessage());
         e.printStackTrace();
       } catch (IOException e) {
-        streamsCallback.onStreamsError(e.getMessage());
+        streamsCallback.onStreamsRetrievalError(e.getMessage());
         e.printStackTrace();
       }
     }
@@ -125,15 +125,15 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
         try {
           textResponse = EntityUtils.toString(response.getEntity());
           logger.log("Online received streams: " + textResponse);
-          streamsCallback.onStreamsSuccess(JsonConverter.createStreamsFromJson(textResponse));
+          streamsCallback.onOnlineRetrieveStreamsSuccess(JsonConverter.createStreamsFromJson(textResponse));
         } catch (ParseException e) {
-          streamsCallback.onStreamsError(e.getMessage());
+          streamsCallback.onStreamsRetrievalError(e.getMessage());
           e.printStackTrace();
         } catch (JsonProcessingException e) {
-          streamsCallback.onStreamsError(e.getMessage());
+          streamsCallback.onStreamsRetrievalError(e.getMessage());
           e.printStackTrace();
         } catch (IOException e) {
-          streamsCallback.onStreamsError(e.getMessage());
+          streamsCallback.onStreamsRetrievalError(e.getMessage());
           e.printStackTrace();
         }
         return null;
@@ -180,7 +180,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
           response = EntityUtils.toString(reply.getEntity());
           logger.log("Online: received events: " + response);
           Map<String, Event> receivedEvents = JsonConverter.createEventsFromJson(response);
-          eventsCallback.onOnlieRetrieveEventsSuccess(receivedEvents);
+          eventsCallback.onOnlineRetrieveEventsSuccess(receivedEvents);
         } catch (ParseException e) {
           eventsCallback.onEventsRetrievalError(e.getMessage());
           e.printStackTrace();
