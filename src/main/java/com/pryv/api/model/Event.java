@@ -124,6 +124,7 @@ public class Event {
     modified = result.getLong(QueryGenerator.EVENTS_MODIFIED_KEY);
     modifiedBy = result.getString(QueryGenerator.EVENTS_MODIFIED_BY_KEY);
     duration = result.getLong(QueryGenerator.EVENTS_DURATION_KEY);
+    content = result.getObject(QueryGenerator.EVENTS_CONTENT_KEY);
     tags = new HashSet<String>(Arrays.asList(result.getString(QueryGenerator.EVENTS_TAGS_KEY).split(",")));
     references =
       new HashSet<String>(Arrays.asList(result.getString(QueryGenerator.EVENTS_REFS_KEY).split(",")));

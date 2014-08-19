@@ -42,6 +42,8 @@ public class SQLiteDBHelperTest {
   private static Event testEvent;
   private static Stream testStream;
 
+  private static final long MODIFIED_INCREMENT = 50;
+
   // create, update, delete
   private static boolean eventsSuccess = false;
   private static boolean eventsError = false;
@@ -68,6 +70,7 @@ public class SQLiteDBHelperTest {
         System.out.println(message);
       }
     });
+    cleanUpTestDB();
   }
 
   // executed after all tests once
@@ -78,9 +81,15 @@ public class SQLiteDBHelperTest {
     for (Event event : events.values()) {
       db.deleteEvent(event, eventsCallback);
       Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
+      eventsSuccess = false;
     }
     db.getStreams(streamsCallback);
-    // awai
+    Awaitility.await().until(hasRetrievedStreamSuccessfully());
+    for (Stream stream : streams.values()) {
+      db.deleteStream(stream, streamsCallback);
+      Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
+      eventsSuccess = false;
+    }
   }
 
   // executed before each test
@@ -114,7 +123,7 @@ public class SQLiteDBHelperTest {
   public void test03UpdateEvent() {
     String newStreamId = "otherStream";
     testEvent.setStreamId(newStreamId);
-    testEvent.setModified(testEvent.getModified() + 50);
+    testEvent.setModified(testEvent.getModified() + MODIFIED_INCREMENT);
     db.updateEvent(testEvent, eventsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
     db.getEvents(null, eventsCallback);
@@ -143,7 +152,7 @@ public class SQLiteDBHelperTest {
 
   @Test
   public void test03UpdateEventShouldModify() {
-    testEvent.setModified(DummyData.getModified() + 50);
+    testEvent.setModified(testEvent.getModified() + MODIFIED_INCREMENT);
     System.out.println("modified value is : " + testEvent.getModified());
     db.updateEvent(testEvent, eventsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
@@ -191,18 +200,21 @@ public class SQLiteDBHelperTest {
 
   @Test
   public void test08InsertFullStream() {
-    System.out.println("test insert full stream");
+    System.out.println("test insert full stream START");
     db.createStream(testStream, streamsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
+    System.out.println("test insert full stream INSERTION SUCCESS");
     db.getStreams(streamsCallback);
     Awaitility.await().until(hasRetrievedStreamSuccessfully());
     assertEquals(streams.get(testStream.getId()).getId(), testStream.getId());
+    System.out.println("test insert full stream END");
   }
 
   @Test
   public void test09UpdateFullStream() {
+    System.out.println("test update full stream START");
     testStream.setTrashed(!testStream.getTrashed());
-    Long newModifiedValue = testStream.getModified() + 50;
+    Long newModifiedValue = testStream.getModified() + MODIFIED_INCREMENT;
     testStream.setModified(newModifiedValue);
     db.updateStream(testStream, streamsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
@@ -230,6 +242,75 @@ public class SQLiteDBHelperTest {
         fail("stream delete fail");
       }
     }
+  }
+
+  @Test
+  public void test14RetrieveCorrectEvent() {
+    Event testedEvent = DummyData.generateFullEvent();
+    String newId = "myNewID";
+    testedEvent.setId(newId);
+    db.createEvent(testedEvent, eventsCallback);
+    Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
+    db.getEvents(null, eventsCallback);
+    Awaitility.await().until(hasRetrievedEventSuccessfully());
+    Event retrievedEvent = events.get(newId);
+    assertEquals(testedEvent.getId(), retrievedEvent.getId());
+    assertEquals(testedEvent.getStreamId(), retrievedEvent.getStreamId());
+    assertEquals(testedEvent.getTime(), retrievedEvent.getTime());
+    assertEquals(testedEvent.getDuration(), retrievedEvent.getDuration());
+    assertEquals(testedEvent.getType(), retrievedEvent.getType());
+    assertEquals(testedEvent.getContent(), retrievedEvent.getContent());
+    for (String tag : testedEvent.getTags()) {
+      assertTrue(retrievedEvent.getTags().contains(tag));
+    }
+    assertTrue(retrievedEvent.getReferences().containsAll(testedEvent.getReferences()));
+    // test attachments
+    assertEquals(testedEvent.getClientDataAsString(), retrievedEvent.getClientDataAsString());
+    assertEquals(testedEvent.getTrashed(), retrievedEvent.getTrashed());
+    assertEquals(testedEvent.getCreated(), retrievedEvent.getCreated());
+    assertEquals(testedEvent.getCreatedBy(), retrievedEvent.getCreatedBy());
+    assertEquals(testedEvent.getModified(), retrievedEvent.getModified());
+    assertEquals(testedEvent.getModifiedBy(), retrievedEvent.getModifiedBy());
+    db.deleteEvent(testedEvent, eventsCallback);
+    Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
+  }
+
+  @Test
+  public void test13RetrieveStreamCorrectly() {
+    Stream testedStream = DummyData.generateFullStream();
+    String newId = "myNewStreamId";
+    testedStream.setId(newId);
+    int i = 1;
+    for (Stream childStream : testedStream.getChildren()) {
+      childStream.setId("childid" + i);
+      childStream.setParentId(newId);
+      i++;
+    }
+    System.out.println("inserting stream with id: " + newId);
+    db.createStream(testedStream, streamsCallback);
+    Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
+    db.getStreams(streamsCallback);
+    Awaitility.await().until(hasRetrievedStreamSuccessfully());
+    Stream retrievedStream = streams.get(newId);
+    assertEquals(testedStream.getName(), retrievedStream.getName());
+    assertEquals(testedStream.getParentId(), retrievedStream.getParentId());
+    assertEquals(testedStream.getSingleActivity(), retrievedStream.getSingleActivity());
+    assertEquals(testedStream.getClientDataAsString(), retrievedStream.getClientDataAsString());
+    boolean childrenMatch = false;
+    for (Stream testedChild : testedStream.getChildren()) {
+      childrenMatch = false;
+      for (Stream retrievedChild : retrievedStream.getChildren()) {
+        if (testedChild.getId().equals(retrievedChild.getId())) {
+          childrenMatch = true;
+        }
+      }
+    }
+    assertTrue(childrenMatch);
+    assertEquals(testedStream.getTrashed(), retrievedStream.getTrashed());
+    assertEquals(testedStream.getCreated(), retrievedStream.getCreated());
+    assertEquals(testedStream.getCreatedBy(), retrievedStream.getCreatedBy());
+    assertEquals(testedStream.getModified(), retrievedStream.getModified());
+    assertEquals(testedStream.getModifiedBy(), retrievedStream.getModifiedBy());
   }
 
   private static Callable<Boolean> hasRetrievedEventSuccessfully() {

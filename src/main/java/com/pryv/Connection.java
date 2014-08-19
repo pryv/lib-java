@@ -8,11 +8,11 @@ import com.pryv.api.EventsManager;
 import com.pryv.api.Filter;
 import com.pryv.api.StreamsCallback;
 import com.pryv.api.StreamsManager;
+import com.pryv.api.Supervisor;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 import com.pryv.utils.Logger;
-import com.pryv.utils.Supervisor;
 
 /**
  *

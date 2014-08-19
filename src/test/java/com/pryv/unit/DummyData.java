@@ -28,14 +28,14 @@ public class DummyData {
   private static final Long EVENT_DURATION = new Long(20); // opt
   private static final String EVENT_TYPE = "testType";
   private static final String EVENT_CONTENT = "testContent its a string"; // opt
-  private static final Set<String> EVENT_TAGS = new HashSet<String>();
+  private static Set<String> eventTags;
   private static final String EVENT_TAGTEST = "test";
   private static final String EVENT_TAGBASIC = "basic test";
-  private static final Set<String> EVENT_REFS = new HashSet<String>();
+  private static Set<String> eventRefs;
   private static final String EVENT_REF = "refTest";
   private static final String EVENT_DESCRIPTION = "the test description";
-  private static final Set<Attachment> EVENT_ATTACHMENTS = new HashSet<Attachment>();
-  private static final Map<String, Object> EVENT_CLIENTDATA = new HashMap<String, Object>();
+  private static Set<Attachment> eventAttachments;
+  private static Map<String, Object> eventClientData;
   private static final String EVENT_CLIENTKEY = "color";
   private static final String EVENT_CLIENTVALUE = "value";
   private static final Boolean EVENT_TRASHED = false;
@@ -50,11 +50,11 @@ public class DummyData {
   private static final String STREAM_NAME = "testStream";
   private static final String STREAM_PARENT_ID = STREAM_ID;
   private static final Boolean STREAM_SINGLE_ACTIVITY = true;
-  private static final Map<String, Object> STREAM_CLIENT_DATA = new HashMap<String, Object>();
+  private static Map<String, Object> streamClientData;
   private static final String STREAM_CLIENT_KEY = "testKey";
   private static final String STREAM_CLIENT_VALUE = "testValue";
-  private static final List<Stream> STREAM_CHILDREN = new ArrayList<Stream>();
-  private static final Boolean STREAM_TRASHED = false;
+  private static List<Stream> streamChildren;
+  private static final Boolean STREAM_TRASHED = true;
   private static final Long STREAM_CREATED = new Long(1000);
   private static final String STREAM_CREATED_BY = "Bob";
   private static final Long STREAM_MODIFIED = new Long(1500);
@@ -68,12 +68,14 @@ public class DummyData {
   private static final String STREAM_CHILD_MODIFIED_BY = "modified of child";
 
   public static Stream generateFullStream() {
-    STREAM_CLIENT_DATA.put(STREAM_CLIENT_KEY, STREAM_CLIENT_VALUE);
-    STREAM_CHILDREN.add(new Stream(STREAM_CHILD_ID, STREAM_CHILD_NAME, STREAM_ID, null, null, null,
+    streamClientData = new HashMap<String, Object>();
+    streamClientData.put(STREAM_CLIENT_KEY, STREAM_CLIENT_VALUE);
+    streamChildren = new ArrayList<Stream>();
+    streamChildren.add(new Stream(STREAM_CHILD_ID, STREAM_CHILD_NAME, STREAM_ID, null, null, null,
       STREAM_CHILD_TRASHED, STREAM_CHILD_CREATED, STREAM_CHILD_CREATED_BY, STREAM_CHILD_MODIFIED,
       STREAM_CHILD_MODIFIED_BY));
     return new Stream(STREAM_ID, STREAM_NAME, null, STREAM_SINGLE_ACTIVITY,
-      STREAM_CLIENT_DATA, STREAM_CHILDREN, STREAM_TRASHED, STREAM_CREATED, STREAM_CREATED_BY,
+      streamClientData, streamChildren, STREAM_TRASHED, STREAM_CREATED, STREAM_CREATED_BY,
       STREAM_MODIFIED, STREAM_MODIFIED_BY);
   }
 
@@ -87,14 +89,18 @@ public class DummyData {
   }
 
   public static Event generateFullEvent() {
-    EVENT_TAGS.add(EVENT_TAGTEST);
-    EVENT_TAGS.add(EVENT_TAGBASIC);
-    EVENT_REFS.add(EVENT_REF);
-    EVENT_ATTACHMENTS.add(new Attachment(EVENT_ATTACH_ID, "testfile", "test", 0, "abc132"));
-    EVENT_CLIENTDATA.put(EVENT_CLIENTKEY, EVENT_CLIENTVALUE);
+    eventTags = new HashSet<String>();
+    eventTags.add(EVENT_TAGTEST);
+    eventTags.add(EVENT_TAGBASIC);
+    eventRefs = new HashSet<String>();
+    eventRefs.add(EVENT_REF);
+    eventAttachments = new HashSet<Attachment>();
+    eventAttachments.add(new Attachment(EVENT_ATTACH_ID, "testfile", "test", 0, "abc132"));
+    eventClientData = new HashMap<String, Object>();
+    eventClientData.put(EVENT_CLIENTKEY, EVENT_CLIENTVALUE);
     return new Event(EVENT_ID, EVENT_STREAMID, EVENT_TIME, EVENT_DURATION, EVENT_TYPE,
-      EVENT_CONTENT, EVENT_TAGS, EVENT_REFS, EVENT_DESCRIPTION, EVENT_ATTACHMENTS,
-      EVENT_CLIENTDATA, EVENT_TRASHED, EVENT_CREATED, EVENT_CREATEDBY, EVENT_MODIFIED,
+      EVENT_CONTENT, eventTags, eventRefs, EVENT_DESCRIPTION, eventAttachments,
+      eventClientData, EVENT_TRASHED, EVENT_CREATED, EVENT_CREATEDBY, EVENT_MODIFIED,
       EVENT_MODIFIED_BY, EVENT_TEMP_REF_ID);
   }
 
@@ -140,7 +146,7 @@ public class DummyData {
   }
 
   public static Set<String> getTags() {
-    return EVENT_TAGS;
+    return eventTags;
   }
 
   public static String getTagTest() {
@@ -152,7 +158,7 @@ public class DummyData {
   }
 
   public static Set<String> getRefs() {
-    return EVENT_REFS;
+    return eventRefs;
   }
 
   public static String getRef() {
@@ -164,11 +170,11 @@ public class DummyData {
   }
 
   public static Set<Attachment> getAttachments() {
-    return EVENT_ATTACHMENTS;
+    return eventAttachments;
   }
 
   public static Map<String, Object> getClientdata() {
-    return EVENT_CLIENTDATA;
+    return eventClientData;
   }
 
   public static String getClientkey() {
@@ -228,7 +234,7 @@ public class DummyData {
   }
 
   public static Map<String, Object> getStreamClientData() {
-    return STREAM_CLIENT_DATA;
+    return streamClientData;
   }
 
   public static String getStreamClientKey() {
@@ -240,7 +246,7 @@ public class DummyData {
   }
 
   public static List<Stream> getStreamChildren() {
-    return STREAM_CHILDREN;
+    return streamChildren;
   }
 
   public static Boolean getStreamTrashed() {

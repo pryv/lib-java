@@ -29,10 +29,6 @@ public class SQLiteDBHelper {
   private final String dbPath = "sqlite-db/";
   private final String initDBerrorMessage = "Database initialization error: ";
 
-  // callback interfaces to send async queries requests back to Cache module
-  private EventsCallback eventsCallback;
-  private StreamsCallback streamsCallback;
-
   private Connection dbConnection;
   private Logger logger = Logger.getInstance();
 
@@ -297,16 +293,19 @@ public class SQLiteDBHelper {
             Stream retrievedStream = new Stream(result);
             retrievedStreams.put(retrievedStream.getId(), retrievedStream);
           }
+          logger.log("SQLiteDBHelper: retrieved " + retrievedStreams.size() + " streams.");
+          Map<String, Stream> returnStreams = new HashMap<String, Stream>();
           for (Stream stream : retrievedStreams.values()) {
             String pid = stream.getParentId();
             if (pid != null) {
               // add this stream as a child
               retrievedStreams.get(pid).addChildStream(stream);
               // remove it from retrievedStreams.
-              retrievedStreams.remove(stream.getId());
+            } else {
+              returnStreams.put(stream.getId(), stream);
             }
           }
-          cacheStreamsCallback.onCacheRetrieveStreamSuccess(retrievedStreams);
+          cacheStreamsCallback.onCacheRetrieveStreamSuccess(returnStreams);
         } catch (SQLException e) {
           cacheStreamsCallback.onStreamError(e.getMessage());
           e.printStackTrace();

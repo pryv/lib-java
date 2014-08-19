@@ -117,7 +117,7 @@ public class QueryGenerator {
     sb.append(formatTextValue(eventToCache.getDescription()) + ",");
     // attachments need to be added in their own table
     sb.append(formatTextValue(eventToCache.getClientDataAsString()) + ",");
-    sb.append(formatTextValue(eventToCache.getTrashed()) + ",");
+    sb.append(formatBooleanValue(eventToCache.getTrashed()) + ",");
     sb.append(formatTextValue(eventToCache.getTempRefId()));
     sb.append(");");
     return sb.toString();
@@ -192,7 +192,7 @@ public class QueryGenerator {
         + ", "
         + EVENTS_TRASHED_KEY
         + "="
-        + formatTextValue(eventToUpdate.getTrashed())
+        + formatBooleanValue(eventToUpdate.getTrashed())
         + ", "
         + EVENTS_TEMP_REF_ID_KEY
         + "="
@@ -341,9 +341,9 @@ public class QueryGenerator {
       sb.append("NULL,");
     }
     sb.append(formatTextValue(streamToCache.getParentId()) + ",");
-    sb.append(formatTextValue(streamToCache.getSingleActivity()) + ",");
+    sb.append(formatBooleanValue(streamToCache.getSingleActivity()) + ",");
     sb.append(formatTextValue(streamToCache.getClientDataAsString()) + ",");
-    sb.append(formatTextValue(streamToCache.getTrashed()) + ",");
+    sb.append(formatBooleanValue(streamToCache.getTrashed()) + ",");
     sb.append(formatLongValue(streamToCache.getCreated()) + ",");
     sb.append(formatTextValue(streamToCache.getCreatedBy()) + ",");
     sb.append(formatLongValue(streamToCache.getModified()) + ",");
@@ -388,7 +388,7 @@ public class QueryGenerator {
         + ", "
         + STREAMS_SINGLE_ACTIVITY_KEY
         + "="
-        + formatTextValue(streamToUpdate.getSingleActivity())
+        + formatBooleanValue(streamToUpdate.getSingleActivity())
         + ", "
         + STREAMS_CLIENT_DATA_KEY
         + "="
@@ -396,7 +396,7 @@ public class QueryGenerator {
         + ", "
         + STREAMS_TRASHED_KEY
         + "="
-        + formatTextValue(streamToUpdate.getTrashed())
+        + formatBooleanValue(streamToUpdate.getTrashed())
         + ", "
         + STREAMS_CREATED_KEY
         + "="
@@ -565,13 +565,29 @@ public class QueryGenerator {
    * @return
    */
   private static String formatLongValue(Long toAdd) {
-    StringBuilder sb = new StringBuilder();
     if (toAdd != null) {
-      sb.append(toAdd);
+      return Long.toString(toAdd);
     } else {
-      sb.append("NULL");
+      return "NULL";
     }
-    return sb.toString();
+  }
+
+  /**
+   * format Boolean for insert/update in DB, if toAdd = null, returns NULL
+   *
+   * @param toAdd
+   * @return
+   */
+  private static String formatBooleanValue(Boolean toAdd) {
+    if (toAdd != null) {
+      if (toAdd == true) {
+        return "1";
+      } else {
+        return "0";
+      }
+    } else {
+      return "NULL";
+    }
   }
 
   /**
@@ -582,13 +598,11 @@ public class QueryGenerator {
    * @return
    */
   private static String formatTextValue(Object obj) {
-    StringBuilder sb = new StringBuilder();
     if (obj != null) {
-      sb.append("\'" + obj + "\'");
+      return "\'" + obj + "\'";
     } else {
-      sb.append("NULL");
+      return "NULL";
     }
-    return sb.toString();
   }
 
   /**

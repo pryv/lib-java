@@ -1,13 +1,14 @@
-package com.pryv.utils;
+package com.pryv.api;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.pryv.api.Filter;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
+import com.pryv.utils.JsonConverter;
+import com.pryv.utils.Logger;
 
 /**
  *
