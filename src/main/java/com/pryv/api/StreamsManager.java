@@ -10,12 +10,12 @@ import com.pryv.api.model.Stream;
  */
 public interface StreamsManager {
 
-  void getStreams(StreamsCallback streams);
+  void getStreams(Filter filter, StreamsCallback streamsCallback);
 
-  Stream createStream(String id);
+  void createStream(Stream newStream, StreamsCallback streamsCallback);
 
-  void deleteStream(String id);
+  void deleteStream(String id, StreamsCallback streamsCallback);
 
-  Stream updateStream(String id);
+  void updateStream(Stream streamToUpdate, StreamsCallback streamsCallback);
 
 }

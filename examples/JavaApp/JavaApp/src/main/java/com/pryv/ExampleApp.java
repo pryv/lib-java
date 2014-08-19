@@ -132,7 +132,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     });
     eventsManager = newConnection;
     streamsManager = newConnection;
-    streamsManager.getStreams(this);
+    streamsManager.getStreams(null, this);
     Filter filter = new Filter();
     filter.setLimit(20);
     eventsManager.getEvents(filter, this);

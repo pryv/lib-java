@@ -67,26 +67,24 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
    */
 
   @Override
-  public void getStreams(StreamsCallback streamsCallback) {
-    new FetchStreamsThread(streamsCallback).start();
+  public void getStreams(Filter filter, StreamsCallback cacheStreamsCallback) {
+    new FetchStreamsThread(filter, cacheStreamsCallback).start();
   }
 
   @Override
-  public Stream createStream(String id) {
+  public void createStream(Stream newStream, StreamsCallback cacheStreamsCallback) {
     // TODO Auto-generated method stub
-    return null;
   }
 
   @Override
-  public void deleteStream(String id) {
+  public void deleteStream(String id, StreamsCallback cacheStreamsCallback) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public Stream updateStream(String id) {
+  public void updateStream(Stream streamToUpdate, StreamsCallback cacheStreamsCallback) {
     // TODO Auto-generated method stub
-    return null;
   }
 
   /**
@@ -99,9 +97,11 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   private class FetchStreamsThread extends Thread {
 
     private StreamsCallback streamsCallback;
+    private Filter filter;
 
-    public FetchStreamsThread(StreamsCallback pStreamsCallback) {
+    public FetchStreamsThread(Filter pFilter, StreamsCallback pStreamsCallback) {
       streamsCallback = pStreamsCallback;
+      filter = pFilter;
     }
 
     @Override

@@ -61,7 +61,7 @@ public class RetrieveEventsTest {
 
   @Test
   public void testFetchEventsForAStream() {
-    streamsManager.getStreams(streamsCallback);
+    streamsManager.getStreams(new Filter(), streamsCallback);
     Awaitility.await().until(hasStreams());
     Filter filter = new Filter();
     Set<String> streamIds = new HashSet<String>();

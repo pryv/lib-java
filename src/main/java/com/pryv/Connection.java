@@ -108,30 +108,28 @@ public class Connection implements EventsManager, StreamsManager {
    */
 
   @Override
-  public void getStreams(final StreamsCallback userStreamsCallback) {
+  public void getStreams(Filter filter, final StreamsCallback userStreamsCallback) {
 
     // send Streams retrieved from Supervisor
     userStreamsCallback.onSupervisorRetrieveStreamsSuccess(supervisor.getStreams());
 
-    cacheStreamsManager.getStreams(new ConnectionStreamsCallback(userStreamsCallback));
+    cacheStreamsManager.getStreams(filter, new ConnectionStreamsCallback(userStreamsCallback));
   }
 
   @Override
-  public Stream createStream(String id) {
+  public void createStream(Stream newStream, StreamsCallback userStreamCallback) {
     // TODO Auto-generated method stub
-    return null;
   }
 
   @Override
-  public void deleteStream(String id) {
+  public void deleteStream(String id, StreamsCallback userStreamCallback) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public Stream updateStream(String id) {
+  public void updateStream(Stream streamToUpdate, StreamsCallback userStreamCallback) {
     // TODO Auto-generated method stub
-    return null;
   }
 
   /**

@@ -93,31 +93,29 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
    */
 
   @Override
-  public void getStreams(final StreamsCallback connectionStreamsCallback) {
+  public void getStreams(Filter filter, final StreamsCallback connectionStreamsCallback) {
     // look in cache and send it onPartialResult
     // dbHelper.getStreams();
     logger.log("Cache: retrieved Events from cache: ");
     connectionStreamsCallback.onCacheRetrieveStreamSuccess(new HashMap<String, Stream>());
 
-    onlineStreamsManager.getStreams(new CacheStreamsCallback(connectionStreamsCallback));
+    onlineStreamsManager.getStreams(filter, new CacheStreamsCallback(connectionStreamsCallback));
   }
 
   @Override
-  public Stream createStream(String id) {
+  public void createStream(Stream newStream, StreamsCallback connectionStreamsCallback) {
     // TODO Auto-generated method stub
-    return null;
   }
 
   @Override
-  public void deleteStream(String id) {
+  public void deleteStream(String id, StreamsCallback connectionStreamsCallback) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public Stream updateStream(String id) {
+  public void updateStream(Stream streamToUpdate, StreamsCallback connectionStreamsCallback) {
     // TODO Auto-generated method stub
-    return null;
   }
 
   /**

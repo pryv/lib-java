@@ -10,6 +10,7 @@ import resources.TestCredentials;
 
 import com.jayway.awaitility.Awaitility;
 import com.pryv.Pryv;
+import com.pryv.api.Filter;
 import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.api.StreamsCallback;
 import com.pryv.api.model.Stream;
@@ -37,7 +38,7 @@ public class OnlineRetrieveStreamsTest {
 
   @Test
   public void testRetrieveStringAndDeserialize() {
-    online.getStreams(streamsCallback);
+    online.getStreams(new Filter(), streamsCallback);
     Awaitility.await().until(hasDeserializedStreams());
   }
 
