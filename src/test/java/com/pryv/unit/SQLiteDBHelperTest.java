@@ -1,6 +1,7 @@
 package com.pryv.unit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -95,7 +96,7 @@ public class SQLiteDBHelperTest {
 
   // executed before each test
   @Before
-  public void before() {
+  public void beforeEachTest() {
     eventsSuccess = false;
     eventsError = false;
     streamsSuccess = false;
@@ -325,6 +326,19 @@ public class SQLiteDBHelperTest {
     assertEquals(testedStream.getCreatedBy(), retrievedStream.getCreatedBy());
     assertEquals(testedStream.getModified(), retrievedStream.getModified());
     assertEquals(testedStream.getModifiedBy(), retrievedStream.getModifiedBy());
+  }
+
+  @Test
+  public void testInsertAndRetrieveEventWithNullAttachments() {
+    Event eventWithoutAttachments = DummyData.generateFullEvent();
+    eventWithoutAttachments.setAttachments(null);
+    String id = "eventWithoutAttachmentsID";
+    eventWithoutAttachments.setId(id);
+    db.createEvent(eventWithoutAttachments, eventsCallback);
+    Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
+    db.getEvents(null, eventsCallback);
+    Awaitility.await().until(hasRetrievedEventSuccessfully());
+    assertNull(events.get(id).getAttachments());
   }
 
   private static Callable<Boolean> hasRetrievedEventSuccessfully() {
