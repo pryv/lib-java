@@ -198,7 +198,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     });
   }
 
-  public void onCacheRetrievePartialResult(Map<String, Stream> newStreams) {
+  public void onCacheRetrieveStreamSuccess(Map<String, Stream> newStreams) {
     // TODO Auto-generated method stub
 
   }

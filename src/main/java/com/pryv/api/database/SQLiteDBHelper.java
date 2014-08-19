@@ -55,22 +55,18 @@ public class SQLiteDBHelper {
    * Connects to the SQLite database. Creates tables if required.
    *
    * @param path
-   * @throws SQLException
-   * @throws ClassNotFoundException
    */
   private void initDB(final String path, DBinitCallback initCallback) {
     try {
       Class.forName("org.sqlite.JDBC");
-    } catch (ClassNotFoundException e) {
-      initCallback.onError(initDBerrorMessage + e.getMessage());
-      e.printStackTrace();
-    }
-    try {
       dbConnection = DriverManager.getConnection("jdbc:sqlite:" + path);
       logger.log("Opened database successfully");
       createEventsTable();
       createSteamsTable();
     } catch (SQLException e) {
+      initCallback.onError(initDBerrorMessage + e.getMessage());
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
       initCallback.onError(initDBerrorMessage + e.getMessage());
       e.printStackTrace();
     }
@@ -82,15 +78,24 @@ public class SQLiteDBHelper {
    *
    * @param eventToCache
    *          the event to insert
-   * @throws SQLException
-   *           if an Event with the same ID already exists in the database.
    */
-  public void createEvent(Event eventToCache) throws SQLException {
-    String cmd = QueryGenerator.insertEvent(eventToCache);
-    logger.log("SQLiteDBHelper: addEvent: " + cmd);
-    Statement statement = dbConnection.createStatement();
-    statement.execute(cmd);
-    statement.close();
+  public void createEvent(Event eventToCache, EventsCallback cacheEventsCallback) {
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          String cmd = QueryGenerator.insertEvent(eventToCache);
+          logger.log("SQLiteDBHelper: addEvent: " + cmd);
+          Statement statement = dbConnection.createStatement();
+          statement.execute(cmd);
+          statement.close();
+          cacheEventsCallback.onEventsSuccess("item added");
+        } catch (SQLException e) {
+          cacheEventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        }
+      }
+    }.start();
   }
 
   /**
@@ -98,28 +103,51 @@ public class SQLiteDBHelper {
    * order to determine if an update is necessary.
    *
    * @param eventToUpdate
-   * @throws SQLException
    */
-  public void updateEvent(Event eventToUpdate) throws SQLException {
-    String cmd = QueryGenerator.updateEvent(eventToUpdate);
-    logger.log("SQLiteDBHelper: updateEvent: " + cmd);
-    Statement statement = dbConnection.createStatement();
-    statement.executeUpdate(cmd);
-    statement.close();
+  public void updateEvent(Event eventToUpdate, EventsCallback cacheEventsCallback) {
+
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          String cmd = QueryGenerator.updateEvent(eventToUpdate);
+          logger.log("SQLiteDBHelper: updateEvent: " + cmd);
+          Statement statement = dbConnection.createStatement();
+          statement.executeUpdate(cmd);
+          statement.close();
+          cacheEventsCallback.onEventsSuccess("item updated");
+        } catch (SQLException e) {
+          cacheEventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        }
+      }
+    }.start();
+
   }
 
   /**
    * Delete event from the SQLite database.
    *
    * @param eventToDelete
-   * @throws SQLException
    */
-  public void deleteEvent(Event eventToDelete) throws SQLException {
-    String cmd = QueryGenerator.deleteEvent(eventToDelete);
-    logger.log("SQLiteDBHelper: deleteEvent: " + cmd);
-    Statement statement = dbConnection.createStatement();
-    statement.executeUpdate(cmd);
-    statement.close();
+  public void deleteEvent(Event eventToDelete, EventsCallback cacheEventsCallback) {
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          String cmd = QueryGenerator.deleteEvent(eventToDelete);
+          logger.log("SQLiteDBHelper: deleteEvent: " + cmd);
+          Statement statement = dbConnection.createStatement();
+          statement.executeUpdate(cmd);
+          statement.close();
+          cacheEventsCallback.onEventsSuccess("Event deleted");
+        } catch (SQLException e) {
+          cacheEventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        }
+      }
+    }.start();
+
   }
 
   /**
@@ -130,19 +158,28 @@ public class SQLiteDBHelper {
    *          the filter used for the retrieval, use null if no filter is
    *          required.
    * @return Map<String, Event> events, with event ID as key.
-   * @throws SQLException
    */
-  public Map<String, Event> getEvents(Filter filter) throws SQLException {
-    String cmd = QueryGenerator.retrieveEvents(filter);
-    logger.log("SQLiteDBHelper: getEvents: " + cmd);
-    Statement statement = dbConnection.createStatement();
-    ResultSet result = statement.executeQuery(cmd);
-    Map<String, Event> retrievedEvents = new HashMap<String, Event>();
-    while (result.next()) {
-      Event retrievedEvent = new Event(result);
-      retrievedEvents.put(retrievedEvent.getId(), retrievedEvent);
-    }
-    return retrievedEvents;
+  public void getEvents(Filter filter, EventsCallback cacheEventsCallback) {
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          String cmd = QueryGenerator.retrieveEvents(filter);
+          logger.log("SQLiteDBHelper: getEvents: " + cmd);
+          Statement statement = dbConnection.createStatement();
+          ResultSet result = statement.executeQuery(cmd);
+          Map<String, Event> retrievedEvents = new HashMap<String, Event>();
+          while (result.next()) {
+            Event retrievedEvent = new Event(result);
+            retrievedEvents.put(retrievedEvent.getId(), retrievedEvent);
+          }
+          cacheEventsCallback.onCacheRetrieveEventsSuccess(retrievedEvents);
+        } catch (SQLException e) {
+          cacheEventsCallback.onEventsRetrievalError(e.getMessage());
+          e.printStackTrace();
+        }
+      }
+    }.start();
   }
 
   /**
@@ -150,21 +187,31 @@ public class SQLiteDBHelper {
    *
    * @param streamToCache
    *          the stream to insert
-   * @throws SQLException
    */
-  public void addStream(Stream streamToCache) throws SQLException {
-    Statement statement = dbConnection.createStatement();
-    String cmd = QueryGenerator.insertStream(streamToCache);
-    logger.log("SQLiteDBHelper: addStream: " + cmd);
-    statement.executeUpdate(cmd);
-    if (streamToCache.getChildren() != null) {
-      for (Stream childStream : streamToCache.getChildren()) {
-        cmd = QueryGenerator.insertStream(childStream);
-        statement.execute(cmd);
-        logger.log("SQLiteDBHelper: add child Stream: " + cmd);
+  public void createStream(Stream streamToCache, StreamsCallback cacheStreamsCallback) {
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          Statement statement = dbConnection.createStatement();
+          String cmd = QueryGenerator.insertStream(streamToCache);
+          logger.log("SQLiteDBHelper: addStream: " + cmd);
+          statement.executeUpdate(cmd);
+          if (streamToCache.getChildren() != null) {
+            for (Stream childStream : streamToCache.getChildren()) {
+              cmd = QueryGenerator.insertStream(childStream);
+              statement.execute(cmd);
+              logger.log("SQLiteDBHelper: add child Stream: " + cmd);
+            }
+          }
+          statement.close();
+          cacheStreamsCallback.onStreamsSuccess("Stream created");
+        } catch (SQLException e) {
+          cacheStreamsCallback.onStreamError(e.getMessage());
+          e.printStackTrace();
+        }
       }
-    }
-    statement.close();
+    }.start();
   }
 
   /**
@@ -174,12 +221,23 @@ public class SQLiteDBHelper {
    * @param streamToUpdate
    * @throws SQLException
    */
-  public void updateStream(Stream streamToUpdate) throws SQLException {
-    String cmd = QueryGenerator.updateStream(streamToUpdate);
-    logger.log("SQLiteDBHelper: updateStream: " + cmd);
-    Statement statement = dbConnection.createStatement();
-    statement.executeUpdate(cmd);
-    statement.close();
+  public void updateStream(Stream streamToUpdate, StreamsCallback cacheStreamsCallback) {
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          String cmd = QueryGenerator.updateStream(streamToUpdate);
+          logger.log("SQLiteDBHelper: updateStream: " + cmd);
+          Statement statement = dbConnection.createStatement();
+          statement.executeUpdate(cmd);
+          statement.close();
+          cacheStreamsCallback.onStreamsSuccess("Stream updated");
+        } catch (SQLException e) {
+          cacheStreamsCallback.onStreamError(e.getMessage());
+          e.printStackTrace();
+        }
+      }
+    }.start();
   }
 
   /**
@@ -188,23 +246,34 @@ public class SQLiteDBHelper {
    * @param streamToDelete
    * @throws SQLException
    */
-  public void deleteStream(Stream streamToDelete) throws SQLException {
-    String cmd;
-    Statement statement = dbConnection.createStatement();
-    if (streamToDelete.getChildren() != null) {
-      for (Stream childStream : streamToDelete.getChildren()) {
-        cmd = QueryGenerator.deleteStream(childStream);
-        statement.executeUpdate(cmd);
-        logger.log("SQLiteDBHelper: delete child Stream with name "
-          + childStream.getName()
-            + ": "
-            + cmd);
+  public void deleteStream(Stream streamToDelete, StreamsCallback cacheStreamsCallback) {
+    new Thread() {
+      @Override
+      public void run() {
+        String cmd;
+        try {
+          Statement statement = dbConnection.createStatement();
+          if (streamToDelete.getChildren() != null) {
+            for (Stream childStream : streamToDelete.getChildren()) {
+              cmd = QueryGenerator.deleteStream(childStream);
+              statement.executeUpdate(cmd);
+              logger.log("SQLiteDBHelper: delete child Stream with name "
+                + childStream.getName()
+                  + ": "
+                  + cmd);
+            }
+          }
+          cmd = QueryGenerator.deleteStream(streamToDelete);
+          logger.log("SQLiteDBHelper: deleteStream: " + cmd);
+          statement.executeUpdate(cmd);
+          statement.close();
+          cacheStreamsCallback.onStreamsSuccess("Stream deleted");
+        } catch (SQLException e) {
+          cacheStreamsCallback.onStreamError(e.getMessage());
+          e.printStackTrace();
+        }
       }
-    }
-    cmd = QueryGenerator.deleteStream(streamToDelete);
-    logger.log("SQLiteDBHelper: deleteStream: " + cmd);
-    statement.executeUpdate(cmd);
-    statement.close();
+    }.start();
   }
 
   /**
@@ -213,27 +282,37 @@ public class SQLiteDBHelper {
    * @return Map<String, Event> events, with event ID as key.
    * @throws SQLException
    */
-  public Map<String, Stream> getStreams() throws SQLException {
-    String cmd = QueryGenerator.retrieveStreams();
-    logger.log("SQLiteDBHelper: getStreams: " + cmd);
-    Statement statement = dbConnection.createStatement();
-    ResultSet result = statement.executeQuery(cmd);
-    Map<String, Stream> retrievedStreams = new HashMap<String, Stream>();
-    while (result.next()) {
-      // get the requested Streams
-      Stream retrievedStream = new Stream(result);
-      retrievedStreams.put(retrievedStream.getId(), retrievedStream);
-    }
-    for (Stream stream : retrievedStreams.values()) {
-      String pid = stream.getParentId();
-      if (pid != null) {
-        // add this stream as a child
-        retrievedStreams.get(pid).addChildStream(stream);
-        // remove it from retrievedStreams.
-        retrievedStreams.remove(stream.getId());
+  public void getStreams(StreamsCallback cacheStreamsCallback) {
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          String cmd = QueryGenerator.retrieveStreams();
+          logger.log("SQLiteDBHelper: getStreams: " + cmd);
+          Statement statement = dbConnection.createStatement();
+          ResultSet result = statement.executeQuery(cmd);
+          Map<String, Stream> retrievedStreams = new HashMap<String, Stream>();
+          while (result.next()) {
+            // get the requested Streams
+            Stream retrievedStream = new Stream(result);
+            retrievedStreams.put(retrievedStream.getId(), retrievedStream);
+          }
+          for (Stream stream : retrievedStreams.values()) {
+            String pid = stream.getParentId();
+            if (pid != null) {
+              // add this stream as a child
+              retrievedStreams.get(pid).addChildStream(stream);
+              // remove it from retrievedStreams.
+              retrievedStreams.remove(stream.getId());
+            }
+          }
+          cacheStreamsCallback.onCacheRetrieveStreamSuccess(retrievedStreams);
+        } catch (SQLException e) {
+          cacheStreamsCallback.onStreamError(e.getMessage());
+          e.printStackTrace();
+        }
       }
-    }
-    return retrievedStreams;
+    }.start();
   }
 
   /**

@@ -25,7 +25,7 @@ public interface StreamsCallback {
    *
    * @param cacheStreams
    */
-  void onCacheRetrievePartialResult(Map<String, Stream> cacheStreams);
+  void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStreams);
 
   /**
    * callback method for successful Supervisor retrieval

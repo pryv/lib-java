@@ -52,13 +52,9 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   @Override
   public void getEvents(Filter filter, final EventsCallback connectionEventsCallback) {
     // look in cache and send it onPartialResult
-    try {
-      connectionEventsCallback.onCacheRetrieveEventsSuccess(dbHelper.getEvents(filter));
-      logger.log("Cache: retrieved Events from cache: ");
-    } catch (SQLException e) {
-      connectionEventsCallback.onEventsRetrievalError("Cache: getEvents error: " + e.getMessage());
-      e.printStackTrace();
-    }
+    // connectionEventsCallback.onCacheRetrieveEventsSuccess(dbHelper.getEvents(filter));
+    dbHelper.getEvents(filter, new CacheEventsCallback(connectionEventsCallback));
+    logger.log("Cache: retrieved Events from cache: ");
 
     // forward call to online module
     onlineEventsManager.getEvents(filter, new CacheEventsCallback(connectionEventsCallback));
@@ -72,12 +68,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
    */
   private void updateEvents(Map<String, Event> newEvents) {
     for (Event event : newEvents.values()) {
-      try {
-        dbHelper.updateEvent(event);
-      } catch (SQLException e) {
-
-        e.printStackTrace();
-      }
+        dbHelper.updateEvent(event, new CacheEventsCallback(null));
     }
   }
 
@@ -106,7 +97,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     // look in cache and send it onPartialResult
     // dbHelper.getStreams();
     logger.log("Cache: retrieved Events from cache: ");
-    connectionStreamsCallback.onCacheRetrievePartialResult(new HashMap<String, Stream>());
+    connectionStreamsCallback.onCacheRetrieveStreamSuccess(new HashMap<String, Stream>());
 
     onlineStreamsManager.getStreams(new CacheStreamsCallback(connectionStreamsCallback));
   }
@@ -212,7 +203,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onCacheRetrievePartialResult(Map<String, Stream> newStreams) {
+    public void onCacheRetrieveStreamSuccess(Map<String, Stream> newStreams) {
       // TODO Auto-generated method stub
 
     }

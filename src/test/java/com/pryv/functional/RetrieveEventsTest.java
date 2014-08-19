@@ -51,7 +51,6 @@ public class RetrieveEventsTest {
 
     eventsManager =
       new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, new DBinitCallback() {
-
         @Override
         public void onError(String message) {
           System.out.println("DB init Error: " + message);
@@ -201,7 +200,7 @@ public class RetrieveEventsTest {
       }
 
       @Override
-      public void onCacheRetrievePartialResult(Map<String, Stream> newStreams) {
+      public void onCacheRetrieveStreamSuccess(Map<String, Stream> newStreams) {
         // TODO Auto-generated method stub
 
       }

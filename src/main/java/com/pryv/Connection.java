@@ -214,9 +214,9 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onCacheRetrievePartialResult(Map<String, Stream> newStreams) {
+    public void onCacheRetrieveStreamSuccess(Map<String, Stream> newStreams) {
       supervisor.updateStreams(newStreams);
-      userStreamsCallback.onCacheRetrievePartialResult(newStreams);
+      userStreamsCallback.onCacheRetrieveStreamSuccess(newStreams);
     }
 
     @Override

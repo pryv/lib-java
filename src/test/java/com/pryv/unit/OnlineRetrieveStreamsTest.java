@@ -66,7 +66,7 @@ public class OnlineRetrieveStreamsTest {
 
       // unused
       @Override
-      public void onCacheRetrievePartialResult(Map<String, Stream> newStreams) {
+      public void onCacheRetrieveStreamSuccess(Map<String, Stream> newStreams) {
       }
 
       @Override
