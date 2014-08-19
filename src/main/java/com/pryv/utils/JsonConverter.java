@@ -3,9 +3,11 @@ package com.pryv.utils;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,14 +36,17 @@ public class JsonConverter {
     return jsonMapper.writeValueAsString(source);
   }
 
-  public static JsonNode fromJson(String source) throws JsonProcessingException, IOException {
+  public static JsonNode toJsonNode(String source) throws JsonProcessingException, IOException {
     return jsonMapper.readTree(source);
   }
 
   public static Map<String, Event> createEventsFromJson(String jsonEventsArray)
     throws JsonParseException, JsonMappingException, IOException {
-    JsonNode arrNode = fromJson(jsonEventsArray).get(EVENTS_KEY);
+
+    JsonNode arrNode = toJsonNode(jsonEventsArray).get(EVENTS_KEY);
+
     Map<String, Event> newEvents = new HashMap<String, Event>();
+
     if (arrNode.isArray()) {
       for (final JsonNode objNode : arrNode) {
         Event eventToAdd = new Event();
@@ -53,13 +58,12 @@ public class JsonConverter {
         // + eventToAdd.getStreamId());
       }
     }
-
     return newEvents;
   }
 
   public static Map<String, Stream> createStreamsFromJson(String jsonStreamsArray)
     throws IOException {
-    JsonNode arrNode = fromJson(jsonStreamsArray).get(STREAMS_KEY);
+    JsonNode arrNode = toJsonNode(jsonStreamsArray).get(STREAMS_KEY);
     Map<String, Stream> newStreams = new HashMap<String, Stream>();
     if (arrNode.isArray()) {
       logger.log("JsonConverter: number of received streams: " + arrNode.size());
@@ -114,6 +118,27 @@ public class JsonConverter {
     JsonMappingException, IOException {
     Stream temp = jsonMapper.readValue(json, Stream.class);
     toUpdate.merge(temp, cloner);
+  }
+
+  /**
+   * Deserializes an array of Attachments into a Set of attachments
+   *
+   * @param jsonAttachments
+   *          JSON array of attachments in JSON glossary format
+   *
+   * @throws JsonParseException
+   * @throws JsonMappingException
+   * @throws IOException
+   */
+  public static Set<Attachment> deserializeAttachments(String jsonAttachments)
+    throws JsonParseException, JsonMappingException, IOException {
+    if (jsonAttachments != null) {
+      logger.log("JsonConverter: deserializing JSON attachments: \'" + jsonAttachments + "\'");
+      return jsonMapper.readValue(jsonAttachments, new TypeReference<Set<Attachment>>() {
+      });
+    } else {
+      return null;
+    }
   }
 
   public static Cloner getCloner() {

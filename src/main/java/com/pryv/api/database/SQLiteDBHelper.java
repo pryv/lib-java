@@ -1,5 +1,6 @@
 package com.pryv.api.database;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -8,6 +9,9 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.pryv.api.EventsCallback;
 import com.pryv.api.Filter;
 import com.pryv.api.StreamsCallback;
@@ -89,6 +93,9 @@ public class SQLiteDBHelper {
         } catch (SQLException e) {
           cacheEventsCallback.onEventsError(e.getMessage());
           e.printStackTrace();
+        } catch (JsonProcessingException e) {
+          cacheEventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
         }
       }
     }.start();
@@ -113,6 +120,9 @@ public class SQLiteDBHelper {
           statement.close();
           cacheEventsCallback.onEventsSuccess("item updated");
         } catch (SQLException e) {
+          cacheEventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        } catch (JsonProcessingException e) {
           cacheEventsCallback.onEventsError(e.getMessage());
           e.printStackTrace();
         }
@@ -171,6 +181,15 @@ public class SQLiteDBHelper {
           }
           cacheEventsCallback.onCacheRetrieveEventsSuccess(retrievedEvents);
         } catch (SQLException e) {
+          cacheEventsCallback.onEventsRetrievalError(e.getMessage());
+          e.printStackTrace();
+        } catch (JsonParseException e) {
+          cacheEventsCallback.onEventsRetrievalError(e.getMessage());
+          e.printStackTrace();
+        } catch (JsonMappingException e) {
+          cacheEventsCallback.onEventsRetrievalError(e.getMessage());
+          e.printStackTrace();
+        } catch (IOException e) {
           cacheEventsCallback.onEventsRetrievalError(e.getMessage());
           e.printStackTrace();
         }

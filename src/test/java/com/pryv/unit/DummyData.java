@@ -32,7 +32,8 @@ public class DummyData {
   private static final String EVENT_TAGTEST = "test";
   private static final String EVENT_TAGBASIC = "basic test";
   private static Set<String> eventRefs;
-  private static final String EVENT_REF = "refTest";
+  private static final String EVENT_REF_FIRST = "refTest1";
+  private static final String EVENT_REF_SECOND = "refTest2";
   private static final String EVENT_DESCRIPTION = "the test description";
   private static Set<Attachment> eventAttachments;
   private static Map<String, Object> eventClientData;
@@ -67,6 +68,17 @@ public class DummyData {
   private static final Long STREAM_CHILD_MODIFIED = new Long(300);
   private static final String STREAM_CHILD_MODIFIED_BY = "modified of child";
 
+  private static final String ATTACHMENT_ID_FIRST = "firstAttachId";
+  private static final String ATTACHMENT_ID_SECOND = "secondAttachId";
+  private static final String ATTACHMENT_FILENAME_FIRST = "firstAttachFilename";
+  private static final String ATTACHMENT_FILENAME_SECOND = "secondAttachFilename";
+  private static final String ATTACHMENT_TYPE_FIRST = "firstAttachType";
+  private static final String ATTACHMENT_TYPE_SECOND = "secondAttachType";
+  private static final int ATTACHMENT_NUMBER_FIRST = 10;
+  private static final int ATTACHMENT_NUMBER_SECOND = 20;
+  private static final String ATTACHMENT_READ_TOKEN_FIRST = "firstAttachReadToken";
+  private static final String ATTACHMENT_READ_TOKEN_SECOND = "secondAttachReadToken";
+
   public static Stream generateFullStream() {
     streamClientData = new HashMap<String, Object>();
     streamClientData.put(STREAM_CLIENT_KEY, STREAM_CLIENT_VALUE);
@@ -77,6 +89,15 @@ public class DummyData {
     return new Stream(STREAM_ID, STREAM_NAME, null, STREAM_SINGLE_ACTIVITY,
       streamClientData, streamChildren, STREAM_TRASHED, STREAM_CREATED, STREAM_CREATED_BY,
       STREAM_MODIFIED, STREAM_MODIFIED_BY);
+  }
+
+  public static Set<Attachment> generateAttachments() {
+    Set<Attachment> attachments = new HashSet<Attachment>();
+    attachments.add(new Attachment(ATTACHMENT_ID_FIRST, ATTACHMENT_FILENAME_FIRST,
+      ATTACHMENT_TYPE_FIRST, ATTACHMENT_NUMBER_FIRST, ATTACHMENT_READ_TOKEN_FIRST));
+    attachments.add(new Attachment(ATTACHMENT_ID_SECOND, ATTACHMENT_FILENAME_SECOND,
+      ATTACHMENT_TYPE_SECOND, ATTACHMENT_NUMBER_SECOND, ATTACHMENT_READ_TOKEN_SECOND));
+    return attachments;
   }
 
   public static String generateJsonStream() {
@@ -93,9 +114,9 @@ public class DummyData {
     eventTags.add(EVENT_TAGTEST);
     eventTags.add(EVENT_TAGBASIC);
     eventRefs = new HashSet<String>();
-    eventRefs.add(EVENT_REF);
-    eventAttachments = new HashSet<Attachment>();
-    eventAttachments.add(new Attachment(EVENT_ATTACH_ID, "testfile", "test", 0, "abc132"));
+    eventRefs.add(EVENT_REF_FIRST);
+    eventRefs.add(EVENT_REF_SECOND);
+    eventAttachments = generateAttachments();
     eventClientData = new HashMap<String, Object>();
     eventClientData.put(EVENT_CLIENTKEY, EVENT_CLIENTVALUE);
     return new Event(EVENT_ID, EVENT_STREAMID, EVENT_TIME, EVENT_DURATION, EVENT_TYPE,
@@ -162,7 +183,7 @@ public class DummyData {
   }
 
   public static String getRef() {
-    return EVENT_REF;
+    return EVENT_REF_FIRST;
   }
 
   public static String getDescription() {
@@ -271,6 +292,162 @@ public class DummyData {
 
   public static String getStreamChildId() {
     return STREAM_CHILD_ID;
+  }
+
+  public static String getEventId() {
+    return EVENT_ID;
+  }
+
+  public static String getEventStreamid() {
+    return EVENT_STREAMID;
+  }
+
+  public static Long getEventTime() {
+    return EVENT_TIME;
+  }
+
+  public static Long getEventDuration() {
+    return EVENT_DURATION;
+  }
+
+  public static String getEventType() {
+    return EVENT_TYPE;
+  }
+
+  public static String getEventContent() {
+    return EVENT_CONTENT;
+  }
+
+  public static Set<String> getEventTags() {
+    return eventTags;
+  }
+
+  public static String getEventTagtest() {
+    return EVENT_TAGTEST;
+  }
+
+  public static String getEventTagbasic() {
+    return EVENT_TAGBASIC;
+  }
+
+  public static Set<String> getEventRefs() {
+    return eventRefs;
+  }
+
+  public static String getEventRef() {
+    return EVENT_REF_FIRST;
+  }
+
+  public static String getEventDescription() {
+    return EVENT_DESCRIPTION;
+  }
+
+  public static Set<Attachment> getEventAttachments() {
+    return eventAttachments;
+  }
+
+  public static Map<String, Object> getEventClientData() {
+    return eventClientData;
+  }
+
+  public static String getEventClientkey() {
+    return EVENT_CLIENTKEY;
+  }
+
+  public static String getEventClientvalue() {
+    return EVENT_CLIENTVALUE;
+  }
+
+  public static Boolean getEventTrashed() {
+    return EVENT_TRASHED;
+  }
+
+  public static Long getEventCreated() {
+    return EVENT_CREATED;
+  }
+
+  public static String getEventCreatedby() {
+    return EVENT_CREATEDBY;
+  }
+
+  public static Long getEventModified() {
+    return EVENT_MODIFIED;
+  }
+
+  public static String getEventModifiedBy() {
+    return EVENT_MODIFIED_BY;
+  }
+
+  public static String getEventAttachId() {
+    return EVENT_ATTACH_ID;
+  }
+
+  public static String getEventTempRefId() {
+    return EVENT_TEMP_REF_ID;
+  }
+
+  public static String getStreamChildName() {
+    return STREAM_CHILD_NAME;
+  }
+
+  public static Boolean getStreamChildTrashed() {
+    return STREAM_CHILD_TRASHED;
+  }
+
+  public static Long getStreamChildCreated() {
+    return STREAM_CHILD_CREATED;
+  }
+
+  public static String getStreamChildCreatedBy() {
+    return STREAM_CHILD_CREATED_BY;
+  }
+
+  public static Long getStreamChildModified() {
+    return STREAM_CHILD_MODIFIED;
+  }
+
+  public static String getStreamChildModifiedBy() {
+    return STREAM_CHILD_MODIFIED_BY;
+  }
+
+  public static String getAttachmentIdFirst() {
+    return ATTACHMENT_ID_FIRST;
+  }
+
+  public static String getAttachmentIdSecond() {
+    return ATTACHMENT_ID_SECOND;
+  }
+
+  public static String getAttachmentFilenameFirst() {
+    return ATTACHMENT_FILENAME_FIRST;
+  }
+
+  public static String getAttachmentFilenameSecond() {
+    return ATTACHMENT_FILENAME_SECOND;
+  }
+
+  public static String getAttachmentTypeFirst() {
+    return ATTACHMENT_TYPE_FIRST;
+  }
+
+  public static String getAttachmentTypeSecond() {
+    return ATTACHMENT_TYPE_SECOND;
+  }
+
+  public static int getAttachmentNumberFirst() {
+    return ATTACHMENT_NUMBER_FIRST;
+  }
+
+  public static int getAttachmentNumberSecond() {
+    return ATTACHMENT_NUMBER_SECOND;
+  }
+
+  public static String getAttachmentReadTokenFirst() {
+    return ATTACHMENT_READ_TOKEN_FIRST;
+  }
+
+  public static String getAttachmentReadTokenSecond() {
+    return ATTACHMENT_READ_TOKEN_SECOND;
   }
 
 }

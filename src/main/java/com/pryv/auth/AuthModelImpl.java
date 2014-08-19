@@ -87,7 +87,7 @@ public class AuthModelImpl implements AuthModel {
       logger.log("signInResponseHandler: handling reply entity : " + reply);
       if (statusCode == HttpStatus.SC_CREATED || statusCode == HttpStatus.SC_OK) {
 
-        JsonNode jsonResponse = JsonConverter.fromJson(reply);
+        JsonNode jsonResponse = JsonConverter.toJsonNode(reply);
 
         if (first) {
           String loginUrl = jsonResponse.get(SERVER_URL_KEY).textValue();

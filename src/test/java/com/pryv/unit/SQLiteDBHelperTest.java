@@ -20,6 +20,7 @@ import com.pryv.api.Filter;
 import com.pryv.api.StreamsCallback;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.database.SQLiteDBHelper;
+import com.pryv.api.model.Attachment;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 
@@ -265,7 +266,20 @@ public class SQLiteDBHelperTest {
     }
     assertTrue(retrievedEvent.getReferences().containsAll(testedEvent.getReferences()));
     // test attachments
-    assertEquals(testedEvent.getClientDataAsString(), retrievedEvent.getClientDataAsString());
+    for (Attachment testedAttachment : testedEvent.getAttachments()) {
+      boolean attachmentsMatch = false;
+      for (Attachment trueAttachment : retrievedEvent.getAttachments()) {
+        if (testedAttachment.getId().equals(trueAttachment.getId())) {
+          attachmentsMatch = true;
+          assertEquals(trueAttachment.getFileName(), testedAttachment.getFileName());
+          assertEquals(trueAttachment.getReadToken(), testedAttachment.getReadToken());
+          assertEquals(trueAttachment.getType(), testedAttachment.getType());
+          assertTrue(trueAttachment.getSize() == testedAttachment.getSize());
+        }
+      }
+      assertTrue(attachmentsMatch);
+    }
+    assertEquals(testedEvent.formatClientDataAsString(), retrievedEvent.formatClientDataAsString());
     assertEquals(testedEvent.getTrashed(), retrievedEvent.getTrashed());
     assertEquals(testedEvent.getCreated(), retrievedEvent.getCreated());
     assertEquals(testedEvent.getCreatedBy(), retrievedEvent.getCreatedBy());
@@ -295,7 +309,7 @@ public class SQLiteDBHelperTest {
     assertEquals(testedStream.getName(), retrievedStream.getName());
     assertEquals(testedStream.getParentId(), retrievedStream.getParentId());
     assertEquals(testedStream.getSingleActivity(), retrievedStream.getSingleActivity());
-    assertEquals(testedStream.getClientDataAsString(), retrievedStream.getClientDataAsString());
+    assertEquals(testedStream.formatClientDataAsString(), retrievedStream.formatClientDataAsString());
     boolean childrenMatch = false;
     for (Stream testedChild : testedStream.getChildren()) {
       childrenMatch = false;

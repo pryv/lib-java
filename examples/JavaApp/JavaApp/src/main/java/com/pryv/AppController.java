@@ -214,7 +214,7 @@ public class AppController {
       }
     }
     if (event.getClientData() != null) {
-      eClientDataLabel.setText(event.getClientDataAsString());
+      eClientDataLabel.setText(event.formatClientDataAsString());
     }
     if (event.getTrashed() != null) {
       eTrashedLabel.setText(event.getTrashed().toString());
@@ -263,7 +263,7 @@ public class AppController {
     String childrenIDs = sb.toString();
     childrenLabel.setText(childrenIDs);
     singleActivityLabel.setText(String.valueOf(stream.getSingleActivity()));
-    clientDataLabel.setText(stream.getClientDataAsString());
+    clientDataLabel.setText(stream.formatClientDataAsString());
     createdLabel.setText(String.valueOf(stream.getCreated()));
     createdByLabel.setText(stream.getCreatedBy());
 

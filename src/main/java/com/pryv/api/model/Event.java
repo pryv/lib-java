@@ -1,5 +1,6 @@
 package com.pryv.api.model;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,7 +13,12 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.pryv.api.database.QueryGenerator;
+import com.pryv.utils.JsonConverter;
 import com.rits.cloning.Cloner;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
@@ -24,6 +30,7 @@ import edu.emory.mathcs.backport.java.util.Arrays;
  *
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(Include.NON_NULL)
 public class Event {
 
   private String id;
@@ -113,8 +120,12 @@ public class Event {
    *
    * @param result
    * @throws SQLException
+   * @throws IOException
+   * @throws JsonMappingException
+   * @throws JsonParseException
    */
-  public Event(ResultSet result) throws SQLException {
+  public Event(ResultSet result) throws SQLException, JsonParseException, JsonMappingException,
+    IOException {
     id = result.getString(QueryGenerator.EVENTS_ID_KEY);
     streamId = result.getString(QueryGenerator.EVENTS_STREAM_ID_KEY);
     time = result.getLong(QueryGenerator.EVENTS_TIME_KEY);
@@ -125,14 +136,19 @@ public class Event {
     modifiedBy = result.getString(QueryGenerator.EVENTS_MODIFIED_BY_KEY);
     duration = result.getLong(QueryGenerator.EVENTS_DURATION_KEY);
     content = result.getObject(QueryGenerator.EVENTS_CONTENT_KEY);
-    tags = new HashSet<String>(Arrays.asList(result.getString(QueryGenerator.EVENTS_TAGS_KEY).split(",")));
+    tags =
+      new HashSet<String>(
+        Arrays.asList(result.getString(QueryGenerator.EVENTS_TAGS_KEY).split(",")));
     references =
-      new HashSet<String>(Arrays.asList(result.getString(QueryGenerator.EVENTS_REFS_KEY).split(",")));
+      new HashSet<String>(
+        Arrays.asList(result.getString(QueryGenerator.EVENTS_REFS_KEY).split(",")));
     description = result.getString(QueryGenerator.EVENTS_DESCRIPTION_KEY);
     // TODO fetch Attachments elsewhere
     setClientDataFromAstring(result.getString(QueryGenerator.EVENTS_CLIENT_DATA_KEY));
     trashed = result.getBoolean(QueryGenerator.EVENTS_TRASHED_KEY);
     tempRefId = result.getString(QueryGenerator.EVENTS_TEMP_REF_ID_KEY);
+    attachments =
+      JsonConverter.deserializeAttachments(result.getString(QueryGenerator.EVENTS_ATTACHMENTS_KEY));
   }
 
   // private
@@ -220,7 +236,7 @@ public class Event {
    *
    * @return client data in readable form as a String.
    */
-  public String getClientDataAsString() {
+  public String formatClientDataAsString() {
     StringBuilder sb = new StringBuilder();
     if (clientData != null) {
       String separator = "";

@@ -126,7 +126,7 @@ public class Stream {
    *
    * @return client data in readable form as a String.
    */
-  public String getClientDataAsString() {
+  public String formatClientDataAsString() {
     StringBuilder sb = new StringBuilder();
     if (clientData != null) {
       String separator = "";

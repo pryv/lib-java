@@ -1,11 +1,20 @@
 package com.pryv.unit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.pryv.api.model.Attachment;
+import com.pryv.utils.JsonConverter;
 
 /**
  * Unit test for Attachment object
@@ -36,4 +45,48 @@ public class AttachmentTest {
     assertEquals(readToken, attachment.getReadToken());
   }
 
+  @Test
+  public void testSerializeAndDeserializeSetOfAttachments() {
+    Set<Attachment> attachments = DummyData.generateAttachments();
+    try {
+      String jsonAttachments = JsonConverter.toJson(attachments);
+      System.out.println("serialized attachments: " + jsonAttachments);
+      assertNotNull(jsonAttachments);
+
+      Set<Attachment> deserializedAttachments =
+        JsonConverter.deserializeAttachments(jsonAttachments);
+      System.out.println("deserialized attachments type: " + deserializedAttachments.getClass());
+
+      for (Attachment testedAttachment : deserializedAttachments) {
+        boolean attachmentsMatch = false;
+        for (Attachment trueAttachment : attachments) {
+          if (testedAttachment.getId().equals(trueAttachment.getId())) {
+            attachmentsMatch = true;
+            assertEquals(trueAttachment.getFileName(), testedAttachment.getFileName());
+            assertEquals(trueAttachment.getReadToken(), testedAttachment.getReadToken());
+            assertEquals(trueAttachment.getType(), testedAttachment.getType());
+            assertTrue(trueAttachment.getSize() == testedAttachment.getSize());
+          }
+        }
+        assertTrue(attachmentsMatch);
+      }
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  public void testDeserializeEmptyAttachments() {
+    try {
+      Set<Attachment> emptyAttachments = JsonConverter.deserializeAttachments(null);
+    } catch (JsonParseException e) {
+      e.printStackTrace();
+    } catch (JsonMappingException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 }

@@ -3,9 +3,11 @@ package com.pryv.api.database;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pryv.api.Filter;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
+import com.pryv.utils.JsonConverter;
 
 /**
  * Class containing methods to generate SQLite queries.
@@ -42,6 +44,7 @@ public class QueryGenerator {
   public static final String EVENTS_CLIENT_DATA_KEY = "CLIENT_DATA";
   public static final String EVENTS_TRASHED_KEY = "TRASHED";
   public static final String EVENTS_TEMP_REF_ID_KEY = "TEMP_REF_ID";
+  public static final String EVENTS_ATTACHMENTS_KEY = "ATTACHMENTS";
 
   /**
    * Streams Table keys
@@ -62,9 +65,11 @@ public class QueryGenerator {
    * Create Event query.
    *
    * @param eventToCache
+   *
+   * @throws JsonProcessingException
    * @return
    */
-  public static String insertEvent(Event eventToCache) {
+  public static String insertEvent(Event eventToCache) throws JsonProcessingException {
     StringBuilder sb = new StringBuilder();
     sb.append("INSERT INTO "
       + EVENTS_TABLE_NAME
@@ -100,6 +105,8 @@ public class QueryGenerator {
         + EVENTS_TRASHED_KEY
         + ", "
         + EVENTS_TEMP_REF_ID_KEY
+        + ", "
+        + EVENTS_ATTACHMENTS_KEY
         + ")"
         + " VALUES (");
     sb.append(formatTextValue(eventToCache.getId()) + ",");
@@ -116,9 +123,10 @@ public class QueryGenerator {
     sb.append(formatSetValue(eventToCache.getReferences()) + ",");
     sb.append(formatTextValue(eventToCache.getDescription()) + ",");
     // attachments need to be added in their own table
-    sb.append(formatTextValue(eventToCache.getClientDataAsString()) + ",");
+    sb.append(formatTextValue(eventToCache.formatClientDataAsString()) + ",");
     sb.append(formatBooleanValue(eventToCache.getTrashed()) + ",");
-    sb.append(formatTextValue(eventToCache.getTempRefId()));
+    sb.append(formatTextValue(eventToCache.getTempRefId()) + ",");
+    sb.append(formatTextValue(JsonConverter.toJson(eventToCache.getAttachments())));
     sb.append(");");
     return sb.toString();
   }
@@ -127,9 +135,12 @@ public class QueryGenerator {
    * Create query to update Event if "modified" field is higher.
    *
    * @param eventToUpdate
+   *
+   * @throws JsonProcessingException
+   *
    * @return
    */
-  public static String updateEvent(Event eventToUpdate) {
+  public static String updateEvent(Event eventToUpdate) throws JsonProcessingException {
     StringBuilder sb = new StringBuilder();
     sb.append("UPDATE "
       + EVENTS_TABLE_NAME
@@ -188,7 +199,7 @@ public class QueryGenerator {
         + ", "
         + EVENTS_CLIENT_DATA_KEY
         + "="
-        + formatTextValue(eventToUpdate.getClientDataAsString())
+        + formatTextValue(eventToUpdate.formatClientDataAsString())
         + ", "
         + EVENTS_TRASHED_KEY
         + "="
@@ -196,7 +207,11 @@ public class QueryGenerator {
         + ", "
         + EVENTS_TEMP_REF_ID_KEY
         + "="
-        + formatTextValue(eventToUpdate.getTempRefId()));
+        + formatTextValue(eventToUpdate.getTempRefId())
+        + ", "
+        + EVENTS_ATTACHMENTS_KEY
+        + "="
+        + formatTextValue(JsonConverter.toJson(eventToUpdate.getAttachments())));
     sb.append(" WHERE "
       + EVENTS_ID_KEY
         + "=\'"
@@ -342,7 +357,7 @@ public class QueryGenerator {
     }
     sb.append(formatTextValue(streamToCache.getParentId()) + ",");
     sb.append(formatBooleanValue(streamToCache.getSingleActivity()) + ",");
-    sb.append(formatTextValue(streamToCache.getClientDataAsString()) + ",");
+    sb.append(formatTextValue(streamToCache.formatClientDataAsString()) + ",");
     sb.append(formatBooleanValue(streamToCache.getTrashed()) + ",");
     sb.append(formatLongValue(streamToCache.getCreated()) + ",");
     sb.append(formatTextValue(streamToCache.getCreatedBy()) + ",");
@@ -392,7 +407,7 @@ public class QueryGenerator {
         + ", "
         + STREAMS_CLIENT_DATA_KEY
         + "="
-        + formatTextValue(streamToUpdate.getClientDataAsString())
+        + formatTextValue(streamToUpdate.formatClientDataAsString())
         + ", "
         + STREAMS_TRASHED_KEY
         + "="
@@ -490,7 +505,9 @@ public class QueryGenerator {
         + EVENTS_TRASHED_KEY
         + " INTEGER, "
         + EVENTS_TEMP_REF_ID_KEY
-        + " TEXT)";
+        + " TEXT, "
+        + EVENTS_ATTACHMENTS_KEY
+        + " TEXT);";
   }
 
   /**
