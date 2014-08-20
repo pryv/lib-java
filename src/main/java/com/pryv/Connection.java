@@ -78,7 +78,7 @@ public class Connection implements EventsManager, StreamsManager {
    */
 
   @Override
-  public void getEvents(final Filter filter, final EventsCallback userEventsCallback) {
+  public void getEvents(final Filter filter, EventsCallback userEventsCallback) {
 
     // send supervisor's events on User's callback.onEventsPartialResult()
     userEventsCallback.onSupervisorRetrieveEventsSuccess(supervisor.getEvents(filter));
@@ -88,18 +88,18 @@ public class Connection implements EventsManager, StreamsManager {
   }
 
   @Override
-  public void createEvent(Event newEvent) {
+  public void createEvent(Event newEvent, EventsCallback userEventsCallback) {
     // TODO Auto-generated method stub
   }
 
   @Override
-  public void deleteEvent(String id) {
+  public void deleteEvent(String id, EventsCallback userEventsCallback) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void updateEvent(Event eventToUpdate) {
+  public void updateEvent(Event eventToUpdate, EventsCallback userEventsCallback) {
     // TODO Auto-generated method stub
   }
 

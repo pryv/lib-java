@@ -47,18 +47,18 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   }
 
   @Override
-  public void createEvent(Event newEvent) {
+  public void createEvent(Event newEvent, EventsCallback userEventsCallback) {
     // TODO Auto-generated method stub
   }
 
   @Override
-  public void deleteEvent(String id) {
+  public void deleteEvent(String id, EventsCallback userEventsCallback) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void updateEvent(Event eventToUpdate) {
+  public void updateEvent(Event eventToUpdate, EventsCallback userEventsCallback) {
     // TODO Auto-generated method stub
   }
 

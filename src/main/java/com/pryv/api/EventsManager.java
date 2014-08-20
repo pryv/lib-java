@@ -26,25 +26,34 @@ public interface EventsManager {
    *
    * @param newEvent
    *          the event to create
+   * @param eventsCallback
+   *          the callback for events creation, notifies success or failure
+   *
    * @return
    */
-  void createEvent(Event newEvent);
+  void createEvent(Event newEvent, EventsCallback eventsCallback);
 
   /**
    * Delete Event with event ID id
    *
    * @param id
    *          the ID of the Event to delete.
+   * @param eventsCallback
+   *          the callback for events deletion, notifies success or failure
+   *
    */
-  void deleteEvent(String id);
+  void deleteEvent(String id, EventsCallback eventsCallback);
 
   /**
    * Update Event.
    *
    * @param eventToUpdate
    *          Event object containing the new fields.
-   * @return
+   *
+   * @param eventsCallback
+   *          the callback for events update, notifies success or failure
+   *
    */
-  void updateEvent(Event eventToUpdate);
+  void updateEvent(Event eventToUpdate, EventsCallback eventsCallback);
 
 }

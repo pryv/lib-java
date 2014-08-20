@@ -50,7 +50,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
    */
 
   @Override
-  public void getEvents(Filter filter, final EventsCallback connectionEventsCallback) {
+  public void getEvents(Filter filter, EventsCallback connectionEventsCallback) {
     // look in cache and send it onPartialResult
     // connectionEventsCallback.onCacheRetrieveEventsSuccess(dbHelper.getEvents(filter));
     dbHelper.getEvents(filter, new CacheEventsCallback(connectionEventsCallback));
@@ -68,23 +68,23 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
    */
   private void updateEvents(Map<String, Event> newEvents) {
     for (Event event : newEvents.values()) {
-        dbHelper.updateEvent(event, new CacheEventsCallback(null));
+      dbHelper.updateEvent(event, new CacheEventsCallback(null));
     }
   }
 
   @Override
-  public void createEvent(Event event) {
+  public void createEvent(Event event, EventsCallback userEventsCallback) {
     // TODO Auto-generated method stub
   }
 
   @Override
-  public void deleteEvent(String id) {
+  public void deleteEvent(String id, EventsCallback userEventsCallback) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void updateEvent(Event eventToUpdate) {
+  public void updateEvent(Event eventToUpdate, EventsCallback userEventsCallback) {
     // TODO Auto-generated method stub
   }
 
