@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import resources.TestCredentials;
@@ -31,19 +31,19 @@ import com.pryv.api.model.Stream;
  */
 public class RetrieveEventsTest {
 
-  private EventsManager eventsManager;
-  private StreamsManager streamsManager;
+  private static EventsManager eventsManager;
+  private static StreamsManager streamsManager;
 
-  private EventsCallback eventsCallback;
-  private StreamsCallback streamsCallback;
+  private static EventsCallback eventsCallback;
+  private static StreamsCallback streamsCallback;
 
-  private Map<String, Event> events;
-  private Map<String, Stream> streams;
+  private static Map<String, Event> events;
+  private static Map<String, Stream> streams;
 
   private String streamId;
 
-  @Before
-  public void setUp() throws Exception {
+  @BeforeClass
+  public static void setUp() throws Exception {
     Pryv.setStaging();
 
     instanciateEventsCallback();
@@ -144,7 +144,7 @@ public class RetrieveEventsTest {
     };
   }
 
-  private void instanciateEventsCallback() {
+  private static void instanciateEventsCallback() {
     eventsCallback = new EventsCallback() {
 
       @Override
@@ -187,7 +187,7 @@ public class RetrieveEventsTest {
     };
   }
 
-  private void instanciateStreamsCallback() {
+  private static void instanciateStreamsCallback() {
     streamsCallback = new StreamsCallback() {
 
       @Override

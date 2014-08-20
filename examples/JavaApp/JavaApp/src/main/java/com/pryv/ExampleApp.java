@@ -18,6 +18,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+import org.apache.http.client.ClientProtocolException;
 import org.controlsfx.dialog.Dialogs;
 
 import com.pryv.api.EventsCallback;
@@ -80,7 +81,15 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
 
     AuthController authenticator =
       new AuthControllerImpl(REQUESTING_APP_ID, permissions, "en", "", this);
-    authenticator.signIn();
+    try {
+      authenticator.signIn();
+    } catch (ClientProtocolException e) {
+      displayError(e.getMessage());
+      e.printStackTrace();
+    } catch (IOException e) {
+      displayError(e.getMessage());
+      e.printStackTrace();
+    }
 
   }
 
@@ -141,9 +150,9 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   /*
    * auth failure
    */
-  public void onDisplayFailure() {
+  public void onDisplayFailure(String msg) {
     logger.log("JavaApp: onDisplayFailure");
-    displayError("auth failure");
+    displayError("auth failure: " + msg);
   }
 
   /*

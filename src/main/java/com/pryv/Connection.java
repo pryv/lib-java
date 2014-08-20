@@ -89,18 +89,30 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void createEvent(Event newEvent, EventsCallback userEventsCallback) {
-    // TODO Auto-generated method stub
+    // create event in Supervisor
+
+    // forward call to cache
+    cacheEventsManager
+      .createEvent(newEvent, new ConnectionEventsCallback(userEventsCallback, null));
+
   }
 
   @Override
   public void deleteEvent(String id, EventsCallback userEventsCallback) {
-    // TODO Auto-generated method stub
+    // delete Event in Supervisor
+
+    // forward call to cache
+    cacheEventsManager.deleteEvent(id, new ConnectionEventsCallback(userEventsCallback, null));
 
   }
 
   @Override
   public void updateEvent(Event eventToUpdate, EventsCallback userEventsCallback) {
-    // TODO Auto-generated method stub
+    // update Event in Supervisor
+
+    // forward call to cache
+    cacheEventsManager.updateEvent(eventToUpdate, new ConnectionEventsCallback(userEventsCallback,
+      null));
   }
 
   /*

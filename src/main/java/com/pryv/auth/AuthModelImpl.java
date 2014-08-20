@@ -11,7 +11,6 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.apache.http.util.EntityUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
@@ -42,16 +41,10 @@ public class AuthModelImpl implements AuthModel {
   public void startLogin() throws ClientProtocolException, IOException {
 
     String jsonRequest;
-    try {
-      jsonRequest = JsonConverter.toJson(authRequest);
-      logger.log("AuthController: start login request: " + jsonRequest);
-      Request.Post(Pryv.REGISTRATION_URL).bodyString(jsonRequest, ContentType.APPLICATION_JSON)
-        .execute().handleResponse(signInResponseHandler);
-    } catch (JsonProcessingException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-
+    jsonRequest = JsonConverter.toJson(authRequest);
+    logger.log("AuthController: start login request: " + jsonRequest);
+    Request.Post(Pryv.REGISTRATION_URL).bodyString(jsonRequest, ContentType.APPLICATION_JSON)
+      .execute().handleResponse(signInResponseHandler);
   }
 
   /**
@@ -78,8 +71,7 @@ public class AuthModelImpl implements AuthModel {
      * the appropriate controller's methods
      */
     @Override
-    public String handleResponse(HttpResponse response) throws ClientProtocolException,
-      IOException {
+    public String handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
 
       int statusCode = response.getStatusLine().getStatusCode();
       String reply = EntityUtils.toString(response.getEntity());
@@ -102,7 +94,7 @@ public class AuthModelImpl implements AuthModel {
           long rate = jsonResponse.get(POLL_RATE_MS_KEY).longValue();
           String pollURL = jsonResponse.get(POLL_URL_KEY).textValue();
           logger.log("signInResponseHandler: polling at address: " + pollURL);
-          new PollingThread(pollURL, rate, signInResponseHandler).start();
+          new PollingThread(pollURL, rate, signInResponseHandler, controller).start();
 
         } else if (state.equals(ACCEPTED_VALUE)) {
           String username = jsonResponse.get(USERNAME_KEY).textValue();

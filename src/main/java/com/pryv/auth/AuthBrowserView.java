@@ -51,7 +51,7 @@ public class AuthBrowserView extends Applet implements AuthView {
 
   // unused
   @Override
-  public void onDisplayFailure() {
+  public void onDisplayFailure(String message) {
   }
 
 }

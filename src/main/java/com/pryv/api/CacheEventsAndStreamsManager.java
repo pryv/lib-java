@@ -60,18 +60,6 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     onlineEventsManager.getEvents(filter, new CacheEventsCallback(connectionEventsCallback));
   }
 
-  /**
-   * Store most recently modified Event in Cache
-   *
-   * @param newEvents
-   *          Events received from online module
-   */
-  private void updateEvents(Map<String, Event> newEvents) {
-    for (Event event : newEvents.values()) {
-      dbHelper.updateEvent(event, new CacheEventsCallback(null));
-    }
-  }
-
   @Override
   public void createEvent(Event event, EventsCallback userEventsCallback) {
     // TODO Auto-generated method stub
@@ -135,14 +123,17 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     @Override
     public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
       // update Cache with receivedEvents
-      updateEvents(onlineEvents);
+      for (Event event : onlineEvents.values()) {
+        dbHelper.updateEvent(event, new CacheEventsCallback(connectionEventsCallback));
+      }
       // SEND UPDATED EVENTS FROM CACHE
       connectionEventsCallback.onOnlineRetrieveEventsSuccess(onlineEvents);
     }
 
     // unused
     @Override
-    public void onCacheRetrieveEventsSuccess(Map<String, Event> newEvents) {
+    public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
+      connectionEventsCallback.onCacheRetrieveEventsSuccess(cacheEvents);
     }
 
     @Override
@@ -153,20 +144,16 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     // unused
     @Override
     public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
-      // TODO Auto-generated method stub
-
     }
 
     @Override
     public void onEventsSuccess(String successMessage) {
-      // TODO Auto-generated method stub
-
+      connectionEventsCallback.onEventsSuccess(successMessage);
     }
 
     @Override
     public void onEventsError(String errorMessage) {
-      // TODO Auto-generated method stub
-
+      connectionEventsCallback.onEventsError(errorMessage);
     }
   }
 
@@ -188,16 +175,12 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams) {
       logger.log("Cache: Streams retrieval success");
 
-      updateCache(onlineStreams);
+      for (Stream stream : onlineStreams.values()) {
+        dbHelper.updateStream(stream, connectionStreamsCallback);
+      }
 
       // SEND UPDATED STREAMS FROM CACHE
       connectionStreamsCallback.onOnlineRetrieveStreamsSuccess(onlineStreams);
-
-    }
-
-    private void updateCache(Map<String, Stream> streams) {
-      // TODO Auto-generated method stub
-
     }
 
     @Override

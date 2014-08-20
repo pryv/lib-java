@@ -2,12 +2,7 @@ package com.pryv.functional;
 
 import com.pryv.auth.AuthView;
 
-/**
- * authentication view used for testing
- *
- * @author ik
- *
- */
+
 public class FakeAuthView implements AuthView {
 
   private Boolean displayLoginViewExecuted = false;
@@ -25,7 +20,7 @@ public class FakeAuthView implements AuthView {
   }
 
   @Override
-  public void onDisplayFailure() {
+  public void onDisplayFailure(String msg) {
     displayFailureExecuted = true;
   }
 

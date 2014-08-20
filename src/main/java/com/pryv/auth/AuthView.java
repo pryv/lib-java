@@ -28,6 +28,8 @@ public interface AuthView {
 
   /**
    * callback method when auth failed.
+   *
+   * @param message
    */
-  void onDisplayFailure();
+  void onDisplayFailure(String message);
 }

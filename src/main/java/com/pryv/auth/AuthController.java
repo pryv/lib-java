@@ -1,5 +1,8 @@
 package com.pryv.auth;
 
+import java.io.IOException;
+
+import org.apache.http.client.ClientProtocolException;
 
 /**
  *
@@ -13,7 +16,7 @@ public interface AuthController {
   /**
    * begin login sequence
    */
-  void signIn();
+  void signIn() throws ClientProtocolException, IOException;
 
   /**
    * login successfull callback, returns username and auth token

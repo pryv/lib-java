@@ -1,7 +1,10 @@
 package com.pryv.examples;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.http.client.ClientProtocolException;
 
 import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
@@ -35,7 +38,13 @@ public class LoginExample {
     AuthController authenticator =
       new AuthControllerImpl(reqAppId, permissions, lang, returnURL, new FakeAuthView());
 
-    authenticator.signIn();
+    try {
+      authenticator.signIn();
+    } catch (ClientProtocolException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
 }

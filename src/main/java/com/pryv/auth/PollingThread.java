@@ -16,12 +16,15 @@ import com.pryv.utils.Logger;
  *
  */
 public class PollingThread extends Thread {
+  private AuthController controller;
   private String pollURL;
   private long pollRate;
   private ResponseHandler<String> responseHandler;
   private Logger logger = Logger.getInstance();
 
-  public PollingThread(String url, long rate, ResponseHandler<String> handler) {
+  public PollingThread(String url, long rate, ResponseHandler<String> handler,
+    AuthController pController) {
+    controller = pController;
     logger.log("PollingThread instanciated");
     pollURL = url;
     pollRate = rate;
@@ -41,12 +44,13 @@ public class PollingThread extends Thread {
         + Thread.currentThread().getName());
 
     } catch (ClientProtocolException e) {
-      // TODO Auto-generated catch block
+      controller.onFailure(0, e.getMessage(), null);
       e.printStackTrace();
     } catch (IOException e) {
-      // TODO Auto-generated catch block
+      controller.onFailure(0, e.getMessage(), null);
       e.printStackTrace();
     } catch (InterruptedException e) {
+      controller.onFailure(0, e.getMessage(), null);
       e.printStackTrace();
     }
   }

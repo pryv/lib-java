@@ -18,18 +18,6 @@ import com.pryv.utils.Logger;
  */
 public class AuthControllerImpl implements AuthController {
 
-  /**
-   *
-   * represents authentication state
-   *
-   * @author ik
-   *
-   */
-  public enum State {
-    POLLING, ACCEPTED, REFUSED, CANCELLED
-  };
-
-  private State state;
   private String requestingAppId;
   private List<Permission> permissions;
   private AuthView view;
@@ -39,10 +27,6 @@ public class AuthControllerImpl implements AuthController {
   private String returnURL = "";
 
   private Logger logger = Logger.getInstance();
-
-  public AuthControllerImpl() {
-
-  }
 
   /**
    *
@@ -72,36 +56,21 @@ public class AuthControllerImpl implements AuthController {
   }
 
   @Override
-  public void signIn() {
+  public void signIn() throws ClientProtocolException, IOException {
     model = new AuthModelImpl(this, requestingAppId, permissions, language, returnURL);
-    try {
-      model.startLogin();
-    } catch (ClientProtocolException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+    model.startLogin();
   }
 
   @Override
   public void onSuccess(String username, String token) {
-    state = State.ACCEPTED;
     view.onDisplaySuccess(username, token);
     // acquire ref to new Connection, instanciated
   }
 
   @Override
   public void onFailure(int errorId, String jsonMessage, String detail) {
-    state = State.REFUSED;
     logger.log("AuthController: failure: id=" + errorId + ", message=" + jsonMessage);
-    view.onDisplayFailure();
-    // display error/reason
-  }
-
-  public State getState() {
-    return state;
+    view.onDisplayFailure("AuthController: failure: id=" + errorId + ", message=" + jsonMessage);
   }
 
   @Override
