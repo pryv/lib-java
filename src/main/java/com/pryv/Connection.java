@@ -79,7 +79,6 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void getEvents(final Filter filter, EventsCallback userEventsCallback) {
-
     // send supervisor's events on User's callback.onEventsPartialResult()
     userEventsCallback.onSupervisorRetrieveEventsSuccess(supervisor.getEvents(filter));
 
@@ -94,7 +93,6 @@ public class Connection implements EventsManager, StreamsManager {
     // forward call to cache
     cacheEventsManager
       .createEvent(newEvent, new ConnectionEventsCallback(userEventsCallback, null));
-
   }
 
   @Override
@@ -103,7 +101,6 @@ public class Connection implements EventsManager, StreamsManager {
 
     // forward call to cache
     cacheEventsManager.deleteEvent(id, new ConnectionEventsCallback(userEventsCallback, null));
-
   }
 
   @Override
@@ -163,17 +160,14 @@ public class Connection implements EventsManager, StreamsManager {
     @Override
     public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
       logger.log("Connection: onEventsSuccess");
-
       // update existing references with JSON received from online
       supervisor.updateEvents(onlineEvents);
-
       // return merged events from Supervisor
       userEventsCallback.onOnlineRetrieveEventsSuccess(supervisor.getEvents(filter));
     }
 
     @Override
     public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
-
       // update existing Events with those retrieved from the cache
       supervisor.updateEvents(cacheEvents);
       // return merged events from Supervisor
@@ -192,14 +186,12 @@ public class Connection implements EventsManager, StreamsManager {
 
     @Override
     public void onEventsSuccess(String successMessage) {
-      // TODO Auto-generated method stub
-
+      userEventsCallback.onEventsSuccess(successMessage);
     }
 
     @Override
     public void onEventsError(String errorMessage) {
-      // TODO Auto-generated method stub
-
+      userEventsCallback.onEventsError(errorMessage);
     }
   }
 
@@ -220,13 +212,15 @@ public class Connection implements EventsManager, StreamsManager {
     @Override
     public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> streams) {
       supervisor.updateStreams(streams);
+      // forward updated Streams
       userStreamsCallback.onOnlineRetrieveStreamsSuccess(supervisor.getStreams());
     }
 
     @Override
     public void onCacheRetrieveStreamSuccess(Map<String, Stream> newStreams) {
       supervisor.updateStreams(newStreams);
-      userStreamsCallback.onCacheRetrieveStreamSuccess(newStreams);
+      // forward updated Streams
+      userStreamsCallback.onCacheRetrieveStreamSuccess(supervisor.getStreams());
     }
 
     @Override
@@ -234,22 +228,19 @@ public class Connection implements EventsManager, StreamsManager {
       userStreamsCallback.onStreamsRetrievalError(message);
     }
 
+    // unused
     @Override
     public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
-      // TODO Auto-generated method stub
-
     }
 
     @Override
     public void onStreamsSuccess(String successMessage) {
-      // TODO Auto-generated method stub
-
+      userStreamsCallback.onStreamsSuccess(successMessage);
     }
 
     @Override
     public void onStreamError(String errorMessage) {
-      // TODO Auto-generated method stub
-
+      userStreamsCallback.onStreamError(errorMessage);
     }
 
   }

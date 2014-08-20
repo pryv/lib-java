@@ -126,7 +126,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       for (Event event : onlineEvents.values()) {
         dbHelper.updateEvent(event, new CacheEventsCallback(connectionEventsCallback));
       }
-      // SEND UPDATED EVENTS FROM CACHE
+      // TODO SEND UPDATED EVENTS FROM CACHE
       connectionEventsCallback.onOnlineRetrieveEventsSuccess(onlineEvents);
     }
 
@@ -179,14 +179,13 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         dbHelper.updateStream(stream, connectionStreamsCallback);
       }
 
-      // SEND UPDATED STREAMS FROM CACHE
+      // TODO SEND UPDATED STREAMS FROM CACHE
       connectionStreamsCallback.onOnlineRetrieveStreamsSuccess(onlineStreams);
     }
 
     @Override
-    public void onCacheRetrieveStreamSuccess(Map<String, Stream> newStreams) {
-      // TODO Auto-generated method stub
-
+    public void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStreams) {
+      connectionStreamsCallback.onCacheRetrieveStreamSuccess(cacheStreams);
     }
 
     @Override
@@ -194,22 +193,19 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       connectionStreamsCallback.onStreamsRetrievalError(message);
     }
 
+    // unused
     @Override
     public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
-      // TODO Auto-generated method stub
-
     }
 
     @Override
     public void onStreamsSuccess(String successMessage) {
-      // TODO Auto-generated method stub
-
+      connectionStreamsCallback.onStreamsSuccess(successMessage);
     }
 
     @Override
     public void onStreamError(String errorMessage) {
-      // TODO Auto-generated method stub
-
+      connectionStreamsCallback.onStreamError(errorMessage);
     }
 
   }
