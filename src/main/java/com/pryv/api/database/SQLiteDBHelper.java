@@ -92,10 +92,8 @@ public class SQLiteDBHelper {
           cacheEventsCallback.onEventsSuccess("item added");
         } catch (SQLException e) {
           cacheEventsCallback.onEventsError(e.getMessage());
-          e.printStackTrace();
         } catch (JsonProcessingException e) {
           cacheEventsCallback.onEventsError(e.getMessage());
-          e.printStackTrace();
         }
       }
     }.start();
@@ -223,7 +221,6 @@ public class SQLiteDBHelper {
           cacheStreamsCallback.onStreamsSuccess("Stream created");
         } catch (SQLException e) {
           cacheStreamsCallback.onStreamError(e.getMessage());
-          e.printStackTrace();
         }
       }
     }.start();
