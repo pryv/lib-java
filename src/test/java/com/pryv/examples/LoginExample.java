@@ -8,9 +8,9 @@ import org.apache.http.client.ClientProtocolException;
 
 import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
+import com.pryv.auth.AuthBrowserView;
 import com.pryv.auth.AuthController;
 import com.pryv.auth.AuthControllerImpl;
-import com.pryv.functional.FakeAuthView;
 
 /**
  *
@@ -36,7 +36,7 @@ public class LoginExample {
 
     Pryv.setStaging();
     AuthController authenticator =
-      new AuthControllerImpl(reqAppId, permissions, lang, returnURL, new FakeAuthView());
+      new AuthControllerImpl(reqAppId, permissions, lang, returnURL, new AuthBrowserView());
 
     try {
       authenticator.signIn();
