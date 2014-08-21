@@ -34,6 +34,8 @@ public class Connection implements EventsManager, StreamsManager {
 
   private Logger logger = Logger.getInstance();
 
+  private final long millisToSeconds = 1000;
+
   /**
    * Connection constructor. builds the Url to which the online requests are
    * done using the provided username and API domain and Scheme from the Pryv
@@ -174,7 +176,7 @@ public class Connection implements EventsManager, StreamsManager {
    * @param event
    */
   private void updateCreated(Event event) {
-    event.setCreated(System.currentTimeMillis() / 1000);
+    event.setCreated(System.currentTimeMillis() / millisToSeconds);
     event.setCreatedBy(username);
   }
 
@@ -184,7 +186,7 @@ public class Connection implements EventsManager, StreamsManager {
    * @param event
    */
   private void updateCreated(Stream stream) {
-    stream.setCreated(System.currentTimeMillis() / 1000);
+    stream.setCreated(System.currentTimeMillis() / millisToSeconds);
     stream.setCreatedBy(username);
   }
 
@@ -195,7 +197,7 @@ public class Connection implements EventsManager, StreamsManager {
    *          the event to modifiy
    */
   private void updateModified(Event event) {
-    event.setModified(System.currentTimeMillis() / 1000);
+    event.setModified(System.currentTimeMillis() / millisToSeconds);
     event.setModifiedBy(username);
   }
 
@@ -206,7 +208,7 @@ public class Connection implements EventsManager, StreamsManager {
    *          the stream to modifiy
    */
   private void updateModified(Stream stream) {
-    stream.setModified(System.currentTimeMillis() / 1000);
+    stream.setModified(System.currentTimeMillis() / millisToSeconds);
     stream.setModifiedBy(username);
   }
 
