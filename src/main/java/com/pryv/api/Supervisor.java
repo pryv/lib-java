@@ -12,7 +12,7 @@ import com.pryv.utils.Logger;
 
 /**
  *
- * contains Pryv objects loaded in memory
+ * Contains Pryv objects loaded in memory
  *
  * @author ik
  *
@@ -24,15 +24,18 @@ public class Supervisor {
 
   private Logger logger = Logger.getInstance();
 
+  /**
+   * Supervisor constructor. Instanciates data structures to store Streams and
+   * Events.
+   *
+   */
   public Supervisor() {
     events = new HashMap<String, Event>();
     streams = new HashMap<String, Stream>();
   }
 
-  /**
-   *
+  /*
    * Streams Management
-   *
    */
 
   /**
@@ -45,22 +48,26 @@ public class Supervisor {
   }
 
   /**
-   * Update Streams map with pStreams.
+   * Update or create Streams in Supervisor whether they already exist or not.
    *
    * @param pStreams
    */
-  public void updateStreams(Map<String, Stream> pStreams) {
-    for (Stream stream : pStreams.values()) {
-      // case exists: compare modified field
-      if (events.containsKey(stream.getId())) {
-        updateStream(stream);
-        // case new Event: simply add
-      } else {
-        addStream(stream);
-      }
+  public void updateOrCreateStream(Stream stream) {
+    // case exists: compare modified field
+    if (events.containsKey(stream.getId())) {
+      updateStream(stream);
+      // case new Event: simply add
+    } else {
+      addStream(stream);
     }
   }
 
+  /**
+   * Update Stream in Supervisor. The condition on the update is the result of
+   * the comparison of the modified fields.
+   *
+   * @param stream
+   */
   private void updateStream(Stream stream) {
     Stream memStream = streams.get(stream.getId());
     if (memStream.getModified() > stream.getModified()) {
@@ -70,14 +77,17 @@ public class Supervisor {
     }
   }
 
+  /**
+   * Add Stream in Supervisor
+   *
+   * @param stream
+   */
   private void addStream(Stream stream) {
     streams.put(stream.getId(), stream);
   }
 
-  /**
-   *
+  /*
    * Events Management
-   *
    */
 
   /**
@@ -108,24 +118,27 @@ public class Supervisor {
   }
 
   /**
-   * updates events with newEvents.
+   * Update or create events in Supervisor whether they already exist or not.
    *
    * @param newEvents
    */
-  public void updateEvents(Map<String, Event> newEvents) {
-    if (newEvents != null) {
-      for (Event event : newEvents.values()) {
-        // case exists: compare modified field
-        if (events.containsKey(event.getId())) {
-          updateEvent(event);
-          // case new Event: simply add
-        } else {
-          addEvent(event);
-        }
+  public void updateOrCreateEvent(Event newEvent) {
+    if (newEvent != null) {
+      // case exists: compare modified field
+      if (events.containsKey(newEvent.getId())) {
+        updateEvent(newEvent);
+        // case new Event: simply add
+      } else {
+        addEvent(newEvent);
       }
     }
   }
 
+  /**
+   * Add Event in Supervisor
+   *
+   * @param newEvent
+   */
   private void addEvent(Event newEvent) {
     logger.log("Supervisor: adding new event: id="
       + newEvent.getId()
@@ -134,6 +147,13 @@ public class Supervisor {
     events.put(newEvent.getId(), newEvent);
   }
 
+  /**
+   * Compare modified field of event with the one stored in the Supervisor to
+   * decided wether to replace it or not.
+   *
+   * @param event
+   *          the event that may replace the one in place if newer.
+   */
   private void updateEvent(Event event) {
     Event memEvent = events.get(event.getId());
     if (memEvent.getModified() > event.getModified()) {
@@ -161,4 +181,5 @@ public class Supervisor {
   public Event getEventById(String id) {
     return events.get(id);
   }
+
 }

@@ -161,7 +161,9 @@ public class Connection implements EventsManager, StreamsManager {
     public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
       logger.log("Connection: onEventsSuccess");
       // update existing references with JSON received from online
-      supervisor.updateEvents(onlineEvents);
+      for (Event onlineEvent : onlineEvents.values()) {
+        supervisor.updateOrCreateEvent(onlineEvent);
+      }
       // return merged events from Supervisor
       userEventsCallback.onOnlineRetrieveEventsSuccess(supervisor.getEvents(filter));
     }
@@ -169,7 +171,9 @@ public class Connection implements EventsManager, StreamsManager {
     @Override
     public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
       // update existing Events with those retrieved from the cache
-      supervisor.updateEvents(cacheEvents);
+      for (Event cacheEvent : cacheEvents.values()) {
+        supervisor.updateOrCreateEvent(cacheEvent);
+      }
       // return merged events from Supervisor
       userEventsCallback.onCacheRetrieveEventsSuccess(supervisor.getEvents(filter));
     }
@@ -210,15 +214,19 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> streams) {
-      supervisor.updateStreams(streams);
+    public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStream) {
+      for (Stream stream : onlineStream.values()) {
+        supervisor.updateOrCreateStream(stream);
+      }
       // forward updated Streams
       userStreamsCallback.onOnlineRetrieveStreamsSuccess(supervisor.getStreams());
     }
 
     @Override
-    public void onCacheRetrieveStreamSuccess(Map<String, Stream> newStreams) {
-      supervisor.updateStreams(newStreams);
+    public void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStream) {
+      for (Stream stream : cacheStream.values()) {
+        supervisor.updateOrCreateStream(stream);
+      }
       // forward updated Streams
       userStreamsCallback.onCacheRetrieveStreamSuccess(supervisor.getStreams());
     }
