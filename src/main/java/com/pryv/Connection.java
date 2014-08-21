@@ -89,6 +89,7 @@ public class Connection implements EventsManager, StreamsManager {
   @Override
   public void createEvent(Event newEvent, EventsCallback userEventsCallback) {
     // create event in Supervisor
+    supervisor.updateOrCreateEvent(newEvent);
 
     // forward call to cache
     cacheEventsManager
@@ -98,6 +99,7 @@ public class Connection implements EventsManager, StreamsManager {
   @Override
   public void deleteEvent(String id, EventsCallback userEventsCallback) {
     // delete Event in Supervisor
+    supervisor.deleteEvent(id);
 
     // forward call to cache
     cacheEventsManager.deleteEvent(id, new ConnectionEventsCallback(userEventsCallback, null));
@@ -106,6 +108,7 @@ public class Connection implements EventsManager, StreamsManager {
   @Override
   public void updateEvent(Event eventToUpdate, EventsCallback userEventsCallback) {
     // update Event in Supervisor
+    supervisor.updateOrCreateEvent(eventToUpdate);
 
     // forward call to cache
     cacheEventsManager.updateEvent(eventToUpdate, new ConnectionEventsCallback(userEventsCallback,
@@ -122,23 +125,33 @@ public class Connection implements EventsManager, StreamsManager {
     // send Streams retrieved from Supervisor
     userStreamsCallback.onSupervisorRetrieveStreamsSuccess(supervisor.getStreams());
 
+    // forward call to cache
     cacheStreamsManager.getStreams(filter, new ConnectionStreamsCallback(userStreamsCallback));
   }
 
   @Override
-  public void createStream(Stream newStream, StreamsCallback userStreamCallback) {
-    // TODO Auto-generated method stub
+  public void createStream(Stream newStream, StreamsCallback userStreamsCallback) {
+    // create Stream in Supervisor
+    supervisor.updateOrCreateStream(newStream);
+    // forward call to cache
+    cacheStreamsManager.createStream(newStream, new ConnectionStreamsCallback(userStreamsCallback));
   }
 
   @Override
-  public void deleteStream(String id, StreamsCallback userStreamCallback) {
-    // TODO Auto-generated method stub
-
+  public void deleteStream(String id, StreamsCallback userStreamsCallback) {
+    // delete Stream in Supervisor
+    supervisor.deleteStream(id);
+    // forward call to cache
+    cacheStreamsManager.deleteStream(id, new ConnectionStreamsCallback(userStreamsCallback));
   }
 
   @Override
-  public void updateStream(Stream streamToUpdate, StreamsCallback userStreamCallback) {
-    // TODO Auto-generated method stub
+  public void updateStream(Stream streamToUpdate, StreamsCallback userStreamsCallback) {
+    // update Stream in Supervisor
+    supervisor.updateOrCreateStream(streamToUpdate);
+    // forward call to cache
+    cacheStreamsManager.updateStream(streamToUpdate, new ConnectionStreamsCallback(
+      userStreamsCallback));
   }
 
   /**

@@ -86,6 +86,15 @@ public class Supervisor {
     streams.put(stream.getId(), stream);
   }
 
+  /**
+   * Delete Stream from Supervisor, namely set their trashed field to true.
+   *
+   * @param streamId
+   */
+  public void deleteStream(String streamId) {
+    streams.get(streamId).setTrashed(true);
+  }
+
   /*
    * Events Management
    */
@@ -169,6 +178,15 @@ public class Supervisor {
           + event.getTime());
       memEvent.merge(event, JsonConverter.getCloner());
     }
+  }
+
+  /**
+   * Delete Event from Supervisor, namely set its trashed field to true.
+   *
+   * @param eventId
+   */
+  public void deleteEvent(String eventId) {
+    events.get(eventId).setTrashed(true);
   }
 
   /**
