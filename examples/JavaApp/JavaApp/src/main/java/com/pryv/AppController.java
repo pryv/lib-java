@@ -5,7 +5,10 @@ import java.util.List;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -21,6 +24,14 @@ import com.pryv.utils.Logger;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
+/**
+ * Controller of the Example Java Application. is instanciated on successful
+ * auth. Links with the GUI components from the XML are done on XML file
+ * loading.
+ *
+ * @author ik
+ *
+ */
 public class AppController {
 
   // fields with @FXML annotations correspond to Views names in .fxml files. If
@@ -31,7 +42,7 @@ public class AppController {
   @FXML
   private ListView<Event> eventsListView;
 
-  /**
+  /*
    * Streams info labels
    */
   private List<Label> streamsLabels;
@@ -52,7 +63,7 @@ public class AppController {
   @FXML
   private Label createdByLabel;
 
-  /**
+  /*
    * Events info labels
    */
   private List<Label> eventsLabels;
@@ -90,6 +101,22 @@ public class AppController {
   private Label eTrashedLabel;
   @FXML
   private Label eTempRefIdLabel;
+
+  /*
+   * Data Manipulation Buttons
+   */
+  @FXML
+  private Button eventCreateButton;
+  @FXML
+  private Button eventUpdateButton;
+  @FXML
+  private Button eventDeleteButton;
+  @FXML
+  private Button streamCreateButton;
+  @FXML
+  private Button streamUpdateButton;
+  @FXML
+  private Button streamDeleteButton;
 
   // Reference to the main application
   private ExampleApp exampleApp;
@@ -168,6 +195,13 @@ public class AppController {
           }
         }
       });
+
+    eventCreateButton.setOnAction(new EventHandler<ActionEvent>() {
+
+      public void handle(ActionEvent event) {
+        exampleApp.displayError("create event pressed");
+      }
+    });
   }
 
   /**

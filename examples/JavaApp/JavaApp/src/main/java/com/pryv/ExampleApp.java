@@ -36,6 +36,13 @@ import com.pryv.auth.AuthControllerImpl;
 import com.pryv.auth.AuthView;
 import com.pryv.utils.Logger;
 
+/**
+ * Example JavaFX application to demonstrate the way to use the Pryv Java
+ * library.
+ *
+ * @author ik
+ *
+ */
 public class ExampleApp extends Application implements AuthView, EventsCallback, StreamsCallback {
 
   private AppController controller;
@@ -162,7 +169,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   /**
    * Shows the main View, sets the controller.
    */
-  public void showMainView() {
+  private void showMainView() {
     try {
       // Load the fxml file and set into the center of the main layout
       FXMLLoader loader = new FXMLLoader(ExampleApp.class.getResource("view/MainView.fxml"));
@@ -308,7 +315,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    * @param message
    *          the message to display
    */
-  private void displayError(final String message) {
+  public void displayError(final String message) {
     Platform.runLater(new Runnable() {
 
       public void run() {
