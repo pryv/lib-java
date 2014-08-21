@@ -25,7 +25,6 @@ public class OnlineRetrieveStreamsTest {
 
   private OnlineEventsAndStreamsManager online;
   private StreamsCallback streamsCallback;
-  private String stringStreams;
   private Map<String, Stream> streams;
 
   @Before
@@ -72,25 +71,18 @@ public class OnlineRetrieveStreamsTest {
 
       @Override
       public void onStreamsRetrievalError(String message) {
-        // TODO Auto-generated method stub
       }
 
       @Override
       public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
-        // TODO Auto-generated method stub
-
       }
 
       @Override
       public void onStreamsSuccess(String successMessage) {
-        // TODO Auto-generated method stub
-
       }
 
       @Override
       public void onStreamError(String errorMessage) {
-        // TODO Auto-generated method stub
-
       }
 
     };
