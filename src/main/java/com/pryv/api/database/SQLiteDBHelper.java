@@ -142,7 +142,11 @@ public class SQLiteDBHelper {
           String cmd = QueryGenerator.deleteEvent(eventToDelete);
           logger.log("SQLiteDBHelper: deleteEvent: " + cmd);
           Statement statement = dbConnection.createStatement();
-          statement.executeUpdate(cmd);
+          int done = statement.executeUpdate(cmd);
+          // set trashed field to 1
+          if (done == 0) {
+            updateEvent(eventToDelete, cacheEventsCallback);
+          }
           statement.close();
           cacheEventsCallback.onEventsSuccess("Event deleted");
         } catch (SQLException e) {
@@ -268,16 +272,24 @@ public class SQLiteDBHelper {
           if (streamToDelete.getChildren() != null) {
             for (Stream childStream : streamToDelete.getChildren()) {
               cmd = QueryGenerator.deleteStream(childStream);
-              statement.executeUpdate(cmd);
+              int done = statement.executeUpdate(cmd);
               logger.log("SQLiteDBHelper: delete child Stream with name "
                 + childStream.getName()
                   + ": "
                   + cmd);
+              // set trashed to true
+              if (done == 0) {
+                updateStream(childStream, cacheStreamsCallback);
+              }
             }
           }
           cmd = QueryGenerator.deleteStream(streamToDelete);
           logger.log("SQLiteDBHelper: deleteStream: " + cmd);
-          statement.executeUpdate(cmd);
+          int done = statement.executeUpdate(cmd);
+          // set trashed to true
+          if (done == 0) {
+            updateStream(streamToDelete, cacheStreamsCallback);
+          }
           statement.close();
           cacheStreamsCallback.onStreamsSuccess("Stream deleted");
         } catch (SQLException e) {

@@ -66,7 +66,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   }
 
   @Override
-  public void deleteEvent(String id, EventsCallback userEventsCallback) {
+  public void deleteEvent(Event eventToDelete, EventsCallback userEventsCallback) {
     // TODO Auto-generated method stub
 
   }
@@ -96,7 +96,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   }
 
   @Override
-  public void deleteStream(String id, StreamsCallback connectionStreamsCallback) {
+  public void deleteStream(Stream streamToDelete, StreamsCallback connectionStreamsCallback) {
     // TODO Auto-generated method stub
 
   }

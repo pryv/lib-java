@@ -87,12 +87,23 @@ public class Supervisor {
   }
 
   /**
-   * Delete Stream from Supervisor, namely set their trashed field to true.
+   * Delete Stream from Supervisor, if trashed is false, sets it to true, else
+   * deletes it.
    *
-   * @param streamId
+   * @param streamToDelete
+   *          the stream to delete
    */
-  public void deleteStream(String streamId) {
-    streams.get(streamId).setTrashed(true);
+  public void deleteStream(Stream streamToDelete) {
+    if (streams.get(streamToDelete.getId()).getTrashed() == true) {
+      // delete really
+      streams.remove(streamToDelete.getId());
+    } else {
+      // update trashed field
+      streams.get(streamToDelete.getId()).setTrashed(true);
+      for (Stream childstream : streams.get(streamToDelete.getId()).getChildren()) {
+        childstream.setTrashed(true);
+      }
+    }
   }
 
   /*
@@ -181,12 +192,19 @@ public class Supervisor {
   }
 
   /**
-   * Delete Event from Supervisor, namely set its trashed field to true.
+   * Delete Event from Supervisor, if trashed is false, sets it to true, else
+   * deletes it.
    *
    * @param eventId
    */
-  public void deleteEvent(String eventId) {
-    events.get(eventId).setTrashed(true);
+  public void deleteEvent(Event eventToDelete) {
+    if (events.get(eventToDelete.getId()).getTrashed() == true) {
+      // delete really
+      events.remove(eventToDelete.getId());
+    } else {
+      // update trashed field
+      events.get(eventToDelete.getId()).setTrashed(true);
+    }
   }
 
   /**

@@ -22,7 +22,6 @@ public class QueryGenerator {
    */
   private static final String EVENTS_TABLE_NAME = "EVENTS";
   private static final String STREAMS_TABLE_NAME = "STREAMS";
-  // private static final String ATTACHMENTS_TABLE_NAME = "ATTACHMENTS";
 
   /**
    * Events Table keys
@@ -237,7 +236,10 @@ public class QueryGenerator {
         + EVENTS_ID_KEY
         + "=\'"
         + eventToDelete.getId()
-        + "\';";
+        + "\'"
+        + " AND "
+        + EVENTS_TRASHED_KEY
+        + "=1;";
   }
 
   /**

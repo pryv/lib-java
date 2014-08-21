@@ -88,6 +88,7 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void createEvent(Event newEvent, EventsCallback userEventsCallback) {
+    updateCreated(newEvent);
     // create event in Supervisor
     supervisor.updateOrCreateEvent(newEvent);
 
@@ -97,16 +98,21 @@ public class Connection implements EventsManager, StreamsManager {
   }
 
   @Override
-  public void deleteEvent(String id, EventsCallback userEventsCallback) {
+  public void deleteEvent(Event eventToDelete, EventsCallback userEventsCallback) {
+    updateModified(eventToDelete);
+    eventToDelete.setTrashed(true);
+
     // delete Event in Supervisor
-    supervisor.deleteEvent(id);
+    supervisor.deleteEvent(eventToDelete);
 
     // forward call to cache
-    cacheEventsManager.deleteEvent(id, new ConnectionEventsCallback(userEventsCallback, null));
+    cacheEventsManager.deleteEvent(eventToDelete, new ConnectionEventsCallback(userEventsCallback,
+      null));
   }
 
   @Override
   public void updateEvent(Event eventToUpdate, EventsCallback userEventsCallback) {
+    updateModified(eventToUpdate);
     // update Event in Supervisor
     supervisor.updateOrCreateEvent(eventToUpdate);
 
@@ -131,6 +137,7 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void createStream(Stream newStream, StreamsCallback userStreamsCallback) {
+    updateCreated(newStream);
     // create Stream in Supervisor
     supervisor.updateOrCreateStream(newStream);
     // forward call to cache
@@ -138,15 +145,22 @@ public class Connection implements EventsManager, StreamsManager {
   }
 
   @Override
-  public void deleteStream(String id, StreamsCallback userStreamsCallback) {
+  public void deleteStream(Stream streamToDelete, StreamsCallback userStreamsCallback) {
+    updateModified(streamToDelete);
+    streamToDelete.setTrashed(true);
+    for (Stream childStream : streamToDelete.getChildren()) {
+      childStream.setTrashed(true);
+    }
     // delete Stream in Supervisor
-    supervisor.deleteStream(id);
+    supervisor.deleteStream(streamToDelete);
     // forward call to cache
-    cacheStreamsManager.deleteStream(id, new ConnectionStreamsCallback(userStreamsCallback));
+    cacheStreamsManager.deleteStream(streamToDelete, new ConnectionStreamsCallback(
+      userStreamsCallback));
   }
 
   @Override
   public void updateStream(Stream streamToUpdate, StreamsCallback userStreamsCallback) {
+    updateModified(streamToUpdate);
     // update Stream in Supervisor
     supervisor.updateOrCreateStream(streamToUpdate);
     // forward call to cache
@@ -155,7 +169,49 @@ public class Connection implements EventsManager, StreamsManager {
   }
 
   /**
-   * EventsCallback used in Connection class
+   * Fill event's "created" and "createdBy" fields.
+   *
+   * @param event
+   */
+  private void updateCreated(Event event) {
+    event.setCreated(System.currentTimeMillis() / 1000);
+    event.setCreatedBy(username);
+  }
+
+  /**
+   * Fill stream's "created" and "createdBy" fields.
+   *
+   * @param event
+   */
+  private void updateCreated(Stream stream) {
+    stream.setCreated(System.currentTimeMillis() / 1000);
+    stream.setCreatedBy(username);
+  }
+
+  /**
+   * Update event's "modified" and "modifiedBy" fields.
+   *
+   * @param event
+   *          the event to modifiy
+   */
+  private void updateModified(Event event) {
+    event.setModified(System.currentTimeMillis() / 1000);
+    event.setModifiedBy(username);
+  }
+
+  /**
+   * Update stream's "modified" and modifiedBy" fields.
+   *
+   * @param stream
+   *          the stream to modifiy
+   */
+  private void updateModified(Stream stream) {
+    stream.setModified(System.currentTimeMillis() / 1000);
+    stream.setModifiedBy(username);
+  }
+
+  /**
+   * EventsCallback used by Connection class
    *
    * @author ik
    *
@@ -213,7 +269,7 @@ public class Connection implements EventsManager, StreamsManager {
   }
 
   /**
-   * StreamsCallback used in Connection class
+   * StreamsCallback used by Connection class
    *
    * @author ik
    *
@@ -222,6 +278,13 @@ public class Connection implements EventsManager, StreamsManager {
 
     private StreamsCallback userStreamsCallback;
 
+    /**
+     * public constructor
+     *
+     * @param pUserStreamsCallback
+     *          the class to which the results are forwarder after optional
+     *          processing.
+     */
     public ConnectionStreamsCallback(StreamsCallback pUserStreamsCallback) {
       userStreamsCallback = pUserStreamsCallback;
     }

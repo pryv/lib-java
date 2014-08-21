@@ -52,7 +52,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   }
 
   @Override
-  public void deleteEvent(String id, EventsCallback userEventsCallback) {
+  public void deleteEvent(Event eventToDelete, EventsCallback userEventsCallback) {
     // TODO Auto-generated method stub
 
   }
@@ -77,7 +77,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   }
 
   @Override
-  public void deleteStream(String id, StreamsCallback cacheStreamsCallback) {
+  public void deleteStream(Stream streamToDelete, StreamsCallback cacheStreamsCallback) {
     // TODO Auto-generated method stub
 
   }
