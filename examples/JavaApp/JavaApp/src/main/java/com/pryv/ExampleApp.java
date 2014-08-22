@@ -234,8 +234,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   }
 
   public void onStreamError(String errorMessage) {
-    // TODO Auto-generated method stub
-
+    displayError(errorMessage);
   }
 
   /**
@@ -273,8 +272,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   }
 
   public void onEventsError(String errorMessage) {
-    // TODO Auto-generated method stub
-
+    displayError(errorMessage);
   }
 
   public void onEventsRetrievalError(String message) {

@@ -9,6 +9,7 @@ import com.pryv.api.Filter;
 import com.pryv.api.StreamsCallback;
 import com.pryv.api.StreamsManager;
 import com.pryv.api.Supervisor;
+import com.pryv.api.Supervisor.IncompleteFieldsException;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
@@ -92,7 +93,11 @@ public class Connection implements EventsManager, StreamsManager {
   public void createEvent(Event newEvent, EventsCallback userEventsCallback) {
     updateCreated(newEvent);
     // create event in Supervisor
-    supervisor.updateOrCreateEvent(newEvent);
+    try {
+      supervisor.updateOrCreateEvent(newEvent);
+    } catch (IncompleteFieldsException e) {
+      userEventsCallback.onEventsError(e.getMessage());
+    }
 
     // forward call to cache
     cacheEventsManager
@@ -105,7 +110,11 @@ public class Connection implements EventsManager, StreamsManager {
     eventToDelete.setTrashed(true);
 
     // delete Event in Supervisor
-    supervisor.deleteEvent(eventToDelete);
+    try {
+      supervisor.deleteEvent(eventToDelete);
+    } catch (IncompleteFieldsException e) {
+      userEventsCallback.onEventsError(e.getMessage());
+    }
 
     // forward call to cache
     cacheEventsManager.deleteEvent(eventToDelete, new ConnectionEventsCallback(userEventsCallback,
@@ -116,7 +125,11 @@ public class Connection implements EventsManager, StreamsManager {
   public void updateEvent(Event eventToUpdate, EventsCallback userEventsCallback) {
     updateModified(eventToUpdate);
     // update Event in Supervisor
-    supervisor.updateOrCreateEvent(eventToUpdate);
+    try {
+      supervisor.updateOrCreateEvent(eventToUpdate);
+    } catch (IncompleteFieldsException e) {
+      userEventsCallback.onEventsError(e.getMessage());
+    }
 
     // forward call to cache
     cacheEventsManager.updateEvent(eventToUpdate, new ConnectionEventsCallback(userEventsCallback,
@@ -141,7 +154,11 @@ public class Connection implements EventsManager, StreamsManager {
   public void createStream(Stream newStream, StreamsCallback userStreamsCallback) {
     updateCreated(newStream);
     // create Stream in Supervisor
-    supervisor.updateOrCreateStream(newStream);
+    try {
+      supervisor.updateOrCreateStream(newStream);
+    } catch (IncompleteFieldsException e) {
+      userStreamsCallback.onStreamError(e.getMessage());
+    }
     // forward call to cache
     cacheStreamsManager.createStream(newStream, new ConnectionStreamsCallback(userStreamsCallback));
   }
@@ -154,7 +171,11 @@ public class Connection implements EventsManager, StreamsManager {
       childStream.setTrashed(true);
     }
     // delete Stream in Supervisor
-    supervisor.deleteStream(streamToDelete);
+    try {
+      supervisor.deleteStream(streamToDelete);
+    } catch (IncompleteFieldsException e) {
+      userStreamsCallback.onStreamError(e.getMessage());
+    }
     // forward call to cache
     cacheStreamsManager.deleteStream(streamToDelete, new ConnectionStreamsCallback(
       userStreamsCallback));
@@ -164,30 +185,36 @@ public class Connection implements EventsManager, StreamsManager {
   public void updateStream(Stream streamToUpdate, StreamsCallback userStreamsCallback) {
     updateModified(streamToUpdate);
     // update Stream in Supervisor
-    supervisor.updateOrCreateStream(streamToUpdate);
+    try {
+      supervisor.updateOrCreateStream(streamToUpdate);
+    } catch (IncompleteFieldsException e) {
+      userStreamsCallback.onStreamError(e.getMessage());
+    }
     // forward call to cache
     cacheStreamsManager.updateStream(streamToUpdate, new ConnectionStreamsCallback(
       userStreamsCallback));
   }
 
   /**
-   * Fill event's "created" and "createdBy" fields.
+   * Fill event's "created","createdBy", "modified" and "modifiedBy" fields.
    *
    * @param event
    */
   private void updateCreated(Event event) {
     event.setCreated(System.currentTimeMillis() / millisToSeconds);
     event.setCreatedBy(username);
+    updateModified(event);
   }
 
   /**
-   * Fill stream's "created" and "createdBy" fields.
+   * Fill stream's "created", "createdBy", "modified" and "modifiedBy" fields.
    *
    * @param event
    */
   private void updateCreated(Stream stream) {
     stream.setCreated(System.currentTimeMillis() / millisToSeconds);
     stream.setCreatedBy(username);
+    updateModified(stream);
   }
 
   /**
@@ -233,7 +260,11 @@ public class Connection implements EventsManager, StreamsManager {
       logger.log("Connection: onEventsSuccess");
       // update existing references with JSON received from online
       for (Event onlineEvent : onlineEvents.values()) {
-        supervisor.updateOrCreateEvent(onlineEvent);
+        try {
+          supervisor.updateOrCreateEvent(onlineEvent);
+        } catch (IncompleteFieldsException e) {
+          userEventsCallback.onEventsError(e.getMessage());
+        }
       }
       // return merged events from Supervisor
       userEventsCallback.onOnlineRetrieveEventsSuccess(supervisor.getEvents(filter));
@@ -243,7 +274,11 @@ public class Connection implements EventsManager, StreamsManager {
     public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
       // update existing Events with those retrieved from the cache
       for (Event cacheEvent : cacheEvents.values()) {
-        supervisor.updateOrCreateEvent(cacheEvent);
+        try {
+          supervisor.updateOrCreateEvent(cacheEvent);
+        } catch (IncompleteFieldsException e) {
+          userEventsCallback.onEventsError(e.getMessage());
+        }
       }
       // return merged events from Supervisor
       userEventsCallback.onCacheRetrieveEventsSuccess(supervisor.getEvents(filter));
@@ -294,7 +329,11 @@ public class Connection implements EventsManager, StreamsManager {
     @Override
     public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStream) {
       for (Stream stream : onlineStream.values()) {
-        supervisor.updateOrCreateStream(stream);
+        try {
+          supervisor.updateOrCreateStream(stream);
+        } catch (IncompleteFieldsException e) {
+          userStreamsCallback.onStreamError(e.getMessage());
+        }
       }
       // forward updated Streams
       userStreamsCallback.onOnlineRetrieveStreamsSuccess(supervisor.getStreams());
@@ -303,7 +342,11 @@ public class Connection implements EventsManager, StreamsManager {
     @Override
     public void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStream) {
       for (Stream stream : cacheStream.values()) {
-        supervisor.updateOrCreateStream(stream);
+        try {
+          supervisor.updateOrCreateStream(stream);
+        } catch (IncompleteFieldsException e) {
+          userStreamsCallback.onStreamError(e.getMessage());
+        }
       }
       // forward updated Streams
       userStreamsCallback.onCacheRetrieveStreamSuccess(supervisor.getStreams());

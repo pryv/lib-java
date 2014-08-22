@@ -1,4 +1,4 @@
-package com.pryv.unit;
+package com.pryv.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -24,6 +24,7 @@ import com.pryv.api.database.SQLiteDBHelper;
 import com.pryv.api.model.Attachment;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
+import com.pryv.unit.DummyData;
 
 /**
  * unit tests for SQLiteDBHelper class

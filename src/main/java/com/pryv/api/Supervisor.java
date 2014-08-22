@@ -52,13 +52,17 @@ public class Supervisor {
    *
    * @param pStreams
    */
-  public void updateOrCreateStream(Stream stream) {
-    // case exists: compare modified field
-    if (events.containsKey(stream.getId())) {
-      updateStream(stream);
-      // case new Event: simply add
+  public void updateOrCreateStream(Stream stream) throws IncompleteFieldsException {
+    if (areFieldsValid(stream)) {
+      // case exists: compare modified field
+      if (events.containsKey(stream.getId())) {
+        updateStream(stream);
+        // case new Event: simply add
+      } else {
+        addStream(stream);
+      }
     } else {
-      addStream(stream);
+      throw new IncompleteFieldsException();
     }
   }
 
@@ -67,8 +71,9 @@ public class Supervisor {
    * the comparison of the modified fields.
    *
    * @param stream
+   * @throws IncompleteFieldsException
    */
-  private void updateStream(Stream stream) {
+  private void updateStream(Stream stream) throws IncompleteFieldsException {
     Stream memStream = streams.get(stream.getId());
     if (memStream.getModified() > stream.getModified()) {
       // do nothing
@@ -81,8 +86,9 @@ public class Supervisor {
    * Add Stream in Supervisor
    *
    * @param stream
+   * @throws IncompleteFieldsException
    */
-  private void addStream(Stream stream) {
+  private void addStream(Stream stream) throws IncompleteFieldsException {
     streams.put(stream.getId(), stream);
   }
 
@@ -93,16 +99,20 @@ public class Supervisor {
    * @param streamToDelete
    *          the stream to delete
    */
-  public void deleteStream(Stream streamToDelete) {
-    if (streams.get(streamToDelete.getId()).getTrashed() == true) {
-      // delete really
-      streams.remove(streamToDelete.getId());
-    } else {
-      // update trashed field
-      streams.get(streamToDelete.getId()).setTrashed(true);
-      for (Stream childstream : streams.get(streamToDelete.getId()).getChildren()) {
-        childstream.setTrashed(true);
+  public void deleteStream(Stream streamToDelete) throws IncompleteFieldsException {
+    if (areFieldsValid(streamToDelete)) {
+      if (streams.get(streamToDelete.getId()).getTrashed() == true) {
+        // delete really
+        streams.remove(streamToDelete.getId());
+      } else {
+        // update trashed field
+        streams.get(streamToDelete.getId()).setTrashed(true);
+        for (Stream childstream : streams.get(streamToDelete.getId()).getChildren()) {
+          childstream.setTrashed(true);
+        }
       }
+    } else {
+      throw new IncompleteFieldsException();
     }
   }
 
@@ -124,8 +134,12 @@ public class Supervisor {
     for (Event event : events.values()) {
       if (filter.match(event)) {
         returnEvents.put(event.getId(), event);
-        logger
-          .log("Supervisor: matched: streamId=" + event.getStreamId() + ", id=" + event.getId());
+        logger.log("Supervisor: matched: streamName="
+        // + streams.get(event.getStreamId()).getName()
+            + ", streamId="
+            + event.getStreamId()
+            + ", id="
+            + event.getId());
       }
     }
 
@@ -141,9 +155,10 @@ public class Supervisor {
    * Update or create events in Supervisor whether they already exist or not.
    *
    * @param newEvents
+   * @throws IncompleteFieldsException
    */
-  public void updateOrCreateEvent(Event newEvent) {
-    if (newEvent != null) {
+  public void updateOrCreateEvent(Event newEvent) throws IncompleteFieldsException {
+    if (areFieldsValid(newEvent)) {
       // case exists: compare modified field
       if (events.containsKey(newEvent.getId())) {
         updateEvent(newEvent);
@@ -151,6 +166,8 @@ public class Supervisor {
       } else {
         addEvent(newEvent);
       }
+    } else {
+      throw new IncompleteFieldsException();
     }
   }
 
@@ -196,14 +213,19 @@ public class Supervisor {
    * deletes it.
    *
    * @param eventId
+   * @throws IncompleteFieldsException
    */
-  public void deleteEvent(Event eventToDelete) {
-    if (events.get(eventToDelete.getId()).getTrashed() == true) {
-      // delete really
-      events.remove(eventToDelete.getId());
+  public void deleteEvent(Event eventToDelete) throws IncompleteFieldsException {
+    if (areFieldsValid(eventToDelete)) {
+      if (events.get(eventToDelete.getId()).getTrashed() == true) {
+        // delete really
+        events.remove(eventToDelete.getId());
+      } else {
+        // update trashed field
+        events.get(eventToDelete.getId()).setTrashed(true);
+      }
     } else {
-      // update trashed field
-      events.get(eventToDelete.getId()).setTrashed(true);
+      throw new IncompleteFieldsException();
     }
   }
 
@@ -216,6 +238,65 @@ public class Supervisor {
    */
   public Event getEventById(String id) {
     return events.get(id);
+  }
+
+  /**
+   * used to check if input Event have all the required fields not null.
+   *
+   * @param eventToCheck
+   * @return true if all fields are valid, false if any of the mandatory fields
+   *         is null or the parameter is null
+   */
+  private boolean areFieldsValid(Event eventToCheck) {
+    if (eventToCheck == null) {
+      return false;
+    } else {
+      return eventToCheck.getId() != null
+        && eventToCheck.getStreamId() != null
+          && eventToCheck.getCreated() != null
+          && eventToCheck.getCreatedBy() != null
+          && eventToCheck.getModified() != null
+          && eventToCheck.getModifiedBy() != null;
+    }
+  }
+
+  /**
+   * used to check if input Stream has all the required fields as not null.
+   *
+   * @param streamToCheck
+   * @return true if all fields are not null, false if any mandatory field is
+   *         null or the stream is null.
+   */
+  private boolean areFieldsValid(Stream streamToCheck) {
+    if (streamToCheck == null) {
+      return false;
+    } else {
+      return streamToCheck.getId() != null
+        && streamToCheck.getName() != null
+          && streamToCheck.getCreated() != null
+          && streamToCheck.getCreatedBy() != null
+          && streamToCheck.getModified() != null
+          && streamToCheck.getModifiedBy() != null;
+    }
+  }
+
+  /**
+   * custom thrown when user tries to call Supervisor methods with data having
+   * mandatory fields as null.
+   *
+   * @author ik
+   *
+   */
+  public class IncompleteFieldsException extends Exception {
+
+    /**
+     * Constructor containing message to display
+     *
+     * @param message
+     */
+    public IncompleteFieldsException() {
+      super("Supervisor: attempt to Create a Stream with incomplete fields");
+    }
   }
 
 }

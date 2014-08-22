@@ -125,7 +125,8 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
         try {
           textResponse = EntityUtils.toString(response.getEntity());
           logger.log("Online received streams: " + textResponse);
-          streamsCallback.onOnlineRetrieveStreamsSuccess(JsonConverter.createStreamsFromJson(textResponse));
+          streamsCallback.onOnlineRetrieveStreamsSuccess(JsonConverter
+            .createStreamsFromJson(textResponse));
         } catch (ParseException e) {
           streamsCallback.onStreamsRetrievalError(e.getMessage());
           e.printStackTrace();
@@ -151,10 +152,12 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   private class FetchEventsThread extends Thread {
     private String params = "";
     private EventsCallback eventsCallback;
+    private ResponseHandler<String> eventsResponseHandler;
 
     public FetchEventsThread(String pParams, EventsCallback pEventsCallback) {
       params = pParams;
       eventsCallback = pEventsCallback;
+      instanciateResponseHandler();
     }
 
     @Override
@@ -171,32 +174,34 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       }
     }
 
-    private ResponseHandler<String> eventsResponseHandler = new ResponseHandler<String>() {
+    private void instanciateResponseHandler() {
+      eventsResponseHandler = new ResponseHandler<String>() {
 
-      @Override
-      public String handleResponse(HttpResponse reply) {
-        String response;
-        try {
-          response = EntityUtils.toString(reply.getEntity());
-          logger.log("Online: received events: " + response);
-          Map<String, Event> receivedEvents = JsonConverter.createEventsFromJson(response);
-          eventsCallback.onOnlineRetrieveEventsSuccess(receivedEvents);
-        } catch (ParseException e) {
-          eventsCallback.onEventsRetrievalError(e.getMessage());
-          e.printStackTrace();
-        } catch (JsonParseException e) {
-          eventsCallback.onEventsRetrievalError(e.getMessage());
-          e.printStackTrace();
-        } catch (JsonMappingException e) {
-          eventsCallback.onEventsRetrievalError(e.getMessage());
-          e.printStackTrace();
-        } catch (IOException e) {
-          eventsCallback.onEventsRetrievalError(e.getMessage());
-          e.printStackTrace();
+        @Override
+        public String handleResponse(HttpResponse reply) {
+          String response;
+          try {
+            response = EntityUtils.toString(reply.getEntity());
+            logger.log("Online: received events: " + response);
+            Map<String, Event> receivedEvents = JsonConverter.createEventsFromJson(response);
+            eventsCallback.onOnlineRetrieveEventsSuccess(receivedEvents);
+          } catch (ParseException e) {
+            eventsCallback.onEventsRetrievalError(e.getMessage());
+            e.printStackTrace();
+          } catch (JsonParseException e) {
+            eventsCallback.onEventsRetrievalError(e.getMessage());
+            e.printStackTrace();
+          } catch (JsonMappingException e) {
+            eventsCallback.onEventsRetrievalError(e.getMessage());
+            e.printStackTrace();
+          } catch (IOException e) {
+            eventsCallback.onEventsRetrievalError(e.getMessage());
+            e.printStackTrace();
+          }
+          return null;
         }
-        return null;
-      }
-    };
+      };
+    }
   }
 
 }

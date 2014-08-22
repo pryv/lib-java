@@ -315,25 +315,25 @@ public class SQLiteDBHelper {
           logger.log("SQLiteDBHelper: getStreams: " + cmd);
           Statement statement = dbConnection.createStatement();
           ResultSet result = statement.executeQuery(cmd);
-          Map<String, Stream> retrievedStreams = new HashMap<String, Stream>();
+          Map<String, Stream> allStreams = new HashMap<String, Stream>();
           while (result.next()) {
             // get the requested Streams
             Stream retrievedStream = new Stream(result);
-            retrievedStreams.put(retrievedStream.getId(), retrievedStream);
+            allStreams.put(retrievedStream.getId(), retrievedStream);
           }
-          logger.log("SQLiteDBHelper: retrieved " + retrievedStreams.size() + " streams.");
-          Map<String, Stream> returnStreams = new HashMap<String, Stream>();
-          for (Stream stream : retrievedStreams.values()) {
+          logger.log("SQLiteDBHelper: retrieved " + allStreams.size() + " streams.");
+          Map<String, Stream> rootStreams = new HashMap<String, Stream>();
+          for (Stream stream : allStreams.values()) {
             String pid = stream.getParentId();
             if (pid != null) {
               // add this stream as a child
-              retrievedStreams.get(pid).addChildStream(stream);
+              allStreams.get(pid).addChildStream(stream);
               // remove it from retrievedStreams.
             } else {
-              returnStreams.put(stream.getId(), stream);
+              rootStreams.put(stream.getId(), stream);
             }
           }
-          cacheStreamsCallback.onCacheRetrieveStreamSuccess(returnStreams);
+          cacheStreamsCallback.onCacheRetrieveStreamSuccess(rootStreams);
         } catch (SQLException e) {
           cacheStreamsCallback.onStreamError(e.getMessage());
           e.printStackTrace();

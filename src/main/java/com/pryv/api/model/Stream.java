@@ -23,14 +23,14 @@ public class Stream {
 
   private String id;
   private String name;
-  private List<Stream> children;
-  private Boolean trashed;
   private Long created;
   private String createdBy;
   private Long modified;
   private String modifiedBy;
 
   // optional
+  private Boolean trashed;
+  private List<Stream> children;
   private String parentId;
   private Boolean singleActivity;
   private Map<String, Object> clientData;

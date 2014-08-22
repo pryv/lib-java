@@ -1,7 +1,6 @@
 package com.pryv.api;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.pryv.Pryv;
@@ -36,6 +35,9 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
    *          the url to which online requests are made.
    * @param token
    *          the token used to authenticate online requests.
+   * @param initCallback
+   *          the callback for SQLite database initialization
+   *
    * @throws SQLException
    * @throws ClassNotFoundException
    */
@@ -51,8 +53,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
   @Override
   public void getEvents(Filter filter, EventsCallback connectionEventsCallback) {
-    // look in cache and send it onPartialResult
-    // connectionEventsCallback.onCacheRetrieveEventsSuccess(dbHelper.getEvents(filter));
+    // retrieve Events from cache
     dbHelper.getEvents(filter, new CacheEventsCallback(connectionEventsCallback));
     logger.log("Cache: retrieved Events from cache: ");
 
@@ -61,19 +62,32 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   }
 
   @Override
-  public void createEvent(Event event, EventsCallback userEventsCallback) {
-    // TODO Auto-generated method stub
+  public void createEvent(Event event, EventsCallback connectionEventsCallback) {
+    // create Event in cache
+    dbHelper.createEvent(event, new CacheEventsCallback(connectionEventsCallback));
+
+    // forward call to online module
+    onlineEventsManager.createEvent(event, new CacheEventsCallback(connectionEventsCallback));
   }
 
   @Override
-  public void deleteEvent(Event eventToDelete, EventsCallback userEventsCallback) {
-    // TODO Auto-generated method stub
+  public void deleteEvent(Event eventToDelete, EventsCallback connectionEventsCallback) {
+    // delete Event from cache
+    dbHelper.deleteEvent(eventToDelete, new CacheEventsCallback(connectionEventsCallback));
 
+    // forward call to online module
+    onlineEventsManager.deleteEvent(eventToDelete,
+      new CacheEventsCallback(connectionEventsCallback));
   }
 
   @Override
-  public void updateEvent(Event eventToUpdate, EventsCallback userEventsCallback) {
-    // TODO Auto-generated method stub
+  public void updateEvent(Event eventToUpdate, EventsCallback connectionEventsCallback) {
+    // update Event in cache
+    dbHelper.updateEvent(eventToUpdate, new CacheEventsCallback(connectionEventsCallback));
+
+    // forward call to online module
+    onlineEventsManager.updateEvent(eventToUpdate,
+      new CacheEventsCallback(connectionEventsCallback));
   }
 
   /*
@@ -82,28 +96,41 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
   @Override
   public void getStreams(Filter filter, final StreamsCallback connectionStreamsCallback) {
-    // look in cache and send it onPartialResult
-    // dbHelper.getStreams();
-    logger.log("Cache: retrieved Events from cache: ");
-    connectionStreamsCallback.onCacheRetrieveStreamSuccess(new HashMap<String, Stream>());
+    // retrieve Streams from cache
+    logger.log("Cache: retrieved Streams from cache: ");
+    dbHelper.getStreams(new CacheStreamsCallback(connectionStreamsCallback));
 
     onlineStreamsManager.getStreams(filter, new CacheStreamsCallback(connectionStreamsCallback));
   }
 
   @Override
   public void createStream(Stream newStream, StreamsCallback connectionStreamsCallback) {
-    // TODO Auto-generated method stub
+    // create Stream in DB
+    dbHelper.createStream(newStream, new CacheStreamsCallback(connectionStreamsCallback));
+
+    // forward call to online module
+    onlineStreamsManager.createStream(newStream,
+      new CacheStreamsCallback(connectionStreamsCallback));
   }
 
   @Override
   public void deleteStream(Stream streamToDelete, StreamsCallback connectionStreamsCallback) {
-    // TODO Auto-generated method stub
+    // delete Stream from local db
+    dbHelper.deleteStream(streamToDelete, new CacheStreamsCallback(connectionStreamsCallback));
 
+    // forward call to online module
+    onlineStreamsManager.deleteStream(streamToDelete, new CacheStreamsCallback(
+      connectionStreamsCallback));
   }
 
   @Override
   public void updateStream(Stream streamToUpdate, StreamsCallback connectionStreamsCallback) {
-    // TODO Auto-generated method stub
+    // update Stream in local db
+    dbHelper.updateStream(streamToUpdate, new CacheStreamsCallback(connectionStreamsCallback));
+
+    // forward call to online module
+    onlineStreamsManager.updateStream(streamToUpdate, new CacheStreamsCallback(
+      connectionStreamsCallback));
   }
 
   /**
@@ -122,7 +149,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
     @Override
     public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
-      // update Cache with receivedEvents
+      // update or create Cache with receivedEvents
       for (Event event : onlineEvents.values()) {
         dbHelper.updateEvent(event, new CacheEventsCallback(connectionEventsCallback));
       }
