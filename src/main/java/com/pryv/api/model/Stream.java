@@ -31,6 +31,9 @@ public class Stream {
   // optional
   private Boolean trashed;
   private List<Stream> children;
+  // @JsonSerialize(using=MySerializer.class)
+  // @JsonDeserialize(using = JsonConverter.ChildrenDeserializer.class)
+  // private Map<String, Stream> children;
   private String parentId;
   private Boolean singleActivity;
   private Map<String, Object> clientData;
@@ -114,6 +117,11 @@ public class Stream {
     for (Stream stream : temp.children) {
       children.add(cloner.deepClone(stream));
     }
+    // children = new HashMap<String, Stream>();
+    // for (Stream stream : temp.children.values()) {
+    // children.put(stream.getId(), cloner.deepClone(stream));
+    // }
+
     trashed = temp.trashed;
     created = temp.created;
     createdBy = temp.createdBy;
@@ -166,8 +174,10 @@ public class Stream {
   public void addChildStream(Stream childStream) {
     if (children == null) {
       children = new ArrayList<Stream>();
+      // children = new HashMap<String, Stream>();
     }
     children.add(childStream);
+    // children.put(childStream.getId(), childStream);
   }
 
   public String getId() {
@@ -189,6 +199,10 @@ public class Stream {
   public Map<String, Object> getClientData() {
     return clientData;
   }
+
+  // public Map<String, Stream> getChildren() {
+  // return children;
+  // }
 
   public List<Stream> getChildren() {
     return children;
@@ -233,6 +247,10 @@ public class Stream {
   public void setClientData(Map<String, Object> pClientData) {
     this.clientData = pClientData;
   }
+
+  // public void setChildren(Map<String, Stream> pChildren) {
+  // this.children = pChildren;
+  // }
 
   public void setChildren(List<Stream> pChildren) {
     this.children = pChildren;
