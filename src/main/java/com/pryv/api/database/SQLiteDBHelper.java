@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.sqlite.SQLiteConfig;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -59,7 +61,10 @@ public class SQLiteDBHelper {
   private void initDB(final String path, DBinitCallback initCallback) {
     try {
       Class.forName("org.sqlite.JDBC");
-      dbConnection = DriverManager.getConnection("jdbc:sqlite:" + path);
+      SQLiteConfig config = new SQLiteConfig();
+      config.enforceForeignKeys(true);
+      dbConnection = DriverManager.getConnection("jdbc:sqlite:" + path, config.toProperties());
+
       logger.log("Opened database successfully");
       createEventsTable();
       createSteamsTable();
