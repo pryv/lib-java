@@ -152,7 +152,13 @@ public class JsonConverter {
     return cloner;
   }
 
-
+  /**
+   * Custom Serializer used to properly convert Map<String, Stream> to JSON
+   * array
+   *
+   * @author ik
+   *
+   */
   public class ChildrenSerializer extends JsonSerializer<Map<String, Stream>> {
 
     @Override
@@ -189,10 +195,6 @@ public class JsonConverter {
           newChildren.put(id, jsonMapper.readValue(streamNode.toString(), Stream.class));
         }
       }
-      // int id = (Integer) ((IntNode) node.get("id")).numberValue();
-      // String itemName = node.get("itemName").asText();
-      // int userId = (Integer) ((IntNode) node.get("createdBy")).numberValue();
-
       return newChildren;
     }
 
