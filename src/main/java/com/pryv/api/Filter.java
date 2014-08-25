@@ -74,12 +74,18 @@ public class Filter {
   }
 
   /**
-   * Empty Filter constructor.
+   * Empty constructor.
    */
   public Filter() {
 
   }
 
+  /**
+   * Verify if an Event is contained in this filter.
+   *
+   * @param event
+   * @return
+   */
   public Boolean match(Event event) {
 
     // fromTime
@@ -163,6 +169,43 @@ public class Filter {
         && modifiedSinceMatch;
   }
 
+  /**
+   * Verify if another filter encompasses this filter
+   *
+   * @param other
+   *          filter that might be encompassing the caller filter
+   * @return
+   */
+  public boolean isIncludedIn(Filter other) {
+    return (fromTime > other.fromTime)
+      && (toTime < other.toTime)
+        && (other.streamIds.containsAll(streamIds))
+        && (other.tags.containsAll(tags))
+        && (other.types.containsAll(types))
+        && (modifiedSince < other.modifiedSince);
+  }
+
+  /**
+   * Verify if this filter encompasses another filter
+   *
+   * @param other
+   *          filter that might be encompassed by the caller filter
+   * @return
+   */
+  public boolean includes(Filter other) {
+    return (fromTime < other.fromTime)
+      && (toTime > other.toTime)
+        && (streamIds.containsAll(other.streamIds))
+        && (tags.containsAll(other.tags))
+        && (types.containsAll(other.types))
+        && (modifiedSince > other.modifiedSince);
+  }
+
+  /**
+   * add a specific stream id to the filter
+   *
+   * @param pStreamId
+   */
   public void addStreamId(String pStreamId) {
     if (streamIds == null) {
       streamIds = new HashSet<>();
@@ -170,6 +213,11 @@ public class Filter {
     streamIds.add(pStreamId);
   }
 
+  /**
+   * format Filter as URL parameters for online requests
+   *
+   * @return
+   */
   public String toUrlParameters() {
     StringBuilder sb = new StringBuilder();
     if (fromTime != null) {

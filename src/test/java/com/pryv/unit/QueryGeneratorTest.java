@@ -1,7 +1,5 @@
 package com.pryv.unit;
 
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Class used to test QueryGenerators methods.
@@ -11,13 +9,6 @@ import org.junit.Test;
  */
 public class QueryGeneratorTest {
 
-  @Before
-  public void setUp() throws Exception {
 
-  }
-
-  @Test
-  public void test() {
-  }
 
 }

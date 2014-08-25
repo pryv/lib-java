@@ -1,6 +1,5 @@
 package com.pryv.unit;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -82,13 +81,16 @@ public class DummyData {
   public static Stream generateFullStream() {
     streamClientData = new HashMap<String, Object>();
     streamClientData.put(STREAM_CLIENT_KEY, STREAM_CLIENT_VALUE);
-    streamChildren = new ArrayList<Stream>();
-    streamChildren.add(new Stream(STREAM_CHILD_ID, STREAM_CHILD_NAME, STREAM_ID, null, null, null,
+    Stream streamChild =
+      new Stream(STREAM_CHILD_ID, STREAM_CHILD_NAME, STREAM_ID, null, null, null,
       STREAM_CHILD_TRASHED, STREAM_CHILD_CREATED, STREAM_CHILD_CREATED_BY, STREAM_CHILD_MODIFIED,
-      STREAM_CHILD_MODIFIED_BY));
-    return new Stream(STREAM_ID, STREAM_NAME, null, STREAM_SINGLE_ACTIVITY,
-      streamClientData, streamChildren, STREAM_TRASHED, STREAM_CREATED, STREAM_CREATED_BY,
+        STREAM_CHILD_MODIFIED_BY);
+    Stream testStream =
+      new Stream(STREAM_ID, STREAM_NAME, null, STREAM_SINGLE_ACTIVITY, streamClientData, null,
+        STREAM_TRASHED, STREAM_CREATED, STREAM_CREATED_BY,
       STREAM_MODIFIED, STREAM_MODIFIED_BY);
+    testStream.addChildStream(streamChild);
+    return testStream;
   }
 
   public static Set<Attachment> generateAttachments() {

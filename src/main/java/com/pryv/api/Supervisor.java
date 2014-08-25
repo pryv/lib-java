@@ -9,6 +9,7 @@ import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 import com.pryv.utils.JsonConverter;
 import com.pryv.utils.Logger;
+import com.pryv.utils.StreamUtils;
 
 /**
  *
@@ -25,7 +26,7 @@ public class Supervisor {
   private Logger logger = Logger.getInstance();
 
   /**
-   * Supervisor constructor. Instanciates data structures to store Streams and
+   * Supervisor constructor. Instantiates data structures to store Streams and
    * Events.
    *
    */
@@ -39,7 +40,7 @@ public class Supervisor {
    */
 
   /**
-   * Returns the local memory streams
+   * Returns the root local memory streams
    *
    * @return
    */
@@ -52,14 +53,19 @@ public class Supervisor {
    *
    * @param pStreams
    */
-  public void updateOrCreateStream(Stream stream) throws IncompleteFieldsException {
+  public void updateOrCreateStream(Stream stream, StreamsCallback connectionCallback)
+    throws IncompleteFieldsException {
     if (areFieldsValid(stream)) {
-      // case exists: compare modified field
-      if (events.containsKey(stream.getId())) {
-        updateStream(stream);
-        // case new Event: simply add
+      Stream oldStream = StreamUtils.findStreamReference(stream.getId(), streams);
+      if (oldStream != null) {
+        // case exists: compare modified field
+        updateStream(oldStream, stream, connectionCallback);
       } else {
+        // case new Event: simply add
         addStream(stream);
+        connectionCallback.onStreamsSuccess("Stream with id="
+          + stream.getId()
+            + " added successfully");
       }
     } else {
       throw new IncompleteFieldsException();
@@ -70,15 +76,96 @@ public class Supervisor {
    * Update Stream in Supervisor. The condition on the update is the result of
    * the comparison of the modified fields.
    *
-   * @param stream
+   * @param streamToUpdate
    * @throws IncompleteFieldsException
    */
-  private void updateStream(Stream stream) throws IncompleteFieldsException {
-    Stream memStream = streams.get(stream.getId());
-    if (memStream.getModified() > stream.getModified()) {
+  private void updateStream(Stream oldStream, Stream streamToUpdate,
+    StreamsCallback connectionCallback) {
+    if (oldStream.getModified() > streamToUpdate.getModified()) {
       // do nothing
+      connectionCallback.onStreamsSuccess("Stream with id="
+        + streamToUpdate.getId()
+          + " not updated since it is older than the stored version.");
     } else {
-      memStream.merge(stream, JsonConverter.getCloner());
+      // find out if parent has changed:
+      if (oldStream.getParentId() == null && streamToUpdate.getParentId() == null) {
+        // case 1: was root, still root
+        // do nothing
+      } else if (oldStream.getParentId() == null && streamToUpdate.getParentId() != null) {
+        // case 2: was root, now child
+        // add it to its parent's children
+        addChildStreamToParent(streamToUpdate.getParentId(), streamToUpdate, connectionCallback);
+      } else if (oldStream.getParentId() != null && streamToUpdate.getParentId() == null) {
+        // case 3: was child, now root
+        // remove it from old parents children
+        removeChildStreamFromParent(oldStream.getParentId(), streamToUpdate, connectionCallback);
+        streams.put(streamToUpdate.getId(), streamToUpdate);
+      } else {
+        // case 4: was child, still child
+        if (oldStream.getParentId().equals(streamToUpdate.getParentId())) {
+          // case 4a: same parent
+          // do nothing
+        } else {
+          // case 4b: parent changed
+          // remove it from old parent
+          removeChildStreamFromParent(oldStream.getParentId(), streamToUpdate, connectionCallback);
+          // add it to new parent
+          addChildStreamToParent(streamToUpdate.getParentId(), streamToUpdate, connectionCallback);
+        }
+      }
+    }
+    // do the update
+    oldStream.merge(streamToUpdate, JsonConverter.getCloner());
+    connectionCallback.onStreamsSuccess("Stream updated: " + streamToUpdate.getId());
+  }
+
+  /**
+   * Add Stream's reference to parent's children list
+   *
+   * @param parentId
+   *          the id of the parent Stream
+   * @param childStream
+   *          the reference of the Stream to add
+   * @param connectionCallback
+   *          the callback to notify failure
+   */
+  private void addChildStreamToParent(String parentId, Stream childStream,
+    StreamsCallback connectionCallback) {
+    Stream newParent = StreamUtils.findStreamReference(parentId, streams);
+    if (newParent != null) {
+      // verify that new parent is not the Stream's child - loop bug
+      if (StreamUtils.findStreamReference(childStream.getId(), newParent.getChildrenMap()) == null) {
+        newParent.addChildStream(childStream);
+        logger.log(childStream.getId() + " now child of " + parentId);
+      } else {
+        connectionCallback
+          .onStreamError("Stream update failure: trying to add Stream to child of its children");
+      }
+    } else {
+      connectionCallback
+        .onStreamError("Stream update failure: trying to add Stream as child of unexisting Stream.");
+    }
+  }
+
+  /**
+   * remove Stream's reference from parent's children list.
+   *
+   * @param parentId
+   *          the id of the parent Stream
+   * @param childStream
+   *          the reference of the Stream to remove
+   * @param connectionCallback
+   *          the callback to notify failure
+   */
+  private void removeChildStreamFromParent(String parentId, Stream childStream,
+    StreamsCallback connectionCallback) {
+    Stream oldParent = StreamUtils.findStreamReference(parentId, streams);
+    if (oldParent != null) {
+      logger.log(childStream.getId() + " removed from " + parentId + "'s children.");
+      oldParent.removeChildStream(childStream);
+    } else {
+      connectionCallback
+        .onStreamError("Stream update failure: trying to remove Stream from unexisting Stream's children list");
     }
   }
 
@@ -86,9 +173,10 @@ public class Supervisor {
    * Add Stream in Supervisor
    *
    * @param stream
-   * @throws IncompleteFieldsException
+   *          the stream to add
    */
-  private void addStream(Stream stream) throws IncompleteFieldsException {
+  private void addStream(Stream stream) {
+    logger.log("Stream added: " + stream.getId());
     streams.put(stream.getId(), stream);
   }
 
@@ -96,23 +184,55 @@ public class Supervisor {
    * Delete Stream from Supervisor, if trashed is false, sets it to true, else
    * deletes it.
    *
-   * @param streamToDelete
-   *          the stream to delete
+   * @param streamId
+   *          the Id of the Stream to delete.
+   * @param connectionSCallback
+   *          callback for the Stream deletion
    */
-  public void deleteStream(Stream streamToDelete) throws IncompleteFieldsException {
-    if (areFieldsValid(streamToDelete)) {
-      if (streams.get(streamToDelete.getId()).getTrashed() == true) {
+  public void deleteStream(String streamId, StreamsCallback connectionSCallback) {
+    Stream streamToDelete = StreamUtils.findStreamReference(streamId, streams);
+    if (streamToDelete != null) {
+      if (streamToDelete.getTrashed() == true) {
         // delete really
-        streams.remove(streamToDelete.getId());
+
+        // delete from parent stream
+        Stream parentStream =
+          StreamUtils.findStreamReference(streamToDelete.getParentId(), streams);
+        parentStream.removeChildStream(streamToDelete);
+
+        // delete Stream's events
+        for (Event event : events.values()) {
+          if (event.getStreamId().equals(streamId)) {
+            deleteEvent(event, null);
+          }
+        }
+        // delete Stream's children Streams
+        if (streamToDelete.getChildren() != null) {
+          for (String childStream : streamToDelete.getChildrenMap().keySet()) {
+            deleteStream(childStream, connectionSCallback);
+          }
+        }
+        // delete Stream
+        streamToDelete = null;
       } else {
-        // update trashed field
-        streams.get(streamToDelete.getId()).setTrashed(true);
-        for (Stream childstream : streams.get(streamToDelete.getId()).getChildren()) {
+        // update trashed field of stream to delete and its child streams
+        streamToDelete.setTrashed(true);
+        for (Stream childstream : streamToDelete.getChildren()) {
+          childstream.setTrashed(true);
+          for (Event event : events.values()) {
+            if (event.getStreamId().equals(streamId)) {
+              event.setTrashed(true);
+            }
+          }
+        }
+        for (Stream childstream : streamToDelete.getChildrenMap().values()) {
           childstream.setTrashed(true);
         }
       }
+      connectionSCallback.onStreamsSuccess("Stream with id=" + streamId + " deleted.");
     } else {
-      throw new IncompleteFieldsException();
+      // streamToDelete not found
+      connectionSCallback.onStreamError("Stream with id=" + streamId + " not found.");
     }
   }
 
@@ -128,7 +248,7 @@ public class Supervisor {
    * @return returns the events matching the filter or an empty Map<String,
    *         Event>.
    */
-  public Map<String, Event> getEvents(Filter filter) {
+  public void getEvents(Filter filter, EventsCallback connectionCallback) {
     Map<String, Event> returnEvents = new HashMap<String, Event>();
 
     for (Event event : events.values()) {
@@ -136,7 +256,7 @@ public class Supervisor {
         returnEvents.put(event.getId(), event);
         logger.log("Supervisor: matched: streamName="
         // + streams.get(event.getStreamId()).getName()
-            + ", streamId="
+          + ", streamId="
             + event.getStreamId()
             + ", id="
             + event.getId());
@@ -148,7 +268,7 @@ public class Supervisor {
       returnEvents.keySet().retainAll(
         ImmutableSet.copyOf(Iterables.limit(returnEvents.keySet(), filter.getLimit())));
     }
-    return returnEvents;
+    connectionCallback.onSupervisorRetrieveEventsSuccess(returnEvents);
   }
 
   /**
@@ -157,14 +277,20 @@ public class Supervisor {
    * @param newEvents
    * @throws IncompleteFieldsException
    */
-  public void updateOrCreateEvent(Event newEvent) throws IncompleteFieldsException {
+  public void updateOrCreateEvent(Event newEvent, EventsCallback connectionCallback)
+    throws IncompleteFieldsException {
     if (areFieldsValid(newEvent)) {
       // case exists: compare modified field
       if (events.containsKey(newEvent.getId())) {
         updateEvent(newEvent);
-        // case new Event: simply add
+        connectionCallback.onEventsSuccess("Event with id="
+          + newEvent.getId()
+            + " updated successfully.");
       } else {
         addEvent(newEvent);
+        connectionCallback.onEventsSuccess("Event with id="
+          + newEvent.getId()
+            + " added successfully.");
       }
     } else {
       throw new IncompleteFieldsException();
@@ -212,21 +338,24 @@ public class Supervisor {
    * Delete Event from Supervisor, if trashed is false, sets it to true, else
    * deletes it.
    *
-   * @param eventId
-   * @throws IncompleteFieldsException
+   * @param eventToDelete
+   *          the Event to delete
    */
-  public void deleteEvent(Event eventToDelete) throws IncompleteFieldsException {
-    if (areFieldsValid(eventToDelete)) {
+  public void deleteEvent(Event eventToDelete, EventsCallback connectionCallback) {
+    if (events.get(eventToDelete.getId()) != null) {
       if (events.get(eventToDelete.getId()).getTrashed() == true) {
         // delete really
         events.remove(eventToDelete.getId());
       } else {
         // update trashed field
-        events.get(eventToDelete.getId()).setTrashed(true);
+        eventToDelete.setTrashed(true);
+        updateEvent(eventToDelete);
       }
+      connectionCallback.onEventsSuccess("Event with id=" + eventToDelete.getId() + " deleted.");
     } else {
-      throw new IncompleteFieldsException();
+      connectionCallback.onEventsError("Event with id=" + eventToDelete.getId() + " not found.");
     }
+
   }
 
   /**
@@ -295,7 +424,7 @@ public class Supervisor {
      * @param message
      */
     public IncompleteFieldsException() {
-      super("Supervisor: attempt to Create a Stream with incomplete fields");
+      super("Supervisor: attempt to Create a Stream or Event with incomplete fields");
     }
   }
 

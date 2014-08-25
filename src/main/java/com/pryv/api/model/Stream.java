@@ -31,9 +31,7 @@ public class Stream {
   // optional
   private Boolean trashed;
   private List<Stream> children;
-  // @JsonSerialize(using=MySerializer.class)
-  // @JsonDeserialize(using = JsonConverter.ChildrenDeserializer.class)
-  // private Map<String, Stream> children;
+  private Map<String, Stream> childrenMap;
   private String parentId;
   private Boolean singleActivity;
   private Map<String, Object> clientData;
@@ -65,6 +63,11 @@ public class Stream {
     singleActivity = pSingleActivity;
     clientData = pClientData;
     children = pChildren;
+    if (pChildren != null) {
+      for (Stream stream : pChildren) {
+        childrenMap.put(stream.getId(), stream);
+      }
+    }
     trashed = pTrashed;
     created = pCreated;
     createdBy = pCreatedBy;
@@ -117,10 +120,10 @@ public class Stream {
     for (Stream stream : temp.children) {
       children.add(cloner.deepClone(stream));
     }
-    // children = new HashMap<String, Stream>();
-    // for (Stream stream : temp.children.values()) {
-    // children.put(stream.getId(), cloner.deepClone(stream));
-    // }
+    childrenMap = new HashMap<String, Stream>();
+    for (Stream stream : temp.childrenMap.values()) {
+      childrenMap.put(stream.getId(), cloner.deepClone(stream));
+    }
 
     trashed = temp.trashed;
     created = temp.created;
@@ -166,18 +169,26 @@ public class Stream {
   }
 
   /**
-   * Add a stream as child to caller. If children list doesn't exists yet,
-   * instanciates it.
+   * Add a stream as child to caller. If children list is null, instanciates it.
    *
    * @param childStream
    */
   public void addChildStream(Stream childStream) {
-    if (children == null) {
+    if (childrenMap == null || children == null) {
       children = new ArrayList<Stream>();
-      // children = new HashMap<String, Stream>();
+      childrenMap = new HashMap<String, Stream>();
     }
     children.add(childStream);
-    // children.put(childStream.getId(), childStream);
+    childrenMap.put(childStream.getId(), childStream);
+  }
+
+  public void removeChildStream(Stream childStream) {
+    childrenMap.remove(childStream.getId());
+    children.remove(childStream);
+    if (childrenMap.size() == 0) {
+      childrenMap = null;
+      children = null;
+    }
   }
 
   public String getId() {
@@ -200,9 +211,9 @@ public class Stream {
     return clientData;
   }
 
-  // public Map<String, Stream> getChildren() {
-  // return children;
-  // }
+  public Map<String, Stream> getChildrenMap() {
+    return childrenMap;
+  }
 
   public List<Stream> getChildren() {
     return children;
@@ -248,12 +259,16 @@ public class Stream {
     this.clientData = pClientData;
   }
 
-  // public void setChildren(Map<String, Stream> pChildren) {
-  // this.children = pChildren;
-  // }
-
   public void setChildren(List<Stream> pChildren) {
     this.children = pChildren;
+    if (pChildren != null) {
+      for (Stream stream : pChildren) {
+        if (childrenMap == null) {
+          childrenMap = new HashMap<String, Stream>();
+        }
+        childrenMap.put(stream.getId(), stream);
+      }
+    }
   }
 
   public void setTrashed(Boolean pTrashed) {

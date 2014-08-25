@@ -42,23 +42,23 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
    */
 
   @Override
-  public void getEvents(Filter filter, EventsCallback eventsCallback) {
-    new FetchEventsThread(filter.toUrlParameters(), eventsCallback).start();
+  public void getEvents(Filter filter, EventsCallback cacheEventsCallback) {
+    new FetchEventsThread(filter.toUrlParameters(), cacheEventsCallback).start();
   }
 
   @Override
-  public void createEvent(Event newEvent, EventsCallback userEventsCallback) {
+  public void createEvent(Event newEvent, EventsCallback cacheEventsCallback) {
     // TODO Auto-generated method stub
   }
 
   @Override
-  public void deleteEvent(Event eventToDelete, EventsCallback userEventsCallback) {
+  public void deleteEvent(Event eventToDelete, EventsCallback cacheEventsCallback) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void updateEvent(Event eventToUpdate, EventsCallback userEventsCallback) {
+  public void updateEvent(Event eventToUpdate, EventsCallback cacheEventsCallback) {
     // TODO Auto-generated method stub
   }
 

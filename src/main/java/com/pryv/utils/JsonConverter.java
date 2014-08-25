@@ -11,12 +11,12 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.pryv.api.model.Attachment;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
@@ -177,10 +177,15 @@ public class JsonConverter {
    * @author ik
    *
    */
-  public class ChildrenDeserializer extends JsonDeserializer<Map<String, Stream>> {
+  public class ChildrenDeserializer extends StdDeserializer<Map<String, Stream>> {
 
-    public ChildrenDeserializer() {
+    public ChildrenDeserializer(Class<?> vc) {
+      super(vc);
     }
+
+    // public ChildrenDeserializer() {
+    // this(Map<String, Stream>.class);
+    // }
 
     @Override
     public Map<String, Stream> deserialize(JsonParser jp, DeserializationContext ctxt)

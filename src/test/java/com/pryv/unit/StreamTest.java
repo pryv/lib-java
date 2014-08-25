@@ -30,7 +30,9 @@ public class StreamTest {
   @Before
   public void setUp() throws Exception {
     testStream = DummyData.generateFullStream();
-    testChildStream = testStream.getChildren().get(0);
+    for (Stream testChildren : testStream.getChildren()) {
+      testChildren = testChildren;
+    }
     jsonStream = DummyData.generateJsonStream();
   }
 

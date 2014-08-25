@@ -83,7 +83,7 @@ public class Connection implements EventsManager, StreamsManager {
   @Override
   public void getEvents(final Filter filter, EventsCallback userEventsCallback) {
     // send supervisor's events on User's callback.onEventsPartialResult()
-    userEventsCallback.onSupervisorRetrieveEventsSuccess(supervisor.getEvents(filter));
+    supervisor.getEvents(filter, userEventsCallback);
 
     // forward getEvents() to Cache
     cacheEventsManager.getEvents(filter, new ConnectionEventsCallback(userEventsCallback, filter));
@@ -94,7 +94,7 @@ public class Connection implements EventsManager, StreamsManager {
     updateCreated(newEvent);
     // create event in Supervisor
     try {
-      supervisor.updateOrCreateEvent(newEvent);
+      supervisor.updateOrCreateEvent(newEvent, userEventsCallback);
     } catch (IncompleteFieldsException e) {
       userEventsCallback.onEventsError(e.getMessage());
     }
@@ -110,11 +110,7 @@ public class Connection implements EventsManager, StreamsManager {
     eventToDelete.setTrashed(true);
 
     // delete Event in Supervisor
-    try {
-      supervisor.deleteEvent(eventToDelete);
-    } catch (IncompleteFieldsException e) {
-      userEventsCallback.onEventsError(e.getMessage());
-    }
+    supervisor.deleteEvent(eventToDelete, userEventsCallback);
 
     // forward call to cache
     cacheEventsManager.deleteEvent(eventToDelete, new ConnectionEventsCallback(userEventsCallback,
@@ -126,7 +122,7 @@ public class Connection implements EventsManager, StreamsManager {
     updateModified(eventToUpdate);
     // update Event in Supervisor
     try {
-      supervisor.updateOrCreateEvent(eventToUpdate);
+      supervisor.updateOrCreateEvent(eventToUpdate, userEventsCallback);
     } catch (IncompleteFieldsException e) {
       userEventsCallback.onEventsError(e.getMessage());
     }
@@ -155,7 +151,7 @@ public class Connection implements EventsManager, StreamsManager {
     updateCreated(newStream);
     // create Stream in Supervisor
     try {
-      supervisor.updateOrCreateStream(newStream);
+      supervisor.updateOrCreateStream(newStream, userStreamsCallback);
     } catch (IncompleteFieldsException e) {
       userStreamsCallback.onStreamError(e.getMessage());
     }
@@ -171,11 +167,9 @@ public class Connection implements EventsManager, StreamsManager {
       childStream.setTrashed(true);
     }
     // delete Stream in Supervisor
-    try {
-      supervisor.deleteStream(streamToDelete);
-    } catch (IncompleteFieldsException e) {
-      userStreamsCallback.onStreamError(e.getMessage());
-    }
+    supervisor.deleteStream(streamToDelete.getId(), new ConnectionStreamsCallback(
+      userStreamsCallback));
+
     // forward call to cache
     cacheStreamsManager.deleteStream(streamToDelete, new ConnectionStreamsCallback(
       userStreamsCallback));
@@ -186,7 +180,7 @@ public class Connection implements EventsManager, StreamsManager {
     updateModified(streamToUpdate);
     // update Stream in Supervisor
     try {
-      supervisor.updateOrCreateStream(streamToUpdate);
+      supervisor.updateOrCreateStream(streamToUpdate, userStreamsCallback);
     } catch (IncompleteFieldsException e) {
       userStreamsCallback.onStreamError(e.getMessage());
     }
@@ -261,13 +255,13 @@ public class Connection implements EventsManager, StreamsManager {
       // update existing references with JSON received from online
       for (Event onlineEvent : onlineEvents.values()) {
         try {
-          supervisor.updateOrCreateEvent(onlineEvent);
+          supervisor.updateOrCreateEvent(onlineEvent, userEventsCallback);
         } catch (IncompleteFieldsException e) {
           userEventsCallback.onEventsError(e.getMessage());
         }
       }
       // return merged events from Supervisor
-      userEventsCallback.onOnlineRetrieveEventsSuccess(supervisor.getEvents(filter));
+      supervisor.getEvents(filter, userEventsCallback);
     }
 
     @Override
@@ -275,13 +269,13 @@ public class Connection implements EventsManager, StreamsManager {
       // update existing Events with those retrieved from the cache
       for (Event cacheEvent : cacheEvents.values()) {
         try {
-          supervisor.updateOrCreateEvent(cacheEvent);
+          supervisor.updateOrCreateEvent(cacheEvent, userEventsCallback);
         } catch (IncompleteFieldsException e) {
           userEventsCallback.onEventsError(e.getMessage());
         }
       }
       // return merged events from Supervisor
-      userEventsCallback.onCacheRetrieveEventsSuccess(supervisor.getEvents(filter));
+      supervisor.getEvents(filter, userEventsCallback);
     }
 
     @Override
@@ -330,7 +324,7 @@ public class Connection implements EventsManager, StreamsManager {
     public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStream) {
       for (Stream stream : onlineStream.values()) {
         try {
-          supervisor.updateOrCreateStream(stream);
+          supervisor.updateOrCreateStream(stream, userStreamsCallback);
         } catch (IncompleteFieldsException e) {
           userStreamsCallback.onStreamError(e.getMessage());
         }
@@ -343,7 +337,7 @@ public class Connection implements EventsManager, StreamsManager {
     public void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStream) {
       for (Stream stream : cacheStream.values()) {
         try {
-          supervisor.updateOrCreateStream(stream);
+          supervisor.updateOrCreateStream(stream, userStreamsCallback);
         } catch (IncompleteFieldsException e) {
           userStreamsCallback.onStreamError(e.getMessage());
         }

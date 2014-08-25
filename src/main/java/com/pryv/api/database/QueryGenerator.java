@@ -1,6 +1,5 @@
 package com.pryv.api.database;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -348,12 +347,8 @@ public class QueryGenerator {
         + " VALUES (");
     sb.append(formatTextValue(streamToCache.getId()) + ",");
     sb.append(formatTextValue(streamToCache.getName()) + ",");
-    if (streamToCache.getChildren() != null) {
-      Set<String> childIds = new HashSet<String>();
-      for (Stream childStream : streamToCache.getChildren()) {
-        childIds.add(childStream.getId());
-      }
-      sb.append(formatSetValue(childIds) + ",");
+    if (streamToCache.getChildrenMap() != null) {
+      sb.append(formatSetValue(streamToCache.getChildrenMap().keySet()) + ",");
     } else {
       sb.append("NULL,");
     }
@@ -378,11 +373,8 @@ public class QueryGenerator {
   public static String updateStream(Stream streamToUpdate) {
     StringBuilder sb = new StringBuilder();
     Set<String> childIds = null;
-    if (streamToUpdate.getChildren() != null) {
-      childIds = new HashSet<String>();
-      for (Stream childStream : streamToUpdate.getChildren()) {
-        childIds.add(childStream.getId());
-      }
+    if (streamToUpdate.getChildrenMap() != null) {
+      childIds = streamToUpdate.getChildrenMap().keySet();
     }
     sb.append("UPDATE "
       + STREAMS_TABLE_NAME

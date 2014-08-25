@@ -157,8 +157,7 @@ public class RetrieveEventsTest {
 
       @Override
       public void onCacheRetrieveEventsSuccess(Map<String, Event> newEvents) {
-        // TODO Auto-generated method stub
-
+        events = newEvents;
       }
 
       @Override
@@ -169,8 +168,7 @@ public class RetrieveEventsTest {
 
       @Override
       public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
-        // TODO Auto-generated method stub
-
+        events = supervisorEvents;
       }
 
       @Override
@@ -201,8 +199,7 @@ public class RetrieveEventsTest {
 
       @Override
       public void onCacheRetrieveStreamSuccess(Map<String, Stream> newStreams) {
-        // TODO Auto-generated method stub
-
+        streams = newStreams;
       }
 
       @Override
@@ -213,8 +210,7 @@ public class RetrieveEventsTest {
 
       @Override
       public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
-        // TODO Auto-generated method stub
-
+        streams = supervisorStreams;
       }
 
       @Override
