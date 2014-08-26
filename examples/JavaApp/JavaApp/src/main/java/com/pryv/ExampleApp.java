@@ -142,7 +142,6 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     });
 
     Connection newConnection = new Connection(username, token, new DBinitCallback() {
-
       public void onError(String message) {
         displayError(message);
       }
@@ -192,8 +191,10 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    *
    * @param action
    *          "Edit" or "Create"
+   * @param streamToUpdate
+   *          the stream to update
    */
-  public void showStreamForm(FormController.Mode action) {
+  public void showStreamForm(FormController.Mode action, Stream streamToUpdate) {
     try {
       // Load the fxml file and set into the center of the main layout
       FXMLLoader loader =
@@ -211,6 +212,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
       FormController controller = loader.getController();
       controller.setMainApp(this);
       controller.setMode(action);
+      controller.setStream(streamToUpdate);
 
       // Show the dialog and wait until the user closes it
       dialogStage.showAndWait();
@@ -226,14 +228,15 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    *
    * @param action
    *          "Edit" or "Create"
+   * @param eventToUpdate
+   *          the Event to update
    */
-  public void showEventForm(FormController.Mode action) {
+  public void showEventForm(FormController.Mode action, Event eventToUpdate) {
     try {
       // Load the fxml file and set into the center of the main layout
       FXMLLoader loader =
  new FXMLLoader(ExampleApp.class.getResource("view/EventFormWindow.fxml"));
       AnchorPane page = (AnchorPane) loader.load();
-      // rootLayout.setCenter(overviewPage);
 
       Stage dialogStage = new Stage();
       dialogStage.initModality(Modality.WINDOW_MODAL);
@@ -245,6 +248,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
       FormController controller = loader.getController();
       controller.setMainApp(this);
       controller.setMode(action);
+      controller.setEvent(eventToUpdate);
 
       // Show the dialog and wait until the user closes it
       dialogStage.showAndWait();
@@ -256,29 +260,41 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   }
 
   /*
+   * Streams management
+   */
+
+  public void createStream(Stream newStream) {
+    streamsManager.createStream(newStream, this);
+  }
+
+  public void updateStream(Stream streamToUpdate) {
+    streamsManager.updateStream(streamToUpdate, this);
+  }
+
+  /*
    * Streams Callbacks
    */
 
-  public void onOnlineRetrieveStreamsSuccess(final Map<String, Stream> streams) {
-    logger.log("JavaApp: onSuccess()");
+  public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> streams) {
+    logger.log("JavaApp: received " + streams.size() + " from online");
+    addStreamsToTree(streams);
+  }
 
+  public void onCacheRetrieveStreamSuccess(Map<String, Stream> newStreams) {
+    addStreamsToTree(newStreams);
+  }
+
+  public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
+    addStreamsToTree(supervisorStreams);
+  }
+
+  private void addStreamsToTree(final Map<String, Stream> newStreams) {
     Platform.runLater(new Runnable() {
 
       public void run() {
         TreeItem<Stream> root = new TreeItem<Stream>();
         root.setExpanded(true);
-        buildStreamTree(root, streams.values());
-
-        // for (Stream stream : streams.values()) {
-        //
-        // TreeItem<Stream> streamTreeItem = new TreeItem<Stream>(stream);
-        // if (stream.getChildren() != null) {
-        // for (Stream childStream : stream.getChildren()) {
-        // streamTreeItem.getChildren().add(new TreeItem<Stream>(childStream));
-        // }
-        // }
-        // root.getChildren().add(streamTreeItem);
-        // }
+        buildStreamTree(root, newStreams.values());
         streamTreeItemsObservableList.add(root);
         controller.showStreams(root);
       }
@@ -296,28 +312,21 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     }
   }
 
-  public void onCacheRetrieveStreamSuccess(Map<String, Stream> newStreams) {
-    // TODO Auto-generated method stub
-
-  }
-
-  public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
-    // TODO Auto-generated method stub
-
-  }
-
   public void onStreamsRetrievalError(String message) {
     displayError(message);
   }
 
   public void onStreamsSuccess(String successMessage) {
-    // TODO Auto-generated method stub
-
+    // displayError(successMessage);
   }
 
   public void onStreamError(String errorMessage) {
     displayError(errorMessage);
   }
+
+  /*
+   * Events management
+   */
 
   /**
    * Fetch Events for a specific streamId
@@ -330,6 +339,14 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     Filter filter = new Filter();
     filter.setStreamIds(streamIds);
     eventsManager.getEvents(filter, this);
+  }
+
+  public void createEvent(Event newEvent) {
+    eventsManager.createEvent(newEvent, this);
+  }
+
+  public void updateEvent(Event eventToUpdate) {
+    eventsManager.updateEvent(eventToUpdate, this);
   }
 
   /*
@@ -349,8 +366,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   }
 
   public void onEventsSuccess(String successMessage) {
-    // TODO Auto-generated method stub
-
+    // displayError(successMessage);
   }
 
   public void onEventsError(String errorMessage) {

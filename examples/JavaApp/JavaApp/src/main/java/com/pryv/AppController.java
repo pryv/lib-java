@@ -118,6 +118,9 @@ public class AppController {
   @FXML
   private Button streamDeleteButton;
 
+  private Stream selectedStream;
+  private Event selectedEvent;
+
   // Reference to the main application
   private ExampleApp exampleApp;
 
@@ -151,6 +154,8 @@ public class AppController {
             super.updateItem(t, bln);
             if (t != null) {
               setText(t.getName());
+            } else {
+              setText(null);
             }
           }
         };
@@ -164,6 +169,7 @@ public class AppController {
         public void changed(ObservableValue<? extends TreeItem<Stream>> observable,
           TreeItem<Stream> oldValue, TreeItem<Stream> newValue) {
           showStreamDetails(newValue.getValue());
+          selectedStream = newValue.getValue();
         }
       });
 
@@ -177,7 +183,7 @@ public class AppController {
             if (t != null) {
               setText(t.getId());
             } else {
-              setText("");
+              setText(null);
             }
           }
         };
@@ -192,6 +198,7 @@ public class AppController {
           Event newValue) {
           if (newValue != null) {
             showEventDetails(newValue);
+            selectedEvent = newValue;
           }
         }
       });
@@ -199,28 +206,28 @@ public class AppController {
     streamCreateButton.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent event) {
         // exampleApp.displayError("create event pressed");
-        exampleApp.showStreamForm(FormController.Mode.CREATE);
+        exampleApp.showStreamForm(FormController.Mode.CREATE, null);
       }
     });
 
     streamUpdateButton.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent event) {
         // exampleApp.displayError("create event pressed");
-        exampleApp.showStreamForm(FormController.Mode.EDIT);
+        exampleApp.showStreamForm(FormController.Mode.EDIT, selectedStream);
       }
     });
 
     eventCreateButton.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent event) {
         // exampleApp.displayError("create event pressed");
-        exampleApp.showEventForm(FormController.Mode.CREATE);
+        exampleApp.showEventForm(FormController.Mode.CREATE, null);
       }
     });
 
     eventUpdateButton.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent event) {
         // exampleApp.displayError("create event pressed");
-        exampleApp.showEventForm(FormController.Mode.EDIT);
+        exampleApp.showEventForm(FormController.Mode.EDIT, selectedEvent);
       }
     });
   }
