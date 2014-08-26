@@ -7,9 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.sqlite.SQLiteConfig;
 
@@ -39,11 +37,6 @@ public class SQLiteDBHelper {
 
   private Connection dbConnection;
 
-  /**
-   * defines the scope of the data the SQLite DB contains.
-   */
-  private Set<Filter> scope;
-
   private Logger logger = Logger.getInstance();
 
   /**
@@ -59,7 +52,6 @@ public class SQLiteDBHelper {
   public SQLiteDBHelper(String name, DBinitCallback initCallback) {
     logger.log("SQLiteDBHelper: init DB in: " + dbPath + name);
     initDB(dbPath + name, initCallback);
-    scope = new HashSet<Filter>();
   }
 
   /**
@@ -85,42 +77,6 @@ public class SQLiteDBHelper {
       e.printStackTrace();
     }
 
-  }
-
-  /**
-   * Verify if the requested data is contained in the cache
-   *
-   * @param filter
-   *          the filter representing the requested data
-   * @return true if the requested data is in the cache, false if all or part of
-   *         the requested data is missing from the cache
-   */
-  public boolean isFilterIncludedInScope(Filter filter) {
-    for (Filter scopeFilter : scope) {
-      if (filter.isIncludedIn(scopeFilter)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * update scope of data contained in cache
-   *
-   * @param filter
-   *          the filter of the data inserted in the cache.
-   */
-  public void updateScope(Filter filter) {
-    Filter toRemove = null;
-    for (Filter scopeFilter : scope) {
-      if (filter.includes(scopeFilter)) {
-        toRemove = scopeFilter;
-      }
-    }
-    if (toRemove != null) {
-      scope.remove(toRemove);
-    }
-    scope.add(filter);
   }
 
   /**

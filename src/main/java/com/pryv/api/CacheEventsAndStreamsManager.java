@@ -1,7 +1,9 @@
 package com.pryv.api;
 
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.pryv.Pryv;
 import com.pryv.api.database.DBinitCallback;
@@ -23,6 +25,14 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   private EventsManager onlineEventsManager;
   private StreamsManager onlineStreamsManager;
 
+  /**
+   * defines the scope of the data the SQLite DB contains.
+   */
+  private Set<Filter> scope;
+
+  /**
+   * The SQLite DB
+   */
   private SQLiteDBHelper dbHelper;
 
   private Logger logger = Logger.getInstance();
@@ -44,7 +54,10 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   public CacheEventsAndStreamsManager(String url, String token, DBinitCallback initCallback) {
     onlineEventsManager = new OnlineEventsAndStreamsManager(url, token);
     onlineStreamsManager = (StreamsManager) onlineEventsManager;
-    dbHelper = new SQLiteDBHelper(Pryv.DATABASE_NAME, initCallback);
+    if (Pryv.isCacheActive()) {
+      dbHelper = new SQLiteDBHelper(Pryv.DATABASE_NAME, initCallback);
+      scope = new HashSet<Filter>();
+    }
   }
 
   /*
@@ -114,12 +127,13 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   }
 
   @Override
-  public void deleteStream(Stream streamToDelete, StreamsCallback connectionStreamsCallback) {
+  public void deleteStream(Stream streamToDelete, boolean mergeWithParent,
+    StreamsCallback connectionStreamsCallback) {
     // delete Stream from local db
     dbHelper.deleteStream(streamToDelete, new CacheStreamsCallback(connectionStreamsCallback));
 
     // forward call to online module
-    onlineStreamsManager.deleteStream(streamToDelete, new CacheStreamsCallback(
+    onlineStreamsManager.deleteStream(streamToDelete, mergeWithParent, new CacheStreamsCallback(
       connectionStreamsCallback));
   }
 
@@ -131,6 +145,42 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     // forward call to online module
     onlineStreamsManager.updateStream(streamToUpdate, new CacheStreamsCallback(
       connectionStreamsCallback));
+  }
+
+  /**
+   * Verify if the requested data is contained in the cache
+   *
+   * @param filter
+   *          the filter representing the requested data
+   * @return true if the requested data is in the cache, false if all or part of
+   *         the requested data is missing from the cache
+   */
+  public boolean isFilterIncludedInScope(Filter filter) {
+    for (Filter scopeFilter : scope) {
+      if (filter.isIncludedIn(scopeFilter)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * update scope of data contained in cache
+   *
+   * @param filter
+   *          the filter of the data inserted in the cache.
+   */
+  public void updateScope(Filter filter) {
+    Filter toRemove = null;
+    for (Filter scopeFilter : scope) {
+      if (filter.includes(scopeFilter)) {
+        toRemove = scopeFilter;
+      }
+    }
+    if (toRemove != null) {
+      scope.remove(toRemove);
+    }
+    scope.add(filter);
   }
 
   /**
