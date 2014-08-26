@@ -122,7 +122,7 @@
                         <Label fx:id="eTempRefIdLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="16" />
                      </children>
                   </GridPane>
-                  <HBox layoutX="309.0" layoutY="18.0" prefHeight="26.0" prefWidth="166.0" spacing="10.0">
+                  <HBox layoutX="294.0" layoutY="16.0" prefHeight="26.0" prefWidth="166.0" spacing="10.0">
                      <children>
                         <Button fx:id="eventCreateButton" layoutX="46.0" layoutY="348.0" mnemonicParsing="false" text="New" />
                         <Button fx:id="eventUpdateButton" layoutX="126.0" layoutY="348.0" mnemonicParsing="false" text="Edit" />
