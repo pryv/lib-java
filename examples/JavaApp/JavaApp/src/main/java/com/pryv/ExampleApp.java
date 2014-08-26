@@ -2,6 +2,7 @@ package com.pryv;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import org.apache.http.client.ClientProtocolException;
@@ -134,7 +136,6 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     logger.log("JavaApp: onSignInSuccess");
 
     Platform.runLater(new Runnable() {
-
       public void run() {
         showMainView();
       }
@@ -186,6 +187,74 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     }
   }
 
+  /**
+   * show Stream form window
+   *
+   * @param action
+   *          "Edit" or "Create"
+   */
+  public void showStreamForm(FormController.Mode action) {
+    try {
+      // Load the fxml file and set into the center of the main layout
+      FXMLLoader loader =
+        new FXMLLoader(ExampleApp.class.getResource("view/StreamFormWindow.fxml"));
+      AnchorPane page = (AnchorPane) loader.load();
+      // rootLayout.setCenter(overviewPage);
+
+      Stage dialogStage = new Stage();
+      dialogStage.initModality(Modality.WINDOW_MODAL);
+      dialogStage.initOwner(primaryStage);
+      Scene scene = new Scene(page);
+      dialogStage.setScene(scene);
+
+      // Give the controller access to the main app
+      FormController controller = loader.getController();
+      controller.setMainApp(this);
+      controller.setMode(action);
+
+      // Show the dialog and wait until the user closes it
+      dialogStage.showAndWait();
+
+    } catch (IOException e) {
+      // Exception gets thrown if the fxml file could not be loaded
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * show Event form window
+   *
+   * @param action
+   *          "Edit" or "Create"
+   */
+  public void showEventForm(FormController.Mode action) {
+    try {
+      // Load the fxml file and set into the center of the main layout
+      FXMLLoader loader =
+ new FXMLLoader(ExampleApp.class.getResource("view/EventFormWindow.fxml"));
+      AnchorPane page = (AnchorPane) loader.load();
+      // rootLayout.setCenter(overviewPage);
+
+      Stage dialogStage = new Stage();
+      dialogStage.initModality(Modality.WINDOW_MODAL);
+      dialogStage.initOwner(primaryStage);
+      Scene scene = new Scene(page);
+      dialogStage.setScene(scene);
+
+      // Give the controller access to the main app
+      FormController controller = loader.getController();
+      controller.setMainApp(this);
+      controller.setMode(action);
+
+      // Show the dialog and wait until the user closes it
+      dialogStage.showAndWait();
+
+    } catch (IOException e) {
+      // Exception gets thrown if the fxml file could not be loaded
+      e.printStackTrace();
+    }
+  }
+
   /*
    * Streams Callbacks
    */
@@ -198,20 +267,33 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
       public void run() {
         TreeItem<Stream> root = new TreeItem<Stream>();
         root.setExpanded(true);
-        for (Stream stream : streams.values()) {
+        buildStreamTree(root, streams.values());
 
-          TreeItem<Stream> streamTreeItem = new TreeItem<Stream>(stream);
-          if (stream.getChildren() != null) {
-            for (Stream childStream : stream.getChildren()) {
-              streamTreeItem.getChildren().add(new TreeItem<Stream>(childStream));
-            }
-          }
-          root.getChildren().add(streamTreeItem);
-        }
+        // for (Stream stream : streams.values()) {
+        //
+        // TreeItem<Stream> streamTreeItem = new TreeItem<Stream>(stream);
+        // if (stream.getChildren() != null) {
+        // for (Stream childStream : stream.getChildren()) {
+        // streamTreeItem.getChildren().add(new TreeItem<Stream>(childStream));
+        // }
+        // }
+        // root.getChildren().add(streamTreeItem);
+        // }
         streamTreeItemsObservableList.add(root);
         controller.showStreams(root);
       }
     });
+  }
+
+  private void buildStreamTree(TreeItem<Stream> root, Collection<Stream> streams) {
+    for (Stream stream : streams) {
+
+      TreeItem<Stream> streamTreeItem = new TreeItem<Stream>(stream);
+      root.getChildren().add(streamTreeItem);
+      if (stream.getChildrenMap() != null) {
+        buildStreamTree(streamTreeItem, stream.getChildrenMap().values());
+      }
+    }
   }
 
   public void onCacheRetrieveStreamSuccess(Map<String, Stream> newStreams) {
