@@ -82,26 +82,35 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void getEvents(final Filter filter, EventsCallback userEventsCallback) {
-    // send supervisor's events on User's callback.onEventsPartialResult()
-    supervisor.getEvents(filter, userEventsCallback);
-
-    // forward getEvents() to Cache
-    cacheEventsManager.getEvents(filter, new ConnectionEventsCallback(userEventsCallback, filter));
+    if (Pryv.isSupervisorActive()) {
+      // make sync request to supervisor
+      supervisor.getEvents(filter, userEventsCallback);
+    }
+    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
+      // forward getEvents() to Cache
+      cacheEventsManager
+        .getEvents(filter, new ConnectionEventsCallback(userEventsCallback, filter));
+    }
   }
 
   @Override
   public void createEvent(Event newEvent, EventsCallback userEventsCallback) {
-    updateCreated(newEvent);
-    // create event in Supervisor
-    try {
-      supervisor.updateOrCreateEvent(newEvent, userEventsCallback);
-    } catch (IncompleteFieldsException e) {
-      userEventsCallback.onEventsError(e.getMessage());
-    }
 
-    // forward call to cache
-    cacheEventsManager
-      .createEvent(newEvent, new ConnectionEventsCallback(userEventsCallback, null));
+    updateCreated(newEvent);
+
+    if (Pryv.isSupervisorActive()) {
+      // make sync request to supervisor
+      try {
+        supervisor.updateOrCreateEvent(newEvent, userEventsCallback);
+      } catch (IncompleteFieldsException e) {
+        userEventsCallback.onEventsError(e.getMessage());
+      }
+    }
+    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
+      // forward call to cache
+      cacheEventsManager.createEvent(newEvent, new ConnectionEventsCallback(userEventsCallback,
+        null));
+    }
   }
 
   @Override
@@ -109,27 +118,34 @@ public class Connection implements EventsManager, StreamsManager {
     updateModified(eventToDelete);
     eventToDelete.setTrashed(true);
 
-    // delete Event in Supervisor
-    supervisor.deleteEvent(eventToDelete, userEventsCallback);
-
-    // forward call to cache
-    cacheEventsManager.deleteEvent(eventToDelete, new ConnectionEventsCallback(userEventsCallback,
-      null));
+    if (Pryv.isSupervisorActive()) {
+      // delete Event in Supervisor
+      supervisor.deleteEvent(eventToDelete, userEventsCallback);
+    }
+    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
+      // forward call to cache
+      cacheEventsManager.deleteEvent(eventToDelete, new ConnectionEventsCallback(
+        userEventsCallback, null));
+    }
   }
 
   @Override
   public void updateEvent(Event eventToUpdate, EventsCallback userEventsCallback) {
     updateModified(eventToUpdate);
-    // update Event in Supervisor
-    try {
-      supervisor.updateOrCreateEvent(eventToUpdate, userEventsCallback);
-    } catch (IncompleteFieldsException e) {
-      userEventsCallback.onEventsError(e.getMessage());
-    }
 
-    // forward call to cache
-    cacheEventsManager.updateEvent(eventToUpdate, new ConnectionEventsCallback(userEventsCallback,
-      null));
+    if (Pryv.isSupervisorActive()) {
+      // update Event in Supervisor
+      try {
+        supervisor.updateOrCreateEvent(eventToUpdate, userEventsCallback);
+      } catch (IncompleteFieldsException e) {
+        userEventsCallback.onEventsError(e.getMessage());
+      }
+    }
+    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
+      // forward call to cache
+      cacheEventsManager.updateEvent(eventToUpdate, new ConnectionEventsCallback(
+        userEventsCallback, null));
+    }
   }
 
   /*
@@ -139,54 +155,69 @@ public class Connection implements EventsManager, StreamsManager {
   @Override
   public void getStreams(Filter filter, final StreamsCallback userStreamsCallback) {
 
-    // send Streams retrieved from Supervisor
-    userStreamsCallback.onSupervisorRetrieveStreamsSuccess(supervisor.getStreams());
-
-    // forward call to cache
-    cacheStreamsManager.getStreams(filter, new ConnectionStreamsCallback(userStreamsCallback));
+    if (Pryv.isSupervisorActive()) {
+      // send Streams retrieved from Supervisor
+      userStreamsCallback.onSupervisorRetrieveStreamsSuccess(supervisor.getStreams());
+    }
+    if (Pryv.isCacheActive() || Pryv.isSupervisorActive()) {
+      // forward call to cache
+      cacheStreamsManager.getStreams(filter, new ConnectionStreamsCallback(userStreamsCallback));
+    }
   }
 
   @Override
   public void createStream(Stream newStream, StreamsCallback userStreamsCallback) {
     updateCreated(newStream);
-    // create Stream in Supervisor
-    try {
-      supervisor.updateOrCreateStream(newStream, userStreamsCallback);
-    } catch (IncompleteFieldsException e) {
-      userStreamsCallback.onStreamError(e.getMessage());
+    if (Pryv.isSupervisorActive()) {
+      // create Stream in Supervisor
+      try {
+        supervisor.updateOrCreateStream(newStream, userStreamsCallback);
+      } catch (IncompleteFieldsException e) {
+        userStreamsCallback.onStreamError(e.getMessage());
+      }
     }
-    // forward call to cache
-    cacheStreamsManager.createStream(newStream, new ConnectionStreamsCallback(userStreamsCallback));
+    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
+      // forward call to cache
+      cacheStreamsManager.createStream(newStream,
+        new ConnectionStreamsCallback(userStreamsCallback));
+    }
   }
 
   @Override
   public void deleteStream(Stream streamToDelete, StreamsCallback userStreamsCallback) {
     updateModified(streamToDelete);
     streamToDelete.setTrashed(true);
+    // TODO check what to do with children
     for (Stream childStream : streamToDelete.getChildren()) {
       childStream.setTrashed(true);
     }
-    // delete Stream in Supervisor
-    supervisor.deleteStream(streamToDelete.getId(), new ConnectionStreamsCallback(
-      userStreamsCallback));
-
-    // forward call to cache
-    cacheStreamsManager.deleteStream(streamToDelete, new ConnectionStreamsCallback(
-      userStreamsCallback));
+    if (Pryv.isSupervisorActive()) {
+      // delete Stream in Supervisor
+      supervisor.deleteStream(streamToDelete.getId(), userStreamsCallback);
+    }
+    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
+      // forward call to cache
+      cacheStreamsManager.deleteStream(streamToDelete, new ConnectionStreamsCallback(
+        userStreamsCallback));
+    }
   }
 
   @Override
   public void updateStream(Stream streamToUpdate, StreamsCallback userStreamsCallback) {
     updateModified(streamToUpdate);
-    // update Stream in Supervisor
-    try {
-      supervisor.updateOrCreateStream(streamToUpdate, userStreamsCallback);
-    } catch (IncompleteFieldsException e) {
-      userStreamsCallback.onStreamError(e.getMessage());
+    if (Pryv.isSupervisorActive()) {
+      // update Stream in Supervisor
+      try {
+        supervisor.updateOrCreateStream(streamToUpdate, userStreamsCallback);
+      } catch (IncompleteFieldsException e) {
+        userStreamsCallback.onStreamError(e.getMessage());
+      }
     }
-    // forward call to cache
-    cacheStreamsManager.updateStream(streamToUpdate, new ConnectionStreamsCallback(
-      userStreamsCallback));
+    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
+      // forward call to cache
+      cacheStreamsManager.updateStream(streamToUpdate, new ConnectionStreamsCallback(
+        userStreamsCallback));
+    }
   }
 
   /**
@@ -251,17 +282,17 @@ public class Connection implements EventsManager, StreamsManager {
 
     @Override
     public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
-      logger.log("Connection: onEventsSuccess");
-      // update existing references with JSON received from online
-      for (Event onlineEvent : onlineEvents.values()) {
-        try {
-          supervisor.updateOrCreateEvent(onlineEvent, userEventsCallback);
-        } catch (IncompleteFieldsException e) {
-          userEventsCallback.onEventsError(e.getMessage());
-        }
-      }
-      // return merged events from Supervisor
-      supervisor.getEvents(filter, userEventsCallback);
+      // logger.log("Connection: onEventsSuccess");
+      // // update existing references with JSON received from online
+      // for (Event onlineEvent : onlineEvents.values()) {
+      // try {
+      // supervisor.updateOrCreateEvent(onlineEvent, userEventsCallback);
+      // } catch (IncompleteFieldsException e) {
+      // userEventsCallback.onEventsError(e.getMessage());
+      // }
+      // }
+      // // return merged events from Supervisor
+      // supervisor.getEvents(filter, userEventsCallback);
     }
 
     @Override
@@ -367,5 +398,188 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
   }
+
+  // /**
+  // * StreamsCallback instantiated by Connection at each request.
+  // *
+  // * @author ik
+  // *
+  // */
+  // public class Connection2StreamsCallback implements StreamsCallback {
+  //
+  // private StreamsCallback userStreamsCallback;
+  //
+  // /**
+  // * ConnectionStreamsCallback constructor. saves reference to calling
+  // * StreamsCallback.
+  // *
+  // * @param pUserStreamsCallback
+  // */
+  // public Connection2StreamsCallback(StreamsCallback pUserStreamsCallback) {
+  // userStreamsCallback = pUserStreamsCallback;
+  // }
+  //
+  // @Override
+  // public void onOnlineRetrieveStreamsSuccess(Map<String, Stream>
+  // onlineStreams) {
+  // logger.log("ConnectionCallback: received " + onlineStreams.size() +
+  // " streams from cloud.");
+  // if (Pryv.isCacheActive()) {
+  // // merge with cache if cache used:
+  // for (Stream onlineStream : onlineStreams.values()) {
+  // cacheStreamsManager.updateStream(onlineStream, this);
+  // }
+  // cacheStreamsManager.getStreams(null, this);
+  // } else if (Pryv.isSupervisorActive()) {
+  // // if cache not activated merge with Supervisor
+  // for (Stream onlineStream : onlineStreams.values()) {
+  // try {
+  // supervisor.updateOrCreateStream(onlineStream, this);
+  // } catch (IncompleteFieldsException e) {
+  // onStreamError(e.getMessage());
+  // }
+  // }
+  // } else {
+  // // if not local storage is used, foward the result to the caller
+  // userStreamsCallback.onOnlineRetrieveStreamsSuccess(onlineStreams);
+  // }
+  // }
+  //
+  // @Override
+  // public void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStreams)
+  // {
+  // if (Pryv.isSupervisorActive()) {
+  // // merge with Supervisor if it is active
+  // for (Stream cacheStream : cacheStreams.values()) {
+  // try {
+  // supervisor.updateOrCreateStream(cacheStream, userStreamsCallback);
+  // } catch (IncompleteFieldsException e) {
+  // userStreamsCallback.onStreamError(e.getMessage());
+  // }
+  // }
+  // } else {
+  // // if supervisor is not used, forward the result to the caller
+  // userStreamsCallback.onCacheRetrieveStreamSuccess(cacheStreams);
+  // }
+  // }
+  //
+  // @Override
+  // public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream>
+  // supervisorStreams) {
+  // // forward to userEventsCallback
+  // userStreamsCallback.onSupervisorRetrieveStreamsSuccess(supervisorStreams);
+  // }
+  //
+  // @Override
+  // public void onStreamsRetrievalError(String errorMessage) {
+  // // forward to userEventsCallback
+  // userStreamsCallback.onStreamsRetrievalError(errorMessage);
+  // }
+  //
+  // @Override
+  // public void onStreamsSuccess(String successMessage) {
+  // // forward to userEventsCallback
+  // userStreamsCallback.onStreamsSuccess(successMessage);
+  // }
+  //
+  // @Override
+  // public void onStreamError(String errorMessage) {
+  // // forward to userEventsCallback
+  // userStreamsCallback.onStreamError(errorMessage);
+  // }
+  //
+  // }
+  //
+  // /**
+  // * EventsCallback instantiated by Connection for each request
+  // *
+  // * @author ik
+  // *
+  // */
+  // public class Connection2EventsCallback implements EventsCallback {
+  //
+  // private EventsCallback userEventsCallback;
+  // private Filter filter;
+  //
+  // /**
+  // * ConnectionEventsCallback constructor. saves reference to calling
+  // * EventsCallback, as well as filter.
+  // *
+  // * @param pUserEventsCallback
+  // */
+  // public Connection2EventsCallback(EventsCallback pUserEventsCallback, Filter
+  // pFilter) {
+  // userEventsCallback = pUserEventsCallback;
+  // filter = pFilter;
+  // }
+  //
+  // @Override
+  // public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents)
+  // {
+  // logger.log("ConnectionCallback: received " + onlineEvents.size() +
+  // " events from cloud.");
+  // if (Pryv.isCacheActive()) {
+  // // merge with cache if cache used:
+  // for (Event onlineEvent : onlineEvents.values()) {
+  // cacheEventsManager.updateEvent(onlineEvent, this);
+  // }
+  // cacheEventsManager.getEvents(filter, this);
+  // } else if (Pryv.isSupervisorActive()) {
+  // // if cache not activated merge with Supervisor
+  // for (Event onlineEvent : onlineEvents.values()) {
+  // try {
+  // supervisor.updateOrCreateEvent(onlineEvent, this);
+  // } catch (IncompleteFieldsException e) {
+  // onEventsError(e.getMessage());
+  // }
+  // }
+  // } else {
+  // // if not local storage is used, foward the result to the caller
+  // userEventsCallback.onOnlineRetrieveEventsSuccess(onlineEvents);
+  // }
+  // }
+  //
+  // @Override
+  // public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
+  // if (Pryv.isSupervisorActive()) {
+  // // merge with Supervisor if it is active
+  // for (Event cacheEvent : cacheEvents.values()) {
+  // try {
+  // supervisor.updateOrCreateEvent(cacheEvent, userEventsCallback);
+  // } catch (IncompleteFieldsException e) {
+  // userEventsCallback.onEventsError(e.getMessage());
+  // }
+  // }
+  // } else {
+  // // if supervisor is not used, forward the result to the caller
+  // userEventsCallback.onCacheRetrieveEventsSuccess(cacheEvents);
+  // }
+  // }
+  //
+  // @Override
+  // public void onSupervisorRetrieveEventsSuccess(Map<String, Event>
+  // supervisorEvents) {
+  // // forward to userEventsCallback
+  // userEventsCallback.onSupervisorRetrieveEventsSuccess(supervisorEvents);
+  // }
+  //
+  // @Override
+  // public void onEventsRetrievalError(String errorMessage) {
+  // // forward to userEventsCallback
+  // userEventsCallback.onEventsRetrievalError(errorMessage);
+  // }
+  //
+  // @Override
+  // public void onEventsSuccess(String successMessage) {
+  // // forward to userEventsCallback
+  // userEventsCallback.onEventsSuccess(successMessage);
+  // }
+  //
+  // @Override
+  // public void onEventsError(String errorMessage) {
+  // // forward to userEventsCallback
+  // userEventsCallback.onEventsError(errorMessage);
+  // }
+  // }
 
 }

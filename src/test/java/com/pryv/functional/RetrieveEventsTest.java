@@ -70,14 +70,6 @@ public class RetrieveEventsTest {
     filter.setStreamIds(streamIds);
     eventsManager.getEvents(filter, eventsCallback);
     Awaitility.await().until(hasFetchedRightStreams());
-    // for (Stream stream : streams.values()) {
-    // streamIds.clear();
-    // streamId = stream.getId();
-    // streamIds.add(streamId);
-    // filter.setStreamIds(streamIds);
-    // eventsManager.getEvents(filter, eventsCallback);
-    // Awaitility.await().until(hasFetchedRightStreams());
-    // }
   }
 
   private Callable<Boolean> hasFetchedRightStreams() {

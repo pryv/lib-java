@@ -2,7 +2,7 @@ package com.pryv;
 
 /**
  *
- * high-level class
+ * Pryv class, contains the configuration of the API.
  *
  * @author ik
  *
@@ -30,7 +30,7 @@ public class Pryv {
    *
    * @return
    */
-  public boolean isCacheActive() {
+  public static boolean isCacheActive() {
     return cacheActivated;
   }
 
@@ -39,7 +39,7 @@ public class Pryv {
    *
    * @return
    */
-  public boolean isOnlineActive() {
+  public static boolean isOnlineActive() {
     return onlineActivated;
   }
 
@@ -48,49 +48,49 @@ public class Pryv {
    *
    * @return
    */
-  public boolean isSupervisorActive() {
+  public static boolean isSupervisorActive() {
     return supervisorActivated;
   }
 
   /**
    * activates the cache
    */
-  public void activateCache() {
+  public static void activateCache() {
     cacheActivated = true;
   }
 
   /**
    * stop using the cache
    */
-  public void deactivateCache() {
+  public static void deactivateCache() {
     cacheActivated = false;
   }
 
   /**
    * activates the online module
    */
-  public void activateOnline() {
+  public static void activateOnline() {
     onlineActivated = true;
   }
 
   /**
    * Stops using the online module
    */
-  public void deactivateOnline() {
+  public static void deactivateOnline() {
     onlineActivated = false;
   }
 
   /**
    * activates the Supervisor
    */
-  public void activatedSupervisor() {
+  public static void activatedSupervisor() {
     supervisorActivated = true;
   }
 
   /**
    * stop using the Supervisor
    */
-  public void deactivateSupervisor() {
+  public static void deactivateSupervisor() {
     supervisorActivated = false;
   }
 
