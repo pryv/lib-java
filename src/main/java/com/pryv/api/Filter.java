@@ -1,9 +1,12 @@
 package com.pryv.api;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.pryv.api.model.Event;
+import com.pryv.api.model.Stream;
+import com.pryv.utils.StreamUtils;
 
 /**
  * Filter used in Events fetching. All its fields are optional. Either
@@ -96,9 +99,11 @@ public class Filter {
    *
    * @param event
    *          the tested Event
+   * @param allStreams
+   *          a reference to the streams to check stream ids' parency
    * @return
    */
-  public Boolean match(Event event) {
+  public Boolean match(Event event, Map<String, Stream> allStreams) {
 
     // fromTime
     Boolean fromTimeMatch = true;
@@ -118,9 +123,16 @@ public class Filter {
 
     // streamIds
     Boolean streamIdMatch = true;
+    // get all children streamIds
     if (streamIds != null) {
       if (!streamIds.contains(event.getStreamId())) {
         streamIdMatch = false;
+        for (String filterStreamId : streamIds) {
+          Stream filterStream = StreamUtils.findStreamReference(filterStreamId, allStreams);
+          if (StreamUtils.findStreamReference(event.getStreamId(), filterStream.getChildrenMap()) != null) {
+            streamIdMatch = true;
+          }
+        }
       }
     }
 

@@ -266,7 +266,7 @@ public class Supervisor {
     Map<String, Event> returnEvents = new HashMap<String, Event>();
 
     for (Event event : events.values()) {
-      if (filter.match(event)) {
+      if (filter.match(event, streams)) {
         returnEvents.put(event.getId(), event);
         logger.log("Supervisor: matched: streamName="
         // + streams.get(event.getStreamId()).getName()
