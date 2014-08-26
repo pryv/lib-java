@@ -282,17 +282,17 @@ public class Connection implements EventsManager, StreamsManager {
 
     @Override
     public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
-      // logger.log("Connection: onEventsSuccess");
-      // // update existing references with JSON received from online
-      // for (Event onlineEvent : onlineEvents.values()) {
-      // try {
-      // supervisor.updateOrCreateEvent(onlineEvent, userEventsCallback);
-      // } catch (IncompleteFieldsException e) {
-      // userEventsCallback.onEventsError(e.getMessage());
-      // }
-      // }
-      // // return merged events from Supervisor
-      // supervisor.getEvents(filter, userEventsCallback);
+      logger.log("Connection: onEventsSuccess");
+      // update existing references with JSON received from online
+      for (Event onlineEvent : onlineEvents.values()) {
+        try {
+          supervisor.updateOrCreateEvent(onlineEvent, userEventsCallback);
+        } catch (IncompleteFieldsException e) {
+          userEventsCallback.onEventsError(e.getMessage());
+        }
+      }
+      // return merged events from Supervisor
+      supervisor.getEvents(filter, userEventsCallback);
     }
 
     @Override
