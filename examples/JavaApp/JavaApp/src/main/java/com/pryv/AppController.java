@@ -196,10 +196,31 @@ public class AppController {
         }
       });
 
-    eventCreateButton.setOnAction(new EventHandler<ActionEvent>() {
-
+    streamCreateButton.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent event) {
-        exampleApp.displayError("create event pressed");
+        // exampleApp.displayError("create event pressed");
+        exampleApp.showStreamForm(FormController.Mode.CREATE);
+      }
+    });
+
+    streamUpdateButton.setOnAction(new EventHandler<ActionEvent>() {
+      public void handle(ActionEvent event) {
+        // exampleApp.displayError("create event pressed");
+        exampleApp.showStreamForm(FormController.Mode.EDIT);
+      }
+    });
+
+    eventCreateButton.setOnAction(new EventHandler<ActionEvent>() {
+      public void handle(ActionEvent event) {
+        // exampleApp.displayError("create event pressed");
+        exampleApp.showEventForm(FormController.Mode.CREATE);
+      }
+    });
+
+    eventUpdateButton.setOnAction(new EventHandler<ActionEvent>() {
+      public void handle(ActionEvent event) {
+        // exampleApp.displayError("create event pressed");
+        exampleApp.showEventForm(FormController.Mode.EDIT);
       }
     });
   }
