@@ -77,7 +77,8 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   }
 
   @Override
-  public void deleteStream(Stream streamToDelete, StreamsCallback cacheStreamsCallback) {
+  public void deleteStream(Stream streamToDelete, boolean mergeWithParent,
+    StreamsCallback cacheStreamsCallback) {
     // TODO Auto-generated method stub
 
   }

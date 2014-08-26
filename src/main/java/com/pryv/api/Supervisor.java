@@ -49,9 +49,13 @@ public class Supervisor {
   }
 
   /**
-   * Update or create Streams in Supervisor whether they already exist or not.
+   * Update or create Stream in Supervisor whether they already exist or not.
    *
-   * @param pStreams
+   * @param stream
+   * @param connectionCallback
+   *          the callback to notify success or failure
+   * @throws IncompleteFieldsException
+   *           thrown when some mandatory fields are null
    */
   public void updateOrCreateStream(Stream stream, StreamsCallback connectionCallback)
     throws IncompleteFieldsException {
@@ -68,7 +72,7 @@ public class Supervisor {
             + " added successfully");
       }
     } else {
-      throw new IncompleteFieldsException();
+      throw new IncompleteFieldsException(stream.getId(), stream.getName());
     }
   }
 
@@ -76,8 +80,12 @@ public class Supervisor {
    * Update Stream in Supervisor. The condition on the update is the result of
    * the comparison of the modified fields.
    *
+   * @param oldStream
+   *          the old instance of the Stream
    * @param streamToUpdate
-   * @throws IncompleteFieldsException
+   *          the instance of updated stream
+   * @param connectionCallback
+   *          the callback to notify success or failure
    */
   private void updateStream(Stream oldStream, Stream streamToUpdate,
     StreamsCallback connectionCallback) {
@@ -172,24 +180,30 @@ public class Supervisor {
   /**
    * Add Stream in Supervisor
    *
-   * @param stream
+   * @param newStream
    *          the stream to add
    */
-  private void addStream(Stream stream) {
-    logger.log("Stream added: " + stream.getId());
-    streams.put(stream.getId(), stream);
+  private void addStream(Stream newStream) {
+    logger.log("Stream added: " + newStream.getId());
+    if (newStream.getParentId() != null) {
+      Stream parentStream = StreamUtils.findStreamReference(newStream.getParentId(), streams);
+      parentStream.addChildStream(newStream);
+    }
+    streams.put(newStream.getId(), newStream);
   }
 
   /**
-   * Delete Stream from Supervisor, if trashed is false, sets it to true, else
+   * * Delete Stream from Supervisor, if trashed is false, sets it to true, else
    * deletes it.
    *
    * @param streamId
    *          the Id of the Stream to delete.
+   * @param mergeWithParent
    * @param connectionSCallback
    *          callback for the Stream deletion
    */
-  public void deleteStream(String streamId, StreamsCallback connectionSCallback) {
+  public void deleteStream(String streamId, boolean mergeWithParent,
+    StreamsCallback connectionSCallback) {
     Stream streamToDelete = StreamUtils.findStreamReference(streamId, streams);
     if (streamToDelete != null) {
       if (streamToDelete.getTrashed() == true) {
@@ -209,7 +223,7 @@ public class Supervisor {
         // delete Stream's children Streams
         if (streamToDelete.getChildren() != null) {
           for (String childStream : streamToDelete.getChildrenMap().keySet()) {
-            deleteStream(childStream, connectionSCallback);
+            deleteStream(childStream, mergeWithParent, connectionSCallback);
           }
         }
         // delete Stream
@@ -274,8 +288,12 @@ public class Supervisor {
   /**
    * Update or create events in Supervisor whether they already exist or not.
    *
-   * @param newEvents
+   * @param newEvent
+   *          the new Event
+   * @param connectionCallback
+   *          the callback to notify success or failutre
    * @throws IncompleteFieldsException
+   *           thrown when some mandatory fields of the Event are null
    */
   public void updateOrCreateEvent(Event newEvent, EventsCallback connectionCallback)
     throws IncompleteFieldsException {
@@ -293,7 +311,7 @@ public class Supervisor {
             + " added successfully.");
       }
     } else {
-      throw new IncompleteFieldsException();
+      throw new IncompleteFieldsException(newEvent.getId(), null);
     }
   }
 
@@ -423,8 +441,11 @@ public class Supervisor {
      *
      * @param message
      */
-    public IncompleteFieldsException() {
-      super("Supervisor: attempt to Create a Stream or Event with incomplete fields");
+    public IncompleteFieldsException(String id, String name) {
+      super("Supervisor: attempt to Create a Stream or Event with incomplete fields: id="
+        + id
+          + ", name="
+          + name);
     }
   }
 

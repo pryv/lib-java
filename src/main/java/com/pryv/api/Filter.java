@@ -46,16 +46,27 @@ public class Filter {
    * Filter class constructor. All fields are optional: use null when unused.
    *
    * @param from
+   *          from time
    * @param to
+   *          to time
    * @param pStreams
+   *          stream ids
    * @param pTags
+   *          tags
    * @param pTypes
+   *          types
    * @param pRunning
+   *          running
    * @param pSortAscending
+   *          sort ascending
    * @param pSkip
+   *          skip how much
    * @param pLimit
+   *          how many to get
    * @param pState
+   *          which state
    * @param pModifiedSince
+   *          since when is it modified
    */
   public Filter(Long from, Long to, Set<String> pStreams, Set<String> pTags, Set<String> pTypes,
     Boolean pRunning, Boolean pSortAscending, Integer pSkip, Integer pLimit, State pState,
@@ -81,9 +92,10 @@ public class Filter {
   }
 
   /**
-   * Verify if an Event is contained in this filter.
+   * Verify if an Event matches this filter.
    *
    * @param event
+   *          the tested Event
    * @return
    */
   public Boolean match(Event event) {

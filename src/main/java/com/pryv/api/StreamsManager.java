@@ -35,10 +35,15 @@ public interface StreamsManager {
    *
    * @param streamToDelete
    *          the Stream to delete
+   * @param mergeWithParent
+   *          if true, Events of this Stream and its descendants will be moved
+   *          to the parent Stream if any. If false, Events will be deleted too
+   *
    * @param streamsCallback
    *          the callback for streams deletion, notifies success or failure.
    */
-  void deleteStream(Stream streamToDelete, StreamsCallback streamsCallback);
+  void
+    deleteStream(Stream streamToDelete, boolean mergeWithParent, StreamsCallback streamsCallback);
 
   /**
    * Update Stream

@@ -184,7 +184,8 @@ public class Connection implements EventsManager, StreamsManager {
   }
 
   @Override
-  public void deleteStream(Stream streamToDelete, StreamsCallback userStreamsCallback) {
+  public void deleteStream(Stream streamToDelete, boolean mergeWithParent,
+    StreamsCallback userStreamsCallback) {
     updateModified(streamToDelete);
     streamToDelete.setTrashed(true);
     // TODO check what to do with children
@@ -193,12 +194,12 @@ public class Connection implements EventsManager, StreamsManager {
     }
     if (Pryv.isSupervisorActive()) {
       // delete Stream in Supervisor
-      supervisor.deleteStream(streamToDelete.getId(), userStreamsCallback);
+      supervisor.deleteStream(streamToDelete.getId(), mergeWithParent, userStreamsCallback);
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
-      cacheStreamsManager.deleteStream(streamToDelete, new ConnectionStreamsCallback(
-        userStreamsCallback));
+      cacheStreamsManager.deleteStream(streamToDelete, mergeWithParent,
+        new ConnectionStreamsCallback(userStreamsCallback));
     }
   }
 
