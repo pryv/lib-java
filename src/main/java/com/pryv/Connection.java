@@ -5,11 +5,11 @@ import java.util.Map;
 import com.pryv.api.CacheEventsAndStreamsManager;
 import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsManager;
+import com.pryv.api.EventsSupervisor;
 import com.pryv.api.Filter;
 import com.pryv.api.StreamsCallback;
 import com.pryv.api.StreamsManager;
-import com.pryv.api.Supervisor;
-import com.pryv.api.Supervisor.IncompleteFieldsException;
+import com.pryv.api.StreamsSupervisor;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
@@ -29,9 +29,12 @@ public class Connection implements EventsManager, StreamsManager {
   private String apiDomain = Pryv.API_DOMAIN; // pryv.io or pryv.in
   private String apiScheme = "https";
   private String url;
+
   private EventsManager cacheEventsManager;
   private StreamsManager cacheStreamsManager;
-  private Supervisor supervisor;
+  private EventsSupervisor supervisor;
+
+  private StreamsSupervisor streams;
 
   private Logger logger = Logger.getInstance();
 
@@ -51,29 +54,22 @@ public class Connection implements EventsManager, StreamsManager {
     username = pUsername;
     token = pToken;
     url = apiScheme + "://" + username + "." + apiDomain + "/";
-    supervisor = new Supervisor();
+    streams = new StreamsSupervisor();
+    supervisor = new EventsSupervisor(streams);
     cacheEventsManager = new CacheEventsAndStreamsManager(url, token, dbInitCallback);
     cacheStreamsManager = (StreamsManager) cacheEventsManager;
   }
 
-  public String getUsername() {
-    return username;
+  /*
+   * Memory Streams management
+   */
+
+  public Map<String, Stream> getStreams() {
+    return streams.getStreams();
   }
 
-  public String getToken() {
-    return token;
-  }
-
-  public String getApiDomain() {
-    return apiDomain;
-  }
-
-  public String getApiScheme() {
-    return apiScheme;
-  }
-
-  public String getUrl() {
-    return url;
+  public Stream getStreamById(String streamId) {
+    return streams.getStreamById(streamId);
   }
 
   /*
@@ -100,11 +96,7 @@ public class Connection implements EventsManager, StreamsManager {
 
     if (Pryv.isSupervisorActive()) {
       // make sync request to supervisor
-      try {
-        supervisor.updateOrCreateEvent(newEvent, userEventsCallback);
-      } catch (IncompleteFieldsException e) {
-        userEventsCallback.onEventsError(e.getMessage());
-      }
+      supervisor.updateOrCreateEvent(newEvent, userEventsCallback);
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
@@ -135,11 +127,7 @@ public class Connection implements EventsManager, StreamsManager {
 
     if (Pryv.isSupervisorActive()) {
       // update Event in Supervisor
-      try {
-        supervisor.updateOrCreateEvent(eventToUpdate, userEventsCallback);
-      } catch (IncompleteFieldsException e) {
-        userEventsCallback.onEventsError(e.getMessage());
-      }
+      supervisor.updateOrCreateEvent(eventToUpdate, userEventsCallback);
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
@@ -154,11 +142,7 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void getStreams(Filter filter, final StreamsCallback userStreamsCallback) {
-
-    if (Pryv.isSupervisorActive()) {
-      // send Streams retrieved from Supervisor
-      userStreamsCallback.onSupervisorRetrieveStreamsSuccess(supervisor.getStreams());
-    }
+    userStreamsCallback.onSupervisorRetrieveStreamsSuccess(streams.getStreams());
     if (Pryv.isCacheActive() || Pryv.isSupervisorActive()) {
       // forward call to cache
       cacheStreamsManager.getStreams(filter, new ConnectionStreamsCallback(userStreamsCallback));
@@ -170,11 +154,7 @@ public class Connection implements EventsManager, StreamsManager {
     updateCreated(newStream);
     if (Pryv.isSupervisorActive()) {
       // create Stream in Supervisor
-      try {
-        supervisor.updateOrCreateStream(newStream, userStreamsCallback);
-      } catch (IncompleteFieldsException e) {
-        userStreamsCallback.onStreamError(e.getMessage());
-      }
+      streams.updateOrCreateStream(newStream, userStreamsCallback);
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
@@ -194,7 +174,7 @@ public class Connection implements EventsManager, StreamsManager {
     }
     if (Pryv.isSupervisorActive()) {
       // delete Stream in Supervisor
-      supervisor.deleteStream(streamToDelete.getId(), mergeWithParent, userStreamsCallback);
+      streams.deleteStream(streamToDelete.getId(), mergeWithParent, userStreamsCallback);
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
@@ -208,11 +188,7 @@ public class Connection implements EventsManager, StreamsManager {
     updateModified(streamToUpdate);
     if (Pryv.isSupervisorActive()) {
       // update Stream in Supervisor
-      try {
-        supervisor.updateOrCreateStream(streamToUpdate, userStreamsCallback);
-      } catch (IncompleteFieldsException e) {
-        userStreamsCallback.onStreamError(e.getMessage());
-      }
+      streams.updateOrCreateStream(streamToUpdate, userStreamsCallback);
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
@@ -286,11 +262,7 @@ public class Connection implements EventsManager, StreamsManager {
       logger.log("Connection: onEventsSuccess");
       // update existing references with JSON received from online
       for (Event onlineEvent : onlineEvents.values()) {
-        try {
-          supervisor.updateOrCreateEvent(onlineEvent, userEventsCallback);
-        } catch (IncompleteFieldsException e) {
-          userEventsCallback.onEventsError(e.getMessage());
-        }
+        supervisor.updateOrCreateEvent(onlineEvent, userEventsCallback);
       }
       // return merged events from Supervisor
       supervisor.getEvents(filter, userEventsCallback);
@@ -300,11 +272,7 @@ public class Connection implements EventsManager, StreamsManager {
     public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
       // update existing Events with those retrieved from the cache
       for (Event cacheEvent : cacheEvents.values()) {
-        try {
-          supervisor.updateOrCreateEvent(cacheEvent, userEventsCallback);
-        } catch (IncompleteFieldsException e) {
-          userEventsCallback.onEventsError(e.getMessage());
-        }
+        supervisor.updateOrCreateEvent(cacheEvent, userEventsCallback);
       }
       // return merged events from Supervisor
       supervisor.getEvents(filter, userEventsCallback);
@@ -355,27 +323,19 @@ public class Connection implements EventsManager, StreamsManager {
     @Override
     public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStream) {
       for (Stream stream : onlineStream.values()) {
-        try {
-          supervisor.updateOrCreateStream(stream, userStreamsCallback);
-        } catch (IncompleteFieldsException e) {
-          userStreamsCallback.onStreamError(e.getMessage());
-        }
+        streams.updateOrCreateStream(stream, userStreamsCallback);
       }
       // forward updated Streams
-      userStreamsCallback.onOnlineRetrieveStreamsSuccess(supervisor.getStreams());
+      userStreamsCallback.onOnlineRetrieveStreamsSuccess(streams.getStreams());
     }
 
     @Override
     public void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStream) {
       for (Stream stream : cacheStream.values()) {
-        try {
-          supervisor.updateOrCreateStream(stream, userStreamsCallback);
-        } catch (IncompleteFieldsException e) {
-          userStreamsCallback.onStreamError(e.getMessage());
-        }
+        streams.updateOrCreateStream(stream, userStreamsCallback);
       }
       // forward updated Streams
-      userStreamsCallback.onCacheRetrieveStreamSuccess(supervisor.getStreams());
+      userStreamsCallback.onCacheRetrieveStreamSuccess(streams.getStreams());
     }
 
     @Override
@@ -582,5 +542,25 @@ public class Connection implements EventsManager, StreamsManager {
   // userEventsCallback.onEventsError(errorMessage);
   // }
   // }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public String getToken() {
+    return token;
+  }
+
+  public String getApiDomain() {
+    return apiDomain;
+  }
+
+  public String getApiScheme() {
+    return apiScheme;
+  }
+
+  public String getUrl() {
+    return url;
+  }
 
 }
