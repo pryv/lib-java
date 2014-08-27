@@ -3,10 +3,8 @@ package com.pryv;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -51,6 +49,8 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   private Logger logger = Logger.getInstance();
 
   private final static String REQUESTING_APP_ID = "pryv-lib-java-example";
+
+  private Connection connection;
   private EventsManager eventsManager;
   private StreamsManager streamsManager;
 
@@ -141,13 +141,13 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
       }
     });
 
-    Connection newConnection = new Connection(username, token, new DBinitCallback() {
+    connection = new Connection(username, token, new DBinitCallback() {
       public void onError(String message) {
         displayError(message);
       }
     });
-    eventsManager = newConnection;
-    streamsManager = newConnection;
+    eventsManager = connection;
+    streamsManager = connection;
     streamsManager.getStreams(null, this);
     Filter filter = new Filter();
     filter.setLimit(20);
@@ -334,10 +334,8 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    * @param streamId
    */
   public void getEventsForStreamId(String streamId) {
-    Set<String> streamIds = new HashSet<String>();
-    streamIds.add(streamId);
     Filter filter = new Filter();
-    filter.setStreamIds(streamIds);
+    filter.addStreamId(streamId);
     eventsManager.getEvents(filter, this);
   }
 

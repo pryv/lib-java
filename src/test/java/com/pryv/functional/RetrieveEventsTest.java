@@ -66,15 +66,13 @@ public class RetrieveEventsTest {
     Filter filter = new Filter();
     Set<String> streamIds = new HashSet<String>();
     streamId = "flowerBreath";
-    streamIds.add(streamId);
-    filter.setStreamIds(streamIds);
+    filter.addStreamId(streamId);
     eventsManager.getEvents(filter, eventsCallback);
     Awaitility.await().until(hasFetchedRightStreams());
   }
 
   private Callable<Boolean> hasFetchedRightStreams() {
     return new Callable<Boolean>() {
-
       @Override
       public Boolean call() throws Exception {
         if (events != null) {
@@ -85,13 +83,14 @@ public class RetrieveEventsTest {
               + events.values().size());
           System.out.println("########################################################");
           if (events.values().size() > 0) {
+            boolean match = false;
             for (Event event : events.values()) {
               System.out.println("comparing: " + streamId + " with " + event.getStreamId());
-              if (!streamId.equals(event.getStreamId())) {
-                return false;
+              if (streamId.equals(event.getStreamId())) {
+                match = true;
               }
             }
-            return true;
+            return match;
           } else {
             return false;
           }
@@ -149,6 +148,9 @@ public class RetrieveEventsTest {
 
       @Override
       public void onCacheRetrieveEventsSuccess(Map<String, Event> newEvents) {
+        System.out.println("TestEventsCallback: success with "
+          + newEvents.values().size()
+            + " events");
         events = newEvents;
       }
 
@@ -160,6 +162,9 @@ public class RetrieveEventsTest {
 
       @Override
       public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
+        System.out.println("TestEventsCallback: success with "
+          + supervisorEvents.values().size()
+            + " events");
         events = supervisorEvents;
       }
 

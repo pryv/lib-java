@@ -1,12 +1,9 @@
 package com.pryv.api;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
-import com.pryv.utils.StreamUtils;
 
 /**
  * Filter used in Events fetching. All its fields are optional. Either
@@ -99,11 +96,10 @@ public class Filter {
    *
    * @param event
    *          the tested Event
-   * @param allStreams
-   *          a reference to the streams to check stream ids' parency
+   * @param streams
    * @return
    */
-  public Boolean match(Event event, Map<String, Stream> allStreams) {
+  public Boolean match(Event event, StreamsSupervisor streams) {
 
     // fromTime
     Boolean fromTimeMatch = true;
@@ -125,11 +121,12 @@ public class Filter {
     Boolean streamIdMatch = true;
     // get all children streamIds
     if (streamIds != null) {
-      if (!streamIds.contains(event.getStreamId())) {
-        streamIdMatch = false;
-        for (String filterStreamId : streamIds) {
-          Stream filterStream = StreamUtils.findStreamReference(filterStreamId, allStreams);
-          if (StreamUtils.findStreamReference(event.getStreamId(), filterStream.getChildrenMap()) != null) {
+      streamIdMatch = false;
+      for (String streamId : streamIds) {
+        if (streamId.equals(event.getStreamId())) {
+          streamIdMatch = true;
+        } else {
+          if (streams.testParency(event.getStreamId(), streamId)) {
             streamIdMatch = true;
           }
         }
@@ -194,36 +191,30 @@ public class Filter {
   }
 
   /**
-   * Verify if another filter encompasses this filter
-   *
-   * @param other
-   *          filter that might be encompassing the caller filter
-   * @return
+   * // * Verify if the filter is included in the scope of the cache // * // * @param
+   * filterStreamId // * @param scopeWithChildren // * the streamIds stored in
+   * the cache // * @return //
    */
-  public boolean isIncludedIn(Filter other) {
-    return (fromTime > other.fromTime)
-      && (toTime < other.toTime)
-        && (other.streamIds.containsAll(streamIds))
-        && (other.tags.containsAll(tags))
-        && (other.types.containsAll(types))
-        && (modifiedSince < other.modifiedSince);
-  }
-
-  /**
-   * Verify if this filter encompasses another filter
-   *
-   * @param other
-   *          filter that might be encompassed by the caller filter
-   * @return
-   */
-  public boolean includes(Filter other) {
-    return (fromTime < other.fromTime)
-      && (toTime > other.toTime)
-        && (streamIds.containsAll(other.streamIds))
-        && (tags.containsAll(other.tags))
-        && (types.containsAll(other.types))
-        && (modifiedSince > other.modifiedSince);
-  }
+  // public boolean isIncludedInScope(String filterStreamId, Set<String>
+  // scopeWithChildren) {
+  // for (String filterStreamId : streamIds) {
+  // for (Stream scopeStream : scopeWithChildren) {
+  // if (scopeStream.getId().equals(filterStreamId)) {
+  // return true;
+  // } else {
+  // // check scopeStream's children
+  // return checkChildren(scopeStream);
+  // }
+  // }
+  // }
+  // return false;
+  // }
+  //
+  // private boolean checkChildren(Stream checkedStream) {
+  // for (Stream childStream : checkedStream.getChildren()) {
+  //
+  // }
+  // }
 
   /**
    * add a specific stream id to the filter
@@ -232,7 +223,7 @@ public class Filter {
    */
   public void addStreamId(String pStreamId) {
     if (streamIds == null) {
-      streamIds = new HashSet<>();
+      streamIds = new HashSet<String>();
     }
     streamIds.add(pStreamId);
   }

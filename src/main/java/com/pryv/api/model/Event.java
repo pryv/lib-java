@@ -136,12 +136,15 @@ public class Event {
     modifiedBy = result.getString(QueryGenerator.EVENTS_MODIFIED_BY_KEY);
     duration = result.getLong(QueryGenerator.EVENTS_DURATION_KEY);
     content = result.getObject(QueryGenerator.EVENTS_CONTENT_KEY);
-    tags =
-      new HashSet<String>(
-        Arrays.asList(result.getString(QueryGenerator.EVENTS_TAGS_KEY).split(",")));
-    references =
-      new HashSet<String>(
-        Arrays.asList(result.getString(QueryGenerator.EVENTS_REFS_KEY).split(",")));
+    String tagsString = result.getString(QueryGenerator.EVENTS_TAGS_KEY);
+    if (tagsString != null) {
+      tags = new HashSet<String>(Arrays.asList(tagsString.split(",")));
+    }
+    String referencesString = result.getString(QueryGenerator.EVENTS_REFS_KEY);
+    if (referencesString != null) {
+      references = new HashSet<String>(Arrays.asList(referencesString.split(",")));
+    }
+
     description = result.getString(QueryGenerator.EVENTS_DESCRIPTION_KEY);
     // TODO fetch Attachments elsewhere
     setClientDataFromAstring(result.getString(QueryGenerator.EVENTS_CLIENT_DATA_KEY));

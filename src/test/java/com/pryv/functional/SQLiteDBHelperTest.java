@@ -73,7 +73,7 @@ public class SQLiteDBHelperTest {
         System.out.println(message);
       }
     });
-    cleanUpTestDB();
+    // cleanUpTestDB();
   }
 
   // executed after all tests once
@@ -358,14 +358,6 @@ public class SQLiteDBHelperTest {
     assertNull(events.get(id).getAttachments());
   }
 
-  @Test
-  public void testInsertStreamWithWrongParentId() {
-    Stream wrongStream = DummyData.generateFullStream();
-    wrongStream.setId("MyCoolIdea");
-    wrongStream.setParentId("unexisting parent");
-    db.createStream(wrongStream, streamsCallback);
-    Awaitility.await().until(hasErrorWhileInsertingUpdatingDeletingStream());
-  }
 
   private static Callable<Boolean> hasRetrievedEventSuccessfully() {
     return new Callable<Boolean>() {

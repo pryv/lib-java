@@ -77,7 +77,7 @@ public class Connection implements EventsManager, StreamsManager {
    */
 
   @Override
-  public void getEvents(final Filter filter, EventsCallback userEventsCallback) {
+  public void getEvents(Filter filter, EventsCallback userEventsCallback) {
     if (Pryv.isSupervisorActive()) {
       // make sync request to supervisor
       supervisor.getEvents(filter, userEventsCallback);
@@ -265,7 +265,7 @@ public class Connection implements EventsManager, StreamsManager {
         supervisor.updateOrCreateEvent(onlineEvent, userEventsCallback);
       }
       // return merged events from Supervisor
-      supervisor.getEvents(filter, userEventsCallback);
+      supervisor.getEvents(filter, this);
     }
 
     @Override
@@ -275,7 +275,7 @@ public class Connection implements EventsManager, StreamsManager {
         supervisor.updateOrCreateEvent(cacheEvent, userEventsCallback);
       }
       // return merged events from Supervisor
-      supervisor.getEvents(filter, userEventsCallback);
+      supervisor.getEvents(filter, this);
     }
 
     @Override
@@ -286,6 +286,7 @@ public class Connection implements EventsManager, StreamsManager {
     // unused
     @Override
     public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
+      userEventsCallback.onSupervisorRetrieveEventsSuccess(supervisorEvents);
     }
 
     @Override
@@ -332,7 +333,7 @@ public class Connection implements EventsManager, StreamsManager {
     @Override
     public void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStream) {
       for (Stream stream : cacheStream.values()) {
-        streams.updateOrCreateStream(stream, userStreamsCallback);
+        streams.updateOrCreateStream(stream, this);
       }
       // forward updated Streams
       userStreamsCallback.onCacheRetrieveStreamSuccess(streams.getRootStreams());

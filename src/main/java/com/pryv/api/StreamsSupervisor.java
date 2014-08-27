@@ -1,7 +1,9 @@
 package com.pryv.api;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.pryv.api.model.Stream;
 import com.pryv.utils.JsonConverter;
@@ -66,24 +68,16 @@ public class StreamsSupervisor {
    *           thrown when some mandatory fields are null
    */
   public void updateOrCreateStream(Stream stream, StreamsCallback connectionCallback) {
-    if (areFieldsValid(stream)) {
-      Stream oldStream = getStreamById(stream.getId());
-      if (oldStream != null) {
-        // case exists: compare modified field
-        updateStream(oldStream, stream, connectionCallback);
-      } else {
-        // case new Event: simply add
-        addStream(stream);
-        connectionCallback.onStreamsSuccess("Stream with id="
-          + stream.getId()
-            + " added successfully");
-      }
+    Stream oldStream = getStreamById(stream.getId());
+    if (oldStream != null) {
+      // case exists: compare modified field
+      updateStream(oldStream, stream, connectionCallback);
     } else {
-      connectionCallback
-        .onStreamError("Supervisor: attempt to Create a Stream or Event with incomplete fields: id="
-          + stream.getId()
-            + ", name="
-            + stream.getName());
+      // case new Event: simply add
+      addStream(stream);
+      connectionCallback.onStreamsSuccess("Stream with id="
+        + stream.getId()
+          + " added successfully");
     }
   }
 
@@ -264,46 +258,33 @@ public class StreamsSupervisor {
     }
   }
 
-  /**
-   * used to check if input Stream has all the required fields as not null.
-   *
-   * @param streamToCheck
-   * @return true if all fields are not null, false if any mandatory field is
-   *         null or the stream is null.
-   */
-  private boolean areFieldsValid(Stream streamToCheck) {
-    if (streamToCheck == null) {
-      return false;
+  public boolean testParency(String childId, String parentId) {
+    if (flatStreams.get(parentId) != null) {
+      if (flatStreams.get(parentId).getChildren() != null) {
+        Set<String> children = new HashSet<String>();
+        computeDescendants(children, parentId);
+        return children.contains(childId);
+      } else {
+        return false;
+      }
     } else {
-      return streamToCheck.getId() != null
-        && streamToCheck.getName() != null
-          && streamToCheck.getCreated() != null
-          && streamToCheck.getCreatedBy() != null
-          && streamToCheck.getModified() != null
-          && streamToCheck.getModifiedBy() != null;
+      return false;
     }
   }
 
-  // /**
-  // * custom thrown when user tries to call Supervisor methods with data having
-  // * mandatory fields as null.
-  // *
-  // * @author ik
-  // *
-  // */
-  // public class IncompleteFieldsException extends Exception {
-  //
-  // /**
-  // * Constructor containing message to display
-  // *
-  // * @param message
-  // */
-  // public IncompleteFieldsException(String id, String name) {
-  // super("Supervisor: attempt to Create a Stream or Event with incomplete fields: id="
-  // + id
-  // + ", name="
-  // + name);
-  // }
-  // }
+  /**
+   * Save all children of
+   *
+   * @param children
+   * @param stream
+   */
+  private void computeDescendants(Set<String> children, String parentId) {
+    if (flatStreams.get(parentId).getChildren() != null) {
+      for (Stream childStream : flatStreams.get(parentId).getChildren()) {
+        children.add(childStream.getId());
+        computeDescendants(children, childStream.getId());
+      }
+    }
+  }
 
 }

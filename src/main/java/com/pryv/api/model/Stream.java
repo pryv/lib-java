@@ -111,20 +111,22 @@ public class Stream {
     name = temp.name;
     parentId = temp.parentId;
     singleActivity = temp.singleActivity;
-    clientData = new HashMap<String, Object>();
-    for (String key : temp.clientData.keySet()) {
-      clientData.put(key, temp.clientData.get(key));
+    if (temp.clientData != null) {
+      clientData = new HashMap<String, Object>();
+      for (String key : temp.clientData.keySet()) {
+        clientData.put(key, temp.clientData.get(key));
+      }
     }
-    // maybe do recursive merge (compare ids, if exists merge, else new...)
-    children = new ArrayList<Stream>();
-    for (Stream stream : temp.children) {
-      children.add(cloner.deepClone(stream));
+    if (temp.children != null) {
+      children = new ArrayList<Stream>();
+      for (Stream childStream : temp.children) {
+        children.add(childStream);
+      }
+      childrenMap = new HashMap<String, Stream>();
+      for (Stream childStream : temp.childrenMap.values()) {
+        childrenMap.put(childStream.getId(), childStream);
+      }
     }
-    childrenMap = new HashMap<String, Stream>();
-    for (Stream stream : temp.childrenMap.values()) {
-      childrenMap.put(stream.getId(), cloner.deepClone(stream));
-    }
-
     trashed = temp.trashed;
     created = temp.created;
     createdBy = temp.createdBy;

@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,8 +64,8 @@ public class SQLiteDBHelper {
     try {
       Class.forName("org.sqlite.JDBC");
       SQLiteConfig config = new SQLiteConfig();
-      config.enforceForeignKeys(true);
-      dbConnection = DriverManager.getConnection("jdbc:sqlite:" + path, config.toProperties());
+      // config.enforceForeignKeys(true);
+      dbConnection = DriverManager.getConnection("jdbc:sqlite:" + path);
 
       logger.log("Opened database successfully");
       createEventsTable();
@@ -90,7 +91,7 @@ public class SQLiteDBHelper {
       @Override
       public void run() {
         try {
-          String cmd = QueryGenerator.insertEvent(eventToCache);
+          String cmd = QueryGenerator.insertOrReplaceEvent(eventToCache);
           logger.log("SQLiteDBHelper: addEvent: " + cmd);
           Statement statement = dbConnection.createStatement();
           statement.execute(cmd);
@@ -117,7 +118,7 @@ public class SQLiteDBHelper {
       @Override
       public void run() {
         try {
-          String cmd = QueryGenerator.updateEvent(eventToUpdate);
+          String cmd = QueryGenerator.insertOrReplaceEvent(eventToUpdate);
           logger.log("SQLiteDBHelper: updateEvent: " + cmd);
           Statement statement = dbConnection.createStatement();
           statement.executeUpdate(cmd);
@@ -132,7 +133,33 @@ public class SQLiteDBHelper {
         }
       }
     }.start();
+  }
 
+  public void updateEvents(Collection<Event> eventsToUpdate, EventsCallback cacheEventsCallback) {
+    new Thread() {
+      @Override
+      public void run() {
+
+        for (Event event : eventsToUpdate) {
+          try {
+            Statement statement = dbConnection.createStatement();
+            String cmd = QueryGenerator.insertOrReplaceEvent(event);
+            logger.log("SQLiteDBHelper: updateEvent: " + cmd);
+            statement.execute(cmd);
+            logger.log("inserted " + event.getId() + " into DB.");
+            statement.close();
+          } catch (SQLException e) {
+            cacheEventsCallback.onEventsError(e.getMessage());
+            e.printStackTrace();
+          } catch (JsonProcessingException e) {
+            cacheEventsCallback.onEventsError(e.getMessage());
+            e.printStackTrace();
+          }
+        }
+        cacheEventsCallback.onEventsSuccess("events updated");
+
+      }
+    }.start();
   }
 
   /**
@@ -217,12 +244,12 @@ public class SQLiteDBHelper {
       public void run() {
         try {
           Statement statement = dbConnection.createStatement();
-          String cmd = QueryGenerator.insertStream(streamToCache);
+          String cmd = QueryGenerator.insertOrReplaceStream(streamToCache);
           logger.log("SQLiteDBHelper: addStream: " + cmd);
           statement.executeUpdate(cmd);
           if (streamToCache.getChildren() != null) {
             for (Stream childStream : streamToCache.getChildren()) {
-              cmd = QueryGenerator.insertStream(childStream);
+              cmd = QueryGenerator.insertOrReplaceStream(childStream);
               statement.execute(cmd);
               logger.log("SQLiteDBHelper: add child Stream: " + cmd);
             }
@@ -248,7 +275,7 @@ public class SQLiteDBHelper {
       @Override
       public void run() {
         try {
-          String cmd = QueryGenerator.updateStream(streamToUpdate);
+          String cmd = QueryGenerator.insertOrReplaceStream(streamToUpdate);
           logger.log("SQLiteDBHelper: updateStream: " + cmd);
           Statement statement = dbConnection.createStatement();
           statement.executeUpdate(cmd);
@@ -258,6 +285,44 @@ public class SQLiteDBHelper {
           cacheStreamsCallback.onStreamError(e.getMessage());
           e.printStackTrace();
         }
+      }
+    }.start();
+  }
+
+  /**
+   * Update Streams in the SQLite database. used only when the cache receives
+   * streams from online.
+   *
+   * @param streamsToCache
+   * @param cacheStreamsCallback
+   */
+  public void
+    updateOrCreateStreams(Collection<Stream> streamsToCache, StreamsCallback cacheStreamsCallback) {
+    new Thread() {
+      @Override
+      public void run() {
+        logger.log("update streamS called");
+        for (Stream stream : streamsToCache) {
+          try {
+            Statement statement = dbConnection.createStatement();
+            String cmd = QueryGenerator.insertOrReplaceStream(stream);
+            logger.log("SQLiteDBHelper: updateStream: " + cmd);
+            statement.executeUpdate(cmd);
+            logger.log("updated stream: id=" + stream.getId() + ", name=" + stream.getName());
+            if (stream.getChildren() != null) {
+              for (Stream childStream : stream.getChildren()) {
+                cmd = QueryGenerator.insertOrReplaceStream(childStream);
+                statement.execute(cmd);
+                logger.log("SQLiteDBHelper: add child Stream: " + cmd);
+              }
+            }
+            statement.close();
+          } catch (SQLException e) {
+            cacheStreamsCallback.onStreamError(e.getMessage());
+            e.printStackTrace();
+          }
+        }
+        cacheStreamsCallback.onStreamsSuccess("Streams updated");
       }
     }.start();
   }
@@ -329,16 +394,22 @@ public class SQLiteDBHelper {
           }
           logger.log("SQLiteDBHelper: retrieved " + allStreams.size() + " streams.");
           Map<String, Stream> rootStreams = new HashMap<String, Stream>();
+          int cnt = 0;
           for (Stream stream : allStreams.values()) {
             String pid = stream.getParentId();
             if (pid != null) {
               // add this stream as a child
               allStreams.get(pid).addChildStream(stream);
+              logger.log("retrieved family Stream: parent="
+                + allStreams.get(pid).getName()
+                  + ", child="
+                  + stream.getName());
               // remove it from retrievedStreams.
             } else {
               rootStreams.put(stream.getId(), stream);
             }
           }
+          logger.log("retrieved " + cnt + " relations of streams.");
           cacheStreamsCallback.onCacheRetrieveStreamSuccess(rootStreams);
         } catch (SQLException e) {
           cacheStreamsCallback.onStreamError(e.getMessage());

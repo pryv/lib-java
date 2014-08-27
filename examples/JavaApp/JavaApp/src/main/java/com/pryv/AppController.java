@@ -317,10 +317,12 @@ public class AppController {
     parentIdLabel.setText(stream.getParentId());
     StringBuilder sb = new StringBuilder();
     String separator = "";
-    for (Stream child : stream.getChildren()) {
-      sb.append(separator);
-      sb.append(child.getId());
-      separator = ", ";
+    if (stream.getChildren() != null) {
+      for (Stream child : stream.getChildren()) {
+        sb.append(separator);
+        sb.append(child.getId());
+        separator = ", ";
+      }
     }
     String childrenIDs = sb.toString();
     childrenLabel.setText(childrenIDs);

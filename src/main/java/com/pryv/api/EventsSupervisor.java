@@ -6,7 +6,6 @@ import java.util.Map;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
 import com.pryv.utils.JsonConverter;
 import com.pryv.utils.Logger;
 
@@ -51,10 +50,9 @@ public class EventsSupervisor {
     Map<String, Event> returnEvents = new HashMap<String, Event>();
 
     for (Event event : events.values()) {
-      if (filter.match(event, streamsSupervisor.getRootStreams())) {
+      if (filter.match(event, streamsSupervisor)) {
         returnEvents.put(event.getId(), event);
         logger.log("Supervisor: matched: streamName="
-        // + streams.get(event.getStreamId()).getName()
           + ", streamId="
             + event.getStreamId()
             + ", id="
@@ -81,23 +79,17 @@ public class EventsSupervisor {
    *           thrown when some mandatory fields of the Event are null
    */
   public void updateOrCreateEvent(Event newEvent, EventsCallback connectionCallback) {
-    if (areFieldsValid(newEvent)) {
-      // case exists: compare modified field
-      if (events.containsKey(newEvent.getId())) {
-        updateEvent(newEvent);
-        connectionCallback.onEventsSuccess("Event with id="
-          + newEvent.getId()
-            + " updated successfully.");
-      } else {
-        addEvent(newEvent);
-        connectionCallback.onEventsSuccess("Event with id="
-          + newEvent.getId()
-            + " added successfully.");
-      }
+    // case exists: compare modified field
+    if (events.containsKey(newEvent.getId())) {
+      updateEvent(newEvent);
+      connectionCallback.onEventsSuccess("Event with id="
+        + newEvent.getId()
+          + " updated successfully.");
     } else {
-      connectionCallback
-        .onEventsError("Supervisor: attempt to Create an Event with incomplete fields: id="
-          + newEvent.getId());
+      addEvent(newEvent);
+      connectionCallback.onEventsSuccess("Event with id="
+        + newEvent.getId()
+          + " added successfully.");
     }
   }
 
@@ -107,10 +99,10 @@ public class EventsSupervisor {
    * @param newEvent
    */
   private void addEvent(Event newEvent) {
-    logger.log("Supervisor: adding new event: id="
-      + newEvent.getId()
-        + ", streamId="
-        + newEvent.getStreamId());
+    // logger.log("Supervisor: adding new event: id="
+    // + newEvent.getId()
+    // + ", streamId="
+    // + newEvent.getStreamId());
     events.put(newEvent.getId(), newEvent);
   }
 
@@ -126,14 +118,14 @@ public class EventsSupervisor {
     if (memEvent.getModified() > event.getModified()) {
       // do nothing
     } else {
-      logger.log("Supervisor: updating event: id="
-        + event.getId()
-          + ", streamId="
-          + event.getStreamId()
-          + ". Old time="
-          + memEvent.getTime()
-          + ", new Time="
-          + event.getTime());
+      // logger.log("Supervisor: updating event: id="
+      // + event.getId()
+      // + ", streamId="
+      // + event.getStreamId()
+      // + ". Old time="
+      // + memEvent.getTime()
+      // + ", new Time="
+      // + event.getTime());
       memEvent.merge(event, JsonConverter.getCloner());
     }
   }
@@ -171,46 +163,6 @@ public class EventsSupervisor {
    */
   public Event getEventById(String id) {
     return events.get(id);
-  }
-
-  /**
-   * used to check if input Event have all the required fields not null.
-   *
-   * @param eventToCheck
-   * @return true if all fields are valid, false if any of the mandatory fields
-   *         is null or the parameter is null
-   */
-  private boolean areFieldsValid(Event eventToCheck) {
-    if (eventToCheck == null) {
-      return false;
-    } else {
-      return eventToCheck.getId() != null
-        && eventToCheck.getStreamId() != null
-          && eventToCheck.getCreated() != null
-          && eventToCheck.getCreatedBy() != null
-          && eventToCheck.getModified() != null
-          && eventToCheck.getModifiedBy() != null;
-    }
-  }
-
-  /**
-   * used to check if input Stream has all the required fields as not null.
-   *
-   * @param streamToCheck
-   * @return true if all fields are not null, false if any mandatory field is
-   *         null or the stream is null.
-   */
-  private boolean areFieldsValid(Stream streamToCheck) {
-    if (streamToCheck == null) {
-      return false;
-    } else {
-      return streamToCheck.getId() != null
-        && streamToCheck.getName() != null
-          && streamToCheck.getCreated() != null
-          && streamToCheck.getCreatedBy() != null
-          && streamToCheck.getModified() != null
-          && streamToCheck.getModifiedBy() != null;
-    }
   }
 
 }

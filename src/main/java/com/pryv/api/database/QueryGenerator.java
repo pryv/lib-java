@@ -60,16 +60,16 @@ public class QueryGenerator {
   public static final String STREAMS_CHILDREN_KEY = "CHILDREN";
 
   /**
-   * Create Event query.
+   * Create query to insert or replace Event.
    *
    * @param eventToCache
    *
    * @throws JsonProcessingException
    * @return
    */
-  public static String insertEvent(Event eventToCache) throws JsonProcessingException {
+  public static String insertOrReplaceEvent(Event eventToCache) throws JsonProcessingException {
     StringBuilder sb = new StringBuilder();
-    sb.append("INSERT INTO "
+    sb.append("INSERT OR REPLACE INTO "
       + EVENTS_TABLE_NAME
         + " ("
         + EVENTS_ID_KEY
@@ -312,14 +312,14 @@ public class QueryGenerator {
   }
 
   /**
-   * Creates query to insert stream in the SQLite database.
+   * Creates query to insert or replace stream in the SQLite database.
    *
    * @param streamToCache
    * @return
    */
-  public static String insertStream(Stream streamToCache) {
+  public static String insertOrReplaceStream(Stream streamToCache) {
     StringBuilder sb = new StringBuilder();
-    sb.append("INSERT INTO "
+    sb.append("INSERT OR REPLACE INTO "
       + STREAMS_TABLE_NAME
         + " ("
         + STREAMS_ID_KEY
@@ -473,17 +473,17 @@ public class QueryGenerator {
         + EVENTS_STREAM_ID_KEY
         + " TEXT              NOT NULL, "
         + EVENTS_TIME_KEY
-        + " INTEGER           NOT NULL, "
+        + " INTEGER, "
         + EVENTS_TYPE_KEY
-        + " TEXT              NOT NULL, "
+        + " TEXT, "
         + EVENTS_CREATED_KEY
-        + " INTEGER           NOT NULL, "
+        + " INTEGER, "
         + EVENTS_CREATED_BY_KEY
-        + " TEXT              NOT NULL, "
+        + " TEXT, "
         + EVENTS_MODIFIED_KEY
-        + " INTEGER           NOT NULL, "
+        + " INTEGER, "
         + EVENTS_MODIFIED_BY_KEY
-        + " TEXT              NOT NULL, "
+        + " TEXT, "
         + EVENTS_DURATION_KEY
         + " INTEGER, "
         + EVENTS_CONTENT_KEY
@@ -518,13 +518,13 @@ public class QueryGenerator {
         + STREAMS_NAME_KEY
         + " TEXT              NOT NULL, "
         + STREAMS_CREATED_KEY
-        + " INTEGER           NOT NULL, "
+        + " INTEGER, "
         + STREAMS_CREATED_BY_KEY
-        + " TEXT              NOT NULL, "
+        + " TEXT, "
         + STREAMS_MODIFIED_KEY
-        + " INTEGER           NOT NULL, "
+        + " INTEGER, "
         + STREAMS_MODIFIED_BY_KEY
-        + " TEXT              NOT NULL, "
+        + " TEXT, "
         + STREAMS_CHILDREN_KEY
         + " TEXT, "
         + STREAMS_PARENT_ID_KEY
