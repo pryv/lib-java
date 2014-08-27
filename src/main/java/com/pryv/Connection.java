@@ -65,7 +65,7 @@ public class Connection implements EventsManager, StreamsManager {
    */
 
   public Map<String, Stream> getStreams() {
-    return streams.getStreams();
+    return streams.getRootStreams();
   }
 
   public Stream getStreamById(String streamId) {
@@ -142,7 +142,7 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void getStreams(Filter filter, final StreamsCallback userStreamsCallback) {
-    userStreamsCallback.onSupervisorRetrieveStreamsSuccess(streams.getStreams());
+    userStreamsCallback.onSupervisorRetrieveStreamsSuccess(streams.getRootStreams());
     if (Pryv.isCacheActive() || Pryv.isSupervisorActive()) {
       // forward call to cache
       cacheStreamsManager.getStreams(filter, new ConnectionStreamsCallback(userStreamsCallback));
@@ -326,7 +326,7 @@ public class Connection implements EventsManager, StreamsManager {
         streams.updateOrCreateStream(stream, userStreamsCallback);
       }
       // forward updated Streams
-      userStreamsCallback.onOnlineRetrieveStreamsSuccess(streams.getStreams());
+      userStreamsCallback.onOnlineRetrieveStreamsSuccess(streams.getRootStreams());
     }
 
     @Override
@@ -335,7 +335,7 @@ public class Connection implements EventsManager, StreamsManager {
         streams.updateOrCreateStream(stream, userStreamsCallback);
       }
       // forward updated Streams
-      userStreamsCallback.onCacheRetrieveStreamSuccess(streams.getStreams());
+      userStreamsCallback.onCacheRetrieveStreamSuccess(streams.getRootStreams());
     }
 
     @Override

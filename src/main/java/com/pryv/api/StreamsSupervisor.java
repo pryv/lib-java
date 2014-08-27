@@ -41,7 +41,7 @@ public class StreamsSupervisor {
    *
    * @return
    */
-  public Map<String, Stream> getStreams() {
+  public Map<String, Stream> getRootStreams() {
     return rootStreams;
   }
 

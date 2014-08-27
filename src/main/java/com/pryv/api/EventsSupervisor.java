@@ -51,7 +51,7 @@ public class EventsSupervisor {
     Map<String, Event> returnEvents = new HashMap<String, Event>();
 
     for (Event event : events.values()) {
-      if (filter.match(event, streamsSupervisor.getStreams())) {
+      if (filter.match(event, streamsSupervisor.getRootStreams())) {
         returnEvents.put(event.getId(), event);
         logger.log("Supervisor: matched: streamName="
         // + streams.get(event.getStreamId()).getName()
@@ -212,27 +212,5 @@ public class EventsSupervisor {
           && streamToCheck.getModifiedBy() != null;
     }
   }
-
-  // /**
-  // * custom thrown when user tries to call Supervisor methods with data having
-  // * mandatory fields as null.
-  // *
-  // * @author ik
-  // *
-  // */
-  // public class IncompleteFieldsException extends Exception {
-  //
-  // /**
-  // * Constructor containing message to display
-  // *
-  // * @param message
-  // */
-  // public IncompleteFieldsException(String id, String name) {
-  // super("Supervisor: attempt to Create a Stream or Event with incomplete fields: id="
-  // + id
-  // + ", name="
-  // + name);
-  // }
-  // }
 
 }
