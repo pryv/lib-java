@@ -1,8 +1,10 @@
 package com.pryv.functional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
@@ -55,57 +57,69 @@ public class SupervisorTest {
     Stream parent1 = DummyData.generateFullStream();
     String parent1Id = "parent1";
     parent1.setId(parent1Id);
+    parent1.clearChildren();
 
     Stream child = DummyData.generateFullStream();
     String childId = "childStreamId";
     child.setId(childId);
     child.setParentId(parent1Id);
-    parent1.addChildStream(child);
+    child.clearChildren();
 
     String parent2Id = "parent2";
     Stream parent2 = DummyData.generateFullStream();
     parent2.setId(parent2Id);
+    parent2.clearChildren();
 
-    // insert parent1 & parent2 in supervisor
+    // insert parent1 & parent2 and child in supervisor
 
     streams.updateOrCreateStream(parent1, callback);
+    assertNotNull(streams.getRootStreams().get(parent1Id));
     streams.updateOrCreateStream(parent2, callback);
-    assertNotNull(StreamUtils.findStreamReference(parent1Id, streams.getRootStreams()));
-    assertNotNull(StreamUtils.findStreamReference(childId, streams.getRootStreams()));
+    assertNotNull(streams.getRootStreams().get(parent2Id));
+    streams.updateOrCreateStream(child, callback);
+    assertNull(streams.getRootStreams().get(childId));
+    assertNotNull(streams.getStreamById(childId));
+    assertTrue(streams.verifyParency(childId, parent1Id));
+    assertFalse(streams.verifyParency(childId, parent2Id));
 
     // change random stuff
     String newName = "myChildNewName";
     Stream childUpdate3 = DummyData.generateFullStream();
+    childUpdate3.clearChildren();
     childUpdate3.setId(childId);
     childUpdate3.setParentId(parent1Id);
     childUpdate3.setName(newName);
+    assertEquals(newName, childUpdate3.getName());
     childUpdate3.setModified(child.getModified() + TIME_INTERVAL);
     streams.updateOrCreateStream(childUpdate3, callback);
 
-    assertNotNull(StreamUtils.findStreamReference(childId, streams.getRootStreams()));
-    assertEquals(newName, StreamUtils.findStreamReference(childId, streams.getRootStreams()).getName());
+    assertNotNull(streams.getStreamById(childId));
+    assertEquals(newName, streams.getStreamById(childId).getName());
 
-    // change parents
+    // change parents 1->2
     Stream childUpdate1 = DummyData.generateFullStream();
+    childUpdate1.clearChildren();
     childUpdate1.setId(childId);
     childUpdate1.setParentId(parent2Id);
     childUpdate1.setModified(child.getModified() + TIME_INTERVAL);
     streams.updateOrCreateStream(childUpdate1, callback);
-    assertNull(StreamUtils.findStreamReference(childId, parent1.getChildrenMap()));
-    assertNotNull(StreamUtils.findStreamReference(childId, parent2.getChildrenMap()));
+    assertFalse(streams.verifyParency(childId, parent1Id));
+    assertTrue(streams.verifyParency(childId, parent2Id));
 
     // orphan child
     Stream childUpdate2 = DummyData.generateFullStream();
+    childUpdate2.clearChildren();
     childUpdate2.setId(childId);
     childUpdate2.setParentId(null);
     childUpdate2.setModified(child.getModified() + TIME_INTERVAL);
 
     streams.updateOrCreateStream(childUpdate2, callback);
-    assertNull(StreamUtils.findStreamReference(childId, parent1.getChildrenMap()));
+    assertFalse(streams.verifyParency(childId, parent2Id));
     assertNotNull(streams.getStreamById(childId));
 
     // random change as orphan
     Stream childUpdate5 = DummyData.generateFullStream();
+    childUpdate5.clearChildren();
     childUpdate5.setId(childId);
     String randomName = "randomName";
     childUpdate5.setName(randomName);
@@ -115,6 +129,7 @@ public class SupervisorTest {
 
     // add it a parent now
     Stream childUpdate4 = DummyData.generateFullStream();
+    childUpdate4.clearChildren();
     childUpdate4.setId(childId);
     childUpdate4.setParentId(parent1Id);
     childUpdate4.setModified(child.getModified() + TIME_INTERVAL);

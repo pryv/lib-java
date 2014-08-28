@@ -182,13 +182,28 @@ public class Stream {
     childrenMap.put(childStream.getId(), childStream);
   }
 
+  /**
+   * Removes a child Stream from the Stream. If no more children are left, the
+   * children and childrenMap fields are set to null.
+   *
+   * @param childStream
+   *          the child Stream to remove
+   */
   public void removeChildStream(Stream childStream) {
     childrenMap.remove(childStream.getId());
     children.remove(childStream);
-    if (childrenMap.size() == 0) {
+    if (childrenMap.size() == 0 || children.size() == 0) {
       childrenMap = null;
       children = null;
     }
+  }
+
+  /**
+   * remove all the child Streams of the Stream.
+   */
+  public void clearChildren() {
+    children = null;
+    childrenMap = null;
   }
 
   public String getId() {

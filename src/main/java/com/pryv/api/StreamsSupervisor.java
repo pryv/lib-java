@@ -7,7 +7,6 @@ import java.util.Set;
 
 import com.pryv.api.model.Stream;
 import com.pryv.utils.Logger;
-import com.pryv.utils.StreamUtils;
 
 /**
  *
@@ -93,41 +92,53 @@ public class StreamsSupervisor {
    */
   private void updateStream(Stream oldStream, Stream streamToUpdate,
     StreamsCallback connectionCallback) {
+
     if (oldStream.getModified() > streamToUpdate.getModified()) {
       // do nothing
       connectionCallback.onStreamsSuccess("Stream with id="
         + streamToUpdate.getId()
           + " not updated since it is older than the stored version.");
     } else {
+      // oldStream.merge(streamToUpdate);
       // find out if parent has changed:
       if (oldStream.getParentId() == null && streamToUpdate.getParentId() == null) {
         // case 1: was root, still root
         // do nothing
+        oldStream.merge(streamToUpdate);
       } else if (oldStream.getParentId() == null && streamToUpdate.getParentId() != null) {
         // case 2: was root, now child
         // add it to its parent's children
-        addChildStreamToParent(streamToUpdate.getParentId(), streamToUpdate, connectionCallback);
+        oldStream.merge(streamToUpdate);
+        addChildStreamToParent(streamToUpdate.getParentId(), oldStream, connectionCallback);
+        rootStreams.remove(oldStream.getId());
       } else if (oldStream.getParentId() != null && streamToUpdate.getParentId() == null) {
         // case 3: was child, now root
         // remove it from old parents children
-        removeChildStreamFromParent(oldStream.getParentId(), streamToUpdate, connectionCallback);
-        rootStreams.put(streamToUpdate.getId(), streamToUpdate);
+        String oldParent = oldStream.getParentId();
+        oldStream.merge(streamToUpdate);
+        removeChildStreamFromParent(oldParent, oldStream, connectionCallback);
+        rootStreams.put(streamToUpdate.getId(), oldStream);
       } else {
         // case 4: was child, still child
         if (oldStream.getParentId().equals(streamToUpdate.getParentId())) {
           // case 4a: same parent
           // do nothing
+          logger.log("StreamsSupervisor: same parents");
+          oldStream.merge(streamToUpdate);
         } else {
           // case 4b: parent changed
           // remove it from old parent
-          removeChildStreamFromParent(oldStream.getParentId(), streamToUpdate, connectionCallback);
+          // removeChildStreamFromParent(oldStream.getParentId(),
+          // streamToUpdate, connectionCallback);
+          logger.log("StreamsSupervisor: changing parents");
+          getStreamById(oldStream.getParentId()).removeChildStream(oldStream);
           // add it to new parent
-          addChildStreamToParent(streamToUpdate.getParentId(), streamToUpdate, connectionCallback);
+          oldStream.merge(streamToUpdate);
+          addChildStreamToParent(oldStream.getParentId(), oldStream, connectionCallback);
         }
       }
     }
     // do the update
-    oldStream.merge(streamToUpdate);
     connectionCallback.onStreamsSuccess("Stream updated: " + streamToUpdate.getId());
   }
 
@@ -143,10 +154,10 @@ public class StreamsSupervisor {
    */
   private void addChildStreamToParent(String parentId, Stream childStream,
     StreamsCallback connectionCallback) {
-    Stream newParent = StreamUtils.findStreamReference(parentId, rootStreams);
+    Stream newParent = flatStreams.get(parentId);
     if (newParent != null) {
       // verify that new parent is not the Stream's child - loop bug
-      if (StreamUtils.findStreamReference(childStream.getId(), newParent.getChildrenMap()) == null) {
+      if (!verifyParency(childStream.getId(), parentId)) {
         newParent.addChildStream(childStream);
         logger.log(childStream.getId() + " now child of " + parentId);
       } else {
@@ -188,13 +199,14 @@ public class StreamsSupervisor {
    *          the stream to add
    */
   private void addStream(Stream newStream) {
-    logger.log("Stream added: " + newStream.getId());
     if (newStream.getParentId() != null) {
       Stream parentStream = getStreamById(newStream.getParentId());
       parentStream.addChildStream(newStream);
+    } else {
+      rootStreams.put(newStream.getId(), newStream);
     }
-    rootStreams.put(newStream.getId(), newStream);
     flatStreams.put(newStream.getId(), newStream);
+    logger.log("Stream added: " + newStream.getId());
   }
 
   /**
@@ -266,8 +278,8 @@ public class StreamsSupervisor {
    * @return
    */
   public boolean verifyParency(String childId, String parentId) {
-    if (flatStreams.get(parentId) != null) {
-      if (flatStreams.get(parentId).getChildren() != null) {
+    if (getStreamById(parentId) != null) {
+      if (getStreamById(parentId).getChildren() != null) {
         Set<String> children = new HashSet<String>();
         computeDescendants(children, parentId);
         return children.contains(childId);
@@ -300,21 +312,20 @@ public class StreamsSupervisor {
    * Store the ids of Stream with id "parentId"'s descendants.
    *
    * @param children
-   *          the Set<String> in which the Stream Ids will be stored
+   *          the Set<String> in which the Stream Id's will be stored
    * @param parentId
    *          the id of the parent Stream.
    */
   private void computeDescendants(Set<String> children, String parentId) {
     logger.log("StreamSupervisor: computing descendency of stream with id=" + parentId);
-    logger.log("StreamSupervisor: and name=" + flatStreams.get(parentId).getName());
-    logger.log("StreamSupervisor: this Stream has "
-      + flatStreams.get(parentId).getChildren().size()
-        + " children in list");
-    logger.log("StreamSupervisor: this Stream has "
-      + flatStreams.get(parentId).getChildrenMap().size()
-        + " children in map");
-    if (flatStreams.get(parentId).getChildren() != null) {
-      for (Stream childStream : flatStreams.get(parentId).getChildren()) {
+    if (getStreamById(parentId).getChildren() != null) {
+      logger.log("StreamSupervisor: this Stream has "
+        + getStreamById(parentId).getChildren().size()
+          + " children in list");
+      logger.log("StreamSupervisor: this Stream has "
+        + getStreamById(parentId).getChildrenMap().size()
+          + " children in map");
+      for (Stream childStream : getStreamById(parentId).getChildren()) {
         children.add(childStream.getId());
         computeDescendants(children, childStream.getId());
       }
