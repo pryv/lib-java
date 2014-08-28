@@ -280,6 +280,23 @@ public class StreamsSupervisor {
   }
 
   /**
+   * Find out if Stream with id="childId" is a child of any Stream whose id is
+   * contained in parentIds
+   *
+   * @param childId
+   * @param parentIds
+   * @return
+   */
+  public boolean verifyParency(String childId, Set<String> parentIds) {
+    for (String parentId : parentIds) {
+      if (verifyParency(childId, parentId)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Store the ids of Stream with id "parentId"'s descendants.
    *
    * @param children

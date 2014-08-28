@@ -76,6 +76,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
   @Override
   public void getEvents(Filter filter, EventsCallback connectionEventsCallback) {
+    Filter onlineFilter = new Filter();
     if (Pryv.isCacheActive()) {
       // if some specific streams are requested
       if (filter.getStreamIds() != null) {
@@ -83,10 +84,15 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         if (filter.areStreamIdsContainedInScope(scope, streams)) {
           // make request to online for full scope with field modifiedSince set
           // to lastModified
-          filter.setModifiedSince(lastModified);
-          filter.setStreamIds(scope);
+          onlineFilter.setModifiedSince(lastModified);
+          onlineFilter.setStreamIds(scope);
         } else {
-          scope.addAll(filter.getStreamIds());
+          for (String filterStreamId : filter.getStreamIds()) {
+            if (!streams.verifyParency(filterStreamId, scope)) {
+              scope.add(filterStreamId);
+            }
+
+          }
           // / make request to online for missing streams?
         }
       } else {
@@ -99,7 +105,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
-      onlineEventsManager.getEvents(filter, new CacheEventsCallback(filter,
+      onlineEventsManager.getEvents(onlineFilter, new CacheEventsCallback(filter,
         connectionEventsCallback));
     }
   }
