@@ -225,6 +225,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, long serverTime) {
       // update Events in cache and send result to connection
       logger.log("Cache: update cache with online Events");
+      lastModified = serverTime;
       dbHelper.updateEvents(onlineEvents.values(), cacheUpdateEventsCallback);
     }
 
