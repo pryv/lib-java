@@ -639,4 +639,5 @@ public class QueryGenerator {
     return sb.toString();
   }
 
+
 }

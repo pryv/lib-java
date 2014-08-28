@@ -8,7 +8,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.sqlite.SQLiteConfig;
 
@@ -238,7 +240,7 @@ public class SQLiteDBHelper {
    * @param streamToCache
    *          the stream to insert
    */
-  public void createStream(Stream streamToCache, StreamsCallback cacheStreamsCallback) {
+  public void updateOrCreateStream(Stream streamToCache, StreamsCallback cacheStreamsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -248,7 +250,9 @@ public class SQLiteDBHelper {
           logger.log("SQLiteDBHelper: addStream: " + cmd);
           statement.executeUpdate(cmd);
           if (streamToCache.getChildren() != null) {
-            for (Stream childStream : streamToCache.getChildren()) {
+            Set<Stream> children = new HashSet<Stream>();
+            retrieveAllChildren(children, streamToCache);
+            for (Stream childStream : children) {
               cmd = QueryGenerator.insertOrReplaceStream(childStream);
               statement.execute(cmd);
               logger.log("SQLiteDBHelper: add child Stream: " + cmd);
@@ -310,7 +314,9 @@ public class SQLiteDBHelper {
             statement.executeUpdate(cmd);
             logger.log("updated stream: id=" + stream.getId() + ", name=" + stream.getName());
             if (stream.getChildren() != null) {
-              for (Stream childStream : stream.getChildren()) {
+              Set<Stream> children = new HashSet<Stream>();
+              retrieveAllChildren(children, stream);
+              for (Stream childStream : children) {
                 cmd = QueryGenerator.insertOrReplaceStream(childStream);
                 statement.execute(cmd);
                 logger.log("SQLiteDBHelper: add child Stream: " + cmd);
@@ -325,6 +331,23 @@ public class SQLiteDBHelper {
         cacheStreamsCallback.onStreamsSuccess("Streams updated");
       }
     }.start();
+  }
+
+  /**
+   * gathers all descendants of Stream into allStreams
+   *
+   * @param allStreams
+   *          a Set<Stream> into which all children are put
+   * @param parentStream
+   *          the stream whose children are gathered
+   */
+  private void retrieveAllChildren(Set<Stream> allStreams, Stream parentStream) {
+    allStreams.add(parentStream);
+    if (parentStream.getChildren() != null) {
+      for (Stream childStream : parentStream.getChildren()) {
+        retrieveAllChildren(allStreams, childStream);
+      }
+    }
   }
 
   /**

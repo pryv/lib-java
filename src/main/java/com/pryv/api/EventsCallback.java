@@ -16,14 +16,17 @@ public interface EventsCallback {
   /**
    * callback method for successful online retrieval
    *
-   * @param streams
+   * @param onlineEvents
+   *          the events retrieved from the online message
+   * @param serverTime
+   *          the time of the server
    */
-  void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents);
+  void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, long serverTime);
 
   /**
    * callback method for successful DB retrieval
    *
-   * @param newStreams
+   * @param cacheEvents
    */
   void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents);
 
@@ -37,7 +40,7 @@ public interface EventsCallback {
   /**
    * callback method called when an error occured during Event fetching.
    *
-   * @param message
+   * @param errorMessage
    *          the error message
    */
   void onEventsRetrievalError(String errorMessage);

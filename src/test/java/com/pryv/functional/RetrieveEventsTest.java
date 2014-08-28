@@ -76,16 +76,9 @@ public class RetrieveEventsTest {
       @Override
       public Boolean call() throws Exception {
         if (events != null) {
-          System.out.println("########################################################");
-          System.out.println("TEST TEST TEST: events not null, testing for "
-            + streamId
-              + ", matched events: "
-              + events.values().size());
-          System.out.println("########################################################");
           if (events.values().size() > 0) {
             boolean match = false;
             for (Event event : events.values()) {
-              System.out.println("comparing: " + streamId + " with " + event.getStreamId());
               if (streamId.equals(event.getStreamId())) {
                 match = true;
               }
@@ -139,7 +132,7 @@ public class RetrieveEventsTest {
     eventsCallback = new EventsCallback() {
 
       @Override
-      public void onOnlineRetrieveEventsSuccess(Map<String, Event> newEvents) {
+      public void onOnlineRetrieveEventsSuccess(Map<String, Event> newEvents, long serverTime) {
         System.out.println("TestEventsCallback: success with "
           + newEvents.values().size()
             + " events");
@@ -186,7 +179,7 @@ public class RetrieveEventsTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> newStreams) {
+      public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> newStreams, long serverTime) {
         System.out.println("TestStreamsCallback: success for "
           + newStreams.values().size()
             + " streams");

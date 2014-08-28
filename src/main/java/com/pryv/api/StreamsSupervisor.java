@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.pryv.api.model.Stream;
-import com.pryv.utils.JsonConverter;
 import com.pryv.utils.Logger;
 import com.pryv.utils.StreamUtils;
 
@@ -128,7 +127,7 @@ public class StreamsSupervisor {
       }
     }
     // do the update
-    oldStream.merge(streamToUpdate, JsonConverter.getCloner());
+    oldStream.merge(streamToUpdate);
     connectionCallback.onStreamsSuccess("Stream updated: " + streamToUpdate.getId());
   }
 
@@ -258,7 +257,15 @@ public class StreamsSupervisor {
     }
   }
 
-  public boolean testParency(String childId, String parentId) {
+  /**
+   * Find out if Stream with id="childId" is a descendant of Stream with
+   * id="parentId"
+   *
+   * @param childId
+   * @param parentId
+   * @return
+   */
+  public boolean verifyParency(String childId, String parentId) {
     if (flatStreams.get(parentId) != null) {
       if (flatStreams.get(parentId).getChildren() != null) {
         Set<String> children = new HashSet<String>();
@@ -273,12 +280,22 @@ public class StreamsSupervisor {
   }
 
   /**
-   * Save all children of
+   * Store the ids of Stream with id "parentId"'s descendants.
    *
    * @param children
-   * @param stream
+   *          the Set<String> in which the Stream Ids will be stored
+   * @param parentId
+   *          the id of the parent Stream.
    */
   private void computeDescendants(Set<String> children, String parentId) {
+    logger.log("StreamSupervisor: computing descendency of stream with id=" + parentId);
+    logger.log("StreamSupervisor: and name=" + flatStreams.get(parentId).getName());
+    logger.log("StreamSupervisor: this Stream has "
+      + flatStreams.get(parentId).getChildren().size()
+        + " children in list");
+    logger.log("StreamSupervisor: this Stream has "
+      + flatStreams.get(parentId).getChildrenMap().size()
+        + " children in map");
     if (flatStreams.get(parentId).getChildren() != null) {
       for (Stream childStream : flatStreams.get(parentId).getChildren()) {
         children.add(childStream.getId());

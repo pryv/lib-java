@@ -208,7 +208,7 @@ public class SQLiteDBHelperTest {
 
   @Test
   public void test07InsertEmptyStreamShouldFail() {
-    db.createStream(new Stream(), streamsCallback);
+    db.updateOrCreateStream(new Stream(), streamsCallback);
     Awaitility.await().until(hasErrorWhileInsertingUpdatingDeletingStream());
     assertTrue(streamsError);
   }
@@ -216,7 +216,7 @@ public class SQLiteDBHelperTest {
   @Test
   public void test08InsertFullStream() {
     System.out.println("test insert full stream START");
-    db.createStream(testStream, streamsCallback);
+    db.updateOrCreateStream(testStream, streamsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
     System.out.println("test insert full stream INSERTION SUCCESS");
     db.getStreams(streamsCallback);
@@ -319,7 +319,7 @@ public class SQLiteDBHelperTest {
       i++;
     }
     System.out.println("inserting stream with id: " + newId);
-    db.createStream(testedStream, streamsCallback);
+    db.updateOrCreateStream(testedStream, streamsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
     db.getStreams(streamsCallback);
     Awaitility.await().until(hasRetrievedStreamSuccessfully());
@@ -441,7 +441,7 @@ public class SQLiteDBHelperTest {
       }
 
       @Override
-      public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
+      public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, long serverTime) {
       }
 
       @Override
@@ -471,7 +471,8 @@ public class SQLiteDBHelperTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams) {
+      public void
+        onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, long serverTime) {
       }
 
       @Override

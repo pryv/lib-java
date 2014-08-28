@@ -60,7 +60,8 @@ public class OnlineRetrieveStreamsTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams) {
+      public void
+        onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, long serverTime) {
         streams = onlineStreams;
       }
 

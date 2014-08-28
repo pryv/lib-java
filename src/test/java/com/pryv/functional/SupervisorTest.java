@@ -147,7 +147,8 @@ public class SupervisorTest {
       }
 
       @Override
-      public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams) {
+      public void
+        onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, long serverTime) {
         // TODO Auto-generated method stub
 
       }

@@ -9,7 +9,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.pryv.api.database.QueryGenerator;
-import com.rits.cloning.Cloner;
 
 /**
  *
@@ -104,9 +103,8 @@ public class Stream {
    * Copy all temp Stream's values into caller Stream.
    *
    * @param temp
-   * @param cloner
    */
-  public void merge(Stream temp, Cloner cloner) {
+  public void merge(Stream temp) {
     id = temp.id;
     name = temp.name;
     parentId = temp.parentId;

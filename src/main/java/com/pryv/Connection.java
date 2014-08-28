@@ -56,7 +56,7 @@ public class Connection implements EventsManager, StreamsManager {
     url = apiScheme + "://" + username + "." + apiDomain + "/";
     streams = new StreamsSupervisor();
     supervisor = new EventsSupervisor(streams);
-    cacheEventsManager = new CacheEventsAndStreamsManager(url, token, dbInitCallback);
+    cacheEventsManager = new CacheEventsAndStreamsManager(url, token, dbInitCallback, streams);
     cacheStreamsManager = (StreamsManager) cacheEventsManager;
   }
 
@@ -258,7 +258,7 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
+    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, long serverTime) {
       logger.log("Connection: onEventsSuccess");
       // update existing references with JSON received from online
       for (Event onlineEvent : onlineEvents.values()) {
@@ -322,12 +322,12 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStream) {
+    public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStream, long serverTime) {
       for (Stream stream : onlineStream.values()) {
         streams.updateOrCreateStream(stream, userStreamsCallback);
       }
       // forward updated Streams
-      userStreamsCallback.onOnlineRetrieveStreamsSuccess(streams.getRootStreams());
+      userStreamsCallback.onOnlineRetrieveStreamsSuccess(streams.getRootStreams(), serverTime);
     }
 
     @Override

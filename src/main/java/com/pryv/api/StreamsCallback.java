@@ -17,8 +17,11 @@ public interface StreamsCallback {
    * callback method for successful online retrieval
    *
    * @param onlineStreams
+   *          the Streams retrieved from the online message
+   * @param serverTime
+   *          the server time retrieved from the online message
    */
-  void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams);
+  void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, long serverTime);
 
   /**
    * callback method for successful DB retrieval

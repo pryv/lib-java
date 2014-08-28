@@ -24,7 +24,7 @@ import com.rits.cloning.Cloner;
 
 /**
  *
- * utilitary used to update java objects' parameters from a json
+ * utilitary used to do JSON conversions
  *
  * @author ik
  *
@@ -38,14 +38,62 @@ public class JsonConverter {
   private final static String EVENTS_KEY = "events";
   private final static String STREAMS_KEY = "streams";
 
+  private final static String META = "meta";
+  private final static String SERVER_TIME = "serverTime";
+
+  /**
+   * Serializes the Object parameter into JSON
+   *
+   * @param source
+   *          the Object to serialize
+   * @return
+   * @throws JsonProcessingException
+   */
   public static String toJson(Object source) throws JsonProcessingException {
     return jsonMapper.writeValueAsString(source);
   }
 
+  /**
+   * Converts the json in String format into a JsonNode for field-by-field
+   * deserialization
+   *
+   * @param source
+   *          the json in String format
+   * @return
+   * @throws JsonProcessingException
+   * @throws IOException
+   */
   public static JsonNode toJsonNode(String source) throws JsonProcessingException, IOException {
     return jsonMapper.readTree(source);
   }
 
+  /**
+   * Retrieves the serverTime field from a response from the API
+   *
+   * @param jsonResponse
+   *          the jsonResponse containing a field "serverTime"
+   * @return
+   * @throws JsonProcessingException
+   * @throws IOException
+   */
+  public static long retrieveServerTime(String jsonResponse) throws JsonProcessingException,
+    IOException {
+    long serverTime = toJsonNode(jsonResponse).get(META).get(SERVER_TIME).longValue();
+
+    logger.log("JsonConverter: retrieved time: " + serverTime);
+    return serverTime;
+  }
+
+  /**
+   * Deserializes a JSON containing the field "events" into a Map<String, Event>
+   * with Event id as key
+   *
+   * @param jsonEventsArray
+   * @return
+   * @throws JsonParseException
+   * @throws JsonMappingException
+   * @throws IOException
+   */
   public static Map<String, Event> createEventsFromJson(String jsonEventsArray)
     throws JsonParseException, JsonMappingException, IOException {
 
@@ -58,15 +106,19 @@ public class JsonConverter {
         Event eventToAdd = new Event();
         resetEventFromJson(objNode.toString(), eventToAdd);
         newEvents.put(eventToAdd.getId(), eventToAdd);
-        // logger.log("JsonConverter: event created: id = "
-        // + eventToAdd.getId()
-        // + ", streamId = "
-        // + eventToAdd.getStreamId());
       }
     }
     return newEvents;
   }
 
+  /**
+   * Deserializes a JSON containing the field "streams" into a Map<String,
+   * Stream> with Stream id as key
+   *
+   * @param jsonStreamsArray
+   * @return
+   * @throws IOException
+   */
   public static Map<String, Stream> createStreamsFromJson(String jsonStreamsArray)
     throws IOException {
     JsonNode arrNode = toJsonNode(jsonStreamsArray).get(STREAMS_KEY);
@@ -87,6 +139,15 @@ public class JsonConverter {
     return newStreams;
   }
 
+  /**
+   *
+   *
+   * @param json
+   * @param toUpdate
+   * @throws JsonParseException
+   * @throws JsonMappingException
+   * @throws IOException
+   */
   public static void updateAttachmentFromJson(String json, Attachment toUpdate)
     throws JsonParseException, JsonMappingException, IOException {
     Attachment temp = jsonMapper.readValue(json, Attachment.class);
@@ -124,7 +185,7 @@ public class JsonConverter {
   public static void resetStreamFromJson(String json, Stream toUpdate) throws JsonParseException,
     JsonMappingException, IOException {
     Stream temp = jsonMapper.readValue(json, Stream.class);
-    toUpdate.merge(temp, cloner);
+    toUpdate.merge(temp);
   }
 
   /**

@@ -126,8 +126,10 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
         try {
           textResponse = EntityUtils.toString(response.getEntity());
           logger.log("Online received streams: " + textResponse);
-          streamsCallback.onOnlineRetrieveStreamsSuccess(JsonConverter
-            .createStreamsFromJson(textResponse));
+          long serverTime = JsonConverter.retrieveServerTime(textResponse);
+          logger.log("retrieved time: " + serverTime);
+          streamsCallback.onOnlineRetrieveStreamsSuccess(
+            JsonConverter.createStreamsFromJson(textResponse), serverTime);
         } catch (ParseException e) {
           streamsCallback.onStreamsRetrievalError(e.getMessage());
           e.printStackTrace();
@@ -184,8 +186,10 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
           try {
             response = EntityUtils.toString(reply.getEntity());
             logger.log("Online: received events: " + response);
+            long serverTime = JsonConverter.retrieveServerTime(response);
+            logger.log("retrieved time: " + serverTime);
             Map<String, Event> receivedEvents = JsonConverter.createEventsFromJson(response);
-            eventsCallback.onOnlineRetrieveEventsSuccess(receivedEvents);
+            eventsCallback.onOnlineRetrieveEventsSuccess(receivedEvents, serverTime);
           } catch (ParseException e) {
             eventsCallback.onEventsRetrievalError(e.getMessage());
             e.printStackTrace();

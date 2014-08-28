@@ -125,10 +125,6 @@ public class Filter {
       for (String streamId : streamIds) {
         if (streamId.equals(event.getStreamId())) {
           streamIdMatch = true;
-        } else {
-          if (streams.testParency(event.getStreamId(), streamId)) {
-            streamIdMatch = true;
-          }
         }
       }
     }
@@ -278,6 +274,30 @@ public class Filter {
       sb.append("&" + MODIFIED_SINCE_URL_KEY + "=" + modifiedSince);
     }
     return sb.toString();
+  }
+
+  /**
+   * verify if the filter's Stream Ids are contained in the scope of the cache
+   * (including descendants)
+   *
+   * @param scope
+   *          the Stream Ids representing the scope of the cache
+   * @param allStreams
+   *          reference to all the streams, used to resolve Streams descendency
+   *
+   * @return true if it is contained in the scope, false otherwise
+   */
+  public boolean areStreamIdsContainedInScope(Set<String> scope, StreamsSupervisor allStreams) {
+    boolean areContained = false;
+    for (String filterStreamId : streamIds) {
+      areContained = false;
+      for (String scopeStreamId : scope) {
+        if (allStreams.verifyParency(filterStreamId, scopeStreamId)) {
+          areContained = true;
+        }
+      }
+    }
+    return areContained;
   }
 
   public Long getFromTime() {

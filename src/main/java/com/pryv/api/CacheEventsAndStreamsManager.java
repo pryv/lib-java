@@ -27,11 +27,16 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   /**
    * defines the scope of the data the SQLite DB contains.
    */
-  private Set<Stream> scope;
+  private Set<String> scope;
   /**
    * indicates last time the cache was updated - in cloud time
    */
   private long lastModified;
+
+  /**
+   * ref to StreamsSupervisor
+   */
+  private StreamsSupervisor streams;
 
   /**
    * The SQLite DB
@@ -50,13 +55,18 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
    *          the token used to authenticate online requests.
    * @param initCallback
    *          the callback for SQLite database initialization
+   * @param pStreams
+   *          the Streams in volatile memory
    */
-  public CacheEventsAndStreamsManager(String url, String token, DBinitCallback initCallback) {
+  public CacheEventsAndStreamsManager(String url, String token, DBinitCallback initCallback,
+    StreamsSupervisor pStreams) {
     onlineEventsManager = new OnlineEventsAndStreamsManager(url, token);
     onlineStreamsManager = (StreamsManager) onlineEventsManager;
+    streams = pStreams;
     if (Pryv.isCacheActive()) {
       dbHelper = new SQLiteDBHelper(Pryv.DATABASE_NAME, initCallback);
-      scope = new HashSet<Stream>();
+      scope = new HashSet<String>();
+      lastModified = 0;
     }
   }
 
@@ -67,6 +77,22 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   @Override
   public void getEvents(Filter filter, EventsCallback connectionEventsCallback) {
     if (Pryv.isCacheActive()) {
+      // if some specific streams are requested
+      if (filter.getStreamIds() != null) {
+        // verify scope
+        if (filter.areStreamIdsContainedInScope(scope, streams)) {
+          // make request to online for full scope with field modifiedSince set
+          // to lastModified
+          filter.setModifiedSince(lastModified);
+          filter.setStreamIds(scope);
+        } else {
+          scope.addAll(filter.getStreamIds());
+          // / make request to online for missing streams?
+        }
+      } else {
+        // if all streams are requested
+
+      }
       // retrieve Events from cache
       dbHelper.getEvents(filter, new CacheEventsCallback(null, connectionEventsCallback));
       logger.log("Cache: retrieved Events from cache: ");
@@ -137,7 +163,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   public void createStream(Stream newStream, StreamsCallback connectionStreamsCallback) {
     if (Pryv.isCacheActive()) {
       // create Stream in DB
-      dbHelper.createStream(newStream, new CacheStreamsCallback(connectionStreamsCallback));
+      dbHelper.updateOrCreateStream(newStream, new CacheStreamsCallback(connectionStreamsCallback));
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
@@ -173,15 +199,6 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
   }
 
-  private Set<String> getFullScope() {
-    // TODO comare lastModified fields and compute if out of sync only
-    Set<String> fullScope = new HashSet<String>();
-    for (Stream stream : scope) {
-
-    }
-    return fullScope;
-  }
-
   /**
    * EventsCallback used by Cache
    *
@@ -199,7 +216,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
+    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, long serverTime) {
       // update Events in cache and send result to connection
       logger.log("Cache: update cache with online Events");
       dbHelper.updateEvents(onlineEvents.values(), cacheUpdateEventsCallback);
@@ -250,7 +267,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams) {
+    public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, long serverTime) {
       logger.log("Cache: Streams retrieval success");
       // update Streams in cache and make a get call on the cacheStreamsCallback
       dbHelper.updateOrCreateStreams(onlineStreams.values(), cacheUpdateStreamsCallback);
@@ -304,7 +321,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams) {
+    public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, long serverTime) {
       // unused
     }
 
@@ -354,7 +371,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents) {
+    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, long serverTime) {
       // unused
     }
 
