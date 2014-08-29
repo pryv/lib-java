@@ -48,7 +48,7 @@ public class Connection implements EventsManager, StreamsManager {
 
   private Logger logger = Logger.getInstance();
 
-  private final long millisToSeconds = 1000;
+  private final Double millisToSeconds = 1000.0;
 
   /**
    * Connection constructor. builds the Url to which the online requests are
@@ -222,7 +222,7 @@ public class Connection implements EventsManager, StreamsManager {
    * @param pServerTime
    */
   private void computeDelta(double pServerTime) {
-    deltaTime = pServerTime - System.currentTimeMillis();
+    deltaTime = pServerTime - System.currentTimeMillis() / millisToSeconds;
   }
 
   /**

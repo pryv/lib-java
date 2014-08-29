@@ -226,6 +226,11 @@ public class Event {
     modifiedBy = temp.modifiedBy;
   }
 
+  /**
+   * Returns the time of the Event wrapped in a Joda DateTime object
+   *
+   * @return
+   */
   public DateTime getDate() {
     if (time == null) {
       return null;
@@ -236,6 +241,11 @@ public class Event {
     return weakConnection.get().serverTimeInSystemDate(time);
   }
 
+  /**
+   * Sets the time of the Event from a provided Joda DateTime object
+   *
+   * @param date
+   */
   @JsonIgnore
   public void setDate(DateTime date) {
     if (date == null) {
@@ -244,6 +254,7 @@ public class Event {
     if (weakConnection.get() == null) {
       time = date.getMillis() / 1000.0;
     }
+    weakConnection.get().serverTimeInSystemDate(date.getMillis() / 1000.0);
   }
 
   /**
