@@ -247,7 +247,7 @@ public class SQLiteDBHelper {
         try {
           Statement statement = dbConnection.createStatement();
           String cmd = QueryGenerator.insertOrReplaceStream(streamToCache);
-          logger.log("SQLiteDBHelper: addStream: " + cmd);
+          logger.log("SQLiteDBHelper: update or replace Stream : " + cmd);
           statement.executeUpdate(cmd);
           if (streamToCache.getChildren() != null) {
             Set<Stream> children = new HashSet<Stream>();
@@ -310,9 +310,12 @@ public class SQLiteDBHelper {
           try {
             Statement statement = dbConnection.createStatement();
             String cmd = QueryGenerator.insertOrReplaceStream(stream);
-            logger.log("SQLiteDBHelper: updateStream: " + cmd);
+            logger.log("SQLiteDBHelper: update or replace Stream: " + cmd);
             statement.executeUpdate(cmd);
-            logger.log("updated stream: id=" + stream.getId() + ", name=" + stream.getName());
+            logger.log("SQLiteDBHelper: add Stream stream: id="
+              + stream.getId()
+                + ", name="
+                + stream.getName());
             if (stream.getChildren() != null) {
               Set<Stream> children = new HashSet<Stream>();
               retrieveAllChildren(children, stream);
@@ -336,16 +339,17 @@ public class SQLiteDBHelper {
   /**
    * gathers all descendants of Stream into allStreams
    *
-   * @param allStreams
+   * @param childrenStreams
    *          a Set<Stream> into which all children are put
    * @param parentStream
    *          the stream whose children are gathered
    */
-  private void retrieveAllChildren(Set<Stream> allStreams, Stream parentStream) {
-    allStreams.add(parentStream);
+  private void retrieveAllChildren(Set<Stream> childrenStreams, Stream parentStream) {
+    // allStreams.add(parentStream);
     if (parentStream.getChildren() != null) {
       for (Stream childStream : parentStream.getChildren()) {
-        retrieveAllChildren(allStreams, childStream);
+        childrenStreams.add(childStream);
+        retrieveAllChildren(childrenStreams, childStream);
       }
     }
   }
@@ -417,22 +421,15 @@ public class SQLiteDBHelper {
           }
           logger.log("SQLiteDBHelper: retrieved " + allStreams.size() + " streams.");
           Map<String, Stream> rootStreams = new HashMap<String, Stream>();
-          int cnt = 0;
           for (Stream stream : allStreams.values()) {
             String pid = stream.getParentId();
             if (pid != null) {
               // add this stream as a child
               allStreams.get(pid).addChildStream(stream);
-              logger.log("retrieved family Stream: parent="
-                + allStreams.get(pid).getName()
-                  + ", child="
-                  + stream.getName());
-              // remove it from retrievedStreams.
             } else {
               rootStreams.put(stream.getId(), stream);
             }
           }
-          logger.log("retrieved " + cnt + " relations of streams.");
           cacheStreamsCallback.onCacheRetrieveStreamSuccess(rootStreams);
         } catch (SQLException e) {
           cacheStreamsCallback.onStreamError(e.getMessage());

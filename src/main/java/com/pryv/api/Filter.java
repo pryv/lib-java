@@ -187,32 +187,6 @@ public class Filter {
   }
 
   /**
-   * // * Verify if the filter is included in the scope of the cache // * // * @param
-   * filterStreamId // * @param scopeWithChildren // * the streamIds stored in
-   * the cache // * @return //
-   */
-  // public boolean isIncludedInScope(String filterStreamId, Set<String>
-  // scopeWithChildren) {
-  // for (String filterStreamId : streamIds) {
-  // for (Stream scopeStream : scopeWithChildren) {
-  // if (scopeStream.getId().equals(filterStreamId)) {
-  // return true;
-  // } else {
-  // // check scopeStream's children
-  // return checkChildren(scopeStream);
-  // }
-  // }
-  // }
-  // return false;
-  // }
-  //
-  // private boolean checkChildren(Stream checkedStream) {
-  // for (Stream childStream : checkedStream.getChildren()) {
-  //
-  // }
-  // }
-
-  /**
    * add a specific stream id to the filter
    *
    * @param pStreamId
@@ -282,20 +256,26 @@ public class Filter {
    *
    * @param scope
    *          the Stream Ids representing the scope of the cache
-   * @param allStreams
+   * @param streamsSupervisor
    *          reference to all the streams, used to resolve Streams descendency
    *
    * @return true if it is contained in the scope, false otherwise
    */
-  public boolean areStreamIdsContainedInScope(Set<String> scope, StreamsSupervisor allStreams) {
+  public boolean
+    areStreamIdsContainedInScope(Set<String> scope, StreamsSupervisor streamsSupervisor) {
     boolean areContained = false;
     for (String filterStreamId : streamIds) {
       areContained = false;
-      for (String scopeStreamId : scope) {
-        if (allStreams.verifyParency(filterStreamId, scopeStreamId)) {
-          areContained = true;
+      if (scope.contains(filterStreamId)) {
+        areContained = true;
+      } else {
+        for (String scopeStreamId : scope) {
+          if (streamsSupervisor.verifyParency(filterStreamId, scopeStreamId)) {
+            areContained = true;
+          }
         }
       }
+
     }
     return areContained;
   }

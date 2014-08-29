@@ -25,7 +25,9 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   private StreamsManager onlineStreamsManager;
 
   /**
-   * defines the scope of the data the SQLite DB contains.
+   * defines the scope of the Events the SQLite DB contains. Concretely it
+   * represents the Stream Id's for which the Events are synchronized with the
+   * SQLite datbase.
    */
   private Set<String> scope;
   /**
@@ -283,7 +285,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     @Override
     public void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStreams) {
       // forward to connection
-      logger.log("Cache: retrieved streams from cache: streams amount: " + cacheStreams.size());
+      logger
+        .log("Cache: retrieved streams from cache: root streams amount: " + cacheStreams.size());
       connectionStreamsCallback.onCacheRetrieveStreamSuccess(cacheStreams);
     }
 

@@ -72,10 +72,7 @@ public class StreamsSupervisor {
       updateStream(oldStream, stream, connectionCallback);
     } else {
       // case new Event: simply add
-      addStream(stream);
-      connectionCallback.onStreamsSuccess("Stream with id="
-        + stream.getId()
-          + " added successfully");
+      addStream(stream, connectionCallback);
     }
   }
 
@@ -137,9 +134,10 @@ public class StreamsSupervisor {
           addChildStreamToParent(oldStream.getParentId(), oldStream, connectionCallback);
         }
       }
+      // do the update
+      connectionCallback.onStreamsSuccess("Stream updated: " + streamToUpdate.getId());
     }
-    // do the update
-    connectionCallback.onStreamsSuccess("Stream updated: " + streamToUpdate.getId());
+
   }
 
   /**
@@ -198,15 +196,40 @@ public class StreamsSupervisor {
    * @param newStream
    *          the stream to add
    */
-  private void addStream(Stream newStream) {
+  private void addStream(Stream newStream, StreamsCallback connectionCallback) {
     if (newStream.getParentId() != null) {
+      // add the Stream to its parent's children
       Stream parentStream = getStreamById(newStream.getParentId());
       parentStream.addChildStream(newStream);
     } else {
       rootStreams.put(newStream.getId(), newStream);
     }
     flatStreams.put(newStream.getId(), newStream);
-    logger.log("Stream added: " + newStream.getId());
+
+    // add its children
+    addChildren(newStream);
+    connectionCallback.onStreamsSuccess("StreamSupervisor: Stream (id="
+      + newStream.getId()
+        + ", name="
+        + newStream.getName()
+        + ") added ");
+    logger.log("StreamsSupervisor: Stream added: " + newStream.getId());
+  }
+
+  /**
+   * Add all children Streams to StreamsSupervisor recursively
+   *
+   * @param parentStream
+   *          the Stream whose children are added.
+   */
+  private void addChildren(Stream parentStream) {
+    if (parentStream.getChildren() != null) {
+      for (Stream childStream : parentStream.getChildren()) {
+        flatStreams.put(childStream.getId(), childStream);
+        logger.log("StreamsSupervisor: child Stream added: " + childStream.getId());
+        addChildren(childStream);
+      }
+    }
   }
 
   /**
