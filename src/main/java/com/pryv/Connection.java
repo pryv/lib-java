@@ -34,7 +34,7 @@ public class Connection implements EventsManager, StreamsManager {
   /**
    * RTT between server and system: deltaTime = serverTime - systemTime
    */
-  private long deltaTime;
+  private long deltaTime = 0;
 
   private EventsManager cacheEventsManager;
   private StreamsManager cacheStreamsManager;
@@ -209,7 +209,7 @@ public class Connection implements EventsManager, StreamsManager {
    * @param event
    */
   private void updateCreated(Event event) {
-    event.setCreated(System.currentTimeMillis() / millisToSeconds);
+    event.setCreated(System.currentTimeMillis() / millisToSeconds + deltaTime);
     event.setCreatedBy(username);
     updateModified(event);
   }
@@ -220,7 +220,7 @@ public class Connection implements EventsManager, StreamsManager {
    * @param event
    */
   private void updateCreated(Stream stream) {
-    stream.setCreated(System.currentTimeMillis() / millisToSeconds);
+    stream.setCreated(System.currentTimeMillis() / millisToSeconds + deltaTime);
     stream.setCreatedBy(username);
     updateModified(stream);
   }
@@ -232,7 +232,7 @@ public class Connection implements EventsManager, StreamsManager {
    *          the event to modifiy
    */
   private void updateModified(Event event) {
-    event.setModified(System.currentTimeMillis() / millisToSeconds);
+    event.setModified(System.currentTimeMillis() / millisToSeconds + deltaTime);
     event.setModifiedBy(username);
   }
 
@@ -243,7 +243,7 @@ public class Connection implements EventsManager, StreamsManager {
    *          the stream to modifiy
    */
   private void updateModified(Stream stream) {
-    stream.setModified(System.currentTimeMillis() / millisToSeconds);
+    stream.setModified(System.currentTimeMillis() / millisToSeconds + deltaTime);
     stream.setModifiedBy(username);
   }
 
@@ -251,10 +251,10 @@ public class Connection implements EventsManager, StreamsManager {
    * calculates the difference between server and system time: deltaTime =
    * serverTime - systemTime
    *
-   * @param serverTime
+   * @param pServerTime
    */
-  private void computeDelta(long serverTime) {
-    deltaTime = serverTime - System.currentTimeMillis();
+  private void computeDelta(long pServerTime) {
+    deltaTime = pServerTime - System.currentTimeMillis();
   }
 
   /**
