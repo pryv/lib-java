@@ -302,12 +302,19 @@ public class QueryGenerator {
         }
         andSeparator = " AND ";
       }
+      if (filterParams.length() != 0) {
+        filterParams.insert(0, " WHERE ");
+        baseQuery.append(filterParams.toString());
+      }
+
+      if (filter.getLimit() != null) {
+        baseQuery.append(" LIMIT " + filter.getLimit());
+      }
     }
-    if (filterParams.length() != 0) {
-      filterParams.insert(0, " WHERE ");
-      filterParams.append(";");
-      baseQuery.append(filterParams.toString());
-    }
+
+
+
+    filterParams.append(";");
     return baseQuery.toString();
   }
 
