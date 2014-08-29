@@ -10,7 +10,7 @@ import com.pryv.utils.Logger;
 
 /**
  *
- * Contains Pryv objects loaded in memory
+ * Contains Pryv Streams loaded in memory
  *
  * @author ik
  *
@@ -23,8 +23,8 @@ public class StreamsSupervisor {
   private Logger logger = Logger.getInstance();
 
   /**
-   * Supervisor constructor. Instantiates data structures to store Streams and
-   * Events.
+   * StreamsSupervisor constructor. Instantiates data structures to store
+   * Streams.
    *
    */
   public StreamsSupervisor() {
@@ -90,7 +90,6 @@ public class StreamsSupervisor {
   private void updateStream(Stream oldStream, Stream streamToUpdate,
     StreamsCallback connectionCallback) {
 
-    // oldStream.merge(streamToUpdate);
     // find out if parent has changed:
     if (oldStream.getParentId() == null && streamToUpdate.getParentId() == null) {
       // case 1: was root, still root
@@ -108,6 +107,7 @@ public class StreamsSupervisor {
       String oldParent = oldStream.getParentId();
       oldStream.merge(streamToUpdate);
       removeChildStreamFromParent(oldParent, oldStream, connectionCallback);
+      // put it in root streams
       rootStreams.put(streamToUpdate.getId(), oldStream);
     } else {
       // case 4: was child, still child
@@ -119,8 +119,6 @@ public class StreamsSupervisor {
       } else {
         // case 4b: parent changed
         // remove it from old parent
-        // removeChildStreamFromParent(oldStream.getParentId(),
-        // streamToUpdate, connectionCallback);
         logger.log("StreamsSupervisor: changing parents");
         getStreamById(oldStream.getParentId()).removeChildStream(oldStream);
         // add it to new parent
@@ -245,12 +243,6 @@ public class StreamsSupervisor {
         Stream parentStream = getStreamById(streamToDelete.getParentId());
         parentStream.removeChildStream(streamToDelete);
 
-        // delete Stream's events
-        // for (Event event : events.values()) {
-        // if (event.getStreamId().equals(streamId)) {
-        // deleteEvent(event, null);
-        // }
-        // }
         // delete Stream's children Streams
         if (streamToDelete.getChildren() != null) {
           for (String childStream : streamToDelete.getChildrenMap().keySet()) {
@@ -266,12 +258,6 @@ public class StreamsSupervisor {
         streamToDelete.setTrashed(true);
         for (Stream childstream : streamToDelete.getChildren()) {
           childstream.setTrashed(true);
-          // trash Streams' events
-          // for (Event event : events.values()) {
-          // if (event.getStreamId().equals(streamId)) {
-          // event.setTrashed(true);
-          // }
-          // }
         }
         for (Stream childstream : streamToDelete.getChildrenMap().values()) {
           childstream.setTrashed(true);

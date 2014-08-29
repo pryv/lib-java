@@ -30,8 +30,10 @@ public class Logger {
     return logger;
   }
 
-  /*
+  /**
    * writes message in the defined PrintStream (system.out by default)
+   * 
+   * @param message
    */
   public void log(String message) {
     stream.println(message);

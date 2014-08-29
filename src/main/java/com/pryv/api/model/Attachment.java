@@ -18,11 +18,14 @@ public class Attachment implements Cloneable {
   private int size;
   private String readToken;
 
+  /**
+   * empty constructor
+   */
   public Attachment() {
   };
 
   /**
-   * instanciate Attachment object from params.
+   * instantiate Attachment object with parameters
    *
    * @param pId
    * @param pFilename
@@ -59,6 +62,12 @@ public class Attachment implements Cloneable {
 
   }
 
+  /**
+   * copy all fields from temp to the calling Attachment
+   *
+   * @param temp
+   *          other Attachment which fields are copied
+   */
   public void merge(Attachment temp) {
     id = temp.getId();
     fileName = temp.getFileName();

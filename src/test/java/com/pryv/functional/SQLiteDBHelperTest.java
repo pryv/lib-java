@@ -122,13 +122,13 @@ public class SQLiteDBHelperTest {
   public void test01InsertEmpyEvent() {
     System.out.println("test2");
     Event emptyEvent = new Event();
-    db.createEvent(emptyEvent, eventsCallback);
+    db.updateOrCreateEvent(emptyEvent, eventsCallback);
     Awaitility.await().until(hasErrorWhileInsertingUpdatingDeletingEvent());
   }
 
   @Test
   public void test02InsertFullEvent() {
-    db.createEvent(testEvent, eventsCallback);
+    db.updateOrCreateEvent(testEvent, eventsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
   }
 
@@ -137,7 +137,7 @@ public class SQLiteDBHelperTest {
     String newStreamId = "otherStream";
     testEvent.setStreamId(newStreamId);
     testEvent.setModified(testEvent.getModified() + MODIFIED_INCREMENT);
-    db.updateEvent(testEvent, eventsCallback);
+    db.updateOrCreateEvent(testEvent, eventsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
     db.getEvents(null, eventsCallback);
     Awaitility.await().until(hasRetrievedEventSuccessfully());
@@ -155,7 +155,7 @@ public class SQLiteDBHelperTest {
   @Test
   public void test03UpdateEventShouldDoNothingBecauseOfModifiedFields() {
     testEvent.setModified(testEvent.getModified());
-    db.updateEvent(testEvent, eventsCallback);
+    db.updateOrCreateEvent(testEvent, eventsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
     db.getEvents(null, eventsCallback);
     Awaitility.await().until(hasRetrievedEventSuccessfully());
@@ -167,7 +167,7 @@ public class SQLiteDBHelperTest {
   public void test03UpdateEventShouldModify() {
     testEvent.setModified(testEvent.getModified() + MODIFIED_INCREMENT);
     System.out.println("modified value is : " + testEvent.getModified());
-    db.updateEvent(testEvent, eventsCallback);
+    db.updateOrCreateEvent(testEvent, eventsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
     db.getEvents(null, eventsCallback);
     Awaitility.await().until(hasRetrievedEventSuccessfully());
@@ -231,7 +231,7 @@ public class SQLiteDBHelperTest {
     testStream.setTrashed(!testStream.getTrashed());
     Double newModifiedValue = testStream.getModified() + MODIFIED_INCREMENT;
     testStream.setModified(newModifiedValue);
-    db.updateStream(testStream, streamsCallback);
+    db.updateOrCreateStream(testStream, streamsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
     db.getStreams(streamsCallback);
     Awaitility.await().until(hasRetrievedStreamSuccessfully());
@@ -266,7 +266,7 @@ public class SQLiteDBHelperTest {
     Event testedEvent = DummyData.generateFullEvent();
     String newId = "myNewID";
     testedEvent.setId(newId);
-    db.createEvent(testedEvent, eventsCallback);
+    db.updateOrCreateEvent(testedEvent, eventsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
     db.getEvents(null, eventsCallback);
     Awaitility.await().until(hasRetrievedEventSuccessfully());
@@ -351,7 +351,7 @@ public class SQLiteDBHelperTest {
     eventWithoutAttachments.setAttachments(null);
     String id = "eventWithoutAttachmentsID";
     eventWithoutAttachments.setId(id);
-    db.createEvent(eventWithoutAttachments, eventsCallback);
+    db.updateOrCreateEvent(eventWithoutAttachments, eventsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
     db.getEvents(null, eventsCallback);
     Awaitility.await().until(hasRetrievedEventSuccessfully());

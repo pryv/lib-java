@@ -44,7 +44,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
    * @param token
    *          the token passed with each request for auth
    * @param pWeakConnection
-   *          weak reference to connectino
+   *          weak reference to connection
    */
   public OnlineEventsAndStreamsManager(String pUrl, String token,
     WeakReference<Connection> pWeakConnection) {

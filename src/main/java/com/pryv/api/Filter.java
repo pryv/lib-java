@@ -7,8 +7,8 @@ import com.pryv.api.model.Event;
 
 /**
  * Filter used in Events fetching. All its fields are optional. Either
- * instanciate using full Constructor with 'null' values when fields are unused,
- * or use empty Constructor and add fields using setters.
+ * instantiate using full Constructor with 'null' values when fields are unused,
+ * or use empty Constructor and add fields using setters or add methods.
  *
  * @author ik
  *
@@ -69,9 +69,8 @@ public class Filter {
    *          since when is it modified
    */
   public Filter(Double from, Double to, Set<String> pStreams, Set<String> pTags,
-    Set<String> pTypes,
-    Boolean pRunning, Boolean pSortAscending, Integer pSkip, Integer pLimit, State pState,
- Double pModifiedSince) {
+    Set<String> pTypes, Boolean pRunning, Boolean pSortAscending, Integer pSkip, Integer pLimit,
+    State pState, Double pModifiedSince) {
     fromTime = from;
     toTime = to;
     streamIds = pStreams;
@@ -97,10 +96,9 @@ public class Filter {
    *
    * @param event
    *          the tested Event
-   * @param streams
    * @return
    */
-  public Boolean match(Event event, StreamsSupervisor streams) {
+  public Boolean match(Event event) {
 
     // fromTime
     Boolean fromTimeMatch = true;
@@ -120,7 +118,6 @@ public class Filter {
 
     // streamIds
     Boolean streamIdMatch = true;
-    // get all children streamIds
     if (streamIds != null) {
       streamIdMatch = false;
       for (String streamId : streamIds) {

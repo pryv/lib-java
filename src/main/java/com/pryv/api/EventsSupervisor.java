@@ -11,26 +11,22 @@ import com.pryv.utils.Logger;
 
 /**
  *
- * Contains Pryv objects loaded in memory
+ * Contains Events loaded in memory
  *
  * @author ik
  *
  */
 public class EventsSupervisor {
 
-  private StreamsSupervisor streamsSupervisor;
-
   private Map<String, Event> events;
 
   private Logger logger = Logger.getInstance();
 
   /**
-   * Supervisor constructor. Instantiates data structures to store Streams and
-   * Events.
+   * EventsSupervisor constructor. Instantiates data structures to store Events.
    *
    */
-  public EventsSupervisor(StreamsSupervisor pStreamsSupervisor) {
-    streamsSupervisor = pStreamsSupervisor;
+  public EventsSupervisor() {
     events = new HashMap<String, Event>();
   }
 
@@ -43,14 +39,13 @@ public class EventsSupervisor {
    *
    * @param filter
    *          the filter object used to filter the Events.
-   * @return returns the events matching the filter or an empty Map<String,
-   *         Event>.
+   * @param connectionCallback
    */
   public void getEvents(Filter filter, EventsCallback connectionCallback) {
     Map<String, Event> returnEvents = new HashMap<String, Event>();
 
     for (Event event : events.values()) {
-      if (filter.match(event, streamsSupervisor)) {
+      if (filter.match(event)) {
         returnEvents.put(event.getId(), event);
         logger.log("Supervisor: matched: streamName="
           + ", streamId="
@@ -75,8 +70,6 @@ public class EventsSupervisor {
    *          the new Event
    * @param connectionCallback
    *          the callback to notify success or failutre
-   * @throws IncompleteFieldsException
-   *           thrown when some mandatory fields of the Event are null
    */
   public void updateOrCreateEvent(Event newEvent, EventsCallback connectionCallback) {
     // case exists: compare modified field
@@ -99,10 +92,6 @@ public class EventsSupervisor {
    * @param newEvent
    */
   private void addEvent(Event newEvent) {
-    // logger.log("Supervisor: adding new event: id="
-    // + newEvent.getId()
-    // + ", streamId="
-    // + newEvent.getStreamId());
     events.put(newEvent.getId(), newEvent);
   }
 
@@ -124,6 +113,8 @@ public class EventsSupervisor {
    *
    * @param eventToDelete
    *          the Event to delete
+   * @param connectionCallback
+   *          callback used to notify success or failure
    */
   public void deleteEvent(Event eventToDelete, EventsCallback connectionCallback) {
     if (events.get(eventToDelete.getId()) != null) {

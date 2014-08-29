@@ -124,7 +124,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   public void createEvent(Event event, EventsCallback connectionEventsCallback) {
     if (Pryv.isCacheActive()) {
       // create Event in cache
-      dbHelper.createEvent(event, new CacheEventsCallback(null, connectionEventsCallback));
+      dbHelper.updateOrCreateEvent(event, new CacheEventsCallback(null, connectionEventsCallback));
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
@@ -150,7 +150,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   public void updateEvent(Event eventToUpdate, EventsCallback connectionEventsCallback) {
     if (Pryv.isCacheActive()) {
       // update Event in cache
-      dbHelper.updateEvent(eventToUpdate, new CacheEventsCallback(null, connectionEventsCallback));
+      dbHelper.updateOrCreateEvent(eventToUpdate, new CacheEventsCallback(null,
+        connectionEventsCallback));
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
@@ -206,7 +207,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   public void updateStream(Stream streamToUpdate, StreamsCallback connectionStreamsCallback) {
     if (Pryv.isCacheActive()) {
       // update Stream in local db
-      dbHelper.updateStream(streamToUpdate, new CacheStreamsCallback(connectionStreamsCallback));
+      dbHelper.updateOrCreateStream(streamToUpdate, new CacheStreamsCallback(
+        connectionStreamsCallback));
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
@@ -240,7 +242,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       if (Pryv.isCacheActive()) {
         // update Streams in cache and make a get call on the
         // cacheEventsCallback
-        dbHelper.updateEvents(onlineEvents.values(), cacheUpdateEventsCallback);
+        dbHelper.updateOrCreateEvents(onlineEvents.values(), cacheUpdateEventsCallback);
         // forward serverTime to connection
         connectionEventsCallback.onOnlineRetrieveEventsSuccess(null, serverTime);
       } else {

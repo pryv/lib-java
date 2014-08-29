@@ -34,8 +34,10 @@ public class Permission {
     defaultName = pDefaultName;
   }
 
+  /**
+   * empty constructor
+   */
   public Permission() {
-
   }
 
   public String getStreamId() {

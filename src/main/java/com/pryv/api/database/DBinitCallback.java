@@ -10,14 +10,6 @@ package com.pryv.api.database;
  */
 public interface DBinitCallback {
 
-  // /**
-  // * database initialization executed with success.
-  // *
-  // * @param message
-  // * the optional success message to display
-  // */
-  // void onSuccess(String message);
-
   /**
    * database initialization error.
    *

@@ -48,9 +48,8 @@ public class SQLiteDBHelper {
    *
    * @param name
    *          the name of the database
-   *
-   * @throws SQLException
-   * @throws ClassNotFoundException
+   * @param initCallback
+   *          callback to notify failure
    */
   public SQLiteDBHelper(String name, DBinitCallback initCallback) {
     logger.log("SQLiteDBHelper: init DB in: " + dbPath + name);
@@ -66,10 +65,7 @@ public class SQLiteDBHelper {
     try {
       Class.forName("org.sqlite.JDBC");
       SQLiteConfig config = new SQLiteConfig();
-      // config.enforceForeignKeys(true);
       dbConnection = DriverManager.getConnection("jdbc:sqlite:" + path);
-
-      logger.log("Opened database successfully");
       createEventsTable();
       createSteamsTable();
     } catch (SQLException e) {
@@ -87,8 +83,10 @@ public class SQLiteDBHelper {
    *
    * @param eventToCache
    *          the event to insert
+   * @param cacheEventsCallback
+   *          callback to notify success or failure
    */
-  public void createEvent(Event eventToCache, EventsCallback cacheEventsCallback) {
+  public void updateOrCreateEvent(Event eventToCache, EventsCallback cacheEventsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -109,35 +107,15 @@ public class SQLiteDBHelper {
   }
 
   /**
-   * Updates Event in the SQLite database. The "modified" fields are compared in
-   * order to determine if an update is necessary.
+   * Update Events in the SQLite database. used only when the cache receives
+   * events from online.
    *
-   * @param eventToUpdate
+   * @param eventsToCache
+   *          the events to insert in the cache
+   * @param cacheEventsCallback
+   *          callback to notify success or failure
    */
-  public void updateEvent(Event eventToUpdate, EventsCallback cacheEventsCallback) {
-
-    new Thread() {
-      @Override
-      public void run() {
-        try {
-          String cmd = QueryGenerator.insertOrReplaceEvent(eventToUpdate);
-          logger.log("SQLiteDBHelper: updateEvent: " + cmd);
-          Statement statement = dbConnection.createStatement();
-          statement.executeUpdate(cmd);
-          statement.close();
-          cacheEventsCallback.onEventsSuccess("item updated");
-        } catch (SQLException e) {
-          cacheEventsCallback.onEventsError(e.getMessage());
-          e.printStackTrace();
-        } catch (JsonProcessingException e) {
-          cacheEventsCallback.onEventsError(e.getMessage());
-          e.printStackTrace();
-        }
-      }
-    }.start();
-  }
-
-  public void updateEvents(Collection<Event> eventsToUpdate, EventsCallback cacheEventsCallback) {
+  public void updateOrCreateEvents(Collection<Event> eventsToUpdate, EventsCallback cacheEventsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -180,7 +158,7 @@ public class SQLiteDBHelper {
           int done = statement.executeUpdate(cmd);
           // set trashed field to 1
           if (done == 0) {
-            updateEvent(eventToDelete, cacheEventsCallback);
+            updateOrCreateEvent(eventToDelete, cacheEventsCallback);
           }
           statement.close();
           cacheEventsCallback.onEventsSuccess("Event deleted");
@@ -239,6 +217,8 @@ public class SQLiteDBHelper {
    *
    * @param streamToCache
    *          the stream to insert
+   * @param cacheStreamsCallback
+   *          callback to notify success or faiure
    */
   public void updateOrCreateStream(Stream streamToCache, StreamsCallback cacheStreamsCallback) {
     new Thread() {
@@ -267,41 +247,18 @@ public class SQLiteDBHelper {
     }.start();
   }
 
-  /**
-   * Updates Stream in the SQLite database. The "modified" fields are compared
-   * in order to determine if an update is necessary.
-   *
-   * @param streamToUpdate
-   * @throws SQLException
-   */
-  public void updateStream(Stream streamToUpdate, StreamsCallback cacheStreamsCallback) {
-    new Thread() {
-      @Override
-      public void run() {
-        try {
-          String cmd = QueryGenerator.insertOrReplaceStream(streamToUpdate);
-          logger.log("SQLiteDBHelper: updateStream: " + cmd);
-          Statement statement = dbConnection.createStatement();
-          statement.executeUpdate(cmd);
-          statement.close();
-          cacheStreamsCallback.onStreamsSuccess("Stream updated");
-        } catch (SQLException e) {
-          cacheStreamsCallback.onStreamError(e.getMessage());
-          e.printStackTrace();
-        }
-      }
-    }.start();
-  }
 
   /**
    * Update Streams in the SQLite database. used only when the cache receives
    * streams from online.
    *
    * @param streamsToCache
+   *          the streams to cache
    * @param cacheStreamsCallback
+   *          callback to notify success or failure
    */
-  public void
-    updateOrCreateStreams(Collection<Stream> streamsToCache, StreamsCallback cacheStreamsCallback) {
+  public void updateOrCreateStreams(Collection<Stream> streamsToCache,
+    StreamsCallback cacheStreamsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -345,7 +302,6 @@ public class SQLiteDBHelper {
    *          the stream whose children are gathered
    */
   private void retrieveAllChildren(Set<Stream> childrenStreams, Stream parentStream) {
-    // allStreams.add(parentStream);
     if (parentStream.getChildren() != null) {
       for (Stream childStream : parentStream.getChildren()) {
         childrenStreams.add(childStream);
@@ -358,7 +314,9 @@ public class SQLiteDBHelper {
    * Delete Stream and all its children Streams from the SQLite database.
    *
    * @param streamToDelete
-   * @throws SQLException
+   *          the stream to delete
+   * @param cacheStreamsCallback
+   *          callback to notify success or failure
    */
   public void deleteStream(Stream streamToDelete, StreamsCallback cacheStreamsCallback) {
     new Thread() {
@@ -377,7 +335,7 @@ public class SQLiteDBHelper {
                   + cmd);
               // set trashed to true
               if (done == 0) {
-                updateStream(childStream, cacheStreamsCallback);
+                updateOrCreateStream(childStream, cacheStreamsCallback);
               }
             }
           }
@@ -386,7 +344,7 @@ public class SQLiteDBHelper {
           int done = statement.executeUpdate(cmd);
           // set trashed to true
           if (done == 0) {
-            updateStream(streamToDelete, cacheStreamsCallback);
+            updateOrCreateStream(streamToDelete, cacheStreamsCallback);
           }
           statement.close();
           cacheStreamsCallback.onStreamsSuccess("Stream deleted");
@@ -401,8 +359,8 @@ public class SQLiteDBHelper {
   /**
    * Retrieves Streams from the SQLite database
    *
-   * @return Map<String, Event> events, with event ID as key.
-   * @throws SQLException
+   * @param cacheStreamsCallback
+   *          callback to which the streams are returned.
    */
   public void getStreams(StreamsCallback cacheStreamsCallback) {
     new Thread() {

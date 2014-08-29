@@ -19,7 +19,6 @@ import com.pryv.api.StreamsSupervisor;
 import com.pryv.api.model.Stream;
 import com.pryv.unit.DummyData;
 import com.pryv.utils.Logger;
-import com.pryv.utils.StreamUtils;
 
 /**
  * tests for Supervisor class data manipulation
@@ -39,7 +38,7 @@ public class SupervisorTest {
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
     streams = new StreamsSupervisor();
-    supervisor = new EventsSupervisor(streams);
+    supervisor = new EventsSupervisor();
     instantiateCallback();
   }
 
@@ -134,7 +133,9 @@ public class SupervisorTest {
     childUpdate4.setParentId(parent1Id);
     childUpdate4.setModified(child.getModified() + TIME_INTERVAL);
     streams.updateOrCreateStream(childUpdate4, callback);
-    assertNotNull(StreamUtils.findStreamReference(childId, parent1.getChildrenMap()));
+    assertTrue(streams.verifyParency(childId, parent1Id));
+    // assertNotNull(StreamUtils.findStreamReference(childId,
+    // parent1.getChildrenMap()));
   }
 
   private static void instantiateCallback() {

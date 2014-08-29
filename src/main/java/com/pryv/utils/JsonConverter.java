@@ -7,24 +7,20 @@ import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.pryv.api.model.Attachment;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 import com.rits.cloning.Cloner;
 
 /**
- *
- * utilitary used to do JSON conversions
+ * Utilitary class used to do JSON conversions
  *
  * @author ik
  *
@@ -201,8 +197,6 @@ public class JsonConverter {
   public static Set<Attachment> deserializeAttachments(String jsonAttachments)
     throws JsonParseException, JsonMappingException, IOException {
     if (jsonAttachments != null) {
-      // logger.log("JsonConverter: deserializing JSON attachments: \'" +
-      // jsonAttachments + "\'");
       return jsonMapper.readValue(jsonAttachments, new TypeReference<Set<Attachment>>() {
       });
     } else {
@@ -210,6 +204,11 @@ public class JsonConverter {
     }
   }
 
+  /**
+   * Returns Cloner object
+   *
+   * @return
+   */
   public static Cloner getCloner() {
     return cloner;
   }
@@ -228,41 +227,6 @@ public class JsonConverter {
       serialize(Map<String, Stream> value, JsonGenerator jgen, SerializerProvider provider)
         throws IOException, JsonProcessingException {
 
-    }
-
-  }
-
-  /**
-   * Custom Deserializer used to retrieve JSON arrays of streams into Map<id,
-   * stream>
-   *
-   * @author ik
-   *
-   */
-  public class ChildrenDeserializer extends StdDeserializer<Map<String, Stream>> {
-
-    public ChildrenDeserializer(Class<?> vc) {
-      super(vc);
-    }
-
-    // public ChildrenDeserializer() {
-    // this(Map<String, Stream>.class);
-    // }
-
-    @Override
-    public Map<String, Stream> deserialize(JsonParser jp, DeserializationContext ctxt)
-      throws IOException, JsonProcessingException {
-      JsonNode streamsNodeArray = jp.getCodec().readTree(jp);
-      Map<String, Stream> newChildren = null;
-      if (streamsNodeArray.isArray() && streamsNodeArray.size() > 0) {
-        newChildren = new HashMap<String, Stream>();
-        for (JsonNode streamNode : streamsNodeArray) {
-          String id = streamNode.get("id").asText();
-          // jsonMapper.readv
-          newChildren.put(id, jsonMapper.readValue(streamNode.toString(), Stream.class));
-        }
-      }
-      return newChildren;
     }
 
   }

@@ -66,7 +66,7 @@ public class Connection implements EventsManager, StreamsManager {
     url = apiScheme + "://" + username + "." + apiDomain + "/";
     weakConnection = new WeakReference<Connection>(this);
     streams = new StreamsSupervisor();
-    supervisor = new EventsSupervisor(streams);
+    supervisor = new EventsSupervisor();
     cacheEventsManager =
       new CacheEventsAndStreamsManager(url, token, dbInitCallback, streams, weakConnection);
     cacheStreamsManager = (StreamsManager) cacheEventsManager;
@@ -76,10 +76,21 @@ public class Connection implements EventsManager, StreamsManager {
    * Memory Streams management
    */
 
-  public Map<String, Stream> getStreams() {
+  /**
+   * Returns the Root Streams, ie. those with field parent set at null
+   *
+   * @return
+   */
+  public Map<String, Stream> getRootStreams() {
     return streams.getRootStreams();
   }
 
+  /**
+   * Returns a reference to the Stream that has the provided Id.
+   *
+   * @param streamId
+   * @return
+   */
   public Stream getStreamById(String streamId) {
     return streams.getStreamById(streamId);
   }
@@ -361,189 +372,6 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
   }
-
-  // /**
-  // * StreamsCallback instantiated by Connection at each request.
-  // *
-  // * @author ik
-  // *
-  // */
-  // public class Connection2StreamsCallback implements StreamsCallback {
-  //
-  // private StreamsCallback userStreamsCallback;
-  //
-  // /**
-  // * ConnectionStreamsCallback constructor. saves reference to calling
-  // * StreamsCallback.
-  // *
-  // * @param pUserStreamsCallback
-  // */
-  // public Connection2StreamsCallback(StreamsCallback pUserStreamsCallback) {
-  // userStreamsCallback = pUserStreamsCallback;
-  // }
-  //
-  // @Override
-  // public void onOnlineRetrieveStreamsSuccess(Map<String, Stream>
-  // onlineStreams) {
-  // logger.log("ConnectionCallback: received " + onlineStreams.size() +
-  // " streams from cloud.");
-  // if (Pryv.isCacheActive()) {
-  // // merge with cache if cache used:
-  // for (Stream onlineStream : onlineStreams.values()) {
-  // cacheStreamsManager.updateStream(onlineStream, this);
-  // }
-  // cacheStreamsManager.getStreams(null, this);
-  // } else if (Pryv.isSupervisorActive()) {
-  // // if cache not activated merge with Supervisor
-  // for (Stream onlineStream : onlineStreams.values()) {
-  // try {
-  // supervisor.updateOrCreateStream(onlineStream, this);
-  // } catch (IncompleteFieldsException e) {
-  // onStreamError(e.getMessage());
-  // }
-  // }
-  // } else {
-  // // if not local storage is used, foward the result to the caller
-  // userStreamsCallback.onOnlineRetrieveStreamsSuccess(onlineStreams);
-  // }
-  // }
-  //
-  // @Override
-  // public void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStreams)
-  // {
-  // if (Pryv.isSupervisorActive()) {
-  // // merge with Supervisor if it is active
-  // for (Stream cacheStream : cacheStreams.values()) {
-  // try {
-  // supervisor.updateOrCreateStream(cacheStream, userStreamsCallback);
-  // } catch (IncompleteFieldsException e) {
-  // userStreamsCallback.onStreamError(e.getMessage());
-  // }
-  // }
-  // } else {
-  // // if supervisor is not used, forward the result to the caller
-  // userStreamsCallback.onCacheRetrieveStreamSuccess(cacheStreams);
-  // }
-  // }
-  //
-  // @Override
-  // public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream>
-  // supervisorStreams) {
-  // // forward to userEventsCallback
-  // userStreamsCallback.onSupervisorRetrieveStreamsSuccess(supervisorStreams);
-  // }
-  //
-  // @Override
-  // public void onStreamsRetrievalError(String errorMessage) {
-  // // forward to userEventsCallback
-  // userStreamsCallback.onStreamsRetrievalError(errorMessage);
-  // }
-  //
-  // @Override
-  // public void onStreamsSuccess(String successMessage) {
-  // // forward to userEventsCallback
-  // userStreamsCallback.onStreamsSuccess(successMessage);
-  // }
-  //
-  // @Override
-  // public void onStreamError(String errorMessage) {
-  // // forward to userEventsCallback
-  // userStreamsCallback.onStreamError(errorMessage);
-  // }
-  //
-  // }
-  //
-  // /**
-  // * EventsCallback instantiated by Connection for each request
-  // *
-  // * @author ik
-  // *
-  // */
-  // public class Connection2EventsCallback implements EventsCallback {
-  //
-  // private EventsCallback userEventsCallback;
-  // private Filter filter;
-  //
-  // /**
-  // * ConnectionEventsCallback constructor. saves reference to calling
-  // * EventsCallback, as well as filter.
-  // *
-  // * @param pUserEventsCallback
-  // */
-  // public Connection2EventsCallback(EventsCallback pUserEventsCallback, Filter
-  // pFilter) {
-  // userEventsCallback = pUserEventsCallback;
-  // filter = pFilter;
-  // }
-  //
-  // @Override
-  // public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents)
-  // {
-  // logger.log("ConnectionCallback: received " + onlineEvents.size() +
-  // " events from cloud.");
-  // if (Pryv.isCacheActive()) {
-  // // merge with cache if cache used:
-  // for (Event onlineEvent : onlineEvents.values()) {
-  // cacheEventsManager.updateEvent(onlineEvent, this);
-  // }
-  // cacheEventsManager.getEvents(filter, this);
-  // } else if (Pryv.isSupervisorActive()) {
-  // // if cache not activated merge with Supervisor
-  // for (Event onlineEvent : onlineEvents.values()) {
-  // try {
-  // supervisor.updateOrCreateEvent(onlineEvent, this);
-  // } catch (IncompleteFieldsException e) {
-  // onEventsError(e.getMessage());
-  // }
-  // }
-  // } else {
-  // // if not local storage is used, foward the result to the caller
-  // userEventsCallback.onOnlineRetrieveEventsSuccess(onlineEvents);
-  // }
-  // }
-  //
-  // @Override
-  // public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
-  // if (Pryv.isSupervisorActive()) {
-  // // merge with Supervisor if it is active
-  // for (Event cacheEvent : cacheEvents.values()) {
-  // try {
-  // supervisor.updateOrCreateEvent(cacheEvent, userEventsCallback);
-  // } catch (IncompleteFieldsException e) {
-  // userEventsCallback.onEventsError(e.getMessage());
-  // }
-  // }
-  // } else {
-  // // if supervisor is not used, forward the result to the caller
-  // userEventsCallback.onCacheRetrieveEventsSuccess(cacheEvents);
-  // }
-  // }
-  //
-  // @Override
-  // public void onSupervisorRetrieveEventsSuccess(Map<String, Event>
-  // supervisorEvents) {
-  // // forward to userEventsCallback
-  // userEventsCallback.onSupervisorRetrieveEventsSuccess(supervisorEvents);
-  // }
-  //
-  // @Override
-  // public void onEventsRetrievalError(String errorMessage) {
-  // // forward to userEventsCallback
-  // userEventsCallback.onEventsRetrievalError(errorMessage);
-  // }
-  //
-  // @Override
-  // public void onEventsSuccess(String successMessage) {
-  // // forward to userEventsCallback
-  // userEventsCallback.onEventsSuccess(successMessage);
-  // }
-  //
-  // @Override
-  // public void onEventsError(String errorMessage) {
-  // // forward to userEventsCallback
-  // userEventsCallback.onEventsError(errorMessage);
-  // }
-  // }
 
   public String getUsername() {
     return username;
