@@ -25,9 +25,9 @@ public class Stream {
 
   private String id;
   private String name;
-  private Long created;
+  private Double created;
   private String createdBy;
-  private Long modified;
+  private Double modified;
   private String modifiedBy;
 
   /**
@@ -63,8 +63,8 @@ public class Stream {
    * @param pModifiedBy
    */
   public Stream(String pId, String pName, String pParentId, Boolean pSingleActivity,
-    Map<String, Object> pClientData, List<Stream> pChildren, Boolean pTrashed, Long pCreated,
-    String pCreatedBy, Long pModified, String pModifiedBy) {
+    Map<String, Object> pClientData, List<Stream> pChildren, Boolean pTrashed, Double pCreated,
+    String pCreatedBy, Double pModified, String pModifiedBy) {
     id = pId;
     name = pName;
     parentId = pParentId;
@@ -93,9 +93,9 @@ public class Stream {
     id = result.getString(QueryGenerator.STREAMS_ID_KEY);
     name = result.getString(QueryGenerator.STREAMS_NAME_KEY);
     trashed = result.getBoolean(QueryGenerator.STREAMS_TRASHED_KEY);
-    created = result.getLong(QueryGenerator.STREAMS_CREATED_KEY);
+    created = result.getDouble(QueryGenerator.STREAMS_CREATED_KEY);
     createdBy = result.getString(QueryGenerator.STREAMS_CREATED_BY_KEY);
-    modified = result.getLong(QueryGenerator.STREAMS_MODIFIED_KEY);
+    modified = result.getDouble(QueryGenerator.STREAMS_MODIFIED_KEY);
     modifiedBy = result.getString(QueryGenerator.STREAMS_MODIFIED_BY_KEY);
     parentId = result.getString(QueryGenerator.STREAMS_PARENT_ID_KEY);
     singleActivity = result.getBoolean(QueryGenerator.STREAMS_SINGLE_ACTIVITY_KEY);
@@ -266,7 +266,7 @@ public class Stream {
     return trashed;
   }
 
-  public Long getCreated() {
+  public Double getCreated() {
     return created;
   }
 
@@ -274,7 +274,7 @@ public class Stream {
     return createdBy;
   }
 
-  public Long getModified() {
+  public Double getModified() {
     return modified;
   }
 
@@ -318,7 +318,7 @@ public class Stream {
     this.trashed = pTrashed;
   }
 
-  public void setCreated(Long pCreated) {
+  public void setCreated(Double pCreated) {
     this.created = pCreated;
   }
 
@@ -326,7 +326,7 @@ public class Stream {
     this.createdBy = pCreatedBy;
   }
 
-  public void setModified(Long pModified) {
+  public void setModified(Double pModified) {
     this.modified = pModified;
   }
 

@@ -23,8 +23,8 @@ public class DummyData {
 
   private static final String EVENT_ID = "testID";
   private static final String EVENT_STREAMID = "testStreamID";
-  private static final Long EVENT_TIME = new Long(10000);
-  private static final Long EVENT_DURATION = new Long(20); // opt
+  private static final Double EVENT_TIME = new Double(10000);
+  private static final Double EVENT_DURATION = new Double(20); // opt
   private static final String EVENT_TYPE = "testType";
   private static final String EVENT_CONTENT = "testContent its a string"; // opt
   private static Set<String> eventTags;
@@ -39,9 +39,9 @@ public class DummyData {
   private static final String EVENT_CLIENTKEY = "color";
   private static final String EVENT_CLIENTVALUE = "value";
   private static final Boolean EVENT_TRASHED = false;
-  private static final Long EVENT_CREATED = new Long(10);
+  private static final Double EVENT_CREATED = new Double(10);
   private static final String EVENT_CREATEDBY = "event creator";
-  private static final Long EVENT_MODIFIED = new Long(50);
+  private static final Double EVENT_MODIFIED = new Double(50);
   private static final String EVENT_MODIFIED_BY = "event modifier";
   private static final String EVENT_ATTACH_ID = "abc";
   private static final String EVENT_TEMP_REF_ID = "temp ref id";
@@ -55,16 +55,16 @@ public class DummyData {
   private static final String STREAM_CLIENT_VALUE = "testValue";
   private static List<Stream> streamChildren;
   private static final Boolean STREAM_TRASHED = true;
-  private static final Long STREAM_CREATED = new Long(1000);
+  private static final Double STREAM_CREATED = new Double(1000);
   private static final String STREAM_CREATED_BY = "Bob";
-  private static final Long STREAM_MODIFIED = new Long(1500);
+  private static final Double STREAM_MODIFIED = new Double(1500);
   private static final String STREAM_MODIFIED_BY = "Bill";
   private static final String STREAM_CHILD_ID = "childid";
   private static final String STREAM_CHILD_NAME = "childname";
   private static final Boolean STREAM_CHILD_TRASHED = false;
-  private static final Long STREAM_CHILD_CREATED = new Long(200);
+  private static final Double STREAM_CHILD_CREATED = new Double(200);
   private static final String STREAM_CHILD_CREATED_BY = "creator of child";
-  private static final Long STREAM_CHILD_MODIFIED = new Long(300);
+  private static final Double STREAM_CHILD_MODIFIED = new Double(300);
   private static final String STREAM_CHILD_MODIFIED_BY = "modified of child";
 
   private static final String ATTACHMENT_ID_FIRST = "firstAttachId";
@@ -140,8 +140,9 @@ public class DummyData {
     Set<String> dummyStringSet = new HashSet<String>();
     dummyStringSet.add("dummyValue1");
     dummyStringSet.add("dummyValue2");
-    return new Filter(new Long(0), new Long(1000), dummyStringSet, dummyStringSet, dummyStringSet,
-      false, true, new Integer(0), new Integer(10), Filter.State.ALL, new Long(500));
+    return new Filter(new Double(0), new Double(1000), dummyStringSet, dummyStringSet,
+      dummyStringSet, false, true, new Integer(0), new Integer(10), Filter.State.ALL, new Double(
+        500));
   }
 
   public static String getId() {
@@ -152,11 +153,11 @@ public class DummyData {
     return EVENT_STREAMID;
   }
 
-  public static Long getTime() {
+  public static Double getTime() {
     return EVENT_TIME;
   }
 
-  public static Long getDuration() {
+  public static Double getDuration() {
     return EVENT_DURATION;
   }
 
@@ -212,7 +213,7 @@ public class DummyData {
     return EVENT_TRASHED;
   }
 
-  public static Long getCreated() {
+  public static Double getCreated() {
     return EVENT_CREATED;
   }
 
@@ -220,7 +221,7 @@ public class DummyData {
     return EVENT_CREATEDBY;
   }
 
-  public static Long getModified() {
+  public static Double getModified() {
     return EVENT_MODIFIED;
   }
 
@@ -276,7 +277,7 @@ public class DummyData {
     return STREAM_TRASHED;
   }
 
-  public static Long getStreamCreated() {
+  public static Double getStreamCreated() {
     return STREAM_CREATED;
   }
 
@@ -284,7 +285,7 @@ public class DummyData {
     return STREAM_CREATED_BY;
   }
 
-  public static Long getStreamModified() {
+  public static Double getStreamModified() {
     return STREAM_MODIFIED;
   }
 
@@ -304,11 +305,11 @@ public class DummyData {
     return EVENT_STREAMID;
   }
 
-  public static Long getEventTime() {
+  public static Double getEventTime() {
     return EVENT_TIME;
   }
 
-  public static Long getEventDuration() {
+  public static Double getEventDuration() {
     return EVENT_DURATION;
   }
 
@@ -364,7 +365,7 @@ public class DummyData {
     return EVENT_TRASHED;
   }
 
-  public static Long getEventCreated() {
+  public static Double getEventCreated() {
     return EVENT_CREATED;
   }
 
@@ -372,7 +373,7 @@ public class DummyData {
     return EVENT_CREATEDBY;
   }
 
-  public static Long getEventModified() {
+  public static Double getEventModified() {
     return EVENT_MODIFIED;
   }
 
@@ -396,7 +397,7 @@ public class DummyData {
     return STREAM_CHILD_TRASHED;
   }
 
-  public static Long getStreamChildCreated() {
+  public static Double getStreamChildCreated() {
     return STREAM_CHILD_CREATED;
   }
 
@@ -404,7 +405,7 @@ public class DummyData {
     return STREAM_CHILD_CREATED_BY;
   }
 
-  public static Long getStreamChildModified() {
+  public static Double getStreamChildModified() {
     return STREAM_CHILD_MODIFIED;
   }
 

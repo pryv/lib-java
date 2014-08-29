@@ -30,8 +30,8 @@ public class Filter {
   public final static String PARENT_ID_URL_KEY = "parentId";
 
   // filter fields
-  private Long fromTime;
-  private Long toTime;
+  private Double fromTime;
+  private Double toTime;
   private Set<String> streamIds;
   private Set<String> tags;
   private Set<String> types;
@@ -40,7 +40,7 @@ public class Filter {
   private Integer skip;
   private Integer limit;
   private State state;
-  private Long modifiedSince;
+  private Double modifiedSince;
 
   /**
    * Filter class constructor. All fields are optional: use null when unused.
@@ -68,9 +68,10 @@ public class Filter {
    * @param pModifiedSince
    *          since when is it modified
    */
-  public Filter(Long from, Long to, Set<String> pStreams, Set<String> pTags, Set<String> pTypes,
+  public Filter(Double from, Double to, Set<String> pStreams, Set<String> pTags,
+    Set<String> pTypes,
     Boolean pRunning, Boolean pSortAscending, Integer pSkip, Integer pLimit, State pState,
-    Long pModifiedSince) {
+ Double pModifiedSince) {
     fromTime = from;
     toTime = to;
     streamIds = pStreams;
@@ -280,11 +281,11 @@ public class Filter {
     return areContained;
   }
 
-  public Long getFromTime() {
+  public Double getFromTime() {
     return fromTime;
   }
 
-  public Long getToTime() {
+  public Double getToTime() {
     return toTime;
   }
 
@@ -320,15 +321,15 @@ public class Filter {
     return state;
   }
 
-  public Long getModifiedSince() {
+  public Double getModifiedSince() {
     return modifiedSince;
   }
 
-  public void setFromTime(Long pFromTime) {
+  public void setFromTime(Double pFromTime) {
     this.fromTime = pFromTime;
   }
 
-  public void setToTime(Long pToTime) {
+  public void setToTime(Double pToTime) {
     this.toTime = pToTime;
   }
 
@@ -364,7 +365,7 @@ public class Filter {
     this.state = pState;
   }
 
-  public void setModifiedSince(Long pModifiedSince) {
+  public void setModifiedSince(Double pModifiedSince) {
     this.modifiedSince = pModifiedSince;
   };
 

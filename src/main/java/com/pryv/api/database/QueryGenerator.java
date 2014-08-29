@@ -109,13 +109,13 @@ public class QueryGenerator {
         + " VALUES (");
     sb.append(formatTextValue(eventToCache.getId()) + ",");
     sb.append(formatTextValue(eventToCache.getStreamId()) + ",");
-    sb.append(formatLongValue(eventToCache.getTime()) + ",");
+    sb.append(formatDoubleValue(eventToCache.getTime()) + ",");
     sb.append(formatTextValue(eventToCache.getType()) + ",");
-    sb.append(formatLongValue(eventToCache.getCreated()) + ",");
+    sb.append(formatDoubleValue(eventToCache.getCreated()) + ",");
     sb.append(formatTextValue(eventToCache.getCreatedBy()) + ",");
-    sb.append(formatLongValue(eventToCache.getModified()) + ",");
+    sb.append(formatDoubleValue(eventToCache.getModified()) + ",");
     sb.append(formatTextValue(eventToCache.getModifiedBy()) + ",");
-    sb.append(formatLongValue(eventToCache.getDuration()) + ",");
+    sb.append(formatDoubleValue(eventToCache.getDuration()) + ",");
     sb.append(formatTextValue(eventToCache.getContent()) + ",");
     sb.append(formatSetValue(eventToCache.getTags()) + ",");
     sb.append(formatSetValue(eventToCache.getReferences()) + ",");
@@ -153,7 +153,7 @@ public class QueryGenerator {
         + ", "
         + EVENTS_TIME_KEY
         + "="
-        + formatLongValue(eventToUpdate.getTime())
+        + formatDoubleValue(eventToUpdate.getTime())
         + ", "
         + EVENTS_TYPE_KEY
         + "="
@@ -161,7 +161,7 @@ public class QueryGenerator {
         + ", "
         + EVENTS_CREATED_KEY
         + "="
-        + formatLongValue(eventToUpdate.getCreated())
+        + formatDoubleValue(eventToUpdate.getCreated())
         + ", "
         + EVENTS_CREATED_BY_KEY
         + "="
@@ -169,7 +169,7 @@ public class QueryGenerator {
         + ", "
         + EVENTS_MODIFIED_KEY
         + "="
-        + formatLongValue(eventToUpdate.getModified())
+        + formatDoubleValue(eventToUpdate.getModified())
         + ", "
         + EVENTS_MODIFIED_BY_KEY
         + "="
@@ -177,7 +177,7 @@ public class QueryGenerator {
         + ", "
         + EVENTS_DURATION_KEY
         + "="
-        + formatLongValue(eventToUpdate.getDuration())
+        + formatDoubleValue(eventToUpdate.getDuration())
         + ", "
         + EVENTS_CONTENT_KEY
         + "="
@@ -363,9 +363,9 @@ public class QueryGenerator {
     sb.append(formatBooleanValue(streamToCache.getSingleActivity()) + ",");
     sb.append(formatTextValue(streamToCache.formatClientDataAsString()) + ",");
     sb.append(formatBooleanValue(streamToCache.getTrashed()) + ",");
-    sb.append(formatLongValue(streamToCache.getCreated()) + ",");
+    sb.append(formatDoubleValue(streamToCache.getCreated()) + ",");
     sb.append(formatTextValue(streamToCache.getCreatedBy()) + ",");
-    sb.append(formatLongValue(streamToCache.getModified()) + ",");
+    sb.append(formatDoubleValue(streamToCache.getModified()) + ",");
     sb.append(formatTextValue(streamToCache.getModifiedBy()));
     sb.append(");");
     return sb.toString();
@@ -416,7 +416,7 @@ public class QueryGenerator {
         + ", "
         + STREAMS_CREATED_KEY
         + "="
-        + formatLongValue(streamToUpdate.getCreated())
+        + formatDoubleValue(streamToUpdate.getCreated())
         + ", "
         + STREAMS_CREATED_BY_KEY
         + "="
@@ -424,7 +424,7 @@ public class QueryGenerator {
         + ", "
         + STREAMS_MODIFIED_KEY
         + "="
-        + formatLongValue(streamToUpdate.getModified())
+        + formatDoubleValue(streamToUpdate.getModified())
         + ", "
         + STREAMS_MODIFIED_BY_KEY
         + "="
@@ -577,14 +577,14 @@ public class QueryGenerator {
   }
 
   /**
-   * format Long for insert/update in DB, if toAdd == null, returns NULL
+   * format Double for insert/update in DB, if toAdd == null, returns NULL
    *
    * @param toAdd
    * @return
    */
-  private static String formatLongValue(Long toAdd) {
+  private static String formatDoubleValue(Double toAdd) {
     if (toAdd != null) {
-      return Long.toString(toAdd);
+      return Double.toString(toAdd);
     } else {
       return "NULL";
     }

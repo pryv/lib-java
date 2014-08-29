@@ -229,7 +229,7 @@ public class SQLiteDBHelperTest {
   public void test09UpdateFullStream() {
     System.out.println("test update full stream START");
     testStream.setTrashed(!testStream.getTrashed());
-    Long newModifiedValue = testStream.getModified() + MODIFIED_INCREMENT;
+    Double newModifiedValue = testStream.getModified() + MODIFIED_INCREMENT;
     testStream.setModified(newModifiedValue);
     db.updateStream(testStream, streamsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());

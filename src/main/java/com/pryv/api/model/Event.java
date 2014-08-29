@@ -2,14 +2,10 @@ package com.pryv.api.model;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,11 +36,11 @@ public class Event {
 
   private String id;
   private String streamId;
-  private Long time;
+  private Double time;
   private String type;
-  private Long created;
+  private Double created;
   private String createdBy;
-  private Long modified;
+  private Double modified;
   private String modifiedBy;
 
   /**
@@ -54,7 +50,7 @@ public class Event {
   private WeakReference<Connection> weakConnection;
 
   // optional
-  private Long duration;
+  private Double duration;
   private Object content;
   private Set<String> tags;
   private Set<String> references;
@@ -95,10 +91,10 @@ public class Event {
    * @param pTempRefId
    *          optional
    */
-  public Event(String pId, String pStreamId, Long pTime, Long pDuration, String pType,
+  public Event(String pId, String pStreamId, Double pTime, Double pDuration, String pType,
     String pContent, Set<String> pTags, Set<String> pReferences, String pDescription,
-    Set<Attachment> pAttachments, Map<String, Object> pClientData, Boolean pTrashed, Long pCreated,
-    String pCreatedBy, Long pModified, String pModifiedBy, String pTempRefId) {
+    Set<Attachment> pAttachments, Map<String, Object> pClientData, Boolean pTrashed,
+    Double pCreated, String pCreatedBy, Double pModified, String pModifiedBy, String pTempRefId) {
     id = pId;
     streamId = pStreamId;
     time = pTime;
@@ -139,13 +135,13 @@ public class Event {
     IOException {
     id = result.getString(QueryGenerator.EVENTS_ID_KEY);
     streamId = result.getString(QueryGenerator.EVENTS_STREAM_ID_KEY);
-    time = result.getLong(QueryGenerator.EVENTS_TIME_KEY);
+    time = result.getDouble(QueryGenerator.EVENTS_TIME_KEY);
     type = result.getString(QueryGenerator.EVENTS_TYPE_KEY);
-    created = result.getLong(QueryGenerator.EVENTS_CREATED_KEY);
+    created = result.getDouble(QueryGenerator.EVENTS_CREATED_KEY);
     createdBy = result.getString(QueryGenerator.EVENTS_CREATED_BY_KEY);
-    modified = result.getLong(QueryGenerator.EVENTS_MODIFIED_KEY);
+    modified = result.getDouble(QueryGenerator.EVENTS_MODIFIED_KEY);
     modifiedBy = result.getString(QueryGenerator.EVENTS_MODIFIED_BY_KEY);
-    duration = result.getLong(QueryGenerator.EVENTS_DURATION_KEY);
+    duration = result.getDouble(QueryGenerator.EVENTS_DURATION_KEY);
     content = result.getObject(QueryGenerator.EVENTS_CONTENT_KEY);
     String tagsString = result.getString(QueryGenerator.EVENTS_TAGS_KEY);
     if (tagsString != null) {
@@ -235,7 +231,7 @@ public class Event {
       return null;
     }
     if (weakConnection.get() == null) {
-      return new DateTime(time.longValue());
+      return new DateTime(time.doubleValue());
     }
     return weakConnection.get().serverTimeInSystemDate(time);
   }
@@ -246,39 +242,7 @@ public class Event {
       time = null;
     }
     if (weakConnection.get() == null) {
-      time = date.getMillis() / 1000;
-    }
-  }
-
-  /**
-   * used for testing purposes
-   */
-  public void publishValues() {
-    List<String> eventFields = new ArrayList<String>();
-    Field[] fields = Event.class.getDeclaredFields();
-    for (Field field : fields) {
-      eventFields.add(field.getName().toUpperCase());
-      try {
-        System.out.print(field.getName().toUpperCase() + ": ");
-        if (String.class.isAssignableFrom(field.getType())) {
-          System.out.print("\'" + field.get(this) + "\'");
-        } else if (Long.class.isAssignableFrom(field.getType())) {
-          System.out.print(field.get(this));
-        } else if (Collection.class.isAssignableFrom(field.getType())) {
-          if (field.get(this) != null) {
-            for (Object item : (Iterable) field.get(this)) {
-              System.out.print(field.get(this) + ",");
-            }
-          }
-        } else {
-          System.out.print(field.get(this));
-        }
-
-        System.out.println("");
-      } catch (IllegalArgumentException | IllegalAccessException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
+      time = date.getMillis() / 1000.0;
     }
   }
 
@@ -326,7 +290,7 @@ public class Event {
     return streamId;
   }
 
-  public Long getTime() {
+  public Double getTime() {
     return time;
   }
 
@@ -334,7 +298,7 @@ public class Event {
     return type;
   }
 
-  public Long getCreated() {
+  public Double getCreated() {
     return created;
   }
 
@@ -342,7 +306,7 @@ public class Event {
     return createdBy;
   }
 
-  public Long getModified() {
+  public Double getModified() {
     return modified;
   }
 
@@ -350,7 +314,7 @@ public class Event {
     return modifiedBy;
   }
 
-  public Long getDuration() {
+  public Double getDuration() {
     return duration;
   }
 
@@ -394,7 +358,7 @@ public class Event {
     this.streamId = pstreamId;
   }
 
-  public void setTime(Long ptime) {
+  public void setTime(Double ptime) {
     this.time = ptime;
   }
 
@@ -402,7 +366,7 @@ public class Event {
     this.type = ptype;
   }
 
-  public void setCreated(Long pcreated) {
+  public void setCreated(Double pcreated) {
     this.created = pcreated;
   }
 
@@ -410,7 +374,7 @@ public class Event {
     this.createdBy = pcreatedBy;
   }
 
-  public void setModified(Long pmodified) {
+  public void setModified(Double pmodified) {
     this.modified = pmodified;
   }
 
@@ -418,7 +382,7 @@ public class Event {
     this.modifiedBy = pmodifiedBy;
   }
 
-  public void setDuration(Long pduration) {
+  public void setDuration(Double pduration) {
     this.duration = pduration;
   }
 

@@ -266,7 +266,7 @@ public class Connection implements EventsManager, StreamsManager {
    * @param time
    * @return
    */
-  public DateTime serverTimeInSystemDate(long time) {
+  public DateTime serverTimeInSystemDate(double time) {
     return new DateTime(System.currentTimeMillis() / millisToSeconds + deltaTime);
   }
 

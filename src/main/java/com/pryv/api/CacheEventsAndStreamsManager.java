@@ -94,7 +94,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         if (filter.areStreamIdsContainedInScope(scope, streams)) {
           // make request to online for full scope with field modifiedSince set
           // to lastModified
-          onlineFilter.setModifiedSince((long) (lastModified * 1000));
+          onlineFilter.setModifiedSince(lastModified);
           onlineFilter.setStreamIds(scope);
         } else {
           for (String filterStreamId : filter.getStreamIds()) {
