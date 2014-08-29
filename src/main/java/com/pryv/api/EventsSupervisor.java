@@ -107,27 +107,15 @@ public class EventsSupervisor {
   }
 
   /**
-   * Compare modified field of event with the one stored in the Supervisor to
-   * decided wether to replace it or not.
+   * Update event in supervisor with the fields of the event passed in
+   * parameters
    *
    * @param event
    *          the event that may replace the one in place if newer.
    */
   private void updateEvent(Event event) {
     Event memEvent = events.get(event.getId());
-    if (memEvent.getModified() > event.getModified()) {
-      // do nothing
-    } else {
-      // logger.log("Supervisor: updating event: id="
-      // + event.getId()
-      // + ", streamId="
-      // + event.getStreamId()
-      // + ". Old time="
-      // + memEvent.getTime()
-      // + ", new Time="
-      // + event.getTime());
-      memEvent.merge(event, JsonConverter.getCloner());
-    }
+    memEvent.merge(event, JsonConverter.getCloner());
   }
 
   /**

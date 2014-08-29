@@ -90,54 +90,46 @@ public class StreamsSupervisor {
   private void updateStream(Stream oldStream, Stream streamToUpdate,
     StreamsCallback connectionCallback) {
 
-    if (oldStream.getModified() > streamToUpdate.getModified()) {
+    // oldStream.merge(streamToUpdate);
+    // find out if parent has changed:
+    if (oldStream.getParentId() == null && streamToUpdate.getParentId() == null) {
+      // case 1: was root, still root
       // do nothing
-      connectionCallback.onStreamsSuccess("Stream with id="
-        + streamToUpdate.getId()
-          + " not updated since it is older than the stored version.");
+      oldStream.merge(streamToUpdate);
+    } else if (oldStream.getParentId() == null && streamToUpdate.getParentId() != null) {
+      // case 2: was root, now child
+      // add it to its parent's children
+      oldStream.merge(streamToUpdate);
+      addChildStreamToParent(streamToUpdate.getParentId(), oldStream, connectionCallback);
+      rootStreams.remove(oldStream.getId());
+    } else if (oldStream.getParentId() != null && streamToUpdate.getParentId() == null) {
+      // case 3: was child, now root
+      // remove it from old parents children
+      String oldParent = oldStream.getParentId();
+      oldStream.merge(streamToUpdate);
+      removeChildStreamFromParent(oldParent, oldStream, connectionCallback);
+      rootStreams.put(streamToUpdate.getId(), oldStream);
     } else {
-      // oldStream.merge(streamToUpdate);
-      // find out if parent has changed:
-      if (oldStream.getParentId() == null && streamToUpdate.getParentId() == null) {
-        // case 1: was root, still root
+      // case 4: was child, still child
+      if (oldStream.getParentId().equals(streamToUpdate.getParentId())) {
+        // case 4a: same parent
         // do nothing
+        logger.log("StreamsSupervisor: same parents");
         oldStream.merge(streamToUpdate);
-      } else if (oldStream.getParentId() == null && streamToUpdate.getParentId() != null) {
-        // case 2: was root, now child
-        // add it to its parent's children
-        oldStream.merge(streamToUpdate);
-        addChildStreamToParent(streamToUpdate.getParentId(), oldStream, connectionCallback);
-        rootStreams.remove(oldStream.getId());
-      } else if (oldStream.getParentId() != null && streamToUpdate.getParentId() == null) {
-        // case 3: was child, now root
-        // remove it from old parents children
-        String oldParent = oldStream.getParentId();
-        oldStream.merge(streamToUpdate);
-        removeChildStreamFromParent(oldParent, oldStream, connectionCallback);
-        rootStreams.put(streamToUpdate.getId(), oldStream);
       } else {
-        // case 4: was child, still child
-        if (oldStream.getParentId().equals(streamToUpdate.getParentId())) {
-          // case 4a: same parent
-          // do nothing
-          logger.log("StreamsSupervisor: same parents");
-          oldStream.merge(streamToUpdate);
-        } else {
-          // case 4b: parent changed
-          // remove it from old parent
-          // removeChildStreamFromParent(oldStream.getParentId(),
-          // streamToUpdate, connectionCallback);
-          logger.log("StreamsSupervisor: changing parents");
-          getStreamById(oldStream.getParentId()).removeChildStream(oldStream);
-          // add it to new parent
-          oldStream.merge(streamToUpdate);
-          addChildStreamToParent(oldStream.getParentId(), oldStream, connectionCallback);
-        }
+        // case 4b: parent changed
+        // remove it from old parent
+        // removeChildStreamFromParent(oldStream.getParentId(),
+        // streamToUpdate, connectionCallback);
+        logger.log("StreamsSupervisor: changing parents");
+        getStreamById(oldStream.getParentId()).removeChildStream(oldStream);
+        // add it to new parent
+        oldStream.merge(streamToUpdate);
+        addChildStreamToParent(oldStream.getParentId(), oldStream, connectionCallback);
       }
-      // do the update
-      connectionCallback.onStreamsSuccess("Stream updated: " + streamToUpdate.getId());
     }
-
+    // do the update
+    connectionCallback.onStreamsSuccess("Stream updated: " + streamToUpdate.getId());
   }
 
   /**
