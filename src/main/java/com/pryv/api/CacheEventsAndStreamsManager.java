@@ -228,7 +228,17 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       // update Events in cache and send result to connection
       logger.log("Cache: update cache with online Events");
       lastModified = serverTime;
-      dbHelper.updateEvents(onlineEvents.values(), cacheUpdateEventsCallback);
+
+      if (Pryv.isCacheActive()) {
+        // update Streams in cache and make a get call on the
+        // cacheEventsCallback
+        dbHelper.updateEvents(onlineEvents.values(), cacheUpdateEventsCallback);
+        // forward serverTime to connection
+        connectionEventsCallback.onOnlineRetrieveEventsSuccess(null, serverTime);
+      } else {
+        // forward to connection
+        connectionEventsCallback.onOnlineRetrieveEventsSuccess(onlineEvents, serverTime);
+      }
     }
 
     // unused
@@ -278,8 +288,18 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     @Override
     public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, long serverTime) {
       logger.log("Cache: Streams retrieval success");
-      // update Streams in cache and make a get call on the cacheStreamsCallback
-      dbHelper.updateOrCreateStreams(onlineStreams.values(), cacheUpdateStreamsCallback);
+
+      if (Pryv.isCacheActive()) {
+        // update Streams in cache and make a get call on the
+        // cacheStreamsCallback
+        dbHelper.updateOrCreateStreams(onlineStreams.values(), cacheUpdateStreamsCallback);
+        // forward serverTime to connection
+        connectionStreamsCallback.onOnlineRetrieveStreamsSuccess(null, serverTime);
+      } else {
+        // forward to connection
+        connectionStreamsCallback.onOnlineRetrieveStreamsSuccess(onlineStreams, serverTime);
+      }
+
     }
 
     @Override

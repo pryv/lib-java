@@ -30,6 +30,12 @@ public class Connection implements EventsManager, StreamsManager {
   private String apiScheme = "https";
   private String url;
 
+  private long serverTime;
+  /**
+   * RTT between server and system: deltaTime = serverTime - systemTime
+   */
+  private long deltaTime;
+
   private EventsManager cacheEventsManager;
   private StreamsManager cacheStreamsManager;
   private EventsSupervisor supervisor;
@@ -242,6 +248,16 @@ public class Connection implements EventsManager, StreamsManager {
   }
 
   /**
+   * calculates the difference between server and system time: deltaTime =
+   * serverTime - systemTime
+   *
+   * @param serverTime
+   */
+  private void computeDelta(long serverTime) {
+    deltaTime = serverTime - System.currentTimeMillis();
+  }
+
+  /**
    * EventsCallback used by Connection class
    *
    * @author ik
@@ -258,14 +274,22 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, long serverTime) {
-      logger.log("Connection: onEventsSuccess");
-      // update existing references with JSON received from online
-      for (Event onlineEvent : onlineEvents.values()) {
-        supervisor.updateOrCreateEvent(onlineEvent, userEventsCallback);
+    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, long pServerTime) {
+      logger.log("Connection: onOnlineRetrieveEventsSuccess");
+
+      // update server time
+      serverTime = pServerTime;
+      // compute delta time between system time and servertime
+      computeDelta(pServerTime);
+      // onlineStreams are not received here,
+
+      if (onlineEvents != null) {
+        for (Event onlineEvent : onlineEvents.values()) {
+          supervisor.updateOrCreateEvent(onlineEvent, userEventsCallback);
+        }
+        // return merged events from Supervisor
+        supervisor.getEvents(filter, this);
       }
-      // return merged events from Supervisor
-      supervisor.getEvents(filter, this);
     }
 
     @Override
@@ -322,12 +346,20 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStream, long serverTime) {
-      for (Stream stream : onlineStream.values()) {
-        streams.updateOrCreateStream(stream, userStreamsCallback);
+    public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, long pServerTime) {
+      // update server time
+      serverTime = pServerTime;
+      // compute delta time between system time and servertime
+      computeDelta(pServerTime);
+      // onlineStreams are not received here,
+
+      if (onlineStreams != null) {
+        for (Stream stream : onlineStreams.values()) {
+          streams.updateOrCreateStream(stream, userStreamsCallback);
+        }
+        // forward updated Streams
+        userStreamsCallback.onOnlineRetrieveStreamsSuccess(streams.getRootStreams(), serverTime);
       }
-      // forward updated Streams
-      userStreamsCallback.onOnlineRetrieveStreamsSuccess(streams.getRootStreams(), serverTime);
     }
 
     @Override
