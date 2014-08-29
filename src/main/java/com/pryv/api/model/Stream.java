@@ -1,5 +1,6 @@
 package com.pryv.api.model;
 
+import java.lang.ref.WeakReference;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -7,7 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.pryv.Connection;
 import com.pryv.api.database.QueryGenerator;
 
 /**
@@ -26,6 +29,12 @@ public class Stream {
   private String createdBy;
   private Long modified;
   private String modifiedBy;
+
+  /**
+   * a weak reference to the connection to which the Event is linked
+   */
+  @JsonIgnore
+  private WeakReference<Connection> weakConnection;
 
   // optional
   private Boolean trashed;
@@ -97,6 +106,25 @@ public class Stream {
    * Empty Constructor
    */
   public Stream() {
+  }
+
+  /**
+   * Assign a weak reference to the Connection
+   *
+   * @param connection
+   */
+  public void assignConnection(WeakReference<Connection> pWeakConnection) {
+    weakConnection = pWeakConnection;
+  }
+
+  /**
+   * Returns the reference to the Connection to which the Event is linked if
+   * any.
+   *
+   * @return
+   */
+  public Connection getWeakConnection() {
+    return weakConnection.get();
   }
 
   /**

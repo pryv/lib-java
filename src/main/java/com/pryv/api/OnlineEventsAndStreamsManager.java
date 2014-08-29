@@ -1,6 +1,7 @@
 package com.pryv.api;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 
 import org.apache.http.HttpResponse;
@@ -13,6 +14,7 @@ import org.apache.http.util.EntityUtils;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.pryv.Connection;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 import com.pryv.utils.JsonConverter;
@@ -30,11 +32,25 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   private String eventsUrl;
   private String streamsUrl;
 
+  private WeakReference<Connection> weakConnection;
+
   private Logger logger = Logger.getInstance();
 
-  public OnlineEventsAndStreamsManager(String pUrl, String token) {
+  /**
+   * Constructor for online module
+   *
+   * @param pUrl
+   *          the url of the remote API
+   * @param token
+   *          the token passed with each request for auth
+   * @param pWeakConnection
+   *          weak reference to connectino
+   */
+  public OnlineEventsAndStreamsManager(String pUrl, String token,
+    WeakReference<Connection> pWeakConnection) {
     eventsUrl = pUrl + "events?auth=" + token;
     streamsUrl = pUrl + "streams?auth=" + token;
+    weakConnection = pWeakConnection;
   }
 
   /*
@@ -128,8 +144,11 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
           logger.log("Online received streams: " + textResponse);
           long serverTime = JsonConverter.retrieveServerTime(textResponse);
           logger.log("retrieved time: " + serverTime);
-          streamsCallback.onOnlineRetrieveStreamsSuccess(
-            JsonConverter.createStreamsFromJson(textResponse), serverTime);
+          Map<String, Stream> receivedStreams = JsonConverter.createStreamsFromJson(textResponse);
+          for (Stream receivedStream : receivedStreams.values()) {
+            receivedStream.assignConnection(weakConnection);
+          }
+          streamsCallback.onOnlineRetrieveStreamsSuccess(receivedStreams, serverTime);
         } catch (ParseException e) {
           streamsCallback.onStreamsRetrievalError(e.getMessage());
           e.printStackTrace();
@@ -189,6 +208,9 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             long serverTime = JsonConverter.retrieveServerTime(response);
             logger.log("retrieved time: " + serverTime);
             Map<String, Event> receivedEvents = JsonConverter.createEventsFromJson(response);
+            for (Event receivedEvent : receivedEvents.values()) {
+              receivedEvent.assignConnection(weakConnection);
+            }
             eventsCallback.onOnlineRetrieveEventsSuccess(receivedEvents, serverTime);
           } catch (ParseException e) {
             eventsCallback.onEventsRetrievalError(e.getMessage());

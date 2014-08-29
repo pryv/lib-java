@@ -1,5 +1,6 @@
 package com.pryv;
 
+import java.lang.ref.WeakReference;
 import java.util.Map;
 
 import com.pryv.api.CacheEventsAndStreamsManager;
@@ -30,6 +31,8 @@ public class Connection implements EventsManager, StreamsManager {
   private String apiScheme = "https";
   private String url;
 
+  private WeakReference<Connection> weakConnection;
+
   private long serverTime;
   /**
    * RTT between server and system: deltaTime = serverTime - systemTime
@@ -39,7 +42,6 @@ public class Connection implements EventsManager, StreamsManager {
   private EventsManager cacheEventsManager;
   private StreamsManager cacheStreamsManager;
   private EventsSupervisor supervisor;
-
   private StreamsSupervisor streams;
 
   private Logger logger = Logger.getInstance();
@@ -60,9 +62,11 @@ public class Connection implements EventsManager, StreamsManager {
     username = pUsername;
     token = pToken;
     url = apiScheme + "://" + username + "." + apiDomain + "/";
+    weakConnection = new WeakReference<Connection>(this);
     streams = new StreamsSupervisor();
     supervisor = new EventsSupervisor(streams);
-    cacheEventsManager = new CacheEventsAndStreamsManager(url, token, dbInitCallback, streams);
+    cacheEventsManager =
+      new CacheEventsAndStreamsManager(url, token, dbInitCallback, streams, weakConnection);
     cacheStreamsManager = (StreamsManager) cacheEventsManager;
   }
 
@@ -99,6 +103,7 @@ public class Connection implements EventsManager, StreamsManager {
   public void createEvent(Event newEvent, EventsCallback userEventsCallback) {
 
     updateCreated(newEvent);
+    newEvent.assignConnection(weakConnection);
 
     if (Pryv.isSupervisorActive()) {
       // make sync request to supervisor
@@ -158,6 +163,8 @@ public class Connection implements EventsManager, StreamsManager {
   @Override
   public void createStream(Stream newStream, StreamsCallback userStreamsCallback) {
     updateCreated(newStream);
+    newStream.assignConnection(weakConnection);
+
     if (Pryv.isSupervisorActive()) {
       // create Stream in Supervisor
       streams.updateOrCreateStream(newStream, userStreamsCallback);

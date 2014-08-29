@@ -1,9 +1,11 @@
 package com.pryv.api;
 
+import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.pryv.Connection;
 import com.pryv.Pryv;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.database.SQLiteDBHelper;
@@ -23,6 +25,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
   private EventsManager onlineEventsManager;
   private StreamsManager onlineStreamsManager;
+
+  private WeakReference<Connection> weakConnection;
 
   /**
    * defines the scope of the Events the SQLite DB contains. Concretely it
@@ -59,10 +63,14 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
    *          the callback for SQLite database initialization
    * @param pStreams
    *          the Streams in volatile memory
+   * @param pWeakConnection
+   *          a reference to the connection object - used to assign
+   *          weakreference
    */
   public CacheEventsAndStreamsManager(String url, String token, DBinitCallback initCallback,
-    StreamsSupervisor pStreams) {
-    onlineEventsManager = new OnlineEventsAndStreamsManager(url, token);
+    StreamsSupervisor pStreams, WeakReference<Connection> pWeakConnection) {
+    weakConnection = pWeakConnection;
+    onlineEventsManager = new OnlineEventsAndStreamsManager(url, token, pWeakConnection);
     onlineStreamsManager = (StreamsManager) onlineEventsManager;
     streams = pStreams;
     if (Pryv.isCacheActive()) {
@@ -245,6 +253,9 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     @Override
     public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
       logger.log("Cache: retrieved events from cache: events amount: " + cacheEvents.size());
+      for (Event cacheEvent : cacheEvents.values()) {
+        cacheEvent.assignConnection(weakConnection);
+      }
       connectionEventsCallback.onCacheRetrieveEventsSuccess(cacheEvents);
     }
 
@@ -307,6 +318,9 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       // forward to connection
       logger
         .log("Cache: retrieved streams from cache: root streams amount: " + cacheStreams.size());
+      for (Stream cacheStream : cacheStreams.values()) {
+        cacheStream.assignConnection(weakConnection);
+      }
       connectionStreamsCallback.onCacheRetrieveStreamSuccess(cacheStreams);
     }
 

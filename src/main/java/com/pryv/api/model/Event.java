@@ -1,6 +1,7 @@
 package com.pryv.api.model;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,11 +13,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.pryv.Connection;
 import com.pryv.api.database.QueryGenerator;
 import com.pryv.utils.JsonConverter;
 import com.rits.cloning.Cloner;
@@ -41,6 +44,12 @@ public class Event {
   private String createdBy;
   private Long modified;
   private String modifiedBy;
+
+  /**
+   * a weak reference to the connection to which the Event is linked
+   */
+  @JsonIgnore
+  private WeakReference<Connection> weakConnection;
 
   // optional
   private Long duration;
@@ -154,7 +163,24 @@ public class Event {
       JsonConverter.deserializeAttachments(result.getString(QueryGenerator.EVENTS_ATTACHMENTS_KEY));
   }
 
-  // private
+  /**
+   * Assign a weak reference to the Connection
+   *
+   * @param connection
+   */
+  public void assignConnection(WeakReference<Connection> pWeakconnection) {
+    weakConnection = pWeakconnection;
+  }
+
+  /**
+   * Returns the reference to the Connection to which the Event is linked if
+   * any.
+   *
+   * @return
+   */
+  public Connection getWeakConnection() {
+    return weakConnection.get();
+  }
 
   /**
    * Copy all temp Event's values into caller Event.
@@ -201,6 +227,20 @@ public class Event {
     modified = temp.modified;
     modifiedBy = temp.modifiedBy;
   }
+
+  // public Date getDate() {
+  // if (time == null) {
+  // return null;
+  // }
+  // if (connection == null) {
+  // return new Date(time);
+  // }
+  // return connection.serverTimeInSystemDate(time);
+  // }
+  //
+  // public void setDate(Date date) {
+  //
+  // }
 
   /**
    * used for testing purposes

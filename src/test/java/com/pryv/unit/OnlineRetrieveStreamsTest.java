@@ -32,7 +32,7 @@ public class OnlineRetrieveStreamsTest {
     instanciateCallback();
     Pryv.setStaging();
     String url = "https://" + TestCredentials.USERNAME + "." + Pryv.API_DOMAIN + "/";
-    online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN);
+    online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
   }
 
   @Test
