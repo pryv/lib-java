@@ -103,8 +103,6 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void createEvent(Event newEvent, EventsCallback userEventsCallback) {
-
-    updateCreated(newEvent);
     newEvent.assignConnection(weakConnection);
 
     if (Pryv.isSupervisorActive()) {
@@ -120,7 +118,6 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void deleteEvent(Event eventToDelete, EventsCallback userEventsCallback) {
-    updateModified(eventToDelete);
     eventToDelete.setTrashed(true);
 
     if (Pryv.isSupervisorActive()) {
@@ -136,7 +133,6 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void updateEvent(Event eventToUpdate, EventsCallback userEventsCallback) {
-    updateModified(eventToUpdate);
 
     if (Pryv.isSupervisorActive()) {
       // update Event in Supervisor
@@ -164,7 +160,6 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void createStream(Stream newStream, StreamsCallback userStreamsCallback) {
-    updateCreated(newStream);
     newStream.assignConnection(weakConnection);
 
     if (Pryv.isSupervisorActive()) {
@@ -181,7 +176,6 @@ public class Connection implements EventsManager, StreamsManager {
   @Override
   public void deleteStream(Stream streamToDelete, boolean mergeWithParent,
     StreamsCallback userStreamsCallback) {
-    updateModified(streamToDelete);
     streamToDelete.setTrashed(true);
     // TODO check what to do with children
     for (Stream childStream : streamToDelete.getChildren()) {
@@ -200,7 +194,6 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void updateStream(Stream streamToUpdate, StreamsCallback userStreamsCallback) {
-    updateModified(streamToUpdate);
     if (Pryv.isSupervisorActive()) {
       // update Stream in Supervisor
       streams.updateOrCreateStream(streamToUpdate, userStreamsCallback);
@@ -210,54 +203,6 @@ public class Connection implements EventsManager, StreamsManager {
       cacheStreamsManager.updateStream(streamToUpdate, new ConnectionStreamsCallback(
         userStreamsCallback));
     }
-  }
-
-  /**
-   * Fill event's "created","createdBy", "modified" and "modifiedBy" fields.
-   *
-   * @param event
-   */
-  private void updateCreated(Event event) {
-    // event.setCreated(System.currentTimeMillis() / millisToSeconds +
-    // deltaTime);
-    event.setCreatedBy(username);
-    updateModified(event);
-  }
-
-  /**
-   * Fill stream's "created", "createdBy", "modified" and "modifiedBy" fields.
-   *
-   * @param event
-   */
-  private void updateCreated(Stream stream) {
-    // stream.setCreated(System.currentTimeMillis() / millisToSeconds +
-    // deltaTime);
-    stream.setCreatedBy(username);
-    updateModified(stream);
-  }
-
-  /**
-   * Update event's "modified" and "modifiedBy" fields.
-   *
-   * @param event
-   *          the event to modifiy
-   */
-  private void updateModified(Event event) {
-    // event.setModified(System.currentTimeMillis() / millisToSeconds +
-    // deltaTime);
-    event.setModifiedBy(username);
-  }
-
-  /**
-   * Update stream's "modified" and modifiedBy" fields.
-   *
-   * @param stream
-   *          the stream to modifiy
-   */
-  private void updateModified(Stream stream) {
-    // stream.setModified(System.currentTimeMillis() / millisToSeconds +
-    // deltaTime);
-    stream.setModifiedBy(username);
   }
 
   /**
