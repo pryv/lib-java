@@ -205,28 +205,24 @@ public class AppController {
 
     streamCreateButton.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent event) {
-        // exampleApp.displayError("create event pressed");
         exampleApp.showStreamForm(FormController.Mode.CREATE, null);
       }
     });
 
     streamUpdateButton.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent event) {
-        // exampleApp.displayError("create event pressed");
         exampleApp.showStreamForm(FormController.Mode.EDIT, selectedStream);
       }
     });
 
     eventCreateButton.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent event) {
-        // exampleApp.displayError("create event pressed");
         exampleApp.showEventForm(FormController.Mode.CREATE, null);
       }
     });
 
     eventUpdateButton.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent event) {
-        // exampleApp.displayError("create event pressed");
         exampleApp.showEventForm(FormController.Mode.EDIT, selectedEvent);
       }
     });
@@ -397,27 +393,6 @@ public class AppController {
     // Add observable list data to the table
     eventsListView.setItems(exampleApp.getEventsList());
   }
-
-  /**
-   * format client data to printable.
-   *
-   * @param clientData
-   *          the client data to format
-   * @return client data in readable form as a String.
-   */
-  // private String printClientData(Map<String, Object> clientData) {
-  // StringBuilder sb = new StringBuilder();
-  // if (clientData != null) {
-  // String separator = "";
-  // for (String key : clientData.keySet()) {
-  // sb.append(separator);
-  // separator = ", ";
-  // sb.append(key + ": " + clientData.get(key));
-  // }
-  //
-  // }
-  // return sb.toString();
-  // }
 
   public ListView<Event> getEventsListView() {
     return eventsListView;
