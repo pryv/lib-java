@@ -441,7 +441,7 @@ public class SQLiteDBHelperTest {
       }
 
       @Override
-      public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, long serverTime) {
+      public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double serverTime) {
       }
 
       @Override
@@ -472,7 +472,8 @@ public class SQLiteDBHelperTest {
 
       @Override
       public void
-        onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, long serverTime) {
+ onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams,
+        double serverTime) {
       }
 
       @Override

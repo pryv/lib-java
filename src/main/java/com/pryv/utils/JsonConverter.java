@@ -76,9 +76,9 @@ public class JsonConverter {
    * @throws JsonProcessingException
    * @throws IOException
    */
-  public static long retrieveServerTime(String jsonResponse) throws JsonProcessingException,
+  public static double retrieveServerTime(String jsonResponse) throws JsonProcessingException,
     IOException {
-    long serverTime = toJsonNode(jsonResponse).get(META).get(SERVER_TIME).longValue();
+    double serverTime = toJsonNode(jsonResponse).get(META).get(SERVER_TIME).doubleValue();
 
     logger.log("JsonConverter: retrieved time: " + serverTime);
     return serverTime;

@@ -163,7 +163,8 @@ public class SupervisorTest {
 
       @Override
       public void
-        onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, long serverTime) {
+ onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams,
+        double serverTime) {
         // TODO Auto-generated method stub
 
       }

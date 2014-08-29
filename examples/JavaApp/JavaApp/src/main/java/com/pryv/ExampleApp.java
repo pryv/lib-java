@@ -275,7 +275,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    * Streams Callbacks
    */
 
-  public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> streams, long serverTime) {
+  public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> streams, double serverTime) {
     logger.log("JavaApp: received " + streams.size() + " from online");
     addStreamsToTree(streams);
   }
@@ -351,7 +351,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    * Events Callbacks
    */
 
-  public void onOnlineRetrieveEventsSuccess(final Map<String, Event> newEvents, long serverTime) {
+  public void onOnlineRetrieveEventsSuccess(final Map<String, Event> newEvents, double serverTime) {
     addEventsToList(newEvents);
   }
 

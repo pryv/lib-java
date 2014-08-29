@@ -142,7 +142,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
         try {
           textResponse = EntityUtils.toString(response.getEntity());
           logger.log("Online received streams: " + textResponse);
-          long serverTime = JsonConverter.retrieveServerTime(textResponse);
+          double serverTime = JsonConverter.retrieveServerTime(textResponse);
           logger.log("retrieved time: " + serverTime);
           Map<String, Stream> receivedStreams = JsonConverter.createStreamsFromJson(textResponse);
           for (Stream receivedStream : receivedStreams.values()) {
@@ -205,7 +205,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
           try {
             response = EntityUtils.toString(reply.getEntity());
             logger.log("Online: received events: " + response);
-            long serverTime = JsonConverter.retrieveServerTime(response);
+            double serverTime = JsonConverter.retrieveServerTime(response);
             logger.log("retrieved time: " + serverTime);
             Map<String, Event> receivedEvents = JsonConverter.createEventsFromJson(response);
             for (Event receivedEvent : receivedEvents.values()) {

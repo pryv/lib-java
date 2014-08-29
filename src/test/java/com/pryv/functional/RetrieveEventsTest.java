@@ -132,7 +132,7 @@ public class RetrieveEventsTest {
     eventsCallback = new EventsCallback() {
 
       @Override
-      public void onOnlineRetrieveEventsSuccess(Map<String, Event> newEvents, long serverTime) {
+      public void onOnlineRetrieveEventsSuccess(Map<String, Event> newEvents, double serverTime) {
         System.out.println("TestEventsCallback: success with "
           + newEvents.values().size()
             + " events");
@@ -179,7 +179,7 @@ public class RetrieveEventsTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> newStreams, long serverTime) {
+      public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> newStreams, double serverTime) {
         System.out.println("TestStreamsCallback: success for "
           + newStreams.values().size()
             + " streams");

@@ -3,6 +3,8 @@ package com.pryv;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 
+import org.joda.time.DateTime;
+
 import com.pryv.api.CacheEventsAndStreamsManager;
 import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsManager;
@@ -33,11 +35,11 @@ public class Connection implements EventsManager, StreamsManager {
 
   private WeakReference<Connection> weakConnection;
 
-  private long serverTime;
+  private double serverTime;
   /**
    * RTT between server and system: deltaTime = serverTime - systemTime
    */
-  private long deltaTime = 0;
+  private double deltaTime = 0;
 
   private EventsManager cacheEventsManager;
   private StreamsManager cacheStreamsManager;
@@ -216,7 +218,8 @@ public class Connection implements EventsManager, StreamsManager {
    * @param event
    */
   private void updateCreated(Event event) {
-    event.setCreated(System.currentTimeMillis() / millisToSeconds + deltaTime);
+    // event.setCreated(System.currentTimeMillis() / millisToSeconds +
+    // deltaTime);
     event.setCreatedBy(username);
     updateModified(event);
   }
@@ -227,7 +230,8 @@ public class Connection implements EventsManager, StreamsManager {
    * @param event
    */
   private void updateCreated(Stream stream) {
-    stream.setCreated(System.currentTimeMillis() / millisToSeconds + deltaTime);
+    // stream.setCreated(System.currentTimeMillis() / millisToSeconds +
+    // deltaTime);
     stream.setCreatedBy(username);
     updateModified(stream);
   }
@@ -239,7 +243,8 @@ public class Connection implements EventsManager, StreamsManager {
    *          the event to modifiy
    */
   private void updateModified(Event event) {
-    event.setModified(System.currentTimeMillis() / millisToSeconds + deltaTime);
+    // event.setModified(System.currentTimeMillis() / millisToSeconds +
+    // deltaTime);
     event.setModifiedBy(username);
   }
 
@@ -250,8 +255,19 @@ public class Connection implements EventsManager, StreamsManager {
    *          the stream to modifiy
    */
   private void updateModified(Stream stream) {
-    stream.setModified(System.currentTimeMillis() / millisToSeconds + deltaTime);
+    // stream.setModified(System.currentTimeMillis() / millisToSeconds +
+    // deltaTime);
     stream.setModifiedBy(username);
+  }
+
+  /**
+   *
+   *
+   * @param time
+   * @return
+   */
+  public DateTime serverTimeInSystemDate(long time) {
+    return new DateTime(System.currentTimeMillis() / millisToSeconds + deltaTime);
   }
 
   /**
@@ -260,7 +276,7 @@ public class Connection implements EventsManager, StreamsManager {
    *
    * @param pServerTime
    */
-  private void computeDelta(long pServerTime) {
+  private void computeDelta(double pServerTime) {
     deltaTime = pServerTime - System.currentTimeMillis();
   }
 
@@ -281,7 +297,7 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, long pServerTime) {
+    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double pServerTime) {
       logger.log("Connection: onOnlineRetrieveEventsSuccess");
 
       // update server time
@@ -353,7 +369,8 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, long pServerTime) {
+    public void
+      onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, double pServerTime) {
       // update server time
       serverTime = pServerTime;
       // compute delta time between system time and servertime

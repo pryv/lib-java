@@ -37,7 +37,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   /**
    * indicates last time the cache was updated - in cloud time
    */
-  private long lastModified;
+  private double lastModified;
 
   /**
    * ref to StreamsSupervisor
@@ -94,7 +94,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         if (filter.areStreamIdsContainedInScope(scope, streams)) {
           // make request to online for full scope with field modifiedSince set
           // to lastModified
-          onlineFilter.setModifiedSince(lastModified);
+          onlineFilter.setModifiedSince((long) (lastModified * 1000));
           onlineFilter.setStreamIds(scope);
         } else {
           for (String filterStreamId : filter.getStreamIds()) {
@@ -232,7 +232,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, long serverTime) {
+    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double serverTime) {
       // update Events in cache and send result to connection
       logger.log("Cache: update cache with online Events");
       lastModified = serverTime;
@@ -297,7 +297,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, long serverTime) {
+    public void
+      onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, double serverTime) {
       logger.log("Cache: Streams retrieval success");
 
       if (Pryv.isCacheActive()) {
@@ -365,7 +366,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, long serverTime) {
+    public void
+      onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, double serverTime) {
       // unused
     }
 
@@ -415,7 +417,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, long serverTime) {
+    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double serverTime) {
       // unused
     }
 

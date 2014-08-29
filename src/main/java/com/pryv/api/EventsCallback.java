@@ -19,9 +19,9 @@ public interface EventsCallback {
    * @param onlineEvents
    *          the events retrieved from the online message
    * @param serverTime
-   *          the time of the server
+   *          the time of the server in seconds
    */
-  void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, long serverTime);
+  void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double serverTime);
 
   /**
    * callback method for successful DB retrieval

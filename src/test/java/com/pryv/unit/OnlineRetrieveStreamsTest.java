@@ -61,7 +61,8 @@ public class OnlineRetrieveStreamsTest {
 
       @Override
       public void
-        onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, long serverTime) {
+ onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams,
+        double serverTime) {
         streams = onlineStreams;
       }
 

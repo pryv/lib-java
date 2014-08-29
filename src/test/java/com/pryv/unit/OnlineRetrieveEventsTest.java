@@ -97,7 +97,7 @@ public class OnlineRetrieveEventsTest {
     eventsCallback = new EventsCallback() {
 
       @Override
-      public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, long serverTime) {
+      public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double serverTime) {
         events = onlineEvents;
       }
 

@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.joda.time.DateTime;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -228,19 +230,25 @@ public class Event {
     modifiedBy = temp.modifiedBy;
   }
 
-  // public Date getDate() {
-  // if (time == null) {
-  // return null;
-  // }
-  // if (connection == null) {
-  // return new Date(time);
-  // }
-  // return connection.serverTimeInSystemDate(time);
-  // }
-  //
-  // public void setDate(Date date) {
-  //
-  // }
+  public DateTime getDate() {
+    if (time == null) {
+      return null;
+    }
+    if (weakConnection.get() == null) {
+      return new DateTime(time.longValue());
+    }
+    return weakConnection.get().serverTimeInSystemDate(time);
+  }
+
+  @JsonIgnore
+  public void setDate(DateTime date) {
+    if (date == null) {
+      time = null;
+    }
+    if (weakConnection.get() == null) {
+      time = date.getMillis() / 1000;
+    }
+  }
 
   /**
    * used for testing purposes
