@@ -23,6 +23,12 @@ import com.pryv.api.database.QueryGenerator;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Stream {
 
+  /**
+   * id used to access files locally
+   */
+  @JsonIgnore
+  private String clientId;
+
   private String id;
   private String name;
   private Double created;
@@ -232,6 +238,10 @@ public class Stream {
   public void clearChildren() {
     children = null;
     childrenMap = null;
+  }
+
+  public String getClientId() {
+    return clientId;
   }
 
   public String getId() {

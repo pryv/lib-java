@@ -134,8 +134,6 @@ public class SupervisorTest {
     childUpdate4.setModified(child.getModified() + TIME_INTERVAL);
     streams.updateOrCreateStream(childUpdate4, callback);
     assertTrue(streams.verifyParency(childId, parent1Id));
-    // assertNotNull(StreamUtils.findStreamReference(childId,
-    // parent1.getChildrenMap()));
   }
 
   private static void instantiateCallback() {

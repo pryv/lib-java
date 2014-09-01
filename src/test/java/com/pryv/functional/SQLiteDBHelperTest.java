@@ -73,7 +73,6 @@ public class SQLiteDBHelperTest {
         System.out.println(message);
       }
     });
-    // cleanUpTestDB();
   }
 
   // executed after all tests once

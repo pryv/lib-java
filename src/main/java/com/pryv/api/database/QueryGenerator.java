@@ -120,7 +120,6 @@ public class QueryGenerator {
     sb.append(formatSetValue(eventToCache.getTags()) + ",");
     sb.append(formatSetValue(eventToCache.getReferences()) + ",");
     sb.append(formatTextValue(eventToCache.getDescription()) + ",");
-    // attachments need to be added in their own table
     sb.append(formatTextValue(eventToCache.formatClientDataAsString()) + ",");
     sb.append(formatBooleanValue(eventToCache.getTrashed()) + ",");
     sb.append(formatTextValue(eventToCache.getTempRefId()) + ",");

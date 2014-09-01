@@ -124,7 +124,6 @@ public class FormController {
   private void updateStream() {
     editedStream.setName(streamNameTextField.getText());
     exampleApp.updateStream(editedStream);
-
   }
 
   private void closeWindow() {

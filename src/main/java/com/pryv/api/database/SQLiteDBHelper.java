@@ -12,8 +12,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.sqlite.SQLiteConfig;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -64,7 +62,6 @@ public class SQLiteDBHelper {
   private void initDB(final String path, DBinitCallback initCallback) {
     try {
       Class.forName("org.sqlite.JDBC");
-      SQLiteConfig config = new SQLiteConfig();
       dbConnection = DriverManager.getConnection("jdbc:sqlite:" + path);
       createEventsTable();
       createSteamsTable();
@@ -146,6 +143,10 @@ public class SQLiteDBHelper {
    * Delete event from the SQLite database.
    *
    * @param eventToDelete
+   *          the event to delete
+   *
+   * @param cacheEventsCallback
+   *          callback to notify success or failure
    */
   public void deleteEvent(Event eventToDelete, EventsCallback cacheEventsCallback) {
     new Thread() {
@@ -178,7 +179,8 @@ public class SQLiteDBHelper {
    * @param filter
    *          the filter used for the retrieval, use null if no filter is
    *          required.
-   * @return Map<String, Event> events, with event ID as key.
+   * @param cacheEventsCallback
+   *          callback to return retrieved events
    */
   public void getEvents(Filter filter, EventsCallback cacheEventsCallback) {
     new Thread() {

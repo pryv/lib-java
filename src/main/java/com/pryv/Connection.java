@@ -43,7 +43,7 @@ public class Connection implements EventsManager, StreamsManager {
 
   private EventsManager cacheEventsManager;
   private StreamsManager cacheStreamsManager;
-  private EventsSupervisor supervisor;
+  private EventsSupervisor eventsSupervisor;
   private StreamsSupervisor streams;
 
   private Logger logger = Logger.getInstance();
@@ -66,7 +66,7 @@ public class Connection implements EventsManager, StreamsManager {
     url = apiScheme + "://" + username + "." + apiDomain + "/";
     weakConnection = new WeakReference<Connection>(this);
     streams = new StreamsSupervisor();
-    supervisor = new EventsSupervisor();
+    eventsSupervisor = new EventsSupervisor();
     cacheEventsManager =
       new CacheEventsAndStreamsManager(url, token, dbInitCallback, streams, weakConnection);
     cacheStreamsManager = (StreamsManager) cacheEventsManager;
@@ -103,7 +103,7 @@ public class Connection implements EventsManager, StreamsManager {
   public void getEvents(Filter filter, EventsCallback userEventsCallback) {
     if (Pryv.isSupervisorActive()) {
       // make sync request to supervisor
-      supervisor.getEvents(filter, userEventsCallback);
+      eventsSupervisor.getEvents(filter, userEventsCallback);
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward getEvents() to Cache
@@ -118,7 +118,7 @@ public class Connection implements EventsManager, StreamsManager {
 
     if (Pryv.isSupervisorActive()) {
       // make sync request to supervisor
-      supervisor.updateOrCreateEvent(newEvent, userEventsCallback);
+      eventsSupervisor.updateOrCreateEvent(newEvent, userEventsCallback);
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
@@ -133,7 +133,7 @@ public class Connection implements EventsManager, StreamsManager {
 
     if (Pryv.isSupervisorActive()) {
       // delete Event in Supervisor
-      supervisor.deleteEvent(eventToDelete, userEventsCallback);
+      eventsSupervisor.deleteEvent(eventToDelete, userEventsCallback);
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
@@ -147,7 +147,7 @@ public class Connection implements EventsManager, StreamsManager {
 
     if (Pryv.isSupervisorActive()) {
       // update Event in Supervisor
-      supervisor.updateOrCreateEvent(eventToUpdate, userEventsCallback);
+      eventsSupervisor.updateOrCreateEvent(eventToUpdate, userEventsCallback);
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
@@ -258,27 +258,31 @@ public class Connection implements EventsManager, StreamsManager {
 
       // update server time
       serverTime = pServerTime;
-      // compute delta time between system time and servertime
+      // compute delta time between system time and serverTime
       computeDelta(pServerTime);
       // onlineStreams are not received here,
 
-      if (onlineEvents != null) {
-        for (Event onlineEvent : onlineEvents.values()) {
-          supervisor.updateOrCreateEvent(onlineEvent, userEventsCallback);
-        }
-        // return merged events from Supervisor
-        supervisor.getEvents(filter, this);
+      for (Event onlineEvent : onlineEvents.values()) {
+        eventsSupervisor.updateOrCreateEvent(onlineEvent, userEventsCallback);
       }
+
+      /*
+       * new implementation: merge already done in cache, do only the get
+       * request below
+       */
+
+      // return merged events from Supervisor
+      eventsSupervisor.getEvents(filter, this);
     }
 
     @Override
     public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
       // update existing Events with those retrieved from the cache
       for (Event cacheEvent : cacheEvents.values()) {
-        supervisor.updateOrCreateEvent(cacheEvent, userEventsCallback);
+        eventsSupervisor.updateOrCreateEvent(cacheEvent, userEventsCallback);
       }
       // return merged events from Supervisor
-      supervisor.getEvents(filter, this);
+      eventsSupervisor.getEvents(filter, this);
     }
 
     @Override

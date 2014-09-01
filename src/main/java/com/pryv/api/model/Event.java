@@ -34,6 +34,12 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 @JsonInclude(Include.NON_NULL)
 public class Event {
 
+  /**
+   * id used to access files locally
+   */
+  @JsonIgnore
+  private String clientId;
+
   private String id;
   private String streamId;
   private Double time;
@@ -291,6 +297,10 @@ public class Event {
       }
       clientData.put(cdPairs[0], cdPairs[1]);
     }
+  }
+
+  public String getClientId() {
+    return clientId;
   }
 
   public String getId() {

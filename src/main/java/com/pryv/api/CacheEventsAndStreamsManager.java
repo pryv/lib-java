@@ -249,6 +249,17 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         // forward to connection
         connectionEventsCallback.onOnlineRetrieveEventsSuccess(onlineEvents, serverTime);
       }
+
+      /*
+       * new implementation: 1- check if event exists:
+       * eventsSupervisor.getEventById(newEvent.getId()) if exists:
+       * event.merge(newEvent) else: newEvent.generateClientId(),
+       * eventsSupervisor.put(newEvent.getClientId(), newEvent)
+       * 
+       * 2- out of the loop: DBHelper.updateOrCreateEvents(onlineEvents); 3-
+       * forward OK message to connection
+       */
+
     }
 
     // unused
