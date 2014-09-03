@@ -19,6 +19,10 @@ import com.pryv.utils.Logger;
 public class EventsSupervisor {
 
   private Map<String, Event> events;
+  /**
+   * Map: key=event.id, value=event.clientId
+   */
+  private Map<String, String> eventIdToClientId;
 
   private Logger logger = Logger.getInstance();
 
@@ -28,6 +32,7 @@ public class EventsSupervisor {
    */
   public EventsSupervisor() {
     events = new HashMap<String, Event>();
+    eventIdToClientId = new HashMap<String, String>();
   }
 
   /*
@@ -60,6 +65,7 @@ public class EventsSupervisor {
       returnEvents.keySet().retainAll(
         ImmutableSet.copyOf(Iterables.limit(returnEvents.keySet(), filter.getLimit())));
     }
+    logger.log("EventsSupervisor: getEvents returning " + returnEvents.size() + " events.");
     connectionCallback.onSupervisorRetrieveEventsSuccess(returnEvents);
   }
 
@@ -69,11 +75,20 @@ public class EventsSupervisor {
    * @param newEvent
    *          the new Event
    * @param connectionCallback
-   *          the callback to notify success or failutre
+   *          the callback to notify success or failure
    */
   public void updateOrCreateEvent(Event newEvent, EventsCallback connectionCallback) {
+    logger.log("EventsSupervisor: updateOrCreateEvent with id="
+      + newEvent.getId()
+        + ", cid="
+        + newEvent.getClientId());
+    if (getClientId(newEvent.getId()) == null && newEvent.getClientId() == null) {
+      // new event
+      newEvent.generateClientId();
+      newEvent.updateStreamClientId(eventIdToClientId);
+    }
     // case exists: compare modified field
-    if (events.containsKey(newEvent.getId())) {
+    if (eventIdToClientId.containsKey(newEvent.getId())) {
       updateEvent(newEvent);
       connectionCallback.onEventsSuccess("Event with id="
         + newEvent.getId()
@@ -93,6 +108,7 @@ public class EventsSupervisor {
    */
   private void addEvent(Event newEvent) {
     events.put(newEvent.getId(), newEvent);
+    eventIdToClientId.put(newEvent.getId(), newEvent.getClientId());
   }
 
   /**
@@ -121,8 +137,9 @@ public class EventsSupervisor {
       if (events.get(eventToDelete.getId()).getTrashed() == true) {
         // delete really
         events.remove(eventToDelete.getId());
+        eventIdToClientId.remove(eventToDelete.getId());
       } else {
-        // update trashed field
+        // update "trashed" field
         eventToDelete.setTrashed(true);
         updateEvent(eventToDelete);
       }
@@ -142,6 +159,16 @@ public class EventsSupervisor {
    */
   public Event getEventById(String id) {
     return events.get(id);
+  }
+
+  /**
+   * Returns the clientId of the Event whose id is provided.
+   *
+   * @param id
+   * @return the event's clientId if it exists, else null
+   */
+  public String getClientId(String id) {
+    return eventIdToClientId.get(id);
   }
 
 }

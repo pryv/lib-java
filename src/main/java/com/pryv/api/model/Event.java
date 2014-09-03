@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.joda.time.DateTime;
 
@@ -39,6 +40,8 @@ public class Event {
    */
   @JsonIgnore
   private String clientId;
+  @JsonIgnore
+  private String streamClientId;
 
   private String id;
   private String streamId;
@@ -69,6 +72,8 @@ public class Event {
   /**
    * Construct Event object from parameters
    *
+   * @param pClientId
+   * @param pStreamClientId
    * @param pId
    * @param pStreamId
    * @param pTime
@@ -97,10 +102,13 @@ public class Event {
    * @param pTempRefId
    *          optional
    */
-  public Event(String pId, String pStreamId, Double pTime, Double pDuration, String pType,
+  public Event(String pClientId, String pStreamClientID, String pId, String pStreamId,
+    Double pTime, Double pDuration, String pType,
     String pContent, Set<String> pTags, Set<String> pReferences, String pDescription,
     Set<Attachment> pAttachments, Map<String, Object> pClientData, Boolean pTrashed,
     Double pCreated, String pCreatedBy, Double pModified, String pModifiedBy, String pTempRefId) {
+    clientId = pClientId;
+    streamClientId = pStreamClientID;
     id = pId;
     streamId = pStreamId;
     time = pTime;
@@ -168,6 +176,23 @@ public class Event {
   }
 
   /**
+   * Assign unique identifier to the Stream - to execute ONCE upon creation
+   */
+  public void generateClientId() {
+    clientId = UUID.randomUUID().toString();
+  }
+
+  /**
+   * translates the StreamClientId
+   *
+   * @param streamIdToClientId
+   *          the dictionnary streamId->streamClientId
+   */
+  public void updateStreamClientId(Map<String, String> streamIdToClientId) {
+    streamClientId = streamIdToClientId.get(streamId);
+  }
+
+  /**
    * Assign a weak reference to the Connection
    *
    * @param connection
@@ -195,6 +220,12 @@ public class Event {
    *          com.rits.cloning.Cloner instance from JsonConverter util class
    */
   public void merge(Event temp, Cloner cloner) {
+    // removed these 2 fields since merge is used in
+    // StreamsSupervisor.updateStream() and resetFromJson(), which are used to
+    // update from the internet where client id fields are null
+    // clientId = temp.clientId;
+    streamClientId = temp.streamClientId;
+    weakConnection = temp.weakConnection;
     id = temp.id;
     streamId = temp.streamId;
     time = temp.time;
@@ -230,6 +261,8 @@ public class Event {
     createdBy = temp.createdBy;
     modified = temp.modified;
     modifiedBy = temp.modifiedBy;
+
+    temp = null;
   }
 
   /**
@@ -303,6 +336,10 @@ public class Event {
     return clientId;
   }
 
+  public String getStreamClientId() {
+    return streamClientId;
+  }
+
   public String getId() {
     return id;
   }
@@ -369,6 +406,14 @@ public class Event {
 
   public String getTempRefId() {
     return tempRefId;
+  }
+
+  public void setClientId(String pClientId) {
+    clientId = pClientId;
+  }
+
+  public void setStreamClientId(String pStreamClientd) {
+    streamClientId = pStreamClientd;
   }
 
   public void setId(String pid) {

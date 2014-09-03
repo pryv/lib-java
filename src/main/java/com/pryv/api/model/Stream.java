@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -28,6 +29,8 @@ public class Stream {
    */
   @JsonIgnore
   private String clientId;
+  @JsonIgnore
+  private String parentClientId;
 
   private String id;
   private String name;
@@ -53,6 +56,8 @@ public class Stream {
   /**
    * Stream object Constructor with all fields
    *
+   * @param pClientId
+   * @param pParentClientId
    * @param pId
    * @param pName
    * @param pParentId
@@ -68,9 +73,12 @@ public class Stream {
    * @param pModified
    * @param pModifiedBy
    */
-  public Stream(String pId, String pName, String pParentId, Boolean pSingleActivity,
+  public Stream(String pClientId, String pParentClientId, String pId, String pName,
+    String pParentId, Boolean pSingleActivity,
     Map<String, Object> pClientData, List<Stream> pChildren, Boolean pTrashed, Double pCreated,
     String pCreatedBy, Double pModified, String pModifiedBy) {
+    clientId = pClientId;
+    parentClientId = pParentClientId;
     id = pId;
     name = pName;
     parentId = pParentId;
@@ -79,7 +87,7 @@ public class Stream {
     children = pChildren;
     if (pChildren != null) {
       for (Stream stream : pChildren) {
-        childrenMap.put(stream.getId(), stream);
+        childrenMap.put(stream.getClientId(), stream);
       }
     }
     trashed = pTrashed;
@@ -96,6 +104,8 @@ public class Stream {
    * @throws SQLException
    */
   public Stream(ResultSet result) throws SQLException {
+    clientId = result.getString(QueryGenerator.STREAMS_CLIENT_ID_KEY);
+    parentClientId = result.getString(QueryGenerator.STREAMS_PARENT_CLIENT_ID_KEY);
     id = result.getString(QueryGenerator.STREAMS_ID_KEY);
     name = result.getString(QueryGenerator.STREAMS_NAME_KEY);
     trashed = result.getBoolean(QueryGenerator.STREAMS_TRASHED_KEY);
@@ -112,6 +122,23 @@ public class Stream {
    * Empty Constructor
    */
   public Stream() {
+  }
+
+  /**
+   * Assign unique identifier to the Stream - to execute ONCE upon creation
+   */
+  public void generateClientId() {
+    clientId = UUID.randomUUID().toString();
+  }
+
+  /**
+   * translates the Parent stream clientId
+   *
+   * @param streamIdToClientId
+   *          the dictionnary streamId->streamClientId
+   */
+  public void updateParentClientId(Map<String, String> streamIdToClientId) {
+    parentClientId = streamIdToClientId.get(parentId);
   }
 
   /**
@@ -139,6 +166,12 @@ public class Stream {
    * @param temp
    */
   public void merge(Stream temp) {
+    // removed these 2 fields since merge is used in
+    // StreamsSupervisor.updateStream() and resetFromJson(), which are used to
+    // update from the internet where client id fields are null
+    // clientId = temp.clientId;
+    // parentClientId = temp.parentClientId;
+    weakConnection = temp.weakConnection;
     id = temp.id;
     name = temp.name;
     parentId = temp.parentId;
@@ -149,21 +182,22 @@ public class Stream {
         clientData.put(key, temp.clientData.get(key));
       }
     }
-    if (temp.children != null) {
-      children = new ArrayList<Stream>();
-      for (Stream childStream : temp.children) {
-        children.add(childStream);
-      }
-      childrenMap = new HashMap<String, Stream>();
-      for (Stream childStream : temp.childrenMap.values()) {
-        childrenMap.put(childStream.getId(), childStream);
-      }
-    }
+    // if (temp.children != null) {
+    //
+    // children = new ArrayList<Stream>();
+    // childrenMap = new HashMap<String, Stream>();
+    // for (Stream childStream : temp.children) {
+    // children.add(childStream);
+    // childrenMap.put(childStream.getClientId(), childStream);
+    // }
+    // }
     trashed = temp.trashed;
     created = temp.created;
     createdBy = temp.createdBy;
     modified = temp.modified;
     modifiedBy = temp.modifiedBy;
+
+    temp = null;
   }
 
   /**
@@ -203,7 +237,9 @@ public class Stream {
   }
 
   /**
-   * Add a stream as child to caller. If children list is null, instanciates it.
+   * Add a stream as child to caller. If children list & map are null,
+   * instantiates them. The child's parentId and parentClientId fields are
+   * updated.
    *
    * @param childStream
    */
@@ -213,18 +249,19 @@ public class Stream {
       childrenMap = new HashMap<String, Stream>();
     }
     children.add(childStream);
-    childrenMap.put(childStream.getId(), childStream);
+    childrenMap.put(childStream.getClientId(), childStream);
   }
 
   /**
    * Removes a child Stream from the Stream. If no more children are left, the
-   * children and childrenMap fields are set to null.
+   * children and childrenMap fields are set to null. The child's parentId and
+   * parentClientId are set to null.
    *
    * @param childStream
    *          the child Stream to remove
    */
   public void removeChildStream(Stream childStream) {
-    childrenMap.remove(childStream.getId());
+    childrenMap.remove(childStream.getClientId());
     children.remove(childStream);
     if (childrenMap.size() == 0 || children.size() == 0) {
       childrenMap = null;
@@ -242,6 +279,10 @@ public class Stream {
 
   public String getClientId() {
     return clientId;
+  }
+
+  public String getParentClientId() {
+    return parentClientId;
   }
 
   public String getId() {
@@ -292,6 +333,14 @@ public class Stream {
     return modifiedBy;
   }
 
+  public void setClientId(String pClientId) {
+    clientId = pClientId;
+  }
+
+  public void setParentClientId(String pParentClientId) {
+    parentClientId = pParentClientId;
+  }
+
   public void setId(String pId) {
     this.id = pId;
   }
@@ -319,7 +368,7 @@ public class Stream {
         if (childrenMap == null) {
           childrenMap = new HashMap<String, Stream>();
         }
-        childrenMap.put(stream.getId(), stream);
+        childrenMap.put(stream.getClientId(), stream);
       }
     }
   }

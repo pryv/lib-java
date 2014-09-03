@@ -211,6 +211,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             for (Event receivedEvent : receivedEvents.values()) {
               receivedEvent.assignConnection(weakConnection);
             }
+            logger.log("Online: received " + receivedEvents.size() + " event(s) from API.");
             eventsCallback.onOnlineRetrieveEventsSuccess(receivedEvents, serverTime);
           } catch (ParseException e) {
             eventsCallback.onEventsRetrievalError(e.getMessage());

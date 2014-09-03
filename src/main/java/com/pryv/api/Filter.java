@@ -1,6 +1,7 @@
 package com.pryv.api;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.pryv.api.model.Event;
@@ -33,6 +34,7 @@ public class Filter {
   private Double fromTime;
   private Double toTime;
   private Set<String> streamIds;
+  private Set<String> streamCIDsZZtoRevertWithOriginal;
   private Set<String> tags;
   private Set<String> types;
   private Boolean running;
@@ -182,6 +184,20 @@ public class Filter {
         && runningMatch
         && stateMatch
         && modifiedSinceMatch;
+  }
+
+  /**
+   * Generate the set of Stream Ids. It will be used to address the request to
+   * the API.
+   *
+   * @param streamsClientIdToId
+   *          dictionnary stream.clientId->stream.id
+   */
+  public void generateStreamIds(Map<String, String> streamsClientIdToId) {
+    streamCIDsZZtoRevertWithOriginal = new HashSet<String>();
+    for (String string : streamCIDsZZtoRevertWithOriginal) {
+      streamCIDsZZtoRevertWithOriginal.add(streamsClientIdToId.get(string));
+    }
   }
 
   /**

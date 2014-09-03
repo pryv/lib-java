@@ -25,6 +25,8 @@ public class QueryGenerator {
   /**
    * Events Table keys
    */
+  public static final String EVENTS_CLIENT_ID_KEY = "CLIENT_ID";
+  public static final String EVENTS_STREAM_CLIENT_ID_KEY = "STREAM_CLIENT_ID";
   public static final String EVENTS_ID_KEY = "ID";
   public static final String EVENTS_STREAM_ID_KEY = "STREAM_ID";
   public static final String EVENTS_TIME_KEY = "TIME";
@@ -47,8 +49,10 @@ public class QueryGenerator {
   /**
    * Streams Table keys
    */
+  public static final String STREAMS_CLIENT_ID_KEY = "CLIENT_ID";
   public static final String STREAMS_ID_KEY = "ID";
   public static final String STREAMS_NAME_KEY = "NAME";
+  public static final String STREAMS_PARENT_CLIENT_ID_KEY = "PARENT_CLIENT_ID";
   public static final String STREAMS_PARENT_ID_KEY = "PARENT_ID";
   public static final String STREAMS_SINGLE_ACTIVITY_KEY = "SINGLE_ACTIVITY";
   public static final String STREAMS_CLIENT_DATA_KEY = "CLIENT_DATA";
@@ -72,6 +76,10 @@ public class QueryGenerator {
     sb.append("INSERT OR REPLACE INTO "
       + EVENTS_TABLE_NAME
         + " ("
+        + EVENTS_CLIENT_ID_KEY
+        + ", "
+        + EVENTS_STREAM_CLIENT_ID_KEY
+        + ", "
         + EVENTS_ID_KEY
         + ", "
         + EVENTS_STREAM_ID_KEY
@@ -107,6 +115,8 @@ public class QueryGenerator {
         + EVENTS_ATTACHMENTS_KEY
         + ")"
         + " VALUES (");
+    sb.append(formatTextValue(eventToCache.getClientId()) + ",");
+    sb.append(formatTextValue(eventToCache.getStreamClientId()) + ",");
     sb.append(formatTextValue(eventToCache.getId()) + ",");
     sb.append(formatTextValue(eventToCache.getStreamId()) + ",");
     sb.append(formatDoubleValue(eventToCache.getTime()) + ",");
@@ -131,7 +141,7 @@ public class QueryGenerator {
 
 
   /**
-   * Creates the query to delete an Event. It's id is used in the request.
+   * Creates the query to delete an Event. It's clientId is used in the request.
    *
    * @param eventToDelete
    * @return the SQLite query
@@ -140,10 +150,9 @@ public class QueryGenerator {
     return "DELETE FROM "
       + EVENTS_TABLE_NAME
         + " WHERE "
-        + EVENTS_ID_KEY
-        + "=\'"
-        + eventToDelete.getId()
-        + "\'"
+        + EVENTS_CLIENT_ID_KEY
+        + "="
+        + formatTextValue(eventToDelete.getClientId())
         + " AND "
         + EVENTS_TRASHED_KEY
         + "=1;";
@@ -237,11 +246,15 @@ public class QueryGenerator {
     sb.append("INSERT OR REPLACE INTO "
       + STREAMS_TABLE_NAME
         + " ("
+        + STREAMS_CLIENT_ID_KEY
+        + ", "
         + STREAMS_ID_KEY
         + ", "
         + STREAMS_NAME_KEY
         + ", "
         + STREAMS_CHILDREN_KEY
+        + ", "
+        + STREAMS_PARENT_CLIENT_ID_KEY
         + ", "
         + STREAMS_PARENT_ID_KEY
         + ", "
@@ -260,6 +273,7 @@ public class QueryGenerator {
         + STREAMS_MODIFIED_BY_KEY
         + ")"
         + " VALUES (");
+    sb.append(formatTextValue(streamToCache.getClientId()) + ",");
     sb.append(formatTextValue(streamToCache.getId()) + ",");
     sb.append(formatTextValue(streamToCache.getName()) + ",");
     if (streamToCache.getChildrenMap() != null) {
@@ -267,6 +281,7 @@ public class QueryGenerator {
     } else {
       sb.append("NULL,");
     }
+    sb.append(formatTextValue(streamToCache.getParentClientId()) + ",");
     sb.append(formatTextValue(streamToCache.getParentId()) + ",");
     sb.append(formatBooleanValue(streamToCache.getSingleActivity()) + ",");
     sb.append(formatTextValue(streamToCache.formatClientDataAsString()) + ",");
@@ -289,10 +304,13 @@ public class QueryGenerator {
     return "DELETE FROM "
       + STREAMS_TABLE_NAME
         + " WHERE "
-        + STREAMS_ID_KEY
-        + "=\'"
-        + streamToDelete.getId()
-        + "\';";
+        + STREAMS_CLIENT_ID_KEY
+        + "="
+        + formatTextValue(streamToDelete.getClientId())
+        + ""
+        + " AND "
+        + EVENTS_TRASHED_KEY
+        + "=1;";
   }
 
   /**
@@ -313,10 +331,14 @@ public class QueryGenerator {
     return "CREATE TABLE IF NOT EXISTS "
       + EVENTS_TABLE_NAME
         + "("
+        + EVENTS_CLIENT_ID_KEY
+        + " TEXT PRIMARY KEY NOT NULL, "
+        + EVENTS_STREAM_CLIENT_ID_KEY
+        + " TEXT, "
         + EVENTS_ID_KEY
-        + " TEXT PRIMARY KEY  NOT NULL, "
+        + " TEXT, "
         + EVENTS_STREAM_ID_KEY
-        + " TEXT              NOT NULL, "
+        + " TEXT, "
         + EVENTS_TIME_KEY
         + " INTEGER, "
         + EVENTS_TYPE_KEY
@@ -358,10 +380,12 @@ public class QueryGenerator {
     return "CREATE TABLE IF NOT EXISTS "
       + STREAMS_TABLE_NAME
         + "("
-        + STREAMS_ID_KEY
+        + STREAMS_CLIENT_ID_KEY
         + " TEXT PRIMARY KEY  NOT NULL, "
+        + STREAMS_ID_KEY
+        + " TEXT, "
         + STREAMS_NAME_KEY
-        + " TEXT              NOT NULL, "
+        + " TEXT, "
         + STREAMS_CREATED_KEY
         + " INTEGER, "
         + STREAMS_CREATED_BY_KEY
@@ -372,12 +396,14 @@ public class QueryGenerator {
         + " TEXT, "
         + STREAMS_CHILDREN_KEY
         + " TEXT, "
-        + STREAMS_PARENT_ID_KEY
+        + STREAMS_PARENT_CLIENT_ID_KEY
         + " TEXT REFERENCES "
         + STREAMS_TABLE_NAME
         + "("
-        + STREAMS_ID_KEY
+        + STREAMS_CLIENT_ID_KEY
         + "), "
+        + STREAMS_PARENT_ID_KEY
+        + " TEXT, "
         + STREAMS_SINGLE_ACTIVITY_KEY
         + " INTEGER, "
         + STREAMS_CLIENT_DATA_KEY

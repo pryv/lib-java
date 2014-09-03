@@ -38,6 +38,7 @@ public class EventTest {
   public void testCreateEmptyEvent() {
     Event emptyEvent =
       new Event(null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null,
         null, null, null);
     assertNotNull(emptyEvent);
   }

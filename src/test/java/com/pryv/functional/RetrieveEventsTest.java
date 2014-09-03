@@ -1,8 +1,6 @@
 package com.pryv.functional;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.junit.BeforeClass;
@@ -64,8 +62,12 @@ public class RetrieveEventsTest {
     streamsManager.getStreams(new Filter(), streamsCallback);
     Awaitility.await().until(hasStreams());
     Filter filter = new Filter();
-    Set<String> streamIds = new HashSet<String>();
     streamId = "flowerBreath";
+    if (streams.keySet().contains(streamId)) {
+      System.out.println("TEST: on a bien flowerBreath !!!");
+    } else {
+      System.out.println("TEST: on a pas flowerBreath !!!");
+    }
     filter.addStreamId(streamId);
     eventsManager.getEvents(filter, eventsCallback);
     Awaitility.await().until(hasFetchedRightStreams());

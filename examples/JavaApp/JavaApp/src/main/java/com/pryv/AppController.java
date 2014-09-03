@@ -316,7 +316,7 @@ public class AppController {
     if (stream.getChildren() != null) {
       for (Stream child : stream.getChildren()) {
         sb.append(separator);
-        sb.append(child.getId());
+        sb.append(child.getClientId());
         separator = ", ";
       }
     }
@@ -328,7 +328,7 @@ public class AppController {
     createdByLabel.setText(stream.getCreatedBy());
 
     // fetch events
-    exampleApp.getEventsForStreamId(stream.getId());
+    exampleApp.getEventsForStreamId(stream.getClientId());
     clearEventsLabels();
   }
 

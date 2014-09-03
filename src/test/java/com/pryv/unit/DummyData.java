@@ -21,8 +21,10 @@ import com.pryv.utils.JsonConverter;
  */
 public class DummyData {
 
+  private static final String EVENT_CLIENT_ID = "testClientId";
+  private static final String EVENT_STREAM_CLIENT_ID = "testStreamClientId";
   private static final String EVENT_ID = "testID";
-  private static final String EVENT_STREAMID = "testStreamID";
+  private static final String EVENT_STREAM_ID = "testStreamID";
   private static final Double EVENT_TIME = new Double(10000);
   private static final Double EVENT_DURATION = new Double(20); // opt
   private static final String EVENT_TYPE = "testType";
@@ -46,8 +48,10 @@ public class DummyData {
   private static final String EVENT_ATTACH_ID = "abc";
   private static final String EVENT_TEMP_REF_ID = "temp ref id";
 
-  private static final String STREAM_ID = "abc";
-  private static final String STREAM_NAME = "testStream";
+  private static final String STREAM_CLIENT_ID = "streamClientId";
+  private static final String STREAM_PARENT_CLIENT_ID = STREAM_CLIENT_ID;
+  private static final String STREAM_ID = "testStreamId";
+  private static final String STREAM_NAME = "testStreamName";
   private static final String STREAM_PARENT_ID = STREAM_ID;
   private static final Boolean STREAM_SINGLE_ACTIVITY = true;
   private static Map<String, Object> streamClientData;
@@ -59,13 +63,14 @@ public class DummyData {
   private static final String STREAM_CREATED_BY = "Bob";
   private static final Double STREAM_MODIFIED = new Double(1500);
   private static final String STREAM_MODIFIED_BY = "Bill";
+  private static final String STREAM_CHILD_CLIENT_ID = "childClientId";
   private static final String STREAM_CHILD_ID = "childid";
   private static final String STREAM_CHILD_NAME = "childname";
   private static final Boolean STREAM_CHILD_TRASHED = false;
   private static final Double STREAM_CHILD_CREATED = new Double(200);
   private static final String STREAM_CHILD_CREATED_BY = "creator of child";
   private static final Double STREAM_CHILD_MODIFIED = new Double(300);
-  private static final String STREAM_CHILD_MODIFIED_BY = "modified of child";
+  private static final String STREAM_CHILD_MODIFIED_BY = "modifier of child";
 
   private static final String ATTACHMENT_ID_FIRST = "firstAttachId";
   private static final String ATTACHMENT_ID_SECOND = "secondAttachId";
@@ -82,13 +87,13 @@ public class DummyData {
     streamClientData = new HashMap<String, Object>();
     streamClientData.put(STREAM_CLIENT_KEY, STREAM_CLIENT_VALUE);
     Stream streamChild =
-      new Stream(STREAM_CHILD_ID, STREAM_CHILD_NAME, STREAM_ID, null, null, null,
-      STREAM_CHILD_TRASHED, STREAM_CHILD_CREATED, STREAM_CHILD_CREATED_BY, STREAM_CHILD_MODIFIED,
-        STREAM_CHILD_MODIFIED_BY);
+      new Stream(STREAM_CHILD_CLIENT_ID, STREAM_CLIENT_ID, STREAM_CHILD_ID, STREAM_CHILD_NAME,
+        STREAM_ID, null, null, null, STREAM_CHILD_TRASHED, STREAM_CHILD_CREATED,
+        STREAM_CHILD_CREATED_BY, STREAM_CHILD_MODIFIED, STREAM_CHILD_MODIFIED_BY);
     Stream testStream =
-      new Stream(STREAM_ID, STREAM_NAME, null, STREAM_SINGLE_ACTIVITY, streamClientData, null,
-        STREAM_TRASHED, STREAM_CREATED, STREAM_CREATED_BY,
-      STREAM_MODIFIED, STREAM_MODIFIED_BY);
+      new Stream(STREAM_CLIENT_ID, null, STREAM_ID, STREAM_NAME, null, STREAM_SINGLE_ACTIVITY,
+        streamClientData, null, STREAM_TRASHED, STREAM_CREATED, STREAM_CREATED_BY, STREAM_MODIFIED,
+        STREAM_MODIFIED_BY);
     testStream.addChildStream(streamChild);
     return testStream;
   }
@@ -121,10 +126,11 @@ public class DummyData {
     eventAttachments = generateAttachments();
     eventClientData = new HashMap<String, Object>();
     eventClientData.put(EVENT_CLIENTKEY, EVENT_CLIENTVALUE);
-    return new Event(EVENT_ID, EVENT_STREAMID, EVENT_TIME, EVENT_DURATION, EVENT_TYPE,
-      EVENT_CONTENT, eventTags, eventRefs, EVENT_DESCRIPTION, eventAttachments,
-      eventClientData, EVENT_TRASHED, EVENT_CREATED, EVENT_CREATEDBY, EVENT_MODIFIED,
-      EVENT_MODIFIED_BY, EVENT_TEMP_REF_ID);
+    return new Event(EVENT_CLIENT_ID, EVENT_STREAM_CLIENT_ID, EVENT_ID, EVENT_STREAM_ID,
+      EVENT_TIME, EVENT_DURATION, EVENT_TYPE, EVENT_CONTENT, eventTags, eventRefs,
+      EVENT_DESCRIPTION, eventAttachments, eventClientData, EVENT_TRASHED, EVENT_CREATED,
+      EVENT_CREATEDBY, EVENT_MODIFIED, EVENT_MODIFIED_BY, EVENT_TEMP_REF_ID);
+
   }
 
   public static String generateJsonEvent() {
@@ -150,7 +156,7 @@ public class DummyData {
   }
 
   public static String getStreamid() {
-    return EVENT_STREAMID;
+    return EVENT_STREAM_ID;
   }
 
   public static Double getTime() {
@@ -302,7 +308,7 @@ public class DummyData {
   }
 
   public static String getEventStreamid() {
-    return EVENT_STREAMID;
+    return EVENT_STREAM_ID;
   }
 
   public static Double getEventTime() {
