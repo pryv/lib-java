@@ -18,7 +18,11 @@ import com.pryv.utils.Logger;
  */
 public class EventsSupervisor {
 
+  /**
+   *
+   */
   private Map<String, Event> events;
+
   /**
    * Map: key=event.id, value=event.clientId
    */
@@ -54,11 +58,11 @@ public class EventsSupervisor {
 
     for (Event event : events.values()) {
       if (filter.match(event)) {
-        returnEvents.put(event.getId(), event);
+        returnEvents.put(event.getClientId(), event);
         logger.log("EventsSupervisor: matched: streamId="
             + event.getStreamId()
-            + ", id="
-            + event.getId());
+            + ", cid="
+            + event.getClientId());
       }
     }
 
@@ -93,31 +97,15 @@ public class EventsSupervisor {
     // case exists: compare modified field?
     if (eventIdToClientId.containsKey(newEvent.getId())) {
       updateEvent(newEvent);
-      connectionCallback.onEventsSuccess("Event with id="
-        + newEvent.getId()
+      connectionCallback.onEventsSuccess("Event with cid="
+        + newEvent.getClientId()
           + " updated successfully.");
     } else {
       addEvent(newEvent);
       connectionCallback.onEventsSuccess("Event with id="
-        + newEvent.getId()
+        + newEvent.getClientId()
           + " added successfully.");
     }
-
-    // if (getClientId(stream.getId()) == null && stream.getClientId() == null)
-    // {
-    // stream.generateClientId();
-    // logger.log("StreamsSupervisor: Generating new cid for Stream OH NOES");
-    // }
-    // stream.updateParentClientId(idToClientId); // this seems to set it to
-    // null
-    // Stream oldStream = getStreamByClientId(stream.getClientId());
-    // if (oldStream != null) {
-    // // case exists: update Stream
-    // updateStream(oldStream, stream, connectionCallback);
-    // } else {
-    // // case new Event: simply add
-    // addStream(stream, connectionCallback);
-    // }
   }
 
   /**
@@ -126,7 +114,7 @@ public class EventsSupervisor {
    * @param newEvent
    */
   private void addEvent(Event newEvent) {
-    events.put(newEvent.getId(), newEvent);
+    events.put(newEvent.getClientId(), newEvent);
     eventIdToClientId.put(newEvent.getId(), newEvent.getClientId());
   }
 
@@ -138,7 +126,7 @@ public class EventsSupervisor {
    *          the event that may replace the one in place if newer.
    */
   private void updateEvent(Event event) {
-    Event memEvent = events.get(event.getId());
+    Event memEvent = events.get(event.getClientId());
     memEvent.merge(event, JsonConverter.getCloner());
   }
 
@@ -152,19 +140,23 @@ public class EventsSupervisor {
    *          callback used to notify success or failure
    */
   public void deleteEvent(Event eventToDelete, EventsCallback connectionCallback) {
-    if (events.get(eventToDelete.getId()) != null) {
-      if (events.get(eventToDelete.getId()).getTrashed() == true) {
+    if (events.get(eventToDelete.getClientId()) != null) {
+      if (events.get(eventToDelete.getClientId()).getTrashed() == true) {
         // delete really
-        events.remove(eventToDelete.getId());
+        events.remove(eventToDelete.getClientId());
         eventIdToClientId.remove(eventToDelete.getId());
       } else {
         // update "trashed" field
         eventToDelete.setTrashed(true);
         updateEvent(eventToDelete);
       }
-      connectionCallback.onEventsSuccess("Event with id=" + eventToDelete.getId() + " deleted.");
+      connectionCallback.onEventsSuccess("Event with cid="
+        + eventToDelete.getClientId()
+          + " deleted.");
     } else {
-      connectionCallback.onEventsError("Event with id=" + eventToDelete.getId() + " not found.");
+      connectionCallback.onEventsError("Event with cid="
+        + eventToDelete.getClientId()
+          + " not found.");
     }
 
   }
@@ -176,7 +168,7 @@ public class EventsSupervisor {
    *          the id of the event to be retrieved
    * @return the Event with the requested id or null
    */
-  public Event getEventById(String id) {
+  public Event getEventByClientId(String id) {
     return events.get(id);
   }
 

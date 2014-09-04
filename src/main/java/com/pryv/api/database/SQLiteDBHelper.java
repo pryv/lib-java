@@ -123,7 +123,7 @@ public class SQLiteDBHelper {
             String cmd = QueryGenerator.insertOrReplaceEvent(event);
             logger.log("SQLiteDBHelper: updateEvent: " + cmd);
             statement.execute(cmd);
-            logger.log("inserted " + event.getId() + " into DB.");
+            logger.log("inserted " + event.getClientId() + " into DB.");
             statement.close();
           } catch (SQLException e) {
             cacheEventsCallback.onEventsError(e.getMessage());
@@ -197,7 +197,7 @@ public class SQLiteDBHelper {
           Map<String, Event> retrievedEvents = new HashMap<String, Event>();
           while (result.next()) {
             Event retrievedEvent = new Event(result);
-            retrievedEvents.put(retrievedEvent.getId(), retrievedEvent);
+            retrievedEvents.put(retrievedEvent.getClientId(), retrievedEvent);
           }
           cacheEventsCallback.onCacheRetrieveEventsSuccess(retrievedEvents);
         } catch (SQLException e) {

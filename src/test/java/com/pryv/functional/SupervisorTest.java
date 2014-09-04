@@ -13,9 +13,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsSupervisor;
 import com.pryv.api.StreamsCallback;
 import com.pryv.api.StreamsSupervisor;
+import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 import com.pryv.unit.DummyData;
 import com.pryv.utils.Logger;
@@ -30,7 +32,8 @@ public class SupervisorTest {
 
   private static EventsSupervisor eventsSupervisor;
   private static StreamsSupervisor streamsSupervisor;
-  private static StreamsCallback callback;
+  private static EventsCallback eventsCallback;
+  private static StreamsCallback streamsCallback;
   private static Logger logger = Logger.getInstance();
 
   private static final long TIME_INTERVAL = 50;
@@ -39,7 +42,8 @@ public class SupervisorTest {
   public static void setUpBeforeClass() throws Exception {
     streamsSupervisor = new StreamsSupervisor();
     eventsSupervisor = new EventsSupervisor(streamsSupervisor);
-    instantiateCallback();
+    instantiateStreamsCallback();
+    instantiateEventsCallback();
   }
 
   @AfterClass
@@ -51,7 +55,14 @@ public class SupervisorTest {
   }
 
   @Test
-  public void testMoveAndDeleteStream() {
+  public void testManipulateEvent() {
+    Event testEvent = DummyData.generateFullEvent();
+    eventsSupervisor.updateOrCreateEvent(testEvent, eventsCallback);
+    assertNotNull(eventsSupervisor.getEventByClientId(testEvent.getClientId()));
+  }
+
+  @Test
+  public void testManipulateStream() {
     // parent1 parent of child, parent2 has no child
     Stream parent1 = DummyData.generateFullStream();
     String parent1CID = "parent1CID";
@@ -80,11 +91,11 @@ public class SupervisorTest {
     // insert parent1 & parent2 and child in supervisor
 
     System.out.println("Test: first: parent1/child, parent2");
-    streamsSupervisor.updateOrCreateStream(parent1, callback);
+    streamsSupervisor.updateOrCreateStream(parent1, streamsCallback);
     assertNotNull(streamsSupervisor.getRootStreams().get(parent1CID));
-    streamsSupervisor.updateOrCreateStream(parent2, callback);
+    streamsSupervisor.updateOrCreateStream(parent2, streamsCallback);
     assertNotNull(streamsSupervisor.getRootStreams().get(parent2ClientId));
-    streamsSupervisor.updateOrCreateStream(child, callback);
+    streamsSupervisor.updateOrCreateStream(child, streamsCallback);
     assertNull(streamsSupervisor.getRootStreams().get(childClientId));
     assertNotNull(streamsSupervisor.getStreamByClientId(childClientId));
     assertTrue(streamsSupervisor.verifyParency(childClientId, parent1CID));
@@ -103,7 +114,7 @@ public class SupervisorTest {
     childUpdate1.setName(newName);
     assertEquals(newName, childUpdate1.getName());
     childUpdate1.setModified(child.getModified() + TIME_INTERVAL);
-    streamsSupervisor.updateOrCreateStream(childUpdate1, callback);
+    streamsSupervisor.updateOrCreateStream(childUpdate1, streamsCallback);
 
     assertNotNull(streamsSupervisor.getStreamByClientId(childClientId));
     assertEquals(newName, streamsSupervisor.getStreamByClientId(childClientId).getName());
@@ -117,7 +128,7 @@ public class SupervisorTest {
     childUpdate2.setParentId(parent2Id);
     childUpdate2.setParentClientId(parent2ClientId);
     childUpdate2.setModified(child.getModified() + TIME_INTERVAL);
-    streamsSupervisor.updateOrCreateStream(childUpdate2, callback);
+    streamsSupervisor.updateOrCreateStream(childUpdate2, streamsCallback);
     assertFalse(streamsSupervisor.verifyParency(childClientId, parent1CID));
     assertTrue(streamsSupervisor.verifyParency(childClientId, parent2ClientId));
 
@@ -130,7 +141,7 @@ public class SupervisorTest {
     childUpdate3.setParentId(null);
     childUpdate3.setParentClientId(null);
     childUpdate3.setModified(child.getModified() + TIME_INTERVAL);
-    streamsSupervisor.updateOrCreateStream(childUpdate3, callback);
+    streamsSupervisor.updateOrCreateStream(childUpdate3, streamsCallback);
     assertFalse(streamsSupervisor.verifyParency(childClientId, parent2ClientId));
     assertNotNull(streamsSupervisor.getStreamByClientId(childClientId));
 
@@ -143,7 +154,7 @@ public class SupervisorTest {
     String randomName = "randomName";
     childUpdate4.setName(randomName);
     childUpdate4.setModified(child.getModified() + TIME_INTERVAL);
-    streamsSupervisor.updateOrCreateStream(childUpdate4, callback);
+    streamsSupervisor.updateOrCreateStream(childUpdate4, streamsCallback);
     assertEquals(randomName, streamsSupervisor.getStreamByClientId(childClientId).getName());
 
     // add it a parent now
@@ -154,12 +165,44 @@ public class SupervisorTest {
     childUpdate5.setId(childId);
     childUpdate5.setParentClientId(parent1CID);
     childUpdate5.setModified(child.getModified() + TIME_INTERVAL);
-    streamsSupervisor.updateOrCreateStream(childUpdate5, callback);
+    streamsSupervisor.updateOrCreateStream(childUpdate5, streamsCallback);
     assertTrue(streamsSupervisor.verifyParency(childClientId, parent1CID));
   }
 
-  private static void instantiateCallback() {
-    callback = new StreamsCallback() {
+  private static void instantiateEventsCallback() {
+    eventsCallback = new EventsCallback() {
+
+      @Override
+      public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
+      }
+
+      @Override
+      public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double serverTime) {
+      }
+
+      @Override
+      public void onEventsSuccess(String successMessage) {
+        logger.log(successMessage);
+      }
+
+      @Override
+      public void onEventsRetrievalError(String errorMessage) {
+        logger.log(errorMessage);
+      }
+
+      @Override
+      public void onEventsError(String errorMessage) {
+        logger.log(errorMessage);
+      }
+
+      @Override
+      public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
+      }
+    };
+  }
+
+  private static void instantiateStreamsCallback() {
+    streamsCallback = new StreamsCallback() {
 
       @Override
       public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {

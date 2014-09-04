@@ -147,6 +147,8 @@ public class Event {
    */
   public Event(ResultSet result) throws SQLException, JsonParseException, JsonMappingException,
     IOException {
+    clientId = result.getString(QueryGenerator.EVENTS_CLIENT_ID_KEY);
+    streamClientId = result.getString(QueryGenerator.EVENTS_STREAM_CLIENT_ID_KEY);
     id = result.getString(QueryGenerator.EVENTS_ID_KEY);
     streamId = result.getString(QueryGenerator.EVENTS_STREAM_ID_KEY);
     time = result.getDouble(QueryGenerator.EVENTS_TIME_KEY);

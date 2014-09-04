@@ -83,8 +83,8 @@ public class SQLiteDBHelperTest {
     for (Event event : events.values()) {
       System.out.println("deleting event with clientId="
         + event.getClientId()
-          + ", id="
-          + event.getId());
+          + ", cid="
+          + event.getClientId());
       event.setTrashed(true);
       event.setModified(event.getModified() + MODIFIED_INCREMENT);
       db.deleteEvent(event, eventsCallback);
@@ -148,7 +148,7 @@ public class SQLiteDBHelperTest {
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
     db.getEvents(null, eventsCallback);
     Awaitility.await().until(hasRetrievedEventSuccessfully());
-    Event modifiedEvent = events.get(testEvent.getId());
+    Event modifiedEvent = events.get(testEvent.getClientId());
     if (modifiedEvent != null) {
       assertEquals(
         "new sid: " + modifiedEvent.getStreamId() + " should be : " + testEvent.getStreamId(),
@@ -166,7 +166,7 @@ public class SQLiteDBHelperTest {
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
     db.getEvents(null, eventsCallback);
     Awaitility.await().until(hasRetrievedEventSuccessfully());
-    Event notModifiedEvent = events.get(testEvent.getId());
+    Event notModifiedEvent = events.get(testEvent.getClientId());
     assertEquals(notModifiedEvent.getModified(), testEvent.getModified());
   }
 
@@ -178,7 +178,7 @@ public class SQLiteDBHelperTest {
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
     db.getEvents(null, eventsCallback);
     Awaitility.await().until(hasRetrievedEventSuccessfully());
-    Event modifiedEvent = events.get(testEvent.getId());
+    Event modifiedEvent = events.get(testEvent.getClientId());
     assertTrue("new value: "
       + modifiedEvent.getModified()
         + " should be higher than old value: "
@@ -193,7 +193,7 @@ public class SQLiteDBHelperTest {
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
     db.getEvents(null, eventsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
-    assertEquals(true, events.get(testEvent.getId()).getTrashed());
+    assertEquals(true, events.get(testEvent.getClientId()).getTrashed());
   }
 
   @Test
@@ -272,14 +272,14 @@ public class SQLiteDBHelperTest {
   @Test
   public void test14RetrieveCorrectEvent() {
     Event testedEvent = DummyData.generateFullEvent();
-    String newId = "myNewID";
-    testedEvent.setId(newId);
+    String newClientId = "myNewClientID";
+    testedEvent.setClientId(newClientId);
     db.updateOrCreateEvent(testedEvent, eventsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
     db.getEvents(null, eventsCallback);
     Awaitility.await().until(hasRetrievedEventSuccessfully());
-    Event retrievedEvent = events.get(newId);
-    assertEquals(testedEvent.getId(), retrievedEvent.getId());
+    Event retrievedEvent = events.get(newClientId);
+    assertEquals(testedEvent.getClientId(), retrievedEvent.getClientId());
     assertEquals(testedEvent.getStreamId(), retrievedEvent.getStreamId());
     assertEquals(testedEvent.getTime(), retrievedEvent.getTime());
     assertEquals(testedEvent.getDuration(), retrievedEvent.getDuration());
@@ -335,7 +335,8 @@ public class SQLiteDBHelperTest {
     assertEquals(testedStream.getName(), retrievedStream.getName());
     assertEquals(testedStream.getParentId(), retrievedStream.getParentId());
     assertEquals(testedStream.getSingleActivity(), retrievedStream.getSingleActivity());
-    assertEquals(testedStream.formatClientDataAsString(), retrievedStream.formatClientDataAsString());
+    assertEquals(testedStream.formatClientDataAsString(),
+      retrievedStream.formatClientDataAsString());
     boolean childrenMatch = false;
     for (Stream testedChild : testedStream.getChildren()) {
       childrenMatch = false;
@@ -357,15 +358,14 @@ public class SQLiteDBHelperTest {
   public void testInsertAndRetrieveEventWithNullAttachments() {
     Event eventWithoutAttachments = DummyData.generateFullEvent();
     eventWithoutAttachments.setAttachments(null);
-    String id = "eventWithoutAttachmentsID";
-    eventWithoutAttachments.setId(id);
+    String clientId = "eventWithoutAttachmentsID";
+    eventWithoutAttachments.setClientId(clientId);
     db.updateOrCreateEvent(eventWithoutAttachments, eventsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
     db.getEvents(null, eventsCallback);
     Awaitility.await().until(hasRetrievedEventSuccessfully());
-    assertNull(events.get(id).getAttachments());
+    assertNull(events.get(clientId).getAttachments());
   }
-
 
   private static Callable<Boolean> hasRetrievedEventSuccessfully() {
     return new Callable<Boolean>() {
@@ -479,8 +479,7 @@ public class SQLiteDBHelperTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void
- onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams,
+      public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams,
         double serverTime) {
       }
 
