@@ -37,7 +37,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   /**
    * indicates last time the cache was updated - in cloud time
    */
-  private double lastModified;
+  private Double lastModified;
 
   /**
    * ref to StreamsSupervisor
@@ -85,7 +85,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     if (Pryv.isCacheActive()) {
       dbHelper = new SQLiteDBHelper(Pryv.DATABASE_NAME, initCallback);
       scope = new HashSet<String>();
-      lastModified = 0;
+      lastModified = null;
     }
   }
 
@@ -100,23 +100,22 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       // if some specific streams are requested
       if (filter.getStreamIds() != null) {
         // verify scope
-        if (filter.areStreamIdsContainedInScope(scope, streamsSupervisor)) {
+        if (filter.areStreamClientIdsContainedInScope(scope, streamsSupervisor)) {
           // make request to online for full scope with field modifiedSince set
           // to lastModified
-          onlineFilter.setModifiedSince(lastModified);
-          onlineFilter.setStreamIds(scope);
         } else {
-          for (String filterStreamId : filter.getStreamIds()) {
-            if (!streamsSupervisor.verifyParency(filterStreamId, scope)) {
-              scope.add(filterStreamId);
+          for (String filterStreamClientId : filter.getStreamsClientIds()) {
+            if (!streamsSupervisor.verifyParency(filterStreamClientId, scope)) {
+              scope.add(filterStreamClientId);
             }
-
           }
-          // / make request to online for missing streams?
         }
+        // make request to online for missing streams?
+        onlineFilter.setModifiedSince(lastModified);
+        onlineFilter.setStreamClientIds(scope);
+        onlineFilter.generateStreamIds(streamsSupervisor.getStreamsClientIdToIdDictionnary());
       } else {
-        // if all streams are requested
-
+        // all streams are requested - no need to compare
       }
       // retrieve Events from cache
       dbHelper.getEvents(filter, new CacheEventsCallback(null, connectionEventsCallback));
@@ -253,41 +252,12 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       logger.log("Cache: received online Events");
       lastModified = serverTime;
 
-      // if (Pryv.isCacheActive()) {
-      // // update Streams in cache and make a get call on the
-      // // cacheEventsCallback
-      // dbHelper.updateOrCreateEvents(onlineEvents.values(),
-      // cacheUpdateEventsCallback);
-      // // forward serverTime to connection
-      // connectionEventsCallback.onOnlineRetrieveEventsSuccess(null,
-      // serverTime);
-      // } else {
-      // // forward to connection
-      // connectionEventsCallback.onOnlineRetrieveEventsSuccess(onlineEvents,
-      // serverTime);
-      // }
-
-      /*
-       * new implementation: 1- check if event exists:
-       * eventsSupervisor.getEventById(newEvent.getId()) if exists:
-       * event.merge(newEvent) else: newEvent.generateClientId(),
-       * eventsSupervisor.put(newEvent.getClientId(), newEvent)
-       *
-       * 2- out of the loop: DBHelper.updateOrCreateEvents(onlineEvents); 3-
-       * forward OK message to connection
-       */
       for (Event onlineEvent : onlineEvents.values()) {
         // merge with supervisor
         eventsSupervisor.updateOrCreateEvent(onlineEvent, connectionEventsCallback);
       }
       serverTime = pServerTime;
       eventsSupervisor.getEvents(filter, this);
-      // do forward to connection- done in onSupervisorRetrieveEventsSuccess()
-      // connectionEventsCallback.onOnlineRetrieveEventsSuccess(eventsSupervisor.getEvents(filter,
-      // connectionCallback);, serverTime);
-
-      // update cache - done in onSupervisorRetrieveEventsSuccess()
-      // dbHelper.updateOrCreateEvents(onlineEvents.values(), this);
     }
 
     // unused

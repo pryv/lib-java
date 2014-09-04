@@ -1,6 +1,7 @@
 package com.pryv.api;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,8 +34,8 @@ public class Filter {
   // filter fields
   private Double fromTime;
   private Double toTime;
-  private Set<String> streamIds;
-  private Set<String> streamCIDsZZtoRevertWithOriginal;
+  private Set<String> streamsClientIds;
+  private Set<String> streamsIds;
   private Set<String> tags;
   private Set<String> types;
   private Boolean running;
@@ -75,7 +76,7 @@ public class Filter {
     State pState, Double pModifiedSince) {
     fromTime = from;
     toTime = to;
-    streamIds = pStreams;
+    streamsClientIds = pStreams;
     tags = pTags;
     types = pTypes;
     running = pRunning;
@@ -120,10 +121,10 @@ public class Filter {
 
     // streamIds
     Boolean streamIdMatch = true;
-    if (streamIds != null) {
+    if (streamsClientIds != null) {
       streamIdMatch = false;
-      for (String streamId : streamIds) {
-        if (streamId.equals(event.getStreamId())) {
+      for (String streamClientId : streamsClientIds) {
+        if (streamClientId.equals(event.getStreamClientId())) {
           streamIdMatch = true;
         }
       }
@@ -194,22 +195,24 @@ public class Filter {
    *          dictionnary stream.clientId->stream.id
    */
   public void generateStreamIds(Map<String, String> streamsClientIdToId) {
-    streamCIDsZZtoRevertWithOriginal = new HashSet<String>();
-    for (String string : streamCIDsZZtoRevertWithOriginal) {
-      streamCIDsZZtoRevertWithOriginal.add(streamsClientIdToId.get(string));
+    if (streamsClientIds != null) {
+      streamsIds = new HashSet<String>();
+      for (String streamClientId : streamsClientIds) {
+        streamsIds.add(streamsClientIdToId.get(streamClientId));
+      }
     }
   }
 
   /**
-   * add a specific stream id to the filter
+   * add a specific stream client id to the filter
    *
-   * @param pStreamId
+   * @param pStreamClientId
    */
-  public void addStreamId(String pStreamId) {
-    if (streamIds == null) {
-      streamIds = new HashSet<String>();
+  public void addStreamClientId(String pStreamClientId) {
+    if (streamsClientIds == null) {
+      streamsClientIds = new HashSet<String>();
     }
-    streamIds.add(pStreamId);
+    streamsClientIds.add(pStreamClientId);
   }
 
   /**
@@ -220,17 +223,14 @@ public class Filter {
   public String toUrlParameters() {
     StringBuilder sb = new StringBuilder();
     if (fromTime != null) {
-      sb.append("&");
-      sb.append(FROM_TIME_URL_KEY + "=" + fromTime);
+      sb.append("&" + FROM_TIME_URL_KEY + "=" + fromTime);
     }
     if (toTime != null) {
-      sb.append("&");
-      sb.append(TO_TIME_URL_KEY + "=" + toTime);
+      sb.append("&" + TO_TIME_URL_KEY + "=" + toTime);
     }
-    if (streamIds != null) {
-      for (String string : streamIds) {
-        sb.append("&");
-        sb.append(STREAMS_URL_KEY + "=" + string);
+    if (streamsIds != null) {
+      for (String streamId : streamsIds) {
+        sb.append("&" + STREAMS_URL_KEY + "=" + streamId);
       }
     }
     if (tags != null) {
@@ -265,26 +265,29 @@ public class Filter {
   }
 
   /**
-   * verify if the filter's Stream Ids are contained in the scope of the cache
-   * (including descendants)
+   * verify if the filter's Stream client Ids are contained in the scope of the
+   * cache (including descendants)
    *
    * @param scope
-   *          the Stream Ids representing the scope of the cache
+   *          the Stream client Ids representing the scope of the cache
    * @param streamsSupervisor
    *          reference to all the streams, used to resolve Streams descendency
    *
    * @return true if it is contained in the scope, false otherwise
    */
-  public boolean
-    areStreamIdsContainedInScope(Set<String> scope, StreamsSupervisor streamsSupervisor) {
+  public boolean areStreamClientIdsContainedInScope(Set<String> scope,
+    StreamsSupervisor streamsSupervisor) {
     boolean areContained = false;
-    for (String filterStreamId : streamIds) {
+    for (String filterStreamClientId : streamsClientIds) {
       areContained = false;
-      if (scope.contains(filterStreamId)) {
+      // check if it is part of the streams in the scope
+      if (scope.contains(filterStreamClientId)) {
         areContained = true;
       } else {
-        for (String scopeStreamId : scope) {
-          if (streamsSupervisor.verifyParency(filterStreamId, scopeStreamId)) {
+        // check if it is maybe a child of a stream in the scope
+        Iterator<String> iterator = scope.iterator();
+        while (areContained == false && iterator.hasNext()) {
+          if (streamsSupervisor.verifyParency(filterStreamClientId, iterator.next())) {
             areContained = true;
           }
         }
@@ -302,8 +305,12 @@ public class Filter {
     return toTime;
   }
 
+  public Set<String> getStreamsClientIds() {
+    return streamsClientIds;
+  }
+
   public Set<String> getStreamIds() {
-    return streamIds;
+    return streamsIds;
   }
 
   public Set<String> getTags() {
@@ -347,7 +354,11 @@ public class Filter {
   }
 
   public void setStreamIds(Set<String> pStreams) {
-    this.streamIds = pStreams;
+    this.streamsIds = pStreams;
+  }
+
+  public void setStreamClientIds(Set<String> pStreamsClientIds) {
+    streamsClientIds = pStreamsClientIds;
   }
 
   public void setTags(Set<String> pTags) {

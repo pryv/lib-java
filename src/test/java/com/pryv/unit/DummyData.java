@@ -48,7 +48,7 @@ public class DummyData {
   private static final String EVENT_ATTACH_ID = "abc";
   private static final String EVENT_TEMP_REF_ID = "temp ref id";
 
-  private static final String STREAM_CLIENT_ID = "streamClientId";
+  private static final String STREAM_CLIENT_ID = "testStreamClientId";
   private static final String STREAM_PARENT_CLIENT_ID = STREAM_CLIENT_ID;
   private static final String STREAM_ID = "testStreamId";
   private static final String STREAM_NAME = "testStreamName";
@@ -63,7 +63,7 @@ public class DummyData {
   private static final String STREAM_CREATED_BY = "Bob";
   private static final Double STREAM_MODIFIED = new Double(1500);
   private static final String STREAM_MODIFIED_BY = "Bill";
-  private static final String STREAM_CHILD_CLIENT_ID = "childClientId";
+  private static final String STREAM_CHILD_CLIENT_ID = "testChildClientId";
   private static final String STREAM_CHILD_ID = "childid";
   private static final String STREAM_CHILD_NAME = "childname";
   private static final Boolean STREAM_CHILD_TRASHED = false;

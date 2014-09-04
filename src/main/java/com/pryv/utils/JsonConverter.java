@@ -96,12 +96,13 @@ public class JsonConverter {
     JsonNode arrNode = toJsonNode(jsonEventsArray).get(EVENTS_KEY);
 
     Map<String, Event> newEvents = new HashMap<String, Event>();
-
-    if (arrNode.isArray()) {
-      for (final JsonNode objNode : arrNode) {
-        Event eventToAdd = new Event();
-        resetEventFromJson(objNode.toString(), eventToAdd);
-        newEvents.put(eventToAdd.getId(), eventToAdd);
+    if (arrNode != null) {
+      if (arrNode.isArray()) {
+        for (final JsonNode objNode : arrNode) {
+          Event eventToAdd = new Event();
+          resetEventFromJson(objNode.toString(), eventToAdd);
+          newEvents.put(eventToAdd.getId(), eventToAdd);
+        }
       }
     }
     return newEvents;
@@ -181,7 +182,7 @@ public class JsonConverter {
   public static void resetStreamFromJson(String json, Stream toUpdate) throws JsonParseException,
     JsonMappingException, IOException {
     Stream temp = jsonMapper.readValue(json, Stream.class);
-    toUpdate.merge(temp);
+    toUpdate.merge(temp, true);
   }
 
   /**

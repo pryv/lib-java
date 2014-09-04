@@ -66,7 +66,7 @@ public class Connection implements EventsManager, StreamsManager {
     url = apiScheme + "://" + username + "." + apiDomain + "/";
     weakConnection = new WeakReference<Connection>(this);
     streamsSupervisor = new StreamsSupervisor();
-    eventsSupervisor = new EventsSupervisor();
+    eventsSupervisor = new EventsSupervisor(streamsSupervisor);
     cacheEventsManager =
       new CacheEventsAndStreamsManager(url, token, dbInitCallback, streamsSupervisor,
         eventsSupervisor,
@@ -103,8 +103,8 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void getEvents(Filter filter, EventsCallback userEventsCallback) {
-    // convert Filter
-    // filter.generate
+    // generate the set of stream Ids, which will be passed to the online module
+    filter.generateStreamIds(streamsSupervisor.getStreamsClientIdToIdDictionnary());
     if (Pryv.isSupervisorActive()) {
       // make sync request to supervisor
       eventsSupervisor.getEvents(filter, userEventsCallback);

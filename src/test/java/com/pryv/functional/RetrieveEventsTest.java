@@ -1,8 +1,10 @@
 package com.pryv.functional;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -57,23 +59,35 @@ public class RetrieveEventsTest {
     streamsManager = (StreamsManager) eventsManager;
   }
 
-  @Test
-  public void testFetchEventsForAStream() {
-    streamsManager.getStreams(new Filter(), streamsCallback);
-    Awaitility.await().until(hasStreams());
-    Filter filter = new Filter();
-    streamId = "flowerBreath";
-    if (streams.keySet().contains(streamId)) {
-      System.out.println("TEST: on a bien flowerBreath !!!");
-    } else {
-      System.out.println("TEST: on a pas flowerBreath !!!");
-    }
-    filter.addStreamId(streamId);
-    eventsManager.getEvents(filter, eventsCallback);
-    Awaitility.await().until(hasFetchedRightStreams());
+  @Before
+  public void beforeEachTest() {
+    events = null;
+    streams = null;
   }
 
-  private Callable<Boolean> hasFetchedRightStreams() {
+  // TODO create full scenario test: create, update, get, delete
+  public void testFetchEventsForAStream() {
+
+    Filter filter = new Filter();
+    filter.setLimit(20);
+    eventsManager.getEvents(filter, eventsCallback);
+    Awaitility.await().until(hasEvents());
+
+    // get a streamCid
+    String streamCid = null;
+    Iterator<Event> iterator = events.values().iterator();
+    while (streamCid == null && iterator.hasNext()) {
+      streamCid = iterator.next().getStreamClientId();
+    }
+    System.out.println("Test: We're going for dat streamcid=" + streamCid);
+    filter = new Filter();
+    filter.addStreamClientId(streamCid);
+    System.out.println("Test: going for dem right EVENTZZZZZ");
+    eventsManager.getEvents(filter, eventsCallback);
+    Awaitility.await().until(hasFetchedRightEvents(streamCid));
+  }
+
+  private Callable<Boolean> hasFetchedRightEvents(String streamCid) {
     return new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
@@ -81,7 +95,7 @@ public class RetrieveEventsTest {
           if (events.values().size() > 0) {
             boolean match = false;
             for (Event event : events.values()) {
-              if (streamId.equals(event.getStreamId())) {
+              if (streamCid.equals(event.getStreamClientId())) {
                 match = true;
               }
             }
@@ -135,7 +149,7 @@ public class RetrieveEventsTest {
 
       @Override
       public void onOnlineRetrieveEventsSuccess(Map<String, Event> newEvents, double serverTime) {
-        System.out.println("TestEventsCallback: success with "
+        System.out.println("TestEventsCallback: Online success with "
           + newEvents.values().size()
             + " events");
         events = newEvents;
@@ -143,7 +157,7 @@ public class RetrieveEventsTest {
 
       @Override
       public void onCacheRetrieveEventsSuccess(Map<String, Event> newEvents) {
-        System.out.println("TestEventsCallback: success with "
+        System.out.println("TestEventsCallback: Cache success with "
           + newEvents.values().size()
             + " events");
         events = newEvents;
@@ -157,7 +171,7 @@ public class RetrieveEventsTest {
 
       @Override
       public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
-        System.out.println("TestEventsCallback: success with "
+        System.out.println("TestEventsCallback: Supervisor success with "
           + supervisorEvents.values().size()
             + " events");
         events = supervisorEvents;

@@ -328,7 +328,7 @@ public class AppController {
     createdByLabel.setText(stream.getCreatedBy());
 
     // fetch events
-    exampleApp.getEventsForStreamId(stream.getClientId());
+    exampleApp.getEventsForStreamClientId(stream.getClientId());
     clearEventsLabels();
   }
 

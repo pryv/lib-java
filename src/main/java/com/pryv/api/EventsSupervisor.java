@@ -24,13 +24,16 @@ public class EventsSupervisor {
    */
   private Map<String, String> eventIdToClientId;
 
+  private StreamsSupervisor streamsSupervisor;
+
   private Logger logger = Logger.getInstance();
 
   /**
    * EventsSupervisor constructor. Instantiates data structures to store Events.
    *
    */
-  public EventsSupervisor() {
+  public EventsSupervisor(StreamsSupervisor pStreamsSupervisor) {
+    streamsSupervisor = pStreamsSupervisor;
     events = new HashMap<String, Event>();
     eventIdToClientId = new HashMap<String, String>();
   }
@@ -52,8 +55,7 @@ public class EventsSupervisor {
     for (Event event : events.values()) {
       if (filter.match(event)) {
         returnEvents.put(event.getId(), event);
-        logger.log("Supervisor: matched: streamName="
-          + ", streamId="
+        logger.log("EventsSupervisor: matched: streamId="
             + event.getStreamId()
             + ", id="
             + event.getId());
@@ -85,9 +87,10 @@ public class EventsSupervisor {
     if (getClientId(newEvent.getId()) == null && newEvent.getClientId() == null) {
       // new event
       newEvent.generateClientId();
-      newEvent.updateStreamClientId(eventIdToClientId);
     }
-    // case exists: compare modified field
+    newEvent.updateStreamClientId(streamsSupervisor.getStreamsIdToClientIdDictionnary());
+
+    // case exists: compare modified field?
     if (eventIdToClientId.containsKey(newEvent.getId())) {
       updateEvent(newEvent);
       connectionCallback.onEventsSuccess("Event with id="
@@ -99,6 +102,22 @@ public class EventsSupervisor {
         + newEvent.getId()
           + " added successfully.");
     }
+
+    // if (getClientId(stream.getId()) == null && stream.getClientId() == null)
+    // {
+    // stream.generateClientId();
+    // logger.log("StreamsSupervisor: Generating new cid for Stream OH NOES");
+    // }
+    // stream.updateParentClientId(idToClientId); // this seems to set it to
+    // null
+    // Stream oldStream = getStreamByClientId(stream.getClientId());
+    // if (oldStream != null) {
+    // // case exists: update Stream
+    // updateStream(oldStream, stream, connectionCallback);
+    // } else {
+    // // case new Event: simply add
+    // addStream(stream, connectionCallback);
+    // }
   }
 
   /**

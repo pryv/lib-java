@@ -70,6 +70,7 @@ public class OnlineRetrieveEventsTest {
     for (Event event : events.values()) {
       streamId = event.getStreamId();
     }
+    System.out.println("TEst: streamId chosen:" + streamId);
     Set<String> streamIds = new HashSet<String>();
     streamIds.add(streamId);
     Filter filter = new Filter();

@@ -228,10 +228,7 @@ public class QueryGenerator {
         baseQuery.append(" LIMIT " + filter.getLimit());
       }
     }
-
-
-
-    filterParams.append(";");
+    baseQuery.append(";");
     return baseQuery.toString();
   }
 

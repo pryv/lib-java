@@ -74,9 +74,9 @@ public class Stream {
    * @param pModifiedBy
    */
   public Stream(String pClientId, String pParentClientId, String pId, String pName,
-    String pParentId, Boolean pSingleActivity,
-    Map<String, Object> pClientData, List<Stream> pChildren, Boolean pTrashed, Double pCreated,
-    String pCreatedBy, Double pModified, String pModifiedBy) {
+    String pParentId, Boolean pSingleActivity, Map<String, Object> pClientData,
+    List<Stream> pChildren, Boolean pTrashed, Double pCreated, String pCreatedBy, Double pModified,
+    String pModifiedBy) {
     clientId = pClientId;
     parentClientId = pParentClientId;
     id = pId;
@@ -138,7 +138,10 @@ public class Stream {
    *          the dictionnary streamId->streamClientId
    */
   public void updateParentClientId(Map<String, String> streamIdToClientId) {
-    parentClientId = streamIdToClientId.get(parentId);
+    String parentCid = streamIdToClientId.get(parentId);
+    if (parentCid != null) {
+      parentClientId = parentCid;
+    }
   }
 
   /**
@@ -161,16 +164,16 @@ public class Stream {
   }
 
   /**
-   * Copy all temp Stream's values into caller Stream.
+   * Copy all of stream temp's values into the caller Stream.
    *
    * @param temp
+   *          the stream whose fields are copied
+   * @param withChildren
+   *          if set to true, children are also merged
    */
-  public void merge(Stream temp) {
-    // removed these 2 fields since merge is used in
-    // StreamsSupervisor.updateStream() and resetFromJson(), which are used to
-    // update from the internet where client id fields are null
-    // clientId = temp.clientId;
-    // parentClientId = temp.parentClientId;
+  public void merge(Stream temp, boolean withChildren) {
+    clientId = temp.clientId;
+    parentClientId = temp.parentClientId;
     weakConnection = temp.weakConnection;
     id = temp.id;
     name = temp.name;
@@ -182,15 +185,14 @@ public class Stream {
         clientData.put(key, temp.clientData.get(key));
       }
     }
-    // if (temp.children != null) {
-    //
-    // children = new ArrayList<Stream>();
-    // childrenMap = new HashMap<String, Stream>();
-    // for (Stream childStream : temp.children) {
-    // children.add(childStream);
-    // childrenMap.put(childStream.getClientId(), childStream);
-    // }
-    // }
+    if (temp.children != null && withChildren == true) {
+      children = new ArrayList<Stream>();
+      childrenMap = new HashMap<String, Stream>();
+      for (Stream childStream : temp.children) {
+        children.add(childStream);
+        childrenMap.put(childStream.getClientId(), childStream);
+      }
+    }
     trashed = temp.trashed;
     created = temp.created;
     createdBy = temp.createdBy;
@@ -250,6 +252,12 @@ public class Stream {
     }
     children.add(childStream);
     childrenMap.put(childStream.getClientId(), childStream);
+    System.out.println("Stream: added child to cid="
+      + clientId
+        + ", childrenSize="
+        + children.size()
+        + ", childrenMapSize="
+        + childrenMap.size());
   }
 
   /**
@@ -261,6 +269,11 @@ public class Stream {
    *          the child Stream to remove
    */
   public void removeChildStream(Stream childStream) {
+    System.out.println("Stream: about to remove child from cid=" + clientId);
+    System.out.println("childrenSize="
+      + children.size()
+        + ", childrenMapSize="
+        + childrenMap.size());
     childrenMap.remove(childStream.getClientId());
     children.remove(childStream);
     if (childrenMap.size() == 0 || children.size() == 0) {
