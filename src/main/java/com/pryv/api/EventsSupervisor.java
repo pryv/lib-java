@@ -1,10 +1,9 @@
 package com.pryv.api;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.pryv.api.model.Event;
 import com.pryv.utils.JsonConverter;
 import com.pryv.utils.Logger;
@@ -54,14 +53,11 @@ public class EventsSupervisor {
    * @param connectionCallback
    */
   public void getEvents(Filter filter, EventsCallback connectionCallback) {
-    Map<String, Event> returnEvents = new HashMap<String, Event>();
-    if (filter == null) {
-      logger.log("LOLOLOL OMAGAAAAD, MA FILTER IS A NOOOOL!");
-    }
+    Map<String, Event> filteredEvents = new HashMap<String, Event>();
 
     for (Event event : events.values()) {
       if (filter.match(event)) {
-        returnEvents.put(event.getClientId(), event);
+        filteredEvents.put(event.getClientId(), event);
         logger.log("EventsSupervisor: matched: streamId="
           + event.getStreamId()
             + ", cid="
@@ -71,11 +67,18 @@ public class EventsSupervisor {
 
     // apply limit argument
     if (filter.getLimit() != null) {
-      returnEvents.keySet().retainAll(
-        ImmutableSet.copyOf(Iterables.limit(returnEvents.keySet(), filter.getLimit())));
+      Map<String, Event> limitedEvents = new HashMap<String, Event>();
+      int i = 0;
+      Iterator<Event> iterator = filteredEvents.values().iterator();
+      Event temp;
+      while (iterator.hasNext() && i < filter.getLimit()) {
+        temp = iterator.next();
+        limitedEvents.put(temp.getClientId(), temp);
+        i++;
+      }
+      connectionCallback.onSupervisorRetrieveEventsSuccess(limitedEvents);
     }
-    logger.log("EventsSupervisor: getEvents returning " + returnEvents.size() + " events.");
-    connectionCallback.onSupervisorRetrieveEventsSuccess(returnEvents);
+    connectionCallback.onSupervisorRetrieveEventsSuccess(filteredEvents);
   }
 
   /**
