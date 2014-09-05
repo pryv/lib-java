@@ -30,8 +30,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
   /**
    * defines the scope of the Events the SQLite DB contains. Concretely it
-   * represents the Stream Id's for which the Events are synchronized with the
-   * SQLite datbase.
+   * represents the Stream client Id's for which the Events are synchronized
+   * with the SQLite database.
    */
   private Set<String> scope;
   /**
@@ -95,7 +95,6 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
   @Override
   public void getEvents(Filter filter, EventsCallback connectionEventsCallback) {
-    Filter onlineFilter = new Filter();
     if (Pryv.isCacheActive()) {
       // if some specific streams are requested
       if (filter.getStreamIds() != null) {
@@ -110,10 +109,6 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
             }
           }
         }
-        // make request to online for missing streams?
-        onlineFilter.setModifiedSince(lastModified);
-        onlineFilter.setStreamClientIds(scope);
-        onlineFilter.generateStreamIds(streamsSupervisor.getStreamsClientIdToIdDictionnary());
       } else {
         // all streams are requested - no need to compare
       }
@@ -121,11 +116,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       dbHelper.getEvents(filter, new CacheEventsCallback(null, connectionEventsCallback));
       logger.log("Cache: retrieved Events from cache: ");
     }
-    if (Pryv.isOnlineActive()) {
-      // forward call to online module
-      onlineEventsManager.getEvents(onlineFilter, new CacheEventsCallback(filter,
-        connectionEventsCallback));
-    }
+
   }
 
   @Override
@@ -260,7 +251,6 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       eventsSupervisor.getEvents(filter, this);
     }
 
-    // unused
     @Override
     public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
       logger.log("Cache: retrieved events from cache: events amount: " + cacheEvents.size());
@@ -268,6 +258,17 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         cacheEvent.assignConnection(weakConnection);
       }
       connectionEventsCallback.onCacheRetrieveEventsSuccess(cacheEvents);
+
+      if (Pryv.isOnlineActive()) {
+        Filter onlineFilter = new Filter();
+        // make request to online for missing streams?
+        onlineFilter.setModifiedSince(lastModified);
+        onlineFilter.setStreamClientIds(scope);
+        onlineFilter.generateStreamIds(streamsSupervisor.getStreamsClientIdToIdDictionnary());
+        // forward call to online module
+        onlineEventsManager.getEvents(onlineFilter, new CacheEventsCallback(filter,
+          connectionEventsCallback));
+      }
     }
 
     @Override
@@ -279,7 +280,6 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     @Override
     public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
       connectionEventsCallback.onOnlineRetrieveEventsSuccess(supervisorEvents, serverTime);
-
       dbHelper.updateOrCreateEvents(supervisorEvents.values(), this);
     }
 
@@ -317,25 +317,9 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, double serverTime) {
       logger.log("Cache: Streams retrieval success");
 
-      // if (Pryv.isCacheActive()) {
-      // // update Streams in cache and make a get call on the
-      // // cacheStreamsCallback
-      // dbHelper.updateOrCreateStreams(onlineStreams.values(),
-      // cacheUpdateStreamsCallback);
-      // // forward serverTime to connection
-      // connectionStreamsCallback.onOnlineRetrieveStreamsSuccess(null,
-      // serverTime);
-      // } else {
-      // // forward to connection
-      // connectionStreamsCallback.onOnlineRetrieveStreamsSuccess(onlineStreams,
-      // serverTime);
-      // }
+      lastModified = serverTime;
 
       for (Stream onlineStream : onlineStreams.values()) {
-        // if (streamsSupervisor.getClientId(onlineStream.getId()) == null) {
-        // onlineStream.generateClientId();
-        // }
-        // update supervisor
         streamsSupervisor.updateOrCreateStream(onlineStream, connectionStreamsCallback);
       }
       connectionStreamsCallback.onOnlineRetrieveStreamsSuccess(streamsSupervisor.getRootStreams(),

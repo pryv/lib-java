@@ -252,12 +252,6 @@ public class Stream {
     }
     children.add(childStream);
     childrenMap.put(childStream.getClientId(), childStream);
-    System.out.println("Stream: added child to cid="
-      + clientId
-        + ", childrenSize="
-        + children.size()
-        + ", childrenMapSize="
-        + childrenMap.size());
   }
 
   /**

@@ -141,12 +141,12 @@ public class AuthenticationTest {
     }
 
     @Override
-    public void onDisplaySuccess(String username, String token) {
+    public void onAuthSuccess(String username, String token) {
       displaySuccessExecuted = true;
     }
 
     @Override
-    public void onDisplayFailure(String msg) {
+    public void onAuthFailure(String msg) {
       displayFailureExecuted = true;
     }
 

@@ -103,10 +103,10 @@ public class Event {
    *          optional
    */
   public Event(String pClientId, String pStreamClientID, String pId, String pStreamId,
-    Double pTime, Double pDuration, String pType,
-    String pContent, Set<String> pTags, Set<String> pReferences, String pDescription,
-    Set<Attachment> pAttachments, Map<String, Object> pClientData, Boolean pTrashed,
-    Double pCreated, String pCreatedBy, Double pModified, String pModifiedBy, String pTempRefId) {
+    Double pTime, Double pDuration, String pType, String pContent, Set<String> pTags,
+    Set<String> pReferences, String pDescription, Set<Attachment> pAttachments,
+    Map<String, Object> pClientData, Boolean pTrashed, Double pCreated, String pCreatedBy,
+    Double pModified, String pModifiedBy, String pTempRefId) {
     clientId = pClientId;
     streamClientId = pStreamClientID;
     id = pId;
@@ -222,10 +222,7 @@ public class Event {
    *          com.rits.cloning.Cloner instance from JsonConverter util class
    */
   public void merge(Event temp, Cloner cloner) {
-    // removed these 2 fields since merge is used in
-    // StreamsSupervisor.updateStream() and resetFromJson(), which are used to
-    // update from the internet where client id fields are null
-    // clientId = temp.clientId;
+    clientId = temp.clientId;
     streamClientId = temp.streamClientId;
     weakConnection = temp.weakConnection;
     id = temp.id;

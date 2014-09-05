@@ -63,14 +63,14 @@ public class AuthControllerImpl implements AuthController {
 
   @Override
   public void onSuccess(String username, String token) {
-    view.onDisplaySuccess(username, token);
+    view.onAuthSuccess(username, token);
     // acquire ref to new Connection, instanciated
   }
 
   @Override
   public void onFailure(int errorId, String jsonMessage, String detail) {
     logger.log("AuthController: failure: id=" + errorId + ", message=" + jsonMessage);
-    view.onDisplayFailure("AuthController: failure: id=" + errorId + ", message=" + jsonMessage);
+    view.onAuthFailure("AuthController: failure: id=" + errorId + ", message=" + jsonMessage);
   }
 
   @Override

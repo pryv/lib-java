@@ -60,7 +60,7 @@ public class EventsSupervisor {
       if (filter.match(event)) {
         returnEvents.put(event.getClientId(), event);
         logger.log("EventsSupervisor: matched: streamId="
-            + event.getStreamId()
+          + event.getStreamId()
             + ", cid="
             + event.getClientId());
       }
@@ -76,35 +76,35 @@ public class EventsSupervisor {
   }
 
   /**
-   * Update or create events in Supervisor whether they already exist or not.
+   * Update or create Event in Supervisor whether it already exists or not.
+   * generates client Id if necessary
    *
-   * @param newEvent
-   *          the new Event
+   * @param event
+   *          the event to add or update
    * @param connectionCallback
    *          the callback to notify success or failure
    */
-  public void updateOrCreateEvent(Event newEvent, EventsCallback connectionCallback) {
-    logger.log("EventsSupervisor: updateOrCreateEvent with id="
-      + newEvent.getId()
+  public void updateOrCreateEvent(Event event, EventsCallback connectionCallback) {
+    System.out.println("EventsSupervisor: updateOrCreateEvent with id="
+      + event.getId()
         + ", cid="
-        + newEvent.getClientId());
-    if (getClientId(newEvent.getId()) == null && newEvent.getClientId() == null) {
-      // new event
-      newEvent.generateClientId();
+        + event.getClientId()
+        + ", streamCid="
+        + event.getStreamClientId());
+    if ((getClientId(event.getId()) == null && event.getClientId() == null)
+      || (event.getId() == null && event.getClientId() == null)) {
+      event.generateClientId();
     }
-    newEvent.updateStreamClientId(streamsSupervisor.getStreamsIdToClientIdDictionnary());
+    // holding stream should already be inserted - used only when fresh from API
+    event.updateStreamClientId(streamsSupervisor.getStreamsIdToClientIdDictionnary());
 
     // case exists: compare modified field?
-    if (eventIdToClientId.containsKey(newEvent.getId())) {
-      updateEvent(newEvent);
-      connectionCallback.onEventsSuccess("Event with cid="
-        + newEvent.getClientId()
-          + " updated successfully.");
+    Event oldEvent = getEventByClientId(event.getClientId());
+    if (oldEvent != null) {
+      // update
+      updateEvent(oldEvent, event);
     } else {
-      addEvent(newEvent);
-      connectionCallback.onEventsSuccess("Event with id="
-        + newEvent.getClientId()
-          + " added successfully.");
+      addEvent(event, connectionCallback);
     }
   }
 
@@ -112,22 +112,52 @@ public class EventsSupervisor {
    * Add Event in Supervisor
    *
    * @param newEvent
+   *          the event to add
+   * @param connectionCallback
    */
-  private void addEvent(Event newEvent) {
+  private void addEvent(Event newEvent, EventsCallback connectionCallback) {
     events.put(newEvent.getClientId(), newEvent);
     eventIdToClientId.put(newEvent.getId(), newEvent.getClientId());
+    logger.log("EventsSupervisor: added Event (id="
+      + newEvent.getId()
+        + ", cid="
+        + newEvent.getClientId()
+        + ", streamCid="
+        + newEvent.getStreamClientId()
+        + ")");
+    connectionCallback.onEventsSuccess("");
   }
 
   /**
    * Update event in supervisor with the fields of the event passed in
    * parameters
    *
-   * @param event
+   * @param oldEvent
+   * @param eventToUpdate
    *          the event that may replace the one in place if newer.
    */
-  private void updateEvent(Event event) {
-    Event memEvent = events.get(event.getClientId());
-    memEvent.merge(event, JsonConverter.getCloner());
+  private void updateEvent(Event oldEvent, Event eventToUpdate) {
+    logger.log("EventsSupervisor: update oldEvent (id="
+      + oldEvent.getId()
+        + ", cid="
+        + oldEvent.getClientId()
+        + ", parentCid="
+        + oldEvent.getStreamClientId()
+        + ") to eventToUpdate (id="
+        + eventToUpdate.getId()
+        + ", cid="
+        + eventToUpdate.getClientId()
+        + ", streamCid="
+        + eventToUpdate.getStreamClientId()
+        + ")");
+    oldEvent.merge(eventToUpdate, JsonConverter.getCloner());
+    logger.log("EventsSupervisor: updated Event (id="
+      + oldEvent.getId()
+        + ", clientId="
+        + oldEvent.getClientId()
+        + ", streamCid="
+        + oldEvent.getStreamClientId()
+        + ")");
   }
 
   /**
@@ -148,7 +178,7 @@ public class EventsSupervisor {
       } else {
         // update "trashed" field
         eventToDelete.setTrashed(true);
-        updateEvent(eventToDelete);
+        updateEvent(null, eventToDelete);
       }
       connectionCallback.onEventsSuccess("Event with cid="
         + eventToDelete.getClientId()

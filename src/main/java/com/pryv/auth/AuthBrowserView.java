@@ -46,12 +46,12 @@ public class AuthBrowserView extends Applet implements AuthView {
 
   // unused
   @Override
-  public void onDisplaySuccess(String username, String token) {
+  public void onAuthSuccess(String username, String token) {
   }
 
   // unused
   @Override
-  public void onDisplayFailure(String message) {
+  public void onAuthFailure(String message) {
   }
 
 }

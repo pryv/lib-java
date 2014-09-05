@@ -5,15 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.pryv.api.model.Attachment;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
@@ -34,8 +31,8 @@ public class JsonConverter {
   private final static String EVENTS_KEY = "events";
   private final static String STREAMS_KEY = "streams";
 
-  private final static String META = "meta";
-  private final static String SERVER_TIME = "serverTime";
+  private final static String META_KEY = "meta";
+  private final static String SERVER_TIME_KEY = "serverTime";
 
   /**
    * Serializes the Object parameter into JSON
@@ -74,14 +71,13 @@ public class JsonConverter {
    */
   public static double retrieveServerTime(String jsonResponse) throws JsonProcessingException,
     IOException {
-    double serverTime = toJsonNode(jsonResponse).get(META).get(SERVER_TIME).doubleValue();
-
+    double serverTime = toJsonNode(jsonResponse).get(META_KEY).get(SERVER_TIME_KEY).doubleValue();
     logger.log("JsonConverter: retrieved time: " + serverTime);
     return serverTime;
   }
 
   /**
-   * Deserializes a JSON containing the field "events" into a Map<String, Event>
+   * Deserialize a JSON containing the field "events" into a Map<String, Event>
    * with Event id as key
    *
    * @param jsonEventsArray
@@ -109,7 +105,7 @@ public class JsonConverter {
   }
 
   /**
-   * Deserializes a JSON containing the field "streams" into a Map<String,
+   * Deserialize a JSON containing the field "streams" into a Map<String,
    * Stream> with Stream id as key
    *
    * @param jsonStreamsArray
@@ -121,9 +117,8 @@ public class JsonConverter {
     JsonNode arrNode = toJsonNode(jsonStreamsArray).get(STREAMS_KEY);
     Map<String, Stream> newStreams = new HashMap<String, Stream>();
     if (arrNode.isArray()) {
-      logger.log("JsonConverter: number of received streams: " + arrNode.size());
+      logger.log("JsonConverter: number of received root streams: " + arrNode.size());
       for (final JsonNode objNode : arrNode) {
-        // resetStreamFromJson(objNode.toString(), streamToAdd);
         String str = objNode.toString();
         logger.log("JsonConverter: deserializing stream: " + str);
         Stream streamToAdd = jsonMapper.readValue(str, Stream.class);
@@ -137,7 +132,7 @@ public class JsonConverter {
   }
 
   /**
-   *
+   * reset all fields of an attachments to values from JSON glossary json
    *
    * @param json
    * @param toUpdate
@@ -212,24 +207,6 @@ public class JsonConverter {
    */
   public static Cloner getCloner() {
     return cloner;
-  }
-
-  /**
-   * Custom Serializer used to properly convert Map<String, Stream> to JSON
-   * array
-   *
-   * @author ik
-   *
-   */
-  public class ChildrenSerializer extends JsonSerializer<Map<String, Stream>> {
-
-    @Override
-    public void
-      serialize(Map<String, Stream> value, JsonGenerator jgen, SerializerProvider provider)
-        throws IOException, JsonProcessingException {
-
-    }
-
   }
 
 }

@@ -59,6 +59,9 @@ public class SupervisorTest {
     Event testEvent = DummyData.generateFullEvent();
     eventsSupervisor.updateOrCreateEvent(testEvent, eventsCallback);
     assertNotNull(eventsSupervisor.getEventByClientId(testEvent.getClientId()));
+    Event updateEvent = DummyData.generateFullEvent();
+    updateEvent.setDuration(2232.0);
+    eventsSupervisor.updateOrCreateEvent(updateEvent, eventsCallback);
   }
 
   @Test

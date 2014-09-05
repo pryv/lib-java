@@ -173,7 +173,6 @@ public class SQLiteDBHelperTest {
   @Test
   public void test03UpdateEventShouldModify() {
     testEvent.setModified(testEvent.getModified() + MODIFIED_INCREMENT);
-    System.out.println("modified value is : " + testEvent.getModified());
     db.updateOrCreateEvent(testEvent, eventsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
     db.getEvents(null, eventsCallback);

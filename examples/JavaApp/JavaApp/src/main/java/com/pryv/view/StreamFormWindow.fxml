@@ -19,17 +19,15 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
             <Label prefHeight="32.0" prefWidth="143.0" text="name" GridPane.rowIndex="1" />
             <Label prefHeight="32.0" prefWidth="143.0" text="parentId" GridPane.rowIndex="2" />
-            <Label prefHeight="32.0" prefWidth="143.0" text="children" GridPane.rowIndex="3" />
-            <Label prefHeight="32.0" prefWidth="143.0" text="singleActivity" GridPane.rowIndex="4" />
-            <Label prefHeight="32.0" prefWidth="143.0" text="clientData" GridPane.rowIndex="5" />
+            <Label prefHeight="32.0" prefWidth="143.0" text="singleActivity" GridPane.rowIndex="3" />
+            <Label prefHeight="32.0" prefWidth="143.0" text="clientData" GridPane.rowIndex="4" />
             <TextField fx:id="streamNameTextField" promptText="name" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <ComboBox fx:id="parentComboBox" prefHeight="26.0" prefWidth="206.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <ComboBox prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <ComboBox prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <Label text="id" />
             <Label fx:id="idLabel" text="defaultId" GridPane.columnIndex="1" />
          </children>

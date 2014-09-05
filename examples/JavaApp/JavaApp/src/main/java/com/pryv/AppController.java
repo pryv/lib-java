@@ -49,9 +49,13 @@ public class AppController {
   @FXML
   private Label idLabel;
   @FXML
+  private Label clientIdLabel;
+  @FXML
   private Label nameLabel;
   @FXML
   private Label parentIdLabel;
+  @FXML
+  private Label parentClientIdLabel;
   @FXML
   private Label childrenLabel;
   @FXML
@@ -309,8 +313,10 @@ public class AppController {
 
     // stream details
     idLabel.setText(stream.getId());
+    clientIdLabel.setText(stream.getClientId());
     nameLabel.setText(stream.getName());
     parentIdLabel.setText(stream.getParentId());
+    parentClientIdLabel.setText(stream.getParentClientId());
     StringBuilder sb = new StringBuilder();
     String separator = "";
     if (stream.getChildren() != null) {
@@ -373,8 +379,10 @@ public class AppController {
   private void bindStreamsLabels() {
     streamsLabels = new ArrayList<Label>();
     streamsLabels.add(idLabel);
+    streamsLabels.add(clientIdLabel);
     streamsLabels.add(nameLabel);
     streamsLabels.add(parentIdLabel);
+    streamsLabels.add(parentClientIdLabel);
     streamsLabels.add(childrenLabel);
     streamsLabels.add(singleActivityLabel);
     streamsLabels.add(clientDataLabel);

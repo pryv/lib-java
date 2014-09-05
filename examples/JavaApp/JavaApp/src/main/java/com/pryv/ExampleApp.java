@@ -132,7 +132,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   /*
    * auth success, start main view, load all Streams and 20 random Events
    */
-  public void onDisplaySuccess(String username, String token) {
+  public void onAuthSuccess(String username, String token) {
     logger.log("JavaApp: onSignInSuccess");
 
     Platform.runLater(new Runnable() {
@@ -157,7 +157,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   /*
    * auth failure
    */
-  public void onDisplayFailure(String msg) {
+  public void onAuthFailure(String msg) {
     logger.log("JavaApp: onDisplayFailure");
     displayError("auth failure: " + msg);
   }
@@ -317,7 +317,6 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   }
 
   public void onStreamsSuccess(String successMessage) {
-    // displayError(successMessage);
   }
 
   public void onStreamError(String errorMessage) {

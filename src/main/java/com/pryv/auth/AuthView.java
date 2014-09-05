@@ -24,12 +24,12 @@ public interface AuthView {
    * @param username
    * @param token
    */
-  void onDisplaySuccess(String username, String token);
+  void onAuthSuccess(String username, String token);
 
   /**
    * callback method when auth failed.
    *
    * @param message
    */
-  void onDisplayFailure(String message);
+  void onAuthFailure(String message);
 }
