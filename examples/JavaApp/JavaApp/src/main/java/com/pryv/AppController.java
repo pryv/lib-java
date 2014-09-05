@@ -74,7 +74,11 @@ public class AppController {
   @FXML
   private Label eIdLabel;
   @FXML
+  private Label eClientIdLabel;
+  @FXML
   private Label eStreamIdLabel;
+  @FXML
+  private Label eStreamClientIdLabel;
   @FXML
   private Label eTimeLabel;
   @FXML
@@ -241,7 +245,9 @@ public class AppController {
 
     clearEventsLabels();
     eIdLabel.setText(event.getId());
+    eClientIdLabel.setText(event.getClientId());
     eStreamIdLabel.setText(event.getStreamId());
+    eStreamClientIdLabel.setText(event.getStreamClientId());
     if (event.getTime() != null) {
       eTimeLabel.setText(event.getTime().toString());
     }
@@ -365,10 +371,12 @@ public class AppController {
     eventsLabels.add(eDescriptionLabel);
     eventsLabels.add(eDurationLabel);
     eventsLabels.add(eIdLabel);
+    eventsLabels.add(eClientIdLabel);
     eventsLabels.add(eModifiedByLabel);
     eventsLabels.add(eModifiedLabel);
     eventsLabels.add(eReferencesLabel);
     eventsLabels.add(eStreamIdLabel);
+    eventsLabels.add(eStreamClientIdLabel);
     eventsLabels.add(eTagsLabel);
     eventsLabels.add(eTempRefIdLabel);
     eventsLabels.add(eTimeLabel);
