@@ -267,10 +267,6 @@ public class Connection implements EventsManager, StreamsManager {
       computeDelta(pServerTime);
       // onlineStreams are not received here,
 
-      // for (Event onlineEvent : onlineEvents.values()) {
-      // eventsSupervisor.updateOrCreateEvent(onlineEvent, userEventsCallback);
-      // }
-
       // return merged events from Supervisor
       eventsSupervisor.getEvents(filter, this);
     }

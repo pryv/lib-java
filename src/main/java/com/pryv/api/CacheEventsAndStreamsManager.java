@@ -113,7 +113,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         // all streams are requested - no need to compare
       }
       // retrieve Events from cache
-      dbHelper.getEvents(filter, new CacheEventsCallback(null, connectionEventsCallback));
+      dbHelper.getEvents(filter, new CacheEventsCallback(filter, connectionEventsCallback));
       logger.log("Cache: retrieved Events from cache: ");
     }
 

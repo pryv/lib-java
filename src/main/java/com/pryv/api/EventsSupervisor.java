@@ -55,6 +55,9 @@ public class EventsSupervisor {
    */
   public void getEvents(Filter filter, EventsCallback connectionCallback) {
     Map<String, Event> returnEvents = new HashMap<String, Event>();
+    if (filter == null) {
+      logger.log("LOLOLOL OMAGAAAAD, MA FILTER IS A NOOOOL!");
+    }
 
     for (Event event : events.values()) {
       if (filter.match(event)) {
