@@ -97,6 +97,9 @@ public class EventsSupervisor {
         + event.getClientId()
         + ", streamCid="
         + event.getStreamClientId());
+
+    // 1st case: stream fresh from API
+    // 2nd case: stream fresh from user
     if ((getClientId(event.getId()) == null && event.getClientId() == null)
       || (event.getId() == null && event.getClientId() == null)) {
       event.generateClientId();

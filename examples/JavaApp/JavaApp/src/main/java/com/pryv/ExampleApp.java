@@ -62,6 +62,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     .observableArrayList();
 
   public static void main(String[] args) {
+    Pryv.setStaging();
     launch(args);
   }
 
@@ -140,12 +141,12 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
         showMainView();
       }
     });
-
     connection = new Connection(username, token, new DBinitCallback() {
       public void onError(String message) {
         displayError(message);
       }
     });
+
     eventsManager = connection;
     streamsManager = connection;
     streamsManager.getStreams(null, this);

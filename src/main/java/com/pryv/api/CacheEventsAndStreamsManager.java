@@ -34,10 +34,11 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
    * with the SQLite database.
    */
   private Set<String> scope;
+
   /**
-   * indicates last time the cache was updated - in cloud time
+   *
    */
-  private Double lastModified;
+  private static final int MAX_LIMIT = 100; // 2147483647;
 
   /**
    * ref to StreamsSupervisor
@@ -85,7 +86,6 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     if (Pryv.isCacheActive()) {
       dbHelper = new SQLiteDBHelper(Pryv.DATABASE_NAME, initCallback);
       scope = new HashSet<String>();
-      lastModified = null;
     }
   }
 
@@ -114,7 +114,6 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       }
       // retrieve Events from cache
       dbHelper.getEvents(filter, new CacheEventsCallback(filter, connectionEventsCallback));
-      logger.log("Cache: retrieved Events from cache: ");
     }
 
   }
@@ -240,14 +239,13 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     @Override
     public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double pServerTime) {
       // update Events in cache and send result to connection
-      logger.log("Cache: received online Events");
-      lastModified = serverTime;
+      serverTime = pServerTime;
+      logger.log("Cache: received online Events with serverTime " + serverTime);
 
       for (Event onlineEvent : onlineEvents.values()) {
         // merge with supervisor
         eventsSupervisor.updateOrCreateEvent(onlineEvent, connectionEventsCallback);
       }
-      serverTime = pServerTime;
       eventsSupervisor.getEvents(filter, this);
     }
 
@@ -262,7 +260,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       if (Pryv.isOnlineActive()) {
         Filter onlineFilter = new Filter();
         // make request to online for missing streams?
-        onlineFilter.setModifiedSince(lastModified);
+        onlineFilter.setLimit(MAX_LIMIT);
         onlineFilter.setStreamClientIds(scope);
         onlineFilter.generateStreamIds(streamsSupervisor.getStreamsClientIdToIdDictionnary());
         // forward call to online module
@@ -316,8 +314,6 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     public void
       onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, double serverTime) {
       logger.log("Cache: Streams retrieval success");
-
-      lastModified = serverTime;
 
       for (Stream onlineStream : onlineStreams.values()) {
         streamsSupervisor.updateOrCreateStream(onlineStream, connectionStreamsCallback);
