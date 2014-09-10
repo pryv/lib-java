@@ -1,5 +1,7 @@
 package com.pryv.functional;
 
+import static org.junit.Assert.assertFalse;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -21,6 +23,7 @@ import com.pryv.api.StreamsManager;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
+import com.pryv.unit.DummyData;
 
 /**
  *
@@ -40,7 +43,9 @@ public class RetrieveEventsTest {
   private static Map<String, Event> events;
   private static Map<String, Stream> streams;
 
-  private String streamId;
+  private static boolean eventsSuccess = false;
+  private static boolean eventsError = false;
+  private static boolean eventsRetrievalError = false;
 
   @BeforeClass
   public static void setUp() throws Exception {
@@ -66,10 +71,45 @@ public class RetrieveEventsTest {
   }
 
   // TODO create full scenario test: create, update, get, delete
+
+  @Test
+  public void testManipulateEventTest() {
+    streamsManager.getStreams(null, streamsCallback);
+    Awaitility.await().until(hasStreams());
+    Stream chosenStream = null;
+    for (Stream stream : streams.values()) {
+      chosenStream = stream;
+    }
+    System.out.println("i chose dat stream: name="
+      + chosenStream.getName()
+        + ", cid="
+        + chosenStream.getClientId()
+        + ", id="
+        + chosenStream.getId());
+    Event testEvent = new Event();
+    testEvent.setStreamClientId(chosenStream.getClientId());
+    testEvent
+      .setContent("bla bla bla - awesome big content for the ultimate testing phase BRR BRR BRR");
+    testEvent.setTags(DummyData.getTags());
+    testEvent.setDescription("this is the ultimate test Event");
+    testEvent.setClientData(DummyData.getClientdata());
+
+    eventsManager.createEvent(testEvent, eventsCallback);
+    Awaitility.await().until(hasEventsSucces());
+    eventsSuccess = false;
+    Awaitility.await().until(hasEventsSucces());
+    eventsSuccess = false;
+    Awaitility.await().until(hasEventsSucces());
+    eventsSuccess = false;
+    assertFalse(eventsError);
+  }
+
+
   public void testFetchEventsForAStream() {
 
     Filter filter = new Filter();
-    filter.setLimit(20);
+    final int limit = 20;
+    filter.setLimit(limit);
     eventsManager.getEvents(filter, eventsCallback);
     Awaitility.await().until(hasEvents());
 
@@ -85,6 +125,8 @@ public class RetrieveEventsTest {
     System.out.println("Test: going for dem right EVENTZZZZZ");
     eventsManager.getEvents(filter, eventsCallback);
     Awaitility.await().until(hasFetchedRightEvents(streamCid));
+    eventsSuccess = false;
+    assertFalse(eventsError);
   }
 
   private Callable<Boolean> hasFetchedRightEvents(String streamCid) {
@@ -120,6 +162,36 @@ public class RetrieveEventsTest {
         } else {
           return false;
         }
+      }
+    };
+  }
+
+  private Callable<Boolean> hasEventsSucces() {
+    return new Callable<Boolean>() {
+
+      @Override
+      public Boolean call() throws Exception {
+        return eventsSuccess;
+      }
+    };
+  }
+
+  private Callable<Boolean> hasEventsError() {
+    return new Callable<Boolean>() {
+
+      @Override
+      public Boolean call() throws Exception {
+        return eventsError;
+      }
+    };
+  }
+
+  private Callable<Boolean> hasEventsRetrievalError() {
+    return new Callable<Boolean>() {
+
+      @Override
+      public Boolean call() throws Exception {
+        return eventsRetrievalError;
       }
     };
   }
@@ -165,8 +237,7 @@ public class RetrieveEventsTest {
 
       @Override
       public void onEventsRetrievalError(String message) {
-        // TODO Auto-generated method stub
-
+        eventsRetrievalError = true;
       }
 
       @Override
@@ -179,14 +250,12 @@ public class RetrieveEventsTest {
 
       @Override
       public void onEventsSuccess(String successMessage) {
-        // TODO Auto-generated method stub
-
+        eventsSuccess = true;
       }
 
       @Override
       public void onEventsError(String errorMessage) {
-        // TODO Auto-generated method stub
-
+        eventsError = true;
       }
     };
   }
