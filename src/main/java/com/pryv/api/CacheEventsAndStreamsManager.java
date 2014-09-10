@@ -36,9 +36,20 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   private Set<String> scope;
 
   /**
-   *
+   * minimum time value
    */
-  private static final int MAX_LIMIT = 100; // 2147483647;
+  private static final double MIN_TIME = -Double.MAX_VALUE;
+
+  /**
+   * boolean representing if the scope has been modified. When this is set to
+   * true, the next getEvents() will be done for the full time frame.
+   */
+  private boolean scopeChanged = true;
+
+  /**
+   * last time value received from server on online Events retrieval.
+   */
+  private double lastOnlineRetrievalServerTime = MIN_TIME;
 
   /**
    * ref to StreamsSupervisor
@@ -95,6 +106,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
   @Override
   public void getEvents(Filter filter, EventsCallback connectionEventsCallback) {
+    // TODO when verifying if filter is included in scope, maybe clean the cache
+    // when the scope is becoming smaller.
     if (Pryv.isCacheActive()) {
       // if some specific streams are requested
       if (filter.getStreamIds() != null) {
@@ -102,10 +115,12 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         if (filter.areStreamClientIdsContainedInScope(scope, streamsSupervisor)) {
           // make request to online for full scope with field modifiedSince set
           // to lastModified
+
         } else {
           for (String filterStreamClientId : filter.getStreamsClientIds()) {
             if (!streamsSupervisor.verifyParency(filterStreamClientId, scope)) {
               scope.add(filterStreamClientId);
+              lastOnlineRetrievalServerTime = MIN_TIME;
             }
           }
         }
@@ -169,9 +184,10 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       logger.log("Cache: retrieved Streams from cache: ");
       dbHelper.getStreams(new CacheStreamsCallback(connectionStreamsCallback));
     }
-    if (Pryv.isOnlineActive()) {
-      onlineStreamsManager.getStreams(filter, new CacheStreamsCallback(connectionStreamsCallback));
-    }
+    // if (Pryv.isOnlineActive()) {
+    // onlineStreamsManager.getStreams(filter, new
+    // CacheStreamsCallback(connectionStreamsCallback));
+    // }
   }
 
   @Override
@@ -227,19 +243,16 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     private Filter filter;
     private double serverTime;
 
-    // private EventsCallback cacheUpdateEventsCallback;
-
     public CacheEventsCallback(Filter pFilter, EventsCallback pConnectionEventsCallback) {
       connectionEventsCallback = pConnectionEventsCallback;
       filter = pFilter;
-      // cacheUpdateEventsCallback = new CacheUpdateEventsCallback(filter,
-      // this);
     }
 
     @Override
     public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double pServerTime) {
       // update Events in cache and send result to connection
       serverTime = pServerTime;
+      lastOnlineRetrievalServerTime = pServerTime;
       logger.log("Cache: received online Events with serverTime " + serverTime);
 
       for (Event onlineEvent : onlineEvents.values()) {
@@ -260,7 +273,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       if (Pryv.isOnlineActive()) {
         Filter onlineFilter = new Filter();
         // make request to online for missing streams?
-        onlineFilter.setLimit(MAX_LIMIT);
+        onlineFilter.setModifiedSince(lastOnlineRetrievalServerTime);
         onlineFilter.setStreamClientIds(scope);
         onlineFilter.generateStreamIds(streamsSupervisor.getStreamsClientIdToIdDictionnary());
         // forward call to online module
@@ -332,6 +345,11 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         cacheStream.assignConnection(weakConnection);
       }
       connectionStreamsCallback.onCacheRetrieveStreamSuccess(cacheStreams);
+
+      // make the online request
+      if (Pryv.isOnlineActive()) {
+        onlineStreamsManager.getStreams(null, new CacheStreamsCallback(connectionStreamsCallback));
+      }
     }
 
     @Override
