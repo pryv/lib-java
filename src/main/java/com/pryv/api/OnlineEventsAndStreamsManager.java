@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
@@ -22,7 +23,7 @@ import com.pryv.utils.Logger;
 
 /**
  *
- * OnlineEventsAndStreamsManager fetches objects from online Pryv API
+ * OnlineEventsAndStreamsManager fetches data from online Pryv API
  *
  * @author ik
  *
@@ -31,6 +32,18 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
 
   private String eventsUrl;
   private String streamsUrl;
+
+  /**
+   * represents the type of reply that is being handled by the
+   * ApiResponseHandler
+   *
+   * @author ik
+   *
+   */
+  private enum RequestType {
+    GET_EVENTS, CREATE_EVENT, UPDATE_EVENT, DELETE_EVENT, GET_STREAMS, CREATE_STREAM,
+    UPDATE_STREAM, DELETE_STREAM
+  }
 
   private WeakReference<Connection> weakConnection;
 
@@ -59,7 +72,26 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
 
   @Override
   public void getEvents(Filter filter, EventsCallback cacheEventsCallback) {
-    new FetchEventsThread(filter.toUrlParameters(), cacheEventsCallback).start();
+    // new FetchEventsThread(filter.toUrlParameters(),
+    // cacheEventsCallback).start();
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          Request
+            .Get(eventsUrl + filter.toUrlParameters())
+            .execute()
+            .handleResponse(
+              new ApiResponseHandler(RequestType.GET_EVENTS, cacheEventsCallback, null));
+        } catch (ClientProtocolException e) {
+          cacheEventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        } catch (IOException e) {
+          cacheEventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        }
+      }
+    }.start();
   }
 
   @Override
@@ -84,7 +116,24 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
 
   @Override
   public void getStreams(Filter filter, StreamsCallback cacheStreamsCallback) {
-    new FetchStreamsThread(filter, cacheStreamsCallback).start();
+    // new FetchStreamsThread(filter, cacheStreamsCallback).start();
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          Request.Get(streamsUrl).execute()
+            .handleResponse(
+              new ApiResponseHandler(RequestType.GET_STREAMS, null, cacheStreamsCallback));
+
+        } catch (ClientProtocolException e) {
+          cacheStreamsCallback.onStreamError(e.getMessage());
+          e.printStackTrace();
+        } catch (IOException e) {
+          cacheStreamsCallback.onStreamError(e.getMessage());
+          e.printStackTrace();
+        }
+      }
+    }.start();
   }
 
   @Override
@@ -104,6 +153,89 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
     // TODO Auto-generated method stub
   }
 
+  /**
+   * custom response handler to handle replies to API requests.
+   *
+   * @author ik
+   *
+   */
+  private class ApiResponseHandler implements ResponseHandler<String> {
+
+    private RequestType requestType;
+    private EventsCallback eventsCallback;
+    private StreamsCallback streamsCallback;
+
+    public ApiResponseHandler(RequestType type, EventsCallback pEventsCallback,
+      StreamsCallback pStreamsCallback) {
+      requestType = type;
+      eventsCallback = pEventsCallback;
+      streamsCallback = pStreamsCallback;
+    }
+
+    @Override
+    public String handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
+
+      int statusCode = response.getStatusLine().getStatusCode();
+      String responseBody = EntityUtils.toString(response.getEntity());
+      logger.log("signInResponseHandler: response status code: " + statusCode);
+      logger.log("signInResponseHandler: handling reply entity : " + responseBody);
+      double serverTime = JsonConverter.retrieveServerTime(responseBody);
+
+      if (statusCode == HttpStatus.SC_CREATED
+        || statusCode == HttpStatus.SC_OK
+          || statusCode == HttpStatus.SC_NO_CONTENT) {
+        // saul good
+        switch (requestType) {
+
+          case GET_EVENTS:
+            Map<String, Event> receivedEvents = JsonConverter.createEventsFromJson(responseBody);
+            for (Event receivedEvent : receivedEvents.values()) {
+              receivedEvent.assignConnection(weakConnection);
+            }
+            logger.log("Online: received " + receivedEvents.size() + " event(s) from API.");
+            eventsCallback.onOnlineRetrieveEventsSuccess(receivedEvents, serverTime);
+            break;
+          case CREATE_EVENT:
+
+            break;
+          case UPDATE_EVENT:
+
+            break;
+
+          case DELETE_EVENT:
+
+            break;
+          case GET_STREAMS:
+            Map<String, Stream> receivedStreams = JsonConverter.createStreamsFromJson(responseBody);
+            for (Stream receivedStream : receivedStreams.values()) {
+              receivedStream.assignConnection(weakConnection);
+            }
+            streamsCallback.onOnlineRetrieveStreamsSuccess(receivedStreams, serverTime);
+            break;
+
+          case CREATE_STREAM:
+
+            break;
+          case UPDATE_STREAM:
+
+            break;
+          case DELETE_STREAM:
+
+            break;
+          default:
+
+        }
+
+      } else {
+        System.out.println("Online: issue in responseHandler");
+      }
+      return null;
+
+    }
+
+  }
+
+  // TODO remove old implementation
   /**
    * Thread that executes the Get Streams request to the Pryv server and returns
    * the response to the StreamsCallback as a String.
