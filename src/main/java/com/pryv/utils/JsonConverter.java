@@ -28,11 +28,29 @@ public class JsonConverter {
   private static Cloner cloner = new Cloner();
   private static Logger logger = Logger.getInstance();
 
+  private final static String EVENT_KEY = "event";
   private final static String EVENTS_KEY = "events";
   private final static String STREAMS_KEY = "streams";
 
   private final static String META_KEY = "meta";
   private final static String SERVER_TIME_KEY = "serverTime";
+
+  /**
+   * Deserialize JSON into an object
+   *
+   * @param jsonSource
+   *          the object in the form of a JSON dictionary stored in a String.
+   * @param type
+   *          the class into which the JSON will be deserialized.
+   * @return
+   * @throws JsonParseException
+   * @throws JsonMappingException
+   * @throws IOException
+   */
+  public static <T> Object fromJson(String jsonSource, Class<T> type) throws JsonParseException,
+    JsonMappingException, IOException {
+    return jsonMapper.readValue(jsonSource, type);
+  }
 
   /**
    * Serializes the Object parameter into JSON
@@ -74,6 +92,22 @@ public class JsonConverter {
     double serverTime = toJsonNode(jsonResponse).get(META_KEY).get(SERVER_TIME_KEY).doubleValue();
     logger.log("JsonConverter: retrieved time: " + serverTime);
     return serverTime;
+  }
+
+  /**
+   * Retrieves the event from a JSON dictionary containing an event entry at
+   * root level
+   *
+   * @param jsonSource
+   *          the JSON stored in a String
+   * @return
+   * @throws JsonProcessingException
+   * @throws IOException
+   */
+  public static Event retrieveEventFromJson(String jsonSource) throws JsonProcessingException,
+    IOException {
+    JsonNode eventNode = toJsonNode(jsonSource).get(EVENT_KEY);
+    return jsonMapper.readValue(eventNode.toString(), Event.class);
   }
 
   /**

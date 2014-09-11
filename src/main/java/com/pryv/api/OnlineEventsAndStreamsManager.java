@@ -10,6 +10,7 @@ import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
 import org.apache.http.util.EntityUtils;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -96,7 +97,25 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
 
   @Override
   public void createEvent(Event newEvent, EventsCallback cacheEventsCallback) {
-    // TODO Auto-generated method stub
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          Request
+            .Post(eventsUrl)
+            .bodyString(JsonConverter.toJson(newEvent), ContentType.APPLICATION_JSON)
+            .execute()
+            .handleResponse(
+              new ApiResponseHandler(RequestType.CREATE_EVENT, cacheEventsCallback, null));
+        } catch (ClientProtocolException e) {
+          cacheEventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        } catch (IOException e) {
+          cacheEventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        }
+      }
+    }.start();
   }
 
   @Override
@@ -121,7 +140,9 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       @Override
       public void run() {
         try {
-          Request.Get(streamsUrl).execute()
+          Request
+            .Get(streamsUrl)
+            .execute()
             .handleResponse(
               new ApiResponseHandler(RequestType.GET_STREAMS, null, cacheStreamsCallback));
 
