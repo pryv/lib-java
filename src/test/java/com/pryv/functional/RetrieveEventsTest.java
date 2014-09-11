@@ -129,7 +129,7 @@ public class RetrieveEventsTest {
     assertFalse(eventsError);
   }
 
-  private Callable<Boolean> hasFetchedRightEvents(String streamCid) {
+  private Callable<Boolean> hasFetchedRightEvents(final String streamCid) {
     return new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
