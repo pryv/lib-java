@@ -93,7 +93,7 @@ public class SQLiteDBHelper {
           Statement statement = dbConnection.createStatement();
           statement.execute(cmd);
           statement.close();
-          cacheEventsCallback.onEventsSuccess("item added");
+          cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event cached", eventToCache, null);
         } catch (SQLException e) {
           cacheEventsCallback.onEventsError(e.getMessage());
         } catch (JsonProcessingException e) {
@@ -133,7 +133,7 @@ public class SQLiteDBHelper {
             e.printStackTrace();
           }
         }
-        cacheEventsCallback.onEventsSuccess("events updated");
+        cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Events updated", null, null);
 
       }
     }.start();
@@ -163,9 +163,16 @@ public class SQLiteDBHelper {
             updateOrCreateEvent(eventToDelete, cacheEventsCallback);
             logger.log("SQLiteDBHelper: delete - set trashed=true for clientId="
               + eventToDelete.getClientId());
+            cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event with clientId="
+              + eventToDelete.getClientId()
+                + " is trashed.", eventToDelete, null);
+
+          } else {
+            cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event with clientId="
+              + eventToDelete.getClientId()
+                + " is deleted.", eventToDelete, null);
           }
           statement.close();
-          cacheEventsCallback.onEventsSuccess("Event deleted");
         } catch (SQLException e) {
           cacheEventsCallback.onEventsError(e.getMessage());
           e.printStackTrace();

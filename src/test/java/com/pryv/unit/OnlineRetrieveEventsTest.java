@@ -120,7 +120,7 @@ public class OnlineRetrieveEventsTest {
       }
 
       @Override
-      public void onEventsSuccess(String successMessage) {
+      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
         // TODO Auto-generated method stub
 
       }

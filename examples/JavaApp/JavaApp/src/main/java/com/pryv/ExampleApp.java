@@ -363,9 +363,10 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     addEventsToList(supervisorEvents);
   }
 
-  public void onEventsSuccess(String successMessage) {
-    // displayError(successMessage);
+  public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+
   }
+
 
   public void onEventsError(String errorMessage) {
     displayError(errorMessage);

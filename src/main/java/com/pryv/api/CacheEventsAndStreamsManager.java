@@ -295,8 +295,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onEventsSuccess(String successMessage) {
-      connectionEventsCallback.onEventsSuccess(successMessage);
+    public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+      connectionEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
     }
 
     @Override
@@ -464,7 +464,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onEventsSuccess(String successMessage) {
+    public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
       logger.log("Cache: Events from online merge with cache successfully");
       dbHelper.getEvents(filter, cacheEventsCallback);
     }

@@ -293,9 +293,10 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onEventsSuccess(String successMessage) {
-      userEventsCallback.onEventsSuccess(successMessage);
+    public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+      userEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
     }
+
 
     @Override
     public void onEventsError(String errorMessage) {

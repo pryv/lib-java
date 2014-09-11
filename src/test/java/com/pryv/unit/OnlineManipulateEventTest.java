@@ -91,7 +91,7 @@ public class OnlineManipulateEventTest {
       }
 
       @Override
-      public void onEventsSuccess(String successMessage) {
+      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
         success = true;
       }
 

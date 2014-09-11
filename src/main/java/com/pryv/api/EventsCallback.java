@@ -51,8 +51,14 @@ public interface EventsCallback {
    *
    * @param successMessage
    *          the success message
+   * @param event
+   *          updated Event, returned after an update is executed on the event.
+   * @param stoppedId
+   *          Only in singleActivity streams. If set, indicates the id of the
+   *          previously running period event that was stopped as a consequence
+   *          of inserting the new event.
    */
-  void onEventsSuccess(String successMessage);
+  void onEventsSuccess(String successMessage, Event event, Integer stoppedId);
 
   /**
    * callback method called when an error occurs during createEvent(),

@@ -134,7 +134,7 @@ public class EventsSupervisor {
         + ", streamCid="
         + newEvent.getStreamClientId()
         + ")");
-    connectionCallback.onEventsSuccess("");
+    connectionCallback.onEventsSuccess("EventsSupervisor: Event added", newEvent, 0);
   }
 
   /**
@@ -191,7 +191,7 @@ public class EventsSupervisor {
       }
       connectionCallback.onEventsSuccess("Event with cid="
         + eventToDelete.getClientId()
-          + " deleted.");
+          + " deleted.", null, 0);
     } else {
       connectionCallback.onEventsError("Event with cid="
         + eventToDelete.getClientId()
