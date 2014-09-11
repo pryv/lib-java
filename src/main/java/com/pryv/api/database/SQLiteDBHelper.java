@@ -83,7 +83,7 @@ public class SQLiteDBHelper {
    * @param cacheEventsCallback
    *          callback to notify success or failure
    */
-  public void updateOrCreateEvent(Event eventToCache, EventsCallback cacheEventsCallback) {
+  public void updateOrCreateEvent(final Event eventToCache,final EventsCallback cacheEventsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -112,7 +112,7 @@ public class SQLiteDBHelper {
    * @param cacheEventsCallback
    *          callback to notify success or failure
    */
-  public void updateOrCreateEvents(Collection<Event> eventsToUpdate, EventsCallback cacheEventsCallback) {
+  public void updateOrCreateEvents(final Collection<Event> eventsToUpdate, final EventsCallback cacheEventsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -149,7 +149,7 @@ public class SQLiteDBHelper {
    * @param cacheEventsCallback
    *          callback to notify success or failure
    */
-  public void deleteEvent(Event eventToDelete, EventsCallback cacheEventsCallback) {
+  public void deleteEvent(final Event eventToDelete, final EventsCallback cacheEventsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -185,7 +185,7 @@ public class SQLiteDBHelper {
    * @param cacheEventsCallback
    *          callback to return retrieved events
    */
-  public void getEvents(Filter filter, EventsCallback cacheEventsCallback) {
+  public void getEvents(final Filter filter, final EventsCallback cacheEventsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -225,7 +225,7 @@ public class SQLiteDBHelper {
    * @param cacheStreamsCallback
    *          callback to notify success or faiure
    */
-  public void updateOrCreateStream(Stream streamToCache, StreamsCallback cacheStreamsCallback) {
+  public void updateOrCreateStream(final Stream streamToCache,final  StreamsCallback cacheStreamsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -263,8 +263,8 @@ public class SQLiteDBHelper {
    * @param cacheStreamsCallback
    *          callback to notify success or failure
    */
-  public void updateOrCreateStreams(Collection<Stream> streamsToCache,
-    StreamsCallback cacheStreamsCallback) {
+  public void updateOrCreateStreams(final Collection<Stream> streamsToCache,
+                                    final StreamsCallback cacheStreamsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -325,7 +325,7 @@ public class SQLiteDBHelper {
    * @param cacheStreamsCallback
    *          callback to notify success or failure
    */
-  public void deleteStream(Stream streamToDelete, StreamsCallback cacheStreamsCallback) {
+  public void deleteStream(final Stream streamToDelete,final  StreamsCallback cacheStreamsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -373,7 +373,7 @@ public class SQLiteDBHelper {
    * @param cacheStreamsCallback
    *          callback to which the streams are returned.
    */
-  public void getStreams(StreamsCallback cacheStreamsCallback) {
+  public void getStreams(final StreamsCallback cacheStreamsCallback) {
     new Thread() {
       @Override
       public void run() {
