@@ -217,6 +217,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             eventsCallback.onOnlineRetrieveEventsSuccess(receivedEvents, serverTime);
             break;
           case CREATE_EVENT:
+            // eventsCallback.onEventsSuccess(successMessage);
 
             break;
           case UPDATE_EVENT:
@@ -235,6 +236,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             break;
 
           case CREATE_STREAM:
+
 
             break;
           case UPDATE_STREAM:

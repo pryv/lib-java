@@ -72,7 +72,6 @@ public class RetrieveEventsTest {
 
   // TODO create full scenario test: create, update, get, delete
 
-  @Test
   public void testManipulateEventTest() {
     streamsManager.getStreams(null, streamsCallback);
     Awaitility.await().until(hasStreams());
