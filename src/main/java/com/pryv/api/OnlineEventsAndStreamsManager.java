@@ -71,7 +71,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
    */
 
   @Override
-  public void getEvents(Filter filter, EventsCallback cacheEventsCallback) {
+  public void getEvents(final Filter filter, final EventsCallback cacheEventsCallback) {
     // new FetchEventsThread(filter.toUrlParameters(),
     // cacheEventsCallback).start();
     new Thread() {
@@ -95,18 +95,18 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   }
 
   @Override
-  public void createEvent(Event newEvent, EventsCallback cacheEventsCallback) {
+  public void createEvent(Event newEvent, final EventsCallback cacheEventsCallback) {
     // TODO Auto-generated method stub
   }
 
   @Override
-  public void deleteEvent(Event eventToDelete, EventsCallback cacheEventsCallback) {
+  public void deleteEvent(Event eventToDelete, final EventsCallback cacheEventsCallback) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void updateEvent(Event eventToUpdate, EventsCallback cacheEventsCallback) {
+  public void updateEvent(Event eventToUpdate, final EventsCallback cacheEventsCallback) {
     // TODO Auto-generated method stub
   }
 
@@ -115,7 +115,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
    */
 
   @Override
-  public void getStreams(Filter filter, StreamsCallback cacheStreamsCallback) {
+  public void getStreams(Filter filter,final StreamsCallback cacheStreamsCallback) {
     // new FetchStreamsThread(filter, cacheStreamsCallback).start();
     new Thread() {
       @Override
@@ -137,7 +137,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   }
 
   @Override
-  public void createStream(Stream newStream, StreamsCallback cacheStreamsCallback) {
+  public void createStream(Stream newStream,final StreamsCallback cacheStreamsCallback) {
     // TODO Auto-generated method stub
   }
 
@@ -149,7 +149,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   }
 
   @Override
-  public void updateStream(Stream streamToUpdate, StreamsCallback cacheStreamsCallback) {
+  public void updateStream(Stream streamToUpdate,final StreamsCallback cacheStreamsCallback) {
     // TODO Auto-generated method stub
   }
 
@@ -165,7 +165,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
     private EventsCallback eventsCallback;
     private StreamsCallback streamsCallback;
 
-    public ApiResponseHandler(RequestType type, EventsCallback pEventsCallback,
+    public ApiResponseHandler(RequestType type, final EventsCallback pEventsCallback,
       StreamsCallback pStreamsCallback) {
       requestType = type;
       eventsCallback = pEventsCallback;
@@ -308,7 +308,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
     private EventsCallback eventsCallback;
     private ResponseHandler<String> eventsResponseHandler;
 
-    public FetchEventsThread(String pParams, EventsCallback pEventsCallback) {
+    public FetchEventsThread(String pParams, final EventsCallback pEventsCallback) {
       params = pParams;
       eventsCallback = pEventsCallback;
       instanciateResponseHandler();
