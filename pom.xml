@@ -69,20 +69,6 @@
 			<version>3.7.2</version>
 		</dependency>
 
-		<!-- collections filter library -->
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>17.0</version>
-		</dependency>
-
-		<!-- Mock testing libary -->
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>1.9.5</version>
-		</dependency>
-
 		<!-- Asynchronous testing library -->
 		<dependency>
 			<groupId>com.jayway.awaitility</groupId>
