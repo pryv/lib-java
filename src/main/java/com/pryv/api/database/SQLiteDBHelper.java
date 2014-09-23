@@ -83,7 +83,8 @@ public class SQLiteDBHelper {
    * @param cacheEventsCallback
    *          callback to notify success or failure
    */
-  public void updateOrCreateEvent(final Event eventToCache,final EventsCallback cacheEventsCallback) {
+  public void
+    updateOrCreateEvent(final Event eventToCache, final EventsCallback cacheEventsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -93,7 +94,9 @@ public class SQLiteDBHelper {
           Statement statement = dbConnection.createStatement();
           statement.execute(cmd);
           statement.close();
-          cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event cached", eventToCache, null);
+          if (cacheEventsCallback != null) {
+            cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event cached", eventToCache, null);
+          }
         } catch (SQLException e) {
           cacheEventsCallback.onEventsError(e.getMessage());
         } catch (JsonProcessingException e) {
@@ -112,7 +115,8 @@ public class SQLiteDBHelper {
    * @param cacheEventsCallback
    *          callback to notify success or failure
    */
-  public void updateOrCreateEvents(final Collection<Event> eventsToUpdate, final EventsCallback cacheEventsCallback) {
+  public void updateOrCreateEvents(final Collection<Event> eventsToUpdate,
+    final EventsCallback cacheEventsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -232,7 +236,8 @@ public class SQLiteDBHelper {
    * @param cacheStreamsCallback
    *          callback to notify success or faiure
    */
-  public void updateOrCreateStream(final Stream streamToCache,final  StreamsCallback cacheStreamsCallback) {
+  public void updateOrCreateStream(final Stream streamToCache,
+    final StreamsCallback cacheStreamsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -260,7 +265,6 @@ public class SQLiteDBHelper {
     }.start();
   }
 
-
   /**
    * Update Streams in the SQLite database. used only when the cache receives
    * streams from online.
@@ -271,7 +275,7 @@ public class SQLiteDBHelper {
    *          callback to notify success or failure
    */
   public void updateOrCreateStreams(final Collection<Stream> streamsToCache,
-                                    final StreamsCallback cacheStreamsCallback) {
+    final StreamsCallback cacheStreamsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -332,7 +336,7 @@ public class SQLiteDBHelper {
    * @param cacheStreamsCallback
    *          callback to notify success or failure
    */
-  public void deleteStream(final Stream streamToDelete,final  StreamsCallback cacheStreamsCallback) {
+  public void deleteStream(final Stream streamToDelete, final StreamsCallback cacheStreamsCallback) {
     new Thread() {
       @Override
       public void run() {

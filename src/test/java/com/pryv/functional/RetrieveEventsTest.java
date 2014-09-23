@@ -71,7 +71,7 @@ public class RetrieveEventsTest {
   }
 
   // TODO create full scenario test: create, update, get, delete
-
+  @Test
   public void testManipulateEventTest() {
     streamsManager.getStreams(null, streamsCallback);
     Awaitility.await().until(hasStreams());
@@ -86,6 +86,9 @@ public class RetrieveEventsTest {
         + ", id="
         + chosenStream.getId());
     Event testEvent = new Event();
+    testEvent.setStreamId(chosenStream.getId());
+    testEvent.setTime(1410963641.0);
+    testEvent.setType("note/txt");
     testEvent.setStreamClientId(chosenStream.getClientId());
     testEvent
       .setContent("bla bla bla - awesome big content for the ultimate testing phase BRR BRR BRR");
@@ -195,7 +198,7 @@ public class RetrieveEventsTest {
     };
   }
 
-  @Test
+  // @Test
   public void testFetchEvents() {
     eventsManager.getEvents(new Filter(), eventsCallback);
     Awaitility.await().until(hasEvents());
@@ -217,6 +220,8 @@ public class RetrieveEventsTest {
 
   private static void instanciateEventsCallback() {
     eventsCallback = new EventsCallback() {
+
+      int eSuccessCount = 0;
 
       @Override
       public void onOnlineRetrieveEventsSuccess(Map<String, Event> newEvents, double serverTime) {
@@ -249,6 +254,8 @@ public class RetrieveEventsTest {
 
       @Override
       public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+        eSuccessCount++;
+        System.out.println("from test, onEventsSuccess " + eSuccessCount + "th call.");
         eventsSuccess = true;
       }
 

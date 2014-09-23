@@ -104,8 +104,12 @@ public class EventsSupervisor {
       || (event.getId() == null && event.getClientId() == null)) {
       event.generateClientId();
     }
-    // holding stream should already be inserted - used only when fresh from API
-    event.updateStreamClientId(streamsSupervisor.getStreamsIdToClientIdDictionnary());
+    // stream should already be inserted - used only when fresh from API
+    String streamCid =
+      streamsSupervisor.getStreamsIdToClientIdDictionnary().get(event.getStreamId());
+    if (streamCid != null) {
+      event.setStreamClientId(streamCid);
+    }
 
     // case exists: compare modified field?
     Event oldEvent = getEventByClientId(event.getClientId());
@@ -134,7 +138,9 @@ public class EventsSupervisor {
         + ", streamCid="
         + newEvent.getStreamClientId()
         + ")");
-    connectionCallback.onEventsSuccess("EventsSupervisor: Event added", newEvent, 0);
+    if (connectionCallback != null) {
+      connectionCallback.onEventsSuccess("EventsSupervisor: Event added", null, 0);
+    }
   }
 
   /**
@@ -150,7 +156,7 @@ public class EventsSupervisor {
       + oldEvent.getId()
         + ", cid="
         + oldEvent.getClientId()
-        + ", parentCid="
+        + ", streamCid="
         + oldEvent.getStreamClientId()
         + ") to eventToUpdate (id="
         + eventToUpdate.getId()
@@ -184,6 +190,8 @@ public class EventsSupervisor {
         // delete really
         events.remove(eventToDelete.getClientId());
         eventIdToClientId.remove(eventToDelete.getId());
+        connectionCallback.onEventsSuccess(
+          "EventsSupervisor: Event with cid=" + eventToDelete.getClientId() + " deleted.", null, 0);
       } else {
         // update "trashed" field
         eventToDelete.setTrashed(true);

@@ -191,7 +191,9 @@ public class Event {
    *          the dictionnary streamId->streamClientId
    */
   public void updateStreamClientId(Map<String, String> streamIdToClientId) {
-    streamClientId = streamIdToClientId.get(streamId);
+    if (streamIdToClientId.get(streamIdToClientId) != null) {
+      streamClientId = streamIdToClientId.get(streamId);
+    }
   }
 
   /**

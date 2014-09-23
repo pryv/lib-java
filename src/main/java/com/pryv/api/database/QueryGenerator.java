@@ -477,7 +477,7 @@ public class QueryGenerator {
    * @return
    */
   private static String formatTextValue(Object obj) {
-    if (obj != null) {
+    if (obj != null && !obj.equals("null")) {
       return "\'" + obj + "\'";
     } else {
       return "NULL";

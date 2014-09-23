@@ -69,8 +69,7 @@ public class Connection implements EventsManager, StreamsManager {
     eventsSupervisor = new EventsSupervisor(streamsSupervisor);
     cacheEventsManager =
       new CacheEventsAndStreamsManager(url, token, dbInitCallback, streamsSupervisor,
-        eventsSupervisor,
-        weakConnection);
+        eventsSupervisor, weakConnection);
     cacheStreamsManager = (StreamsManager) cacheEventsManager;
   }
 
@@ -294,9 +293,13 @@ public class Connection implements EventsManager, StreamsManager {
 
     @Override
     public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+      if (event != null) {
+        if (event.getId() != null) {
+          eventsSupervisor.updateOrCreateEvent(event, userEventsCallback);
+        }
+      }
       userEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
     }
-
 
     @Override
     public void onEventsError(String errorMessage) {
@@ -339,8 +342,7 @@ public class Connection implements EventsManager, StreamsManager {
         // streamsSupervisor.updateOrCreateStream(stream, userStreamsCallback);
         // }
         // forward updated Streams
-        userStreamsCallback.onOnlineRetrieveStreamsSuccess(onlineStreams,
-          serverTime);
+        userStreamsCallback.onOnlineRetrieveStreamsSuccess(onlineStreams, serverTime);
       }
     }
 

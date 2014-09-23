@@ -137,7 +137,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   public void createEvent(Event event, EventsCallback connectionEventsCallback) {
     if (Pryv.isCacheActive()) {
       // create Event in cache
-      dbHelper.updateOrCreateEvent(event, new CacheEventsCallback(null, connectionEventsCallback));
+      dbHelper.updateOrCreateEvent(event, connectionEventsCallback);
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
@@ -184,10 +184,6 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       logger.log("Cache: retrieved Streams from cache: ");
       dbHelper.getStreams(new CacheStreamsCallback(connectionStreamsCallback));
     }
-    // if (Pryv.isOnlineActive()) {
-    // onlineStreamsManager.getStreams(filter, new
-    // CacheStreamsCallback(connectionStreamsCallback));
-    // }
   }
 
   @Override
@@ -296,7 +292,11 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
     @Override
     public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
-      connectionEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
+      if (event != null) {
+          dbHelper.updateOrCreateEvent(event, connectionEventsCallback);
+      } else {
+        connectionEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
+      }
     }
 
     @Override

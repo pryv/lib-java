@@ -79,11 +79,12 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       @Override
       public void run() {
         try {
+          logger.log("Online: getEvents: Get request at: " + eventsUrl + filter.toUrlParameters());
           Request
             .Get(eventsUrl + filter.toUrlParameters())
             .execute()
             .handleResponse(
-              new ApiResponseHandler(RequestType.GET_EVENTS, cacheEventsCallback, null));
+              new ApiResponseHandler(RequestType.GET_EVENTS, cacheEventsCallback, null, null, null));
         } catch (ClientProtocolException e) {
           cacheEventsCallback.onEventsError(e.getMessage());
           e.printStackTrace();
@@ -96,17 +97,22 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   }
 
   @Override
-  public void createEvent(Event newEvent, EventsCallback cacheEventsCallback) {
+  public void createEvent(final Event newEvent, final EventsCallback cacheEventsCallback) {
     new Thread() {
       @Override
       public void run() {
         try {
+          logger.log("Online: createEvent: Post request at: "
+            + eventsUrl
+              + ", body: "
+              + JsonConverter.toJson(newEvent));
           Request
             .Post(eventsUrl)
             .bodyString(JsonConverter.toJson(newEvent), ContentType.APPLICATION_JSON)
             .execute()
             .handleResponse(
-              new ApiResponseHandler(RequestType.CREATE_EVENT, cacheEventsCallback, null));
+              new ApiResponseHandler(RequestType.CREATE_EVENT, cacheEventsCallback, null, newEvent,
+                null));
         } catch (ClientProtocolException e) {
           cacheEventsCallback.onEventsError(e.getMessage());
           e.printStackTrace();
@@ -140,11 +146,13 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       @Override
       public void run() {
         try {
+          logger.log("Online: getStreams: Get request at: " + streamsUrl);
           Request
             .Get(streamsUrl)
             .execute()
             .handleResponse(
-              new ApiResponseHandler(RequestType.GET_STREAMS, null, cacheStreamsCallback));
+              new ApiResponseHandler(RequestType.GET_STREAMS, null, cacheStreamsCallback, null,
+                null));
 
         } catch (ClientProtocolException e) {
           cacheStreamsCallback.onStreamError(e.getMessage());
@@ -185,9 +193,13 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
     private RequestType requestType;
     private EventsCallback eventsCallback;
     private StreamsCallback streamsCallback;
+    private Event event;
+    private Stream stream;
 
     public ApiResponseHandler(RequestType type, final EventsCallback pEventsCallback,
-      StreamsCallback pStreamsCallback) {
+      final StreamsCallback pStreamsCallback, final Event pEvent, final Stream pStream) {
+      event = pEvent;
+      stream = pStream;
       requestType = type;
       eventsCallback = pEventsCallback;
       streamsCallback = pStreamsCallback;
@@ -198,8 +210,8 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
 
       int statusCode = response.getStatusLine().getStatusCode();
       String responseBody = EntityUtils.toString(response.getEntity());
-      logger.log("signInResponseHandler: response status code: " + statusCode);
-      logger.log("signInResponseHandler: handling reply entity : " + responseBody);
+      logger.log("ApiResponseHandler: response status code: " + statusCode);
+      logger.log("ApiResponseHandler: handling reply entity : " + responseBody);
       double serverTime = JsonConverter.retrieveServerTime(responseBody);
 
       if (statusCode == HttpStatus.SC_CREATED
@@ -217,8 +229,16 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             eventsCallback.onOnlineRetrieveEventsSuccess(receivedEvents, serverTime);
             break;
           case CREATE_EVENT:
-            // eventsCallback.onEventsSuccess(successMessage);
-
+            Event createdEvent = JsonConverter.retrieveEventFromJson(responseBody);
+            createdEvent.assignConnection(weakConnection);
+            createdEvent.setClientId(event.getClientId());
+            createdEvent.setStreamClientId(event.getStreamClientId());
+            eventsCallback.onEventsSuccess(
+              "Online: event with clientId="
+                + createdEvent.getClientId()
+                  + ", Id="
+                  + createdEvent.getId()
+                  + " created on API", createdEvent, null);
             break;
           case UPDATE_EVENT:
 
