@@ -176,11 +176,7 @@ public class SupervisorTest {
     eventsCallback = new EventsCallback() {
 
       @Override
-      public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
-      }
-
-      @Override
-      public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double serverTime) {
+      public void onRetrievalSuccess(Map<String, Event> onlineEvents, double serverTime) {
       }
 
       @Override
@@ -196,10 +192,6 @@ public class SupervisorTest {
       @Override
       public void onEventsError(String errorMessage) {
         logger.log(errorMessage);
-      }
-
-      @Override
-      public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
       }
     };
   }

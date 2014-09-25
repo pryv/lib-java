@@ -239,7 +239,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double pServerTime) {
+    public void onRetrievalSuccess(Map<String, Event> onlineEvents, double pServerTime) {
       // update Events in cache and send result to connection
       serverTime = pServerTime;
       lastOnlineRetrievalServerTime = pServerTime;
@@ -256,21 +256,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
-      // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
-      // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public void onEventsRetrievalError(String errorMessage) {
-      // TODO Auto-generated method stub
-
+      connectionEventsCallback.onEventsRetrievalError(errorMessage);
     }
 
     @Override
@@ -285,8 +272,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
     @Override
     public void onEventsError(String errorMessage) {
-      // TODO Auto-generated method stub
-
+      connectionEventsCallback.onEventsError(errorMessage);
     }
 
   }
@@ -308,31 +294,14 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       filter = pFilter;
     }
 
-    @Override
-    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double pServerTime) {
-      // update Events in cache and send result to connection
-      // serverTime = pServerTime;
-      // lastOnlineRetrievalServerTime = pServerTime;
-      // logger.log("Cache: received online Events with serverTime " +
-      // serverTime);
-      //
-      // for (Event onlineEvent : onlineEvents.values()) {
-      // // merge with supervisor
-      // eventsSupervisor.updateOrCreateEvent(onlineEvent,
-      // connectionEventsCallback);
-      // }
-      // // eventsSupervisor.getEvents(filter, this);
-      // connectionEventsCallback.onOnlineRetrieveEventsSuccess(onlineEvents,
-      // pServerTime);
-    }
 
     @Override
-    public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
+    public void onRetrievalSuccess(Map<String, Event> cacheEvents, double pServerTime) {
       logger.log("Cache: retrieved events from cache: events amount: " + cacheEvents.size());
       for (Event cacheEvent : cacheEvents.values()) {
         cacheEvent.assignConnection(weakConnection);
       }
-      connectionEventsCallback.onCacheRetrieveEventsSuccess(cacheEvents);
+      connectionEventsCallback.onRetrievalSuccess(cacheEvents, pServerTime);
 
       if (Pryv.isOnlineActive()) {
         Filter onlineFilter = new Filter();
@@ -349,14 +318,6 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     @Override
     public void onEventsRetrievalError(String message) {
       connectionEventsCallback.onEventsRetrievalError(message);
-    }
-
-    // called when retrieving events from online
-    @Override
-    public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
-      // connectionEventsCallback.onOnlineRetrieveEventsSuccess(supervisorEvents,
-      // serverTime);
-      // dbHelper.updateOrCreateEvents(supervisorEvents.values(), this);
     }
 
     @Override

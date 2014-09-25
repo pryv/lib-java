@@ -81,12 +81,7 @@ public class OnlineManipulateEventTest {
     callback = new EventsCallback() {
 
       @Override
-      public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
-        // unused
-      }
-
-      @Override
-      public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double serverTime) {
+      public void onRetrievalSuccess(Map<String, Event> onlineEvents, double serverTime) {
         events = onlineEvents;
       }
 
@@ -103,11 +98,6 @@ public class OnlineManipulateEventTest {
       @Override
       public void onEventsError(String errorMessage) {
         error = true;
-      }
-
-      @Override
-      public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
-        // unused
       }
     };
   }

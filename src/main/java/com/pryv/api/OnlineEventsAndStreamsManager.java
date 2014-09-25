@@ -226,7 +226,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
               receivedEvent.assignConnection(weakConnection);
             }
             logger.log("Online: received " + receivedEvents.size() + " event(s) from API.");
-            eventsCallback.onOnlineRetrieveEventsSuccess(receivedEvents, serverTime);
+            eventsCallback.onRetrievalSuccess(receivedEvents, serverTime);
             break;
           case CREATE_EVENT:
             Event createdEvent = JsonConverter.retrieveEventFromJson(responseBody);
@@ -386,7 +386,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
               receivedEvent.assignConnection(weakConnection);
             }
             logger.log("Online: received " + receivedEvents.size() + " event(s) from API.");
-            eventsCallback.onOnlineRetrieveEventsSuccess(receivedEvents, serverTime);
+            eventsCallback.onRetrievalSuccess(receivedEvents, serverTime);
           } catch (ParseException e) {
             eventsCallback.onEventsRetrievalError(e.getMessage());
             e.printStackTrace();

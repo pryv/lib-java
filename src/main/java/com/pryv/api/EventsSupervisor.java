@@ -76,9 +76,9 @@ public class EventsSupervisor {
         limitedEvents.put(temp.getClientId(), temp);
         i++;
       }
-      connectionCallback.onSupervisorRetrieveEventsSuccess(limitedEvents);
+      connectionCallback.onRetrievalSuccess(limitedEvents, 0);
     }
-    connectionCallback.onSupervisorRetrieveEventsSuccess(filteredEvents);
+    connectionCallback.onRetrievalSuccess(filteredEvents, 0);
   }
 
   /**

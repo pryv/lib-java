@@ -443,12 +443,11 @@ public class SQLiteDBHelperTest {
   private static void instanciateEventsCallback() {
     eventsCallback = new EventsCallback() {
 
-      @Override
-      public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
-      }
 
       @Override
-      public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double serverTime) {
+      public void onRetrievalSuccess(Map<String, Event> pEvents, double serverTime) {
+        events = pEvents;
+        eventsRetrievalSuccess = true;
       }
 
       @Override
@@ -466,11 +465,6 @@ public class SQLiteDBHelperTest {
         eventsError = true;
       }
 
-      @Override
-      public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
-        events = cacheEvents;
-        eventsRetrievalSuccess = true;
-      }
     };
   }
 

@@ -14,28 +14,29 @@ import com.pryv.api.model.Event;
 public interface EventsCallback {
 
   /**
-   * callback method for successful online retrieval
+   * callback method for successful events retrieval retrieval
    *
-   * @param onlineEvents
-   *          the events retrieved from the online message
+   * @param events
+   *          the events retrieved
    * @param serverTime
    *          the time of the server in seconds
    */
-  void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double serverTime);
+  void onRetrievalSuccess(Map<String, Event> events, double serverTime);
 
-  /**
-   * callback method for successful DB retrieval
-   *
-   * @param cacheEvents
-   */
-  void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents);
-
-  /**
-   * callback method for successful Supervisor retrieval
-   *
-   * @param supervisorEvents
-   */
-  void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents);
+  // /**
+  // * callback method for successful DB retrieval
+  // *
+  // * @param cacheEvents
+  // */
+  // void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents);
+  //
+  // /**
+  // * callback method for successful Supervisor retrieval
+  // *
+  // * @param supervisorEvents
+  // */
+  // void onSupervisorRetrieveEventsSuccess(Map<String, Event>
+  // supervisorEvents);
 
   /**
    * callback method called when an error occured during Event fetching.

@@ -224,33 +224,20 @@ public class RetrieveEventsTest {
       int eSuccessCount = 0;
 
       @Override
-      public void onOnlineRetrieveEventsSuccess(Map<String, Event> newEvents, double serverTime) {
-        System.out.println("TestEventsCallback: Online success with "
+      public void onRetrievalSuccess(Map<String, Event> newEvents, double serverTime) {
+        System.out.println("TestEventsCallback: success with "
           + newEvents.values().size()
             + " events");
         events = newEvents;
       }
 
-      @Override
-      public void onCacheRetrieveEventsSuccess(Map<String, Event> newEvents) {
-        System.out.println("TestEventsCallback: Cache success with "
-          + newEvents.values().size()
-            + " events");
-        events = newEvents;
-      }
+
 
       @Override
       public void onEventsRetrievalError(String message) {
         eventsRetrievalError = true;
       }
 
-      @Override
-      public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
-        System.out.println("TestEventsCallback: Supervisor success with "
-          + supervisorEvents.values().size()
-            + " events");
-        events = supervisorEvents;
-      }
 
       @Override
       public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {

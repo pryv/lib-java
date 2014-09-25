@@ -98,25 +98,12 @@ public class OnlineRetrieveEventsTest {
     eventsCallback = new EventsCallback() {
 
       @Override
-      public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double serverTime) {
+      public void onRetrievalSuccess(Map<String, Event> onlineEvents, double serverTime) {
         events = onlineEvents;
-      }
-
-      // unused
-      @Override
-      public void onCacheRetrieveEventsSuccess(Map<String, Event> newEvents) {
       }
 
       @Override
       public void onEventsRetrievalError(String message) {
-        // TODO Auto-generated method stub
-
-      }
-
-      @Override
-      public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
-        // TODO Auto-generated method stub
-
       }
 
       @Override

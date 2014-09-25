@@ -210,7 +210,7 @@ public class SQLiteDBHelper {
             Event retrievedEvent = new Event(result);
             retrievedEvents.put(retrievedEvent.getClientId(), retrievedEvent);
           }
-          cacheEventsCallback.onCacheRetrieveEventsSuccess(retrievedEvents);
+          cacheEventsCallback.onRetrievalSuccess(retrievedEvents, 0);
         } catch (SQLException e) {
           cacheEventsCallback.onEventsRetrievalError(e.getMessage());
           e.printStackTrace();

@@ -249,23 +249,16 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double pServerTime) {
+    public void onRetrievalSuccess(Map<String, Event> supervisorEvents, double pServerTime) {
+      userEventsCallback.onRetrievalSuccess(supervisorEvents, pServerTime);
     }
 
-    @Override
-    public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
-    }
 
     @Override
     public void onEventsRetrievalError(String message) {
       userEventsCallback.onEventsRetrievalError(message);
     }
 
-    // unused
-    @Override
-    public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
-      userEventsCallback.onSupervisorRetrieveEventsSuccess(supervisorEvents);
-    }
 
     @Override
     public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
@@ -295,39 +288,21 @@ public class Connection implements EventsManager, StreamsManager {
       filter = pFilter;
     }
 
-    @Override
-    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double pServerTime) {
-      // logger.log("Connection: onOnlineRetrieveEventsSuccess");
-      //
-      // // update server time
-      // serverTime = pServerTime;
-      // // compute delta time between system time and serverTime
-      // computeDelta(pServerTime);
-      // // onlineStreams are not received here,
-      //
-      // // return merged events from Supervisor
-      // eventsSupervisor.getEvents(filter, this);
-    }
 
     @Override
-    public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
+    public void onRetrievalSuccess(Map<String, Event> cacheEvents, double pServerTime) {
+      computeDelta(pServerTime);
       // update existing Events with those retrieved from the cache
       for (Event cacheEvent : cacheEvents.values()) {
         eventsSupervisor.updateOrCreateEvent(cacheEvent, userEventsCallback);
       }
       // return merged events from Supervisor
-      eventsSupervisor.getEvents(filter, this);
+      eventsSupervisor.getEvents(filter, new SupervisorEventsCallback(userEventsCallback, filter));
     }
 
     @Override
     public void onEventsRetrievalError(String message) {
       userEventsCallback.onEventsRetrievalError(message);
-    }
-
-    // unused
-    @Override
-    public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
-      userEventsCallback.onSupervisorRetrieveEventsSuccess(supervisorEvents);
     }
 
     @Override

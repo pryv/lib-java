@@ -351,7 +351,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    * Events Callbacks
    */
 
-  public void onOnlineRetrieveEventsSuccess(final Map<String, Event> newEvents, double serverTime) {
+  public void onRetrievalSuccess(final Map<String, Event> newEvents, double serverTime) {
     addEventsToList(newEvents);
   }
 
