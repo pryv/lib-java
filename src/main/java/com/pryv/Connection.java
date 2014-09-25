@@ -110,8 +110,7 @@ public class Connection implements EventsManager, StreamsManager {
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward getEvents() to Cache
-      cacheEventsManager
-        .getEvents(filter, new ConnectionEventsCallback(userEventsCallback, filter));
+      cacheEventsManager.getEvents(filter, new CacheEventsCallback(userEventsCallback, filter));
     }
   }
 
@@ -125,8 +124,7 @@ public class Connection implements EventsManager, StreamsManager {
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
-      cacheEventsManager.createEvent(newEvent, new ConnectionEventsCallback(userEventsCallback,
-        null));
+      cacheEventsManager.createEvent(newEvent, new CacheEventsCallback(userEventsCallback, null));
     }
   }
 
@@ -140,8 +138,8 @@ public class Connection implements EventsManager, StreamsManager {
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
-      cacheEventsManager.deleteEvent(eventToDelete, new ConnectionEventsCallback(
-        userEventsCallback, null));
+      cacheEventsManager.deleteEvent(eventToDelete, new CacheEventsCallback(userEventsCallback,
+        null));
     }
   }
 
@@ -154,8 +152,8 @@ public class Connection implements EventsManager, StreamsManager {
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
-      cacheEventsManager.updateEvent(eventToUpdate, new ConnectionEventsCallback(
-        userEventsCallback, null));
+      cacheEventsManager.updateEvent(eventToUpdate, new CacheEventsCallback(userEventsCallback,
+        null));
     }
   }
 
@@ -240,34 +238,75 @@ public class Connection implements EventsManager, StreamsManager {
     deltaTime = pServerTime - System.currentTimeMillis() / millisToSeconds;
   }
 
-  /**
-   * EventsCallback used by Connection class
-   *
-   * @author ik
-   *
-   */
-  private class ConnectionEventsCallback implements EventsCallback {
+  private class SupervisorEventsCallback implements EventsCallback {
 
     private EventsCallback userEventsCallback;
     private Filter filter;
 
-    public ConnectionEventsCallback(EventsCallback pUserEventsCallback, Filter pFilter) {
+    public SupervisorEventsCallback(EventsCallback pUserEventsCallback, Filter pFilter) {
       userEventsCallback = pUserEventsCallback;
       filter = pFilter;
     }
 
     @Override
     public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double pServerTime) {
-      logger.log("Connection: onOnlineRetrieveEventsSuccess");
+    }
 
-      // update server time
-      serverTime = pServerTime;
-      // compute delta time between system time and serverTime
-      computeDelta(pServerTime);
-      // onlineStreams are not received here,
+    @Override
+    public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
+    }
 
-      // return merged events from Supervisor
-      eventsSupervisor.getEvents(filter, this);
+    @Override
+    public void onEventsRetrievalError(String message) {
+      userEventsCallback.onEventsRetrievalError(message);
+    }
+
+    // unused
+    @Override
+    public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
+      userEventsCallback.onSupervisorRetrieveEventsSuccess(supervisorEvents);
+    }
+
+    @Override
+    public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+      userEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
+    }
+
+    @Override
+    public void onEventsError(String errorMessage) {
+      userEventsCallback.onEventsError(errorMessage);
+    }
+
+  }
+
+  /**
+   * EventsCallback used by Connection class
+   *
+   * @author ik
+   *
+   */
+  private class CacheEventsCallback implements EventsCallback {
+
+    private EventsCallback userEventsCallback;
+    private Filter filter;
+
+    public CacheEventsCallback(EventsCallback pUserEventsCallback, Filter pFilter) {
+      userEventsCallback = pUserEventsCallback;
+      filter = pFilter;
+    }
+
+    @Override
+    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double pServerTime) {
+      // logger.log("Connection: onOnlineRetrieveEventsSuccess");
+      //
+      // // update server time
+      // serverTime = pServerTime;
+      // // compute delta time between system time and serverTime
+      // computeDelta(pServerTime);
+      // // onlineStreams are not received here,
+      //
+      // // return merged events from Supervisor
+      // eventsSupervisor.getEvents(filter, this);
     }
 
     @Override
@@ -297,8 +336,18 @@ public class Connection implements EventsManager, StreamsManager {
         if (event.getId() != null) {
           eventsSupervisor.updateOrCreateEvent(event, userEventsCallback);
         }
+
+        if (event.getClientId() != null) {
+          userEventsCallback.onEventsSuccess(successMessage,
+            eventsSupervisor.getEventByClientId(event.getClientId()), stoppedId);
+        } else {
+          userEventsCallback.onEventsSuccess(successMessage,
+            eventsSupervisor.getEventByClientId(eventsSupervisor.getClientId(event.getId())),
+            stoppedId);
+        }
+      } else {
+        userEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
       }
-      userEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
     }
 
     @Override

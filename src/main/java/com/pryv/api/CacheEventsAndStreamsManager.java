@@ -141,8 +141,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
-      onlineEventsManager.createEvent(event,
-        new CacheEventsCallback(null, connectionEventsCallback));
+      onlineEventsManager.createEvent(event, new OnlineEventsCallback(null,
+        connectionEventsCallback));
     }
   }
 
@@ -227,6 +227,70 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
   }
 
+  private class OnlineEventsCallback implements EventsCallback {
+
+    private EventsCallback connectionEventsCallback;
+    private Filter filter;
+    private double serverTime;
+
+    public OnlineEventsCallback(Filter pFilter, EventsCallback pConnectionEventsCallback) {
+      connectionEventsCallback = pConnectionEventsCallback;
+      filter = pFilter;
+    }
+
+    @Override
+    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double pServerTime) {
+      // update Events in cache and send result to connection
+      serverTime = pServerTime;
+      lastOnlineRetrievalServerTime = pServerTime;
+      logger.log("Cache: received online Events with serverTime " + serverTime);
+
+      for (Event onlineEvent : onlineEvents.values()) {
+        // merge with supervisor
+        eventsSupervisor.updateOrCreateEvent(onlineEvent, connectionEventsCallback);
+      }
+      // eventsSupervisor.getEvents(filter, this);
+      // connectionEventsCallback.onOnlineRetrieveEventsSuccess(onlineEvents,
+      // pServerTime);
+      dbHelper.updateOrCreateEvents(onlineEvents.values(), connectionEventsCallback);
+    }
+
+    @Override
+    public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
+      // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
+      // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onEventsRetrievalError(String errorMessage) {
+      // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+      if (event != null) {
+        dbHelper.updateOrCreateEvent(event, new CacheEventsCallback(filter,
+          connectionEventsCallback));
+      } else {
+        connectionEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
+      }
+    }
+
+    @Override
+    public void onEventsError(String errorMessage) {
+      // TODO Auto-generated method stub
+
+    }
+
+  }
+
   /**
    * EventsCallback used by Cache
    *
@@ -247,15 +311,19 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     @Override
     public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double pServerTime) {
       // update Events in cache and send result to connection
-      serverTime = pServerTime;
-      lastOnlineRetrievalServerTime = pServerTime;
-      logger.log("Cache: received online Events with serverTime " + serverTime);
-
-      for (Event onlineEvent : onlineEvents.values()) {
-        // merge with supervisor
-        eventsSupervisor.updateOrCreateEvent(onlineEvent, connectionEventsCallback);
-      }
-      eventsSupervisor.getEvents(filter, this);
+      // serverTime = pServerTime;
+      // lastOnlineRetrievalServerTime = pServerTime;
+      // logger.log("Cache: received online Events with serverTime " +
+      // serverTime);
+      //
+      // for (Event onlineEvent : onlineEvents.values()) {
+      // // merge with supervisor
+      // eventsSupervisor.updateOrCreateEvent(onlineEvent,
+      // connectionEventsCallback);
+      // }
+      // // eventsSupervisor.getEvents(filter, this);
+      // connectionEventsCallback.onOnlineRetrieveEventsSuccess(onlineEvents,
+      // pServerTime);
     }
 
     @Override
@@ -273,7 +341,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         onlineFilter.setStreamClientIds(scope);
         onlineFilter.generateStreamIds(streamsSupervisor.getStreamsClientIdToIdDictionnary());
         // forward call to online module
-        onlineEventsManager.getEvents(onlineFilter, new CacheEventsCallback(filter,
+        onlineEventsManager.getEvents(onlineFilter, new OnlineEventsCallback(filter,
           connectionEventsCallback));
       }
     }
@@ -286,17 +354,18 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     // called when retrieving events from online
     @Override
     public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
-      connectionEventsCallback.onOnlineRetrieveEventsSuccess(supervisorEvents, serverTime);
-      dbHelper.updateOrCreateEvents(supervisorEvents.values(), this);
+      // connectionEventsCallback.onOnlineRetrieveEventsSuccess(supervisorEvents,
+      // serverTime);
+      // dbHelper.updateOrCreateEvents(supervisorEvents.values(), this);
     }
 
     @Override
     public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
-      if (event != null) {
-          dbHelper.updateOrCreateEvent(event, connectionEventsCallback);
-      } else {
-        connectionEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
-      }
+      // if (event != null) {
+      // dbHelper.updateOrCreateEvent(event, connectionEventsCallback);
+      // } else {
+      connectionEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
+      // }
     }
 
     @Override
@@ -315,12 +384,9 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
     private StreamsCallback connectionStreamsCallback;
 
-    // private StreamsCallback cacheUpdateStreamsCallback;
 
     public CacheStreamsCallback(StreamsCallback pConnectionStreamsCallback) {
       connectionStreamsCallback = pConnectionStreamsCallback;
-      // cacheUpdateStreamsCallback = new
-      // CacheUpdateStreamsCallback(connectionStreamsCallback);
     }
 
     @Override
@@ -377,102 +443,4 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
   }
 
-  /**
-   * Used when online retrieved streams need to update the cache and this result
-   * is returned to the caller.
-   *
-   * @author ik
-   *
-   */
-  private class CacheUpdateStreamsCallback implements StreamsCallback {
-
-    private StreamsCallback cacheStreamsCallback;
-
-    public CacheUpdateStreamsCallback(StreamsCallback pCacheStreamsCallback) {
-      cacheStreamsCallback = pCacheStreamsCallback;
-    }
-
-    @Override
-    public void
-      onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, double serverTime) {
-      // unused
-    }
-
-    @Override
-    public void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStreams) {
-      // unused
-    }
-
-    @Override
-    public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
-      // unused
-    }
-
-    @Override
-    public void onStreamsRetrievalError(String errorMessage) {
-      // unused
-    }
-
-    @Override
-    public void onStreamsSuccess(String successMessage) {
-      dbHelper.getStreams(cacheStreamsCallback);
-    }
-
-    @Override
-    public void onStreamError(String errorMessage) {
-      cacheStreamsCallback.onStreamError(errorMessage);
-    }
-
-  }
-
-  /**
-   * Used when online retrieved events need to update the cache and this result
-   * is returned to the caller.
-   *
-   * @author ik
-   *
-   */
-  private class CacheUpdateEventsCallback implements EventsCallback {
-
-    private EventsCallback cacheEventsCallback;
-    private Filter filter;
-
-    public CacheUpdateEventsCallback(Filter pFilter, EventsCallback pCacheEventsCallback) {
-      logger.log("cacheUpdateEventsCallback created");
-      filter = pFilter;
-      cacheEventsCallback = pCacheEventsCallback;
-    }
-
-    @Override
-    public void onOnlineRetrieveEventsSuccess(Map<String, Event> onlineEvents, double serverTime) {
-      // unused
-    }
-
-    @Override
-    public void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents) {
-      // unused
-    }
-
-    @Override
-    public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
-      // unused
-    }
-
-    @Override
-    public void onEventsRetrievalError(String errorMessage) {
-      // unused
-    }
-
-    @Override
-    public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
-      logger.log("Cache: Events from online merge with cache successfully");
-      dbHelper.getEvents(filter, cacheEventsCallback);
-    }
-
-    @Override
-    public void onEventsError(String errorMessage) {
-      cacheEventsCallback.onEventsError(errorMessage);
-    }
-
-  }
 }
