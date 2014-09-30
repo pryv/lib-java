@@ -110,7 +110,7 @@ public class Connection implements EventsManager, StreamsManager {
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward getEvents() to Cache
-      cacheEventsManager.getEvents(filter, new CacheEventsCallback(userEventsCallback, filter));
+      cacheEventsManager.getEvents(filter, new CacheManagerEventsCallback(userEventsCallback, filter));
     }
   }
 
@@ -124,7 +124,7 @@ public class Connection implements EventsManager, StreamsManager {
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
-      cacheEventsManager.createEvent(newEvent, new CacheEventsCallback(userEventsCallback, null));
+      cacheEventsManager.createEvent(newEvent, new CacheManagerEventsCallback(userEventsCallback, null));
     }
   }
 
@@ -138,7 +138,7 @@ public class Connection implements EventsManager, StreamsManager {
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
-      cacheEventsManager.deleteEvent(eventToDelete, new CacheEventsCallback(userEventsCallback,
+      cacheEventsManager.deleteEvent(eventToDelete, new CacheManagerEventsCallback(userEventsCallback,
         null));
     }
   }
@@ -152,7 +152,7 @@ public class Connection implements EventsManager, StreamsManager {
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
-      cacheEventsManager.updateEvent(eventToUpdate, new CacheEventsCallback(userEventsCallback,
+      cacheEventsManager.updateEvent(eventToUpdate, new CacheManagerEventsCallback(userEventsCallback,
         null));
     }
   }
@@ -238,6 +238,12 @@ public class Connection implements EventsManager, StreamsManager {
     deltaTime = pServerTime - System.currentTimeMillis() / millisToSeconds;
   }
 
+  /**
+   * EventsCallback for returns coming from Supervisor
+   *
+   * @author ik
+   *
+   */
   private class SupervisorEventsCallback implements EventsCallback {
 
     private EventsCallback userEventsCallback;
@@ -273,17 +279,17 @@ public class Connection implements EventsManager, StreamsManager {
   }
 
   /**
-   * EventsCallback used by Connection class
+   * EventsCallback for returns coming from CacheEventsAndStreamsManager
    *
    * @author ik
    *
    */
-  private class CacheEventsCallback implements EventsCallback {
+  private class CacheManagerEventsCallback implements EventsCallback {
 
     private EventsCallback userEventsCallback;
     private Filter filter;
 
-    public CacheEventsCallback(EventsCallback pUserEventsCallback, Filter pFilter) {
+    public CacheManagerEventsCallback(EventsCallback pUserEventsCallback, Filter pFilter) {
       userEventsCallback = pUserEventsCallback;
       filter = pFilter;
     }

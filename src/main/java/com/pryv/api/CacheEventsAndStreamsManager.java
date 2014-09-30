@@ -141,7 +141,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
-      onlineEventsManager.createEvent(event, new OnlineEventsCallback(null,
+      onlineEventsManager.createEvent(event, new OnlineManagerEventsCallback(null,
         connectionEventsCallback));
     }
   }
@@ -227,13 +227,19 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
   }
 
-  private class OnlineEventsCallback implements EventsCallback {
+  /**
+   * EventsCallback for returns coming from OnlineEventsAndStreamsManager
+   *
+   * @author ik
+   *
+   */
+  private class OnlineManagerEventsCallback implements EventsCallback {
 
     private EventsCallback connectionEventsCallback;
     private Filter filter;
     private double serverTime;
 
-    public OnlineEventsCallback(Filter pFilter, EventsCallback pConnectionEventsCallback) {
+    public OnlineManagerEventsCallback(Filter pFilter, EventsCallback pConnectionEventsCallback) {
       connectionEventsCallback = pConnectionEventsCallback;
       filter = pFilter;
     }
@@ -249,9 +255,6 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         // merge with supervisor
         eventsSupervisor.updateOrCreateEvent(onlineEvent, connectionEventsCallback);
       }
-      // eventsSupervisor.getEvents(filter, this);
-      // connectionEventsCallback.onOnlineRetrieveEventsSuccess(onlineEvents,
-      // pServerTime);
       dbHelper.updateOrCreateEvents(onlineEvents.values(), connectionEventsCallback);
     }
 
@@ -278,7 +281,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   }
 
   /**
-   * EventsCallback used by Cache
+   * EventsCallback for returns coming from Cache
    *
    * @author ik
    *
@@ -287,7 +290,6 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
     private EventsCallback connectionEventsCallback;
     private Filter filter;
-    private double serverTime;
 
     public CacheEventsCallback(Filter pFilter, EventsCallback pConnectionEventsCallback) {
       connectionEventsCallback = pConnectionEventsCallback;
@@ -310,7 +312,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         onlineFilter.setStreamClientIds(scope);
         onlineFilter.generateStreamIds(streamsSupervisor.getStreamsClientIdToIdDictionnary());
         // forward call to online module
-        onlineEventsManager.getEvents(onlineFilter, new OnlineEventsCallback(filter,
+        onlineEventsManager.getEvents(onlineFilter, new OnlineManagerEventsCallback(filter,
           connectionEventsCallback));
       }
     }
@@ -322,11 +324,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
     @Override
     public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
-      // if (event != null) {
-      // dbHelper.updateOrCreateEvent(event, connectionEventsCallback);
-      // } else {
       connectionEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
-      // }
     }
 
     @Override

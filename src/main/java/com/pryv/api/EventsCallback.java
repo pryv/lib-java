@@ -23,20 +23,6 @@ public interface EventsCallback {
    */
   void onRetrievalSuccess(Map<String, Event> events, double serverTime);
 
-  // /**
-  // * callback method for successful DB retrieval
-  // *
-  // * @param cacheEvents
-  // */
-  // void onCacheRetrieveEventsSuccess(Map<String, Event> cacheEvents);
-  //
-  // /**
-  // * callback method for successful Supervisor retrieval
-  // *
-  // * @param supervisorEvents
-  // */
-  // void onSupervisorRetrieveEventsSuccess(Map<String, Event>
-  // supervisorEvents);
 
   /**
    * callback method called when an error occured during Event fetching.
