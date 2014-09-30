@@ -90,7 +90,7 @@ public class SQLiteDBHelper {
       public void run() {
         try {
           String cmd = QueryGenerator.insertOrReplaceEvent(eventToCache);
-          logger.log("SQLiteDBHelper: addEvent: " + cmd);
+          logger.log("SQLiteDBHelper: update or replace event: " + cmd);
           Statement statement = dbConnection.createStatement();
           statement.execute(cmd);
           statement.close();
@@ -125,7 +125,7 @@ public class SQLiteDBHelper {
           try {
             Statement statement = dbConnection.createStatement();
             String cmd = QueryGenerator.insertOrReplaceEvent(event);
-            logger.log("SQLiteDBHelper: updateEvent: " + cmd);
+            logger.log("SQLiteDBHelper: update or create event : " + cmd);
             statement.execute(cmd);
             logger.log("inserted " + event.getClientId() + " into DB.");
             statement.close();
@@ -244,7 +244,7 @@ public class SQLiteDBHelper {
         try {
           Statement statement = dbConnection.createStatement();
           String cmd = QueryGenerator.insertOrReplaceStream(streamToCache);
-          logger.log("SQLiteDBHelper: update or replace Stream : " + cmd);
+          logger.log("SQLiteDBHelper: update or create Stream : " + cmd);
           statement.executeUpdate(cmd);
           if (streamToCache.getChildren() != null) {
             // TODO do recursively maybe
@@ -284,11 +284,11 @@ public class SQLiteDBHelper {
           try {
             Statement statement = dbConnection.createStatement();
             String cmd = QueryGenerator.insertOrReplaceStream(stream);
-            logger.log("SQLiteDBHelper: add Stream stream: id="
+            logger.log("SQLiteDBHelper: update or create Stream stream: id="
               + stream.getId()
                 + ", name="
                 + stream.getName());
-            logger.log("SQLiteDBHelper: update or replace Stream: " + cmd);
+            logger.log("SQLiteDBHelper: update or create Stream: " + cmd);
             statement.executeUpdate(cmd);
             if (stream.getChildren() != null) {
               Set<Stream> children = new HashSet<Stream>();

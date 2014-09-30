@@ -73,8 +73,6 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
 
   @Override
   public void getEvents(final Filter filter, final EventsCallback cacheEventsCallback) {
-    // new FetchEventsThread(filter.toUrlParameters(),
-    // cacheEventsCallback).start();
     new Thread() {
       @Override
       public void run() {
@@ -141,7 +139,6 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
 
   @Override
   public void getStreams(Filter filter, final StreamsCallback cacheStreamsCallback) {
-    // new FetchStreamsThread(filter, cacheStreamsCallback).start();
     new Thread() {
       @Override
       public void run() {
@@ -191,8 +188,8 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   private class ApiResponseHandler implements ResponseHandler<String> {
 
     private RequestType requestType;
-    private EventsCallback eventsCallback;
-    private StreamsCallback streamsCallback;
+    private EventsCallback onlineEventsCallback;
+    private StreamsCallback onlineStreamsCallback;
     private Event event;
     private Stream stream;
 
@@ -201,8 +198,8 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       event = pEvent;
       stream = pStream;
       requestType = type;
-      eventsCallback = pEventsCallback;
-      streamsCallback = pStreamsCallback;
+      onlineEventsCallback = pEventsCallback;
+      onlineStreamsCallback = pStreamsCallback;
     }
 
     @Override
@@ -226,14 +223,14 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
               receivedEvent.assignConnection(weakConnection);
             }
             logger.log("Online: received " + receivedEvents.size() + " event(s) from API.");
-            eventsCallback.onRetrievalSuccess(receivedEvents, serverTime);
+            onlineEventsCallback.onRetrievalSuccess(receivedEvents, serverTime);
             break;
           case CREATE_EVENT:
             Event createdEvent = JsonConverter.retrieveEventFromJson(responseBody);
             createdEvent.assignConnection(weakConnection);
             createdEvent.setClientId(event.getClientId());
             createdEvent.setStreamClientId(event.getStreamClientId());
-            eventsCallback.onEventsSuccess(
+            onlineEventsCallback.onEventsSuccess(
               "Online: event with clientId="
                 + createdEvent.getClientId()
                   + ", Id="
@@ -252,7 +249,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             for (Stream receivedStream : receivedStreams.values()) {
               receivedStream.assignConnection(weakConnection);
             }
-            streamsCallback.onOnlineRetrieveStreamsSuccess(receivedStreams, serverTime);
+            onlineStreamsCallback.onOnlineRetrieveStreamsSuccess(receivedStreams, serverTime);
             break;
 
           case CREATE_STREAM:

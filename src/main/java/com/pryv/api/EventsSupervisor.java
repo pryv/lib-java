@@ -103,6 +103,7 @@ public class EventsSupervisor {
     if ((getClientId(event.getId()) == null && event.getClientId() == null)
       || (event.getId() == null && event.getClientId() == null)) {
       event.generateClientId();
+      logger.log("EventsSupervisor: generating client id: " + event.getClientId());
     }
     // stream should already be inserted - used only when fresh from API
     String streamCid =
@@ -112,8 +113,16 @@ public class EventsSupervisor {
     }
 
     // case exists: compare modified field?
-    Event oldEvent = getEventByClientId(event.getClientId());
+    Event oldEvent = null;
+    if (event.getClientId() == null) {
+      String cid = getClientId(event.getId());
+      if (cid != null) {
+        oldEvent = getEventByClientId(cid);
+        event.setClientId(cid);
+      }
+    }
     if (oldEvent != null) {
+      logger.log("mon old event: id=" + oldEvent.getId() + ", cid=" + oldEvent.getClientId());
       // update
       updateEvent(oldEvent, event);
     } else {
@@ -209,14 +218,14 @@ public class EventsSupervisor {
   }
 
   /**
-   * Returns the Event with eventId id or null if such event does not exist.
+   * Returns the Event with clientId or null if such event does not exist.
    *
-   * @param id
-   *          the id of the event to be retrieved
+   * @param clientId
+   *          the clientId of the event to be retrieved
    * @return the Event with the requested id or null
    */
-  public Event getEventByClientId(String id) {
-    return events.get(id);
+  public Event getEventByClientId(String clientId) {
+    return events.get(clientId);
   }
 
   /**
