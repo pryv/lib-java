@@ -240,45 +240,6 @@ public class Connection implements EventsManager, StreamsManager {
     deltaTime = pServerTime - System.currentTimeMillis() / millisToSeconds;
   }
 
-  // TODO: delete this and use userEventsCallback instead
-  /**
-   * EventsCallback for returns coming from Supervisor
-   *
-   * @author ik
-   *
-   */
-  private class SupervisorEventsCallback implements EventsCallback {
-
-    private EventsCallback userEventsCallback;
-    private Filter filter;
-
-    public SupervisorEventsCallback(EventsCallback pUserEventsCallback, Filter pFilter) {
-      userEventsCallback = pUserEventsCallback;
-      filter = pFilter;
-    }
-
-    @Override
-    public void onEventsRetrievalSuccess(Map<String, Event> supervisorEvents, double pServerTime) {
-      userEventsCallback.onEventsRetrievalSuccess(supervisorEvents, pServerTime);
-    }
-
-    @Override
-    public void onEventsRetrievalError(String message) {
-      userEventsCallback.onEventsRetrievalError(message);
-    }
-
-    @Override
-    public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
-      userEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
-    }
-
-    @Override
-    public void onEventsError(String errorMessage) {
-      userEventsCallback.onEventsError(errorMessage);
-    }
-
-  }
-
   /**
    * EventsCallback for returns coming from CacheEventsAndStreamsManager
    *
@@ -303,7 +264,7 @@ public class Connection implements EventsManager, StreamsManager {
         eventsSupervisor.updateOrCreateEvent(cacheEvent, userEventsCallback);
       }
       // return merged events from Supervisor
-      eventsSupervisor.getEvents(filter, new SupervisorEventsCallback(userEventsCallback, filter));
+      eventsSupervisor.getEvents(filter, userEventsCallback);
     }
 
     @Override
