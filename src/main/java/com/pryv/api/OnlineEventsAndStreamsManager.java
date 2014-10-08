@@ -223,7 +223,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
               receivedEvent.assignConnection(weakConnection);
             }
             logger.log("Online: received " + receivedEvents.size() + " event(s) from API.");
-            onlineEventsCallback.onRetrievalSuccess(receivedEvents, serverTime);
+            onlineEventsCallback.onEventsRetrievalSuccess(receivedEvents, serverTime);
             break;
           case CREATE_EVENT:
             Event createdEvent = JsonConverter.retrieveEventFromJson(responseBody);
@@ -249,7 +249,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             for (Stream receivedStream : receivedStreams.values()) {
               receivedStream.assignConnection(weakConnection);
             }
-            onlineStreamsCallback.onOnlineRetrieveStreamsSuccess(receivedStreams, serverTime);
+            onlineStreamsCallback.onStreamsRetrievalSuccess(receivedStreams, serverTime);
             break;
 
           case CREATE_STREAM:
@@ -319,7 +319,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
           for (Stream receivedStream : receivedStreams.values()) {
             receivedStream.assignConnection(weakConnection);
           }
-          streamsCallback.onOnlineRetrieveStreamsSuccess(receivedStreams, serverTime);
+          streamsCallback.onStreamsRetrievalSuccess(receivedStreams, serverTime);
         } catch (ParseException e) {
           streamsCallback.onStreamsRetrievalError(e.getMessage());
           e.printStackTrace();
@@ -383,7 +383,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
               receivedEvent.assignConnection(weakConnection);
             }
             logger.log("Online: received " + receivedEvents.size() + " event(s) from API.");
-            eventsCallback.onRetrievalSuccess(receivedEvents, serverTime);
+            eventsCallback.onEventsRetrievalSuccess(receivedEvents, serverTime);
           } catch (ParseException e) {
             eventsCallback.onEventsRetrievalError(e.getMessage());
             e.printStackTrace();

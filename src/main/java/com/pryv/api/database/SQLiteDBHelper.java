@@ -210,7 +210,7 @@ public class SQLiteDBHelper {
             Event retrievedEvent = new Event(result);
             retrievedEvents.put(retrievedEvent.getClientId(), retrievedEvent);
           }
-          cacheEventsCallback.onRetrievalSuccess(retrievedEvents, 0);
+          cacheEventsCallback.onEventsRetrievalSuccess(retrievedEvents, 0);
         } catch (SQLException e) {
           cacheEventsCallback.onEventsRetrievalError(e.getMessage());
           e.printStackTrace();
@@ -418,7 +418,7 @@ public class SQLiteDBHelper {
               rootStreams.put(stream.getClientId(), stream);
             }
           }
-          cacheStreamsCallback.onCacheRetrieveStreamSuccess(rootStreams);
+          cacheStreamsCallback.onStreamsRetrievalSuccess(rootStreams, 0);
         } catch (SQLException e) {
           cacheStreamsCallback.onStreamError(e.getMessage());
           e.printStackTrace();

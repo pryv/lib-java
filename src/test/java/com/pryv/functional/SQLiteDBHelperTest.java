@@ -445,7 +445,7 @@ public class SQLiteDBHelperTest {
 
 
       @Override
-      public void onRetrievalSuccess(Map<String, Event> pEvents, double serverTime) {
+      public void onEventsRetrievalSuccess(Map<String, Event> pEvents, double serverTime) {
         events = pEvents;
         eventsRetrievalSuccess = true;
       }
@@ -472,18 +472,10 @@ public class SQLiteDBHelperTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams,
+      public void onStreamsRetrievalSuccess(Map<String, Stream> onlineStreams,
         double serverTime) {
-      }
-
-      @Override
-      public void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStreams) {
-        streams = cacheStreams;
+        streams = onlineStreams;
         streamsRetrievalSuccess = true;
-      }
-
-      @Override
-      public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
       }
 
       @Override

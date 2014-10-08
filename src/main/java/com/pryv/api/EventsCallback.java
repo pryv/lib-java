@@ -21,7 +21,7 @@ public interface EventsCallback {
    * @param serverTime
    *          the time of the server in seconds
    */
-  void onRetrievalSuccess(Map<String, Event> events, double serverTime);
+  void onEventsRetrievalSuccess(Map<String, Event> events, double serverTime);
 
 
   /**

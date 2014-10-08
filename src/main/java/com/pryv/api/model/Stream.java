@@ -115,7 +115,7 @@ public class Stream {
     modifiedBy = result.getString(QueryGenerator.STREAMS_MODIFIED_BY_KEY);
     parentId = result.getString(QueryGenerator.STREAMS_PARENT_ID_KEY);
     singleActivity = result.getBoolean(QueryGenerator.STREAMS_SINGLE_ACTIVITY_KEY);
-    setClientDataFromAstring(result.getString(QueryGenerator.STREAMS_CLIENT_DATA_KEY));
+    setClientDataFromAString(result.getString(QueryGenerator.STREAMS_CLIENT_DATA_KEY));
   }
 
   /**
@@ -228,13 +228,15 @@ public class Stream {
    *
    * @param source
    */
-  public void setClientDataFromAstring(String source) {
+  public void setClientDataFromAString(String source) {
     if (source != null) {
-      String[] cdPairs = source.split(":");
-      if (clientData == null) {
-        clientData = new HashMap<String, Object>();
+      if (source.length() > 0) {
+        String[] cdPairs = source.split(":");
+        if (clientData == null) {
+          clientData = new HashMap<String, Object>();
+        }
+        clientData.put(cdPairs[0], cdPairs[1]);
       }
-      clientData.put(cdPairs[0], cdPairs[1]);
     }
   }
 

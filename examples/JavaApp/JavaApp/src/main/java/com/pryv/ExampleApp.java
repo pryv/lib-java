@@ -276,17 +276,9 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    * Streams Callbacks
    */
 
-  public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> streams, double serverTime) {
+  public void onStreamsRetrievalSuccess(Map<String, Stream> streams, double serverTime) {
     logger.log("JavaApp: received " + streams.size() + " from online");
     addStreamsToTree(streams);
-  }
-
-  public void onCacheRetrieveStreamSuccess(Map<String, Stream> newStreams) {
-    addStreamsToTree(newStreams);
-  }
-
-  public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
-    addStreamsToTree(supervisorStreams);
   }
 
   private void addStreamsToTree(final Map<String, Stream> newStreams) {
@@ -351,7 +343,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    * Events Callbacks
    */
 
-  public void onRetrievalSuccess(final Map<String, Event> newEvents, double serverTime) {
+  public void onEventsRetrievalSuccess(final Map<String, Event> newEvents, double serverTime) {
     addEventsToList(newEvents);
   }
 

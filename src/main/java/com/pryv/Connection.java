@@ -110,7 +110,8 @@ public class Connection implements EventsManager, StreamsManager {
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward getEvents() to Cache
-      cacheEventsManager.getEvents(filter, new CacheManagerEventsCallback(userEventsCallback, filter));
+      cacheEventsManager.getEvents(filter, new CacheManagerEventsCallback(userEventsCallback,
+        filter));
     }
   }
 
@@ -124,7 +125,8 @@ public class Connection implements EventsManager, StreamsManager {
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
-      cacheEventsManager.createEvent(newEvent, new CacheManagerEventsCallback(userEventsCallback, null));
+      cacheEventsManager.createEvent(newEvent, new CacheManagerEventsCallback(userEventsCallback,
+        null));
     }
   }
 
@@ -138,8 +140,8 @@ public class Connection implements EventsManager, StreamsManager {
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
-      cacheEventsManager.deleteEvent(eventToDelete, new CacheManagerEventsCallback(userEventsCallback,
-        null));
+      cacheEventsManager.deleteEvent(eventToDelete, new CacheManagerEventsCallback(
+        userEventsCallback, null));
     }
   }
 
@@ -152,8 +154,8 @@ public class Connection implements EventsManager, StreamsManager {
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
-      cacheEventsManager.updateEvent(eventToUpdate, new CacheManagerEventsCallback(userEventsCallback,
-        null));
+      cacheEventsManager.updateEvent(eventToUpdate, new CacheManagerEventsCallback(
+        userEventsCallback, null));
     }
   }
 
@@ -163,10 +165,10 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void getStreams(Filter filter, final StreamsCallback userStreamsCallback) {
-    userStreamsCallback.onSupervisorRetrieveStreamsSuccess(streamsSupervisor.getRootStreams());
+    userStreamsCallback.onStreamsRetrievalSuccess(streamsSupervisor.getRootStreams(), 0);
     if (Pryv.isCacheActive() || Pryv.isSupervisorActive()) {
       // forward call to cache
-      cacheStreamsManager.getStreams(filter, new ConnectionStreamsCallback(userStreamsCallback));
+      cacheStreamsManager.getStreams(filter, new CacheManagerStreamsCallback(userStreamsCallback));
     }
   }
 
@@ -180,8 +182,8 @@ public class Connection implements EventsManager, StreamsManager {
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
-      cacheStreamsManager.createStream(newStream,
-        new ConnectionStreamsCallback(userStreamsCallback));
+      cacheStreamsManager.createStream(newStream, new CacheManagerStreamsCallback(
+        userStreamsCallback));
     }
   }
 
@@ -201,7 +203,7 @@ public class Connection implements EventsManager, StreamsManager {
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
       cacheStreamsManager.deleteStream(streamToDelete, mergeWithParent,
-        new ConnectionStreamsCallback(userStreamsCallback));
+        new CacheManagerStreamsCallback(userStreamsCallback));
     }
   }
 
@@ -213,7 +215,7 @@ public class Connection implements EventsManager, StreamsManager {
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
-      cacheStreamsManager.updateStream(streamToUpdate, new ConnectionStreamsCallback(
+      cacheStreamsManager.updateStream(streamToUpdate, new CacheManagerStreamsCallback(
         userStreamsCallback));
     }
   }
@@ -238,6 +240,7 @@ public class Connection implements EventsManager, StreamsManager {
     deltaTime = pServerTime - System.currentTimeMillis() / millisToSeconds;
   }
 
+  // TODO: delete this and use userEventsCallback instead
   /**
    * EventsCallback for returns coming from Supervisor
    *
@@ -255,16 +258,14 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onRetrievalSuccess(Map<String, Event> supervisorEvents, double pServerTime) {
-      userEventsCallback.onRetrievalSuccess(supervisorEvents, pServerTime);
+    public void onEventsRetrievalSuccess(Map<String, Event> supervisorEvents, double pServerTime) {
+      userEventsCallback.onEventsRetrievalSuccess(supervisorEvents, pServerTime);
     }
-
 
     @Override
     public void onEventsRetrievalError(String message) {
       userEventsCallback.onEventsRetrievalError(message);
     }
-
 
     @Override
     public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
@@ -294,9 +295,8 @@ public class Connection implements EventsManager, StreamsManager {
       filter = pFilter;
     }
 
-
     @Override
-    public void onRetrievalSuccess(Map<String, Event> cacheEvents, double pServerTime) {
+    public void onEventsRetrievalSuccess(Map<String, Event> cacheEvents, double pServerTime) {
       computeDelta(pServerTime);
       // update existing Events with those retrieved from the cache
       for (Event cacheEvent : cacheEvents.values()) {
@@ -338,12 +338,12 @@ public class Connection implements EventsManager, StreamsManager {
   }
 
   /**
-   * StreamsCallback used by Connection class
+   * Streams Callback for CacheManager
    *
    * @author ik
    *
    */
-  private class ConnectionStreamsCallback implements StreamsCallback {
+  private class CacheManagerStreamsCallback implements StreamsCallback {
 
     private StreamsCallback userStreamsCallback;
 
@@ -351,48 +351,36 @@ public class Connection implements EventsManager, StreamsManager {
      * public constructor
      *
      * @param pUserStreamsCallback
-     *          the class to which the results are forwarder after optional
+     *          the class to which the results are forwarded after optional
      *          processing.
      */
-    public ConnectionStreamsCallback(StreamsCallback pUserStreamsCallback) {
+    public CacheManagerStreamsCallback(StreamsCallback pUserStreamsCallback) {
       userStreamsCallback = pUserStreamsCallback;
     }
 
     @Override
-    public void
-      onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, double pServerTime) {
-      // update server time
-      serverTime = pServerTime;
-      // compute delta time between system time and servertime
-      computeDelta(pServerTime);
-      // onlineStreams are not received here,
+    public void onStreamsRetrievalSuccess(Map<String, Stream> cacheManagerStreams,
+      double pServerTime) {
 
-      if (onlineStreams != null) {
-        // for (Stream stream : onlineStreams.values()) {
-        // streamsSupervisor.updateOrCreateStream(stream, userStreamsCallback);
-        // }
+      if (pServerTime != 0) {
+        // update server time
+        serverTime = pServerTime;
+        // compute delta time between system time and server time
+        computeDelta(pServerTime);
+      }
+
+      if (cacheManagerStreams != null) {
+        for (Stream stream : cacheManagerStreams.values()) {
+          streamsSupervisor.updateOrCreateStream(stream, userStreamsCallback);
+        }
         // forward updated Streams
-        userStreamsCallback.onOnlineRetrieveStreamsSuccess(onlineStreams, serverTime);
+        userStreamsCallback.onStreamsRetrievalSuccess(getRootStreams(), serverTime);
       }
     }
 
     @Override
-    public void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStream) {
-      for (Stream stream : cacheStream.values()) {
-        streamsSupervisor.updateOrCreateStream(stream, this);
-      }
-      // forward updated Streams
-      userStreamsCallback.onCacheRetrieveStreamSuccess(streamsSupervisor.getRootStreams());
-    }
-
-    @Override
-    public void onStreamsRetrievalError(String message) {
-      userStreamsCallback.onStreamsRetrievalError(message);
-    }
-
-    // unused
-    @Override
-    public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
+    public void onStreamsRetrievalError(String errorMessage) {
+      userStreamsCallback.onStreamsRetrievalError(errorMessage);
     }
 
     @Override

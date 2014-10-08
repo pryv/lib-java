@@ -76,9 +76,9 @@ public class EventsSupervisor {
         limitedEvents.put(temp.getClientId(), temp);
         i++;
       }
-      connectionCallback.onRetrievalSuccess(limitedEvents, 0);
+      connectionCallback.onEventsRetrievalSuccess(limitedEvents, 0);
     }
-    connectionCallback.onRetrievalSuccess(filteredEvents, 0);
+    connectionCallback.onEventsRetrievalSuccess(filteredEvents, 0);
   }
 
   /**
@@ -98,12 +98,19 @@ public class EventsSupervisor {
         + ", streamCid="
         + event.getStreamClientId());
 
-    // 1st case: stream fresh from API
-    // 2nd case: stream fresh from user
+    Event oldEvent = null;
+    String cid = getClientId(event.getId());
+
+    // 1st case: event fresh from API
+    // 2nd case: event fresh from user
+    // 3rd case: existing event loaded from API
     if ((getClientId(event.getId()) == null && event.getClientId() == null)
       || (event.getId() == null && event.getClientId() == null)) {
       event.generateClientId();
-      logger.log("EventsSupervisor: generating client id: " + event.getClientId());
+    } else if (event.getClientId() == null && getClientId(event.getId()) != null) {
+      // set clientId
+      oldEvent = getEventByClientId(cid);
+      event.setClientId(cid);
     }
     // stream should already be inserted - used only when fresh from API
     String streamCid =
@@ -112,18 +119,7 @@ public class EventsSupervisor {
       event.setStreamClientId(streamCid);
     }
 
-    // case exists: compare modified field?
-    Event oldEvent = null;
-    if (event.getClientId() == null) {
-      String cid = getClientId(event.getId());
-      if (cid != null) {
-        oldEvent = getEventByClientId(cid);
-        event.setClientId(cid);
-      }
-    }
     if (oldEvent != null) {
-      logger.log("mon old event: id=" + oldEvent.getId() + ", cid=" + oldEvent.getClientId());
-      // update
       updateEvent(oldEvent, event);
     } else {
       addEvent(event, connectionCallback);

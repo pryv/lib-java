@@ -176,7 +176,7 @@ public class SupervisorTest {
     eventsCallback = new EventsCallback() {
 
       @Override
-      public void onRetrievalSuccess(Map<String, Event> onlineEvents, double serverTime) {
+      public void onEventsRetrievalSuccess(Map<String, Event> onlineEvents, double serverTime) {
       }
 
       @Override
@@ -200,10 +200,6 @@ public class SupervisorTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
-      }
-
-      @Override
       public void onStreamsSuccess(String successMessage) {
         logger.log(successMessage);
       }
@@ -219,13 +215,10 @@ public class SupervisorTest {
       }
 
       @Override
-      public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams,
+      public void onStreamsRetrievalSuccess(Map<String, Stream> onlineStreams,
         double serverTime) {
       }
 
-      @Override
-      public void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStreams) {
-      }
     };
   }
 }

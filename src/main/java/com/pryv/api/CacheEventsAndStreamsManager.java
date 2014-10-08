@@ -41,12 +41,6 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   private static final double MIN_TIME = -Double.MAX_VALUE;
 
   /**
-   * boolean representing if the scope has been modified. When this is set to
-   * true, the next getEvents() will be done for the full time frame.
-   */
-  private boolean scopeChanged = true;
-
-  /**
    * last time value received from server on online Events retrieval.
    */
   private double lastOnlineRetrievalServerTime = MIN_TIME;
@@ -182,6 +176,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     if (Pryv.isCacheActive()) {
       // retrieve Streams from cache
       logger.log("Cache: retrieved Streams from cache: ");
+      // dbHelper.getStreams(new
+      // OldCacheStreamsCallback(connectionStreamsCallback));
       dbHelper.getStreams(new CacheStreamsCallback(connectionStreamsCallback));
     }
   }
@@ -194,7 +190,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
-      onlineStreamsManager.createStream(newStream, new CacheStreamsCallback(
+      onlineStreamsManager.createStream(newStream, new OnlineManagerStreamsCallback(
         connectionStreamsCallback));
     }
   }
@@ -208,8 +204,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
-      onlineStreamsManager.deleteStream(streamToDelete, mergeWithParent, new CacheStreamsCallback(
-        connectionStreamsCallback));
+      onlineStreamsManager.deleteStream(streamToDelete, mergeWithParent,
+        new OnlineManagerStreamsCallback(connectionStreamsCallback));
     }
   }
 
@@ -222,7 +218,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
-      onlineStreamsManager.updateStream(streamToUpdate, new CacheStreamsCallback(
+      onlineStreamsManager.updateStream(streamToUpdate, new OnlineManagerStreamsCallback(
         connectionStreamsCallback));
     }
   }
@@ -245,7 +241,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onRetrievalSuccess(Map<String, Event> onlineEvents, double pServerTime) {
+    public void onEventsRetrievalSuccess(Map<String, Event> onlineEvents, double pServerTime) {
       // update Events in cache and send result to connection
       serverTime = pServerTime;
       lastOnlineRetrievalServerTime = pServerTime;
@@ -296,18 +292,16 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       filter = pFilter;
     }
 
-
     @Override
-    public void onRetrievalSuccess(Map<String, Event> cacheEvents, double pServerTime) {
+    public void onEventsRetrievalSuccess(Map<String, Event> cacheEvents, double pServerTime) {
       logger.log("Cache: retrieved events from cache: events amount: " + cacheEvents.size());
       for (Event cacheEvent : cacheEvents.values()) {
         cacheEvent.assignConnection(weakConnection);
       }
-      connectionEventsCallback.onRetrievalSuccess(cacheEvents, pServerTime);
+      connectionEventsCallback.onEventsRetrievalSuccess(cacheEvents, pServerTime);
 
       if (Pryv.isOnlineActive()) {
         Filter onlineFilter = new Filter();
-        // make request to online for missing streams?
         onlineFilter.setModifiedSince(lastOnlineRetrievalServerTime);
         onlineFilter.setStreamClientIds(scope);
         onlineFilter.generateStreamIds(streamsSupervisor.getStreamsClientIdToIdDictionnary());
@@ -334,7 +328,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   }
 
   /**
-   * StreamsCallback used by cache class
+   * Streams callback for local cache DB
    *
    * @author ik
    *
@@ -343,49 +337,31 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
     private StreamsCallback connectionStreamsCallback;
 
-
     public CacheStreamsCallback(StreamsCallback pConnectionStreamsCallback) {
       connectionStreamsCallback = pConnectionStreamsCallback;
     }
 
     @Override
-    public void
-      onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, double serverTime) {
-      logger.log("Cache: Streams retrieval success");
-
-      for (Stream onlineStream : onlineStreams.values()) {
-        streamsSupervisor.updateOrCreateStream(onlineStream, connectionStreamsCallback);
-      }
-      connectionStreamsCallback.onOnlineRetrieveStreamsSuccess(streamsSupervisor.getRootStreams(),
-        serverTime);
-      dbHelper.updateOrCreateStreams(streamsSupervisor.getRootStreams().values(), this);
-    }
-
-    @Override
-    public void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStreams) {
+    public void onStreamsRetrievalSuccess(Map<String, Stream> rootsStreams, double serverTime) {
       // forward to connection
       logger
-        .log("Cache: retrieved streams from cache: root streams amount: " + cacheStreams.size());
-      for (Stream cacheStream : cacheStreams.values()) {
+        .log("Cache: retrieved streams from cache: root streams amount: " + rootsStreams.size());
+      for (Stream cacheStream : rootsStreams.values()) {
         cacheStream.assignConnection(weakConnection);
       }
-      connectionStreamsCallback.onCacheRetrieveStreamSuccess(cacheStreams);
+      connectionStreamsCallback.onStreamsRetrievalSuccess(rootsStreams, 0);
 
       // make the online request
       if (Pryv.isOnlineActive()) {
-        onlineStreamsManager.getStreams(null, new CacheStreamsCallback(connectionStreamsCallback));
+        onlineStreamsManager.getStreams(null, new OnlineManagerStreamsCallback(
+          connectionStreamsCallback));
       }
     }
 
     @Override
-    public void onStreamsRetrievalError(String message) {
+    public void onStreamsRetrievalError(String errorMessage) {
       // forward to connection
-      connectionStreamsCallback.onStreamsRetrievalError(message);
-    }
-
-    @Override
-    public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
-      // unused
+      connectionStreamsCallback.onStreamsRetrievalError(errorMessage);
     }
 
     @Override
@@ -401,5 +377,125 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
   }
+
+  /**
+   * Streams Callback for Online API calls
+   *
+   * @author ik
+   *
+   */
+  private class OnlineManagerStreamsCallback implements StreamsCallback {
+
+    private StreamsCallback connectionStreamsCallback;
+
+    public OnlineManagerStreamsCallback(StreamsCallback pConnectionStreamsCallback) {
+      connectionStreamsCallback = pConnectionStreamsCallback;
+    }
+
+    @Override
+    public void onStreamsRetrievalSuccess(Map<String, Stream> onlineStreams, double serverTime) {
+      logger.log("CacheManager: online Streams retrieval success");
+
+      for (Stream onlineStream : onlineStreams.values()) {
+        streamsSupervisor.updateOrCreateStream(onlineStream, connectionStreamsCallback);
+      }
+      connectionStreamsCallback.onStreamsRetrievalSuccess(streamsSupervisor.getRootStreams(), serverTime);
+      dbHelper.updateOrCreateStreams(streamsSupervisor.getRootStreams().values(), this);
+    }
+
+    @Override
+    public void onStreamsRetrievalError(String errorMessage) {
+      // forward to connection
+      connectionStreamsCallback.onStreamsRetrievalError(errorMessage);
+    }
+
+    @Override
+    public void onStreamsSuccess(String successMessage) {
+      // forward to connection
+      connectionStreamsCallback.onStreamsSuccess(successMessage);
+    }
+
+    @Override
+    public void onStreamError(String errorMessage) {
+      // forward to connection
+      connectionStreamsCallback.onStreamError(errorMessage);
+    }
+
+  }
+
+  // /**
+  // * StreamsCallback used by cache class
+  // *
+  // * @author ik
+  // *
+  // */
+  // private class OldCacheStreamsCallback implements StreamsCallback {
+  //
+  // private StreamsCallback connectionStreamsCallback;
+  //
+  // public OldCacheStreamsCallback(StreamsCallback pConnectionStreamsCallback)
+  // {
+  // connectionStreamsCallback = pConnectionStreamsCallback;
+  // }
+  //
+  // @Override
+  // public void
+  // onRetrievalSuccess(Map<String, Stream> onlineStreams, double serverTime) {
+  // logger.log("Cache: Streams retrieval success");
+  //
+  // for (Stream onlineStream : onlineStreams.values()) {
+  // streamsSupervisor.updateOrCreateStream(onlineStream,
+  // connectionStreamsCallback);
+  // }
+  // connectionStreamsCallback.onRetrievalSuccess(streamsSupervisor.getRootStreams(),
+  // serverTime);
+  // dbHelper.updateOrCreateStreams(streamsSupervisor.getRootStreams().values(),
+  // this);
+  // }
+  //
+  // @Override
+  // public void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStreams)
+  // {
+  // // forward to connection
+  // logger
+  // .log("Cache: retrieved streams from cache: root streams amount: " +
+  // cacheStreams.size());
+  // for (Stream cacheStream : cacheStreams.values()) {
+  // cacheStream.assignConnection(weakConnection);
+  // }
+  // connectionStreamsCallback.onCacheRetrieveStreamSuccess(cacheStreams);
+  //
+  // // make the online request
+  // if (Pryv.isOnlineActive()) {
+  // onlineStreamsManager.getStreams(null,
+  // new OldCacheStreamsCallback(connectionStreamsCallback));
+  // }
+  // }
+  //
+  // @Override
+  // public void onStreamsRetrievalError(String message) {
+  // // forward to connection
+  // connectionStreamsCallback.onStreamsRetrievalError(message);
+  // }
+  //
+  // @Override
+  // public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream>
+  // supervisorStreams) {
+  // // unused
+  // }
+  //
+  // @Override
+  // public void onStreamsSuccess(String successMessage) {
+  // // forward to connection
+  // connectionStreamsCallback.onStreamsSuccess(successMessage);
+  // }
+  //
+  // @Override
+  // public void onStreamError(String errorMessage) {
+  // // forward to connection
+  // connectionStreamsCallback.onStreamError(errorMessage);
+  // }
+  //
+  // }
 
 }

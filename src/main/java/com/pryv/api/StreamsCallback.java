@@ -21,21 +21,7 @@ public interface StreamsCallback {
    * @param serverTime
    *          the server time retrieved from the online message, in seconds
    */
-  void onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams, double serverTime);
-
-  /**
-   * callback method for successful DB retrieval
-   *
-   * @param cacheStreams
-   */
-  void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStreams);
-
-  /**
-   * callback method for successful Supervisor retrieval
-   *
-   * @param supervisorStreams
-   */
-  void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams);
+  void onStreamsRetrievalSuccess(Map<String, Stream> onlineStreams, double serverTime);
 
   /**
    * callback method called when an error occured during Streams fetching.

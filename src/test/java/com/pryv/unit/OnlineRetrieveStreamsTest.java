@@ -60,23 +60,12 @@ public class OnlineRetrieveStreamsTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void
- onOnlineRetrieveStreamsSuccess(Map<String, Stream> onlineStreams,
-        double serverTime) {
+      public void onStreamsRetrievalSuccess(Map<String, Stream> onlineStreams, double serverTime) {
         streams = onlineStreams;
-      }
-
-      // unused
-      @Override
-      public void onCacheRetrieveStreamSuccess(Map<String, Stream> newStreams) {
       }
 
       @Override
       public void onStreamsRetrievalError(String message) {
-      }
-
-      @Override
-      public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
       }
 
       @Override

@@ -73,6 +73,7 @@ public class RetrieveEventsTest {
   // TODO create full scenario test: create, update, get, delete
   @Test
   public void testManipulateEventTest() {
+    System.out.println("testManipulateEventTest begins");
     streamsManager.getStreams(null, streamsCallback);
     Awaitility.await().until(hasStreams());
     Stream chosenStream = null;
@@ -224,7 +225,7 @@ public class RetrieveEventsTest {
       int eSuccessCount = 0;
 
       @Override
-      public void onRetrievalSuccess(Map<String, Event> newEvents, double serverTime) {
+      public void onEventsRetrievalSuccess(Map<String, Event> newEvents, double serverTime) {
         System.out.println("TestEventsCallback: success with "
           + newEvents.values().size()
             + " events");
@@ -257,7 +258,7 @@ public class RetrieveEventsTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void onOnlineRetrieveStreamsSuccess(Map<String, Stream> newStreams, double serverTime) {
+      public void onStreamsRetrievalSuccess(Map<String, Stream> newStreams, double serverTime) {
         System.out.println("TestStreamsCallback: success for "
           + newStreams.values().size()
             + " streams");
@@ -266,19 +267,9 @@ public class RetrieveEventsTest {
       }
 
       @Override
-      public void onCacheRetrieveStreamSuccess(Map<String, Stream> newStreams) {
-        streams = newStreams;
-      }
-
-      @Override
       public void onStreamsRetrievalError(String message) {
         // TODO Auto-generated method stub
 
-      }
-
-      @Override
-      public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream> supervisorStreams) {
-        streams = supervisorStreams;
       }
 
       @Override
