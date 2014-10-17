@@ -144,7 +144,7 @@ public class EventsSupervisor {
         + newEvent.getStreamClientId()
         + ")");
     if (connectionCallback != null) {
-      connectionCallback.onEventsSuccess("EventsSupervisor: Event added", null, 0);
+      connectionCallback.onEventsSuccess("EventsSupervisor: Event added", newEvent, 0);
     }
   }
 
@@ -201,12 +201,11 @@ public class EventsSupervisor {
         // update "trashed" field
         eventToDelete.setTrashed(true);
         updateEvent(null, eventToDelete);
+        connectionCallback.onEventsSuccess(
+          "EventsSupervisor: Event with cid=" + eventToDelete.getClientId() + " trashed.", null, 0);
       }
-      connectionCallback.onEventsSuccess("Event with cid="
-        + eventToDelete.getClientId()
-          + " deleted.", null, 0);
     } else {
-      connectionCallback.onEventsError("Event with cid="
+      connectionCallback.onEventsError("EventsSupervisor: Event with cid="
         + eventToDelete.getClientId()
           + " not found.");
     }

@@ -33,6 +33,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
 
   private String eventsUrl;
   private String streamsUrl;
+  private String tokenUrlArgument;
 
   /**
    * represents the type of reply that is being handled by the
@@ -62,8 +63,9 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
    */
   public OnlineEventsAndStreamsManager(String pUrl, String token,
     WeakReference<Connection> pWeakConnection) {
-    eventsUrl = pUrl + "events?auth=" + token;
-    streamsUrl = pUrl + "streams?auth=" + token;
+    eventsUrl = pUrl + "events"; // ?auth=" + token;
+    streamsUrl = pUrl + "streams"; // ?auth=" + token;
+    tokenUrlArgument = "?auth=" + token;
     weakConnection = pWeakConnection;
   }
 
@@ -77,9 +79,12 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       @Override
       public void run() {
         try {
-          logger.log("Online: getEvents: Get request at: " + eventsUrl + filter.toUrlParameters());
+          logger.log("Online: getEvents: Get request at: "
+            + eventsUrl
+              + tokenUrlArgument
+              + filter.toUrlParameters());
           Request
-            .Get(eventsUrl + filter.toUrlParameters())
+            .Get(eventsUrl + tokenUrlArgument + filter.toUrlParameters())
             .execute()
             .handleResponse(
               new ApiResponseHandler(RequestType.GET_EVENTS, cacheEventsCallback, null, null, null));
@@ -102,10 +107,11 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
         try {
           logger.log("Online: createEvent: Post request at: "
             + eventsUrl
+              + tokenUrlArgument
               + ", body: "
               + JsonConverter.toJson(newEvent));
           Request
-            .Post(eventsUrl)
+            .Post(eventsUrl + tokenUrlArgument)
             .bodyString(JsonConverter.toJson(newEvent), ContentType.APPLICATION_JSON)
             .execute()
             .handleResponse(
@@ -124,8 +130,36 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
 
   @Override
   public void deleteEvent(Event eventToDelete, final EventsCallback cacheEventsCallback) {
-    // TODO Auto-generated method stub
-
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          String deleteUrl = eventsUrl + "/" + eventToDelete.getId() + tokenUrlArgument;
+          logger.log("Online: deleteEvent: Delete request at: " + deleteUrl);
+          Request
+            .Delete(deleteUrl)
+            .execute()
+            .handleResponse(
+              new ApiResponseHandler(RequestType.DELETE_EVENT, cacheEventsCallback, null,
+                eventToDelete, null));
+          // Request
+          // .Post(eventsUrl)
+          // .bodyString(JsonConverter.toJson(newEvent),
+          // ContentType.APPLICATION_JSON)
+          // .execute()
+          // .handleResponse(
+          // new ApiResponseHandler(RequestType.CREATE_EVENT,
+          // cacheEventsCallback, null, newEvent,
+          // null));
+        } catch (ClientProtocolException e) {
+          cacheEventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        } catch (IOException e) {
+          cacheEventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        }
+      }
+    }.start();
   }
 
   @Override
@@ -143,9 +177,9 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       @Override
       public void run() {
         try {
-          logger.log("Online: getStreams: Get request at: " + streamsUrl);
+          logger.log("Online: getStreams: Get request at: " + streamsUrl + tokenUrlArgument);
           Request
-            .Get(streamsUrl)
+            .Get(streamsUrl + tokenUrlArgument)
             .execute()
             .handleResponse(
               new ApiResponseHandler(RequestType.GET_STREAMS, null, cacheStreamsCallback, null,
@@ -206,10 +240,15 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
     public String handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
 
       int statusCode = response.getStatusLine().getStatusCode();
-      String responseBody = EntityUtils.toString(response.getEntity());
+
       logger.log("ApiResponseHandler: response status code: " + statusCode);
-      logger.log("ApiResponseHandler: handling reply entity : " + responseBody);
-      double serverTime = JsonConverter.retrieveServerTime(responseBody);
+      String responseBody = null;
+      double serverTime = 0;
+      if (response.getEntity() != null) {
+        responseBody = EntityUtils.toString(response.getEntity());
+        logger.log("ApiResponseHandler: handling reply entity : " + responseBody);
+        serverTime = JsonConverter.retrieveServerTime(responseBody);
+      }
 
       if (statusCode == HttpStatus.SC_CREATED
         || statusCode == HttpStatus.SC_OK
@@ -242,7 +281,28 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             break;
 
           case DELETE_EVENT:
-
+            // si deleted, pas de body?
+            if (statusCode == HttpStatus.SC_NO_CONTENT) {
+              // deleted
+              onlineEventsCallback.onEventsSuccess(
+                "Online: event with clientId="
+                  + event.getClientId()
+                    + ", Id="
+                    + event.getId()
+                    + " deleted on API", null, null);
+            } else {
+              // trashed
+              Event trashedEvent = JsonConverter.retrieveEventFromJson(responseBody);
+              trashedEvent.assignConnection(weakConnection);
+              trashedEvent.setClientId(event.getClientId());
+              trashedEvent.setStreamClientId(event.getStreamClientId());
+              onlineEventsCallback.onEventsSuccess(
+                "Online: event with clientId="
+                  + trashedEvent.getClientId()
+                    + ", Id="
+                    + trashedEvent.getId()
+                    + " trashed on API", trashedEvent, null);
+            }
             break;
           case GET_STREAMS:
             Map<String, Stream> receivedStreams = JsonConverter.createStreamsFromJson(responseBody);

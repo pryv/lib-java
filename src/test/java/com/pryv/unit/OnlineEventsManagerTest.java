@@ -1,41 +1,37 @@
-package com.pryv.functional;
+package com.pryv.unit;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import resources.TestCredentials;
 
 import com.jayway.awaitility.Awaitility;
-import com.pryv.Connection;
 import com.pryv.Pryv;
 import com.pryv.api.EventsCallback;
-import com.pryv.api.EventsManager;
 import com.pryv.api.Filter;
+import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.api.StreamsCallback;
-import com.pryv.api.StreamsManager;
-import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
-import com.pryv.unit.DummyData;
 
 /**
- *
- * test events retrieval
+ * Test of Retrieval of Events by Online module
  *
  * @author ik
  *
  */
-public class RetrieveEventsTest {
+public class OnlineEventsManagerTest {
 
-  private static EventsManager eventsManager;
-  private static StreamsManager streamsManager;
+  private static OnlineEventsAndStreamsManager online;
 
   private static EventsCallback eventsCallback;
   private static StreamsCallback streamsCallback;
@@ -43,40 +39,51 @@ public class RetrieveEventsTest {
   private static Map<String, Event> events;
   private static Map<String, Stream> streams;
 
+  private static String streamId;
   private static Event createdEvent;
 
   private static boolean eventsSuccess = false;
   private static boolean eventsError = false;
   private static boolean eventsRetrievalError = false;
 
-  @BeforeClass
-  public static void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     Pryv.setStaging();
 
     instanciateEventsCallback();
     instanciateStreamsCallback();
 
-    eventsManager =
-      new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, new DBinitCallback() {
-        @Override
-        public void onError(String message) {
-          System.out.println("DB init Error: " + message);
-        }
-      });
-    streamsManager = (StreamsManager) eventsManager;
+    String url = "https://" + TestCredentials.USERNAME + "." + Pryv.API_DOMAIN + "/";
+    online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
   }
 
-  @Before
-  public void beforeEachTest() {
-    events = null;
-    streams = null;
-  }
-
-  // TODO create full scenario test: create, update, get, delete
   @Test
-  public void testManipulateEventTest() {
+  public void testFetchEventsWithEmptyFilterAndDeserializeJSON() {
+    online.getEvents(new Filter(), eventsCallback);
+    Awaitility.await().until(hasReceivedEvents());
+  }
+
+  @Test
+  public void testFetchEventsForAStream() {
+    online.getEvents(new Filter(), eventsCallback);
+    Awaitility.await().until(hasReceivedEvents());
+    streamId = "";
+    for (Event event : events.values()) {
+      streamId = event.getStreamId();
+    }
+    System.out.println("TEst: streamId chosen:" + streamId);
+    Set<String> streamIds = new HashSet<String>();
+    streamIds.add(streamId);
+    Filter filter = new Filter();
+    filter.setStreamIds(streamIds);
+    online.getEvents(filter, eventsCallback);
+    Awaitility.await().until(hasReceivedEventsForAStream());
+  }
+
+  @Test
+  public void testCreateAndDeleteEvent() {
     System.out.println("testManipulateEventTest begins");
-    streamsManager.getStreams(null, streamsCallback);
+    online.getStreams(null, streamsCallback);
     Awaitility.await().until(hasStreams());
     Stream chosenStream = null;
     for (Stream stream : streams.values()) {
@@ -98,64 +105,61 @@ public class RetrieveEventsTest {
     testEvent.setTags(DummyData.getTags());
     testEvent.setDescription("this is the ultimate test Event");
     testEvent.setClientData(DummyData.getClientdata());
+    online.createEvent(testEvent, eventsCallback);
+    Awaitility.await().until(hasEventsSuccess());
+    eventsSuccess = false;
+    assertNotNull(createdEvent);
+    assertNotNull(createdEvent.getId());
+    online.deleteEvent(createdEvent, eventsCallback);
+    Awaitility.await().until(hasEventsSuccess());
+    eventsSuccess = false;
+    assertNotNull(createdEvent);
+    assertTrue(createdEvent.getTrashed());
+    Event eventToDeleteReally = new Event();
+    eventToDeleteReally.setId(createdEvent.getId());
+    createdEvent = null;
+    online.deleteEvent(eventToDeleteReally, eventsCallback);
+    Awaitility.await().until(hasEventsSuccess());
+    assertNull(createdEvent);
 
-    eventsManager.createEvent(testEvent, eventsCallback);
-    Awaitility.await().until(hasCreatedEventOnline());
-    eventsSuccess = false;
-    eventsManager.deleteEvent(createdEvent, eventsCallback);
-    Awaitility.await().until(hasEventsSuccess());
-    eventsSuccess = false;
-    Awaitility.await().until(hasEventsSuccess());
-    eventsSuccess = false;
-    Awaitility.await().until(hasEventsSuccess());
-    eventsSuccess = false;
-    // assertFalse(eventsError);
-
-    // TODO: delete the created event.
-    // retrieve id from online API response, send delete command
   }
 
-
-  public void testFetchEventsForAStream() {
-
-    Filter filter = new Filter();
-    final int limit = 20;
-    filter.setLimit(limit);
-    eventsManager.getEvents(filter, eventsCallback);
-    Awaitility.await().until(hasEvents());
-
-    // get a streamCid
-    String streamCid = null;
-    Iterator<Event> iterator = events.values().iterator();
-    while (streamCid == null && iterator.hasNext()) {
-      streamCid = iterator.next().getStreamClientId();
-    }
-    System.out.println("Test: We're going for dat streamcid=" + streamCid);
-    filter = new Filter();
-    filter.addStreamClientId(streamCid);
-    System.out.println("Test: going for dem right EVENTZZZZZ");
-    eventsManager.getEvents(filter, eventsCallback);
-    Awaitility.await().until(hasFetchedRightEvents(streamCid));
-    eventsSuccess = false;
-    assertFalse(eventsError);
-  }
-
-  private Callable<Boolean> hasFetchedRightEvents(final String streamCid) {
+  private Callable<Boolean> hasReceivedEvents() {
     return new Callable<Boolean>() {
+
       @Override
       public Boolean call() throws Exception {
         if (events != null) {
-          if (events.values().size() > 0) {
-            boolean match = false;
-            for (Event event : events.values()) {
-              if (streamCid.equals(event.getStreamClientId())) {
-                match = true;
-              }
-            }
-            return match;
-          } else {
+          return events.size() > 0;
+        } else {
+          return false;
+        }
+      }
+    };
+  }
+
+  private Callable<Boolean> hasReceivedEventsForAStream() {
+    return new Callable<Boolean>() {
+
+      @Override
+      public Boolean call() throws Exception {
+        for (Event event : events.values()) {
+          if (!event.getStreamId().equals(streamId)) {
             return false;
           }
+        }
+        return true;
+      }
+    };
+  }
+
+  private Callable<Boolean> hasEvents() {
+    return new Callable<Boolean>() {
+
+      @Override
+      public Boolean call() throws Exception {
+        if (events != null) {
+          return events.values().size() > 0;
         } else {
           return false;
         }
@@ -217,26 +221,6 @@ public class RetrieveEventsTest {
     };
   }
 
-  @Test
-  public void testFetchEvents() {
-    eventsManager.getEvents(new Filter(), eventsCallback);
-    Awaitility.await().until(hasEvents());
-  }
-
-  private Callable<Boolean> hasEvents() {
-    return new Callable<Boolean>() {
-
-      @Override
-      public Boolean call() throws Exception {
-        if (events != null) {
-          return events.values().size() > 0;
-        } else {
-          return false;
-        }
-      }
-    };
-  }
-
   private static void instanciateEventsCallback() {
     eventsCallback = new EventsCallback() {
 
@@ -255,6 +239,7 @@ public class RetrieveEventsTest {
 
       @Override
       public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+        System.out.println("OnlineEventsManagerTest: eventsSuccess msg: " + successMessage);
         eventsSuccess = true;
         if (event != null) {
           createdEvent = event;

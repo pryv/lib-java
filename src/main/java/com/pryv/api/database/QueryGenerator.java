@@ -233,6 +233,23 @@ public class QueryGenerator {
   }
 
   /**
+   * retrieve an Event from the SQLite database.
+   *
+   * @param clientId
+   *          the client ID of the event
+   * @return
+   */
+  public static String retrieveEvent(String clientId) {
+    return "SELECT * FROM "
+      + EVENTS_TABLE_NAME
+        + " WHERE "
+        + EVENTS_CLIENT_ID_KEY
+        + "="
+        + formatTextValue(clientId)
+        + ";";
+  }
+
+  /**
    * Creates query to insert or replace stream in the SQLite database.
    *
    * @param streamToCache

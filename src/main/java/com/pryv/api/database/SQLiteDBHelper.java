@@ -158,26 +158,61 @@ public class SQLiteDBHelper {
       @Override
       public void run() {
         try {
-          String cmd = QueryGenerator.deleteEvent(eventToDelete);
-          logger.log("SQLiteDBHelper: deleteEvent: " + cmd);
+          System.out.println("SQLiteDBHelper: deleting event with id=" + eventToDelete.getId());
+          String fetchCmd = QueryGenerator.retrieveEvent(eventToDelete.getClientId());
+          System.out.println("SQLiteDBHelper: fetching request: " + fetchCmd);
           Statement statement = dbConnection.createStatement();
-          int done = statement.executeUpdate(cmd);
-          // set trashed field to 1
-          if (done == 0) {
-            updateOrCreateEvent(eventToDelete, cacheEventsCallback);
-            logger.log("SQLiteDBHelper: delete - set trashed=true for clientId="
-              + eventToDelete.getClientId());
-            cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event with clientId="
-              + eventToDelete.getClientId()
-                + " is trashed.", eventToDelete, null);
-
-          } else {
-            cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event with clientId="
-              + eventToDelete.getClientId()
-                + " is deleted.", eventToDelete, null);
+          ResultSet result = statement.executeQuery(fetchCmd);
+          while (result.next()) {
+            Event retrievedEvent = new Event(result);
+            if (retrievedEvent.getTrashed() == true) {
+              // delete really
+              String cmd = QueryGenerator.deleteEvent(retrievedEvent);
+              statement.executeUpdate(cmd);
+              cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event with clientId="
+                + eventToDelete.getClientId()
+                  + " is deleted.", null, null);
+            } else {
+              // set to trashed
+              retrievedEvent.setTrashed(true);
+              String cmd = QueryGenerator.insertOrReplaceEvent(retrievedEvent);
+              statement.executeUpdate(cmd);
+              logger.log("SQLiteDBHelper: delete - set trashed=true for clientId="
+                + retrievedEvent.getClientId());
+              cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event with clientId="
+                + retrievedEvent.getClientId()
+                  + " is trashed.", retrievedEvent, null);
+            }
           }
           statement.close();
+          // String cmd = QueryGenerator.deleteEvent(eventToDelete);
+          // logger.log("SQLiteDBHelper: deleteEvent: " + cmd);
+          // // Statement statement = dbConnection.createStatement();
+          // int done = statement.executeUpdate(cmd);
+          //
+          // // set trashed field to 1
+          // if (done == 0) {
+          // updateOrCreateEvent(eventToDelete, cacheEventsCallback);
+          // logger.log("SQLiteDBHelper: delete - set trashed=true for clientId="
+          // + eventToDelete.getClientId());
+          // cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event with clientId="
+          // + eventToDelete.getClientId()
+          // + " is trashed.", eventToDelete, null);
+          // } else {
+          // cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event with clientId="
+          // + eventToDelete.getClientId()
+          // + " is deleted.", eventToDelete, null);
+          // }
         } catch (SQLException e) {
+          cacheEventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        } catch (JsonParseException e) {
+          cacheEventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        } catch (JsonMappingException e) {
+          cacheEventsCallback.onEventsError(e.getMessage());
+          e.printStackTrace();
+        } catch (IOException e) {
           cacheEventsCallback.onEventsError(e.getMessage());
           e.printStackTrace();
         }

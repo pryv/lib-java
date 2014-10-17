@@ -78,6 +78,7 @@ public class SQLiteDBHelperTest {
   // executed after all tests once
   @AfterClass
   public static void cleanUpTestDB() {
+    testEvent = null;
     db.getEvents(null, eventsCallback);
     Awaitility.await().until(hasRetrievedEventSuccessfully());
     for (Event event : events.values()) {
@@ -85,17 +86,21 @@ public class SQLiteDBHelperTest {
         + event.getClientId()
           + ", cid="
           + event.getClientId());
-      event.setTrashed(true);
-      event.setModified(event.getModified() + MODIFIED_INCREMENT);
       db.deleteEvent(event, eventsCallback);
       Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
       eventsSuccess = false;
-      db.deleteEvent(event, eventsCallback);
-      Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
-      eventsSuccess = false;
+      if (testEvent != null) {
+        db.deleteEvent(event, eventsCallback);
+        Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
+        eventsSuccess = false;
+      }
+      testEvent = null;
     }
+
+    testStream = null;
     db.getStreams(streamsCallback);
     Awaitility.await().until(hasRetrievedStreamSuccessfully());
+
     for (Stream stream : streams.values()) {
       System.out.println("deleting stream with clientid="
         + stream.getClientId()
@@ -105,10 +110,10 @@ public class SQLiteDBHelperTest {
       stream.setModified(stream.getModified() + MODIFIED_INCREMENT);
       db.deleteStream(stream, streamsCallback);
       Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
-      eventsSuccess = false;
+      streamsSuccess = false;
       db.deleteStream(stream, streamsCallback);
       Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
-      eventsSuccess = false;
+      streamsSuccess = false;
     }
   }
 
@@ -186,7 +191,6 @@ public class SQLiteDBHelperTest {
 
   @Test
   public void test04RemoveFullEvent() {
-    testEvent.setTrashed(true);
     testEvent.setModified(testEvent.getModified() + MODIFIED_INCREMENT);
     db.deleteEvent(testEvent, eventsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
@@ -452,6 +456,7 @@ public class SQLiteDBHelperTest {
 
       @Override
       public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+        testEvent = event;
         eventsSuccess = true;
       }
 
@@ -472,9 +477,10 @@ public class SQLiteDBHelperTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void onStreamsRetrievalSuccess(Map<String, Stream> onlineStreams,
+      public void
+        onStreamsRetrievalSuccess(Map<String, Stream> receveiedStreams,
         double serverTime) {
-        streams = onlineStreams;
+        streams = receveiedStreams;
         streamsRetrievalSuccess = true;
       }
 
