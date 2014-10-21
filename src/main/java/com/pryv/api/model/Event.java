@@ -125,7 +125,11 @@ public class Event {
     description = pDescription;
     attachments = pAttachments;
     clientData = pClientData;
-    trashed = pTrashed;
+    if (trashed != null) {
+      trashed = pTrashed;
+    } else {
+      trashed = false;
+    }
     tempRefId = pTempRefId;
   }
 
@@ -133,7 +137,7 @@ public class Event {
    * empty Event constructor
    */
   public Event() {
-
+    trashed = false;
   }
 
   /**

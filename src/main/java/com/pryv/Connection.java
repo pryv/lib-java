@@ -132,7 +132,7 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void deleteEvent(Event eventToDelete, EventsCallback userEventsCallback) {
-    eventToDelete.setTrashed(true);
+    // eventToDelete.setTrashed(true);
 
     if (Pryv.isSupervisorActive()) {
       // delete Event in Supervisor

@@ -264,9 +264,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       if (event != null) {
         dbHelper.updateOrCreateEvent(event, new CacheEventsCallback(filter,
           connectionEventsCallback));
-      } else {
-        connectionEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
       }
+      connectionEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
     }
 
     @Override

@@ -190,6 +190,13 @@ public class EventsSupervisor {
    *          callback used to notify success or failure
    */
   public void deleteEvent(Event eventToDelete, EventsCallback connectionCallback) {
+    logger.log("EventsSupervisor: deleting event with cid="
+      + eventToDelete.getClientId()
+        + ", id="
+        + eventToDelete.getId());
+    Event tmpEvent = events.get(eventToDelete.getClientId());
+    System.out.println("EventsSupervisor: event to delete ref in supervisor: " + tmpEvent);
+    System.out.println("ev to Del fields: trashed=" + tmpEvent.getTrashed());
     if (events.get(eventToDelete.getClientId()) != null) {
       if (events.get(eventToDelete.getClientId()).getTrashed() == true) {
         // delete really

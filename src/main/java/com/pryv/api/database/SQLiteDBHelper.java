@@ -158,7 +158,8 @@ public class SQLiteDBHelper {
       @Override
       public void run() {
         try {
-          System.out.println("SQLiteDBHelper: deleting event with id=" + eventToDelete.getId());
+          System.out.println("SQLiteDBHelper: deleting event with cid="
+            + eventToDelete.getClientId());
           String fetchCmd = QueryGenerator.retrieveEvent(eventToDelete.getClientId());
           System.out.println("SQLiteDBHelper: fetching request: " + fetchCmd);
           Statement statement = dbConnection.createStatement();

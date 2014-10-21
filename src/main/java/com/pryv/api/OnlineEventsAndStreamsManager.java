@@ -142,15 +142,6 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             .handleResponse(
               new ApiResponseHandler(RequestType.DELETE_EVENT, cacheEventsCallback, null,
                 eventToDelete, null));
-          // Request
-          // .Post(eventsUrl)
-          // .bodyString(JsonConverter.toJson(newEvent),
-          // ContentType.APPLICATION_JSON)
-          // .execute()
-          // .handleResponse(
-          // new ApiResponseHandler(RequestType.CREATE_EVENT,
-          // cacheEventsCallback, null, newEvent,
-          // null));
         } catch (ClientProtocolException e) {
           cacheEventsCallback.onEventsError(e.getMessage());
           e.printStackTrace();
@@ -269,6 +260,10 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             createdEvent.assignConnection(weakConnection);
             createdEvent.setClientId(event.getClientId());
             createdEvent.setStreamClientId(event.getStreamClientId());
+            logger.log("Online: event created successfully: cid="
+              + createdEvent.getClientId()
+                + ", id="
+                + createdEvent.getId());
             onlineEventsCallback.onEventsSuccess(
               "Online: event with clientId="
                 + createdEvent.getClientId()

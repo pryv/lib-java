@@ -45,6 +45,7 @@ public class RetrieveEventsTest {
 
   private static Event createdEvent;
 
+  private static boolean streamsReceived = false;
   private static boolean eventsSuccess = false;
   private static boolean eventsError = false;
   private static boolean eventsRetrievalError = false;
@@ -73,11 +74,16 @@ public class RetrieveEventsTest {
   }
 
   // TODO create full scenario test: create, update, get, delete
-  @Test
+  // @Test
   public void testManipulateEventTest() {
     System.out.println("testManipulateEventTest begins");
     streamsManager.getStreams(null, streamsCallback);
-    Awaitility.await().until(hasStreams());
+    Awaitility.await().until(hasReceivedStreams());
+    System.out.println("RECEIVED STREAMS ONE - LALALA");
+    streamsReceived = false;
+    Awaitility.await().until(hasReceivedStreams());
+    System.out.println("RECEIVED STREAMS TWO - LALALA");
+    streamsReceived = false;
     Stream chosenStream = null;
     for (Stream stream : streams.values()) {
       chosenStream = stream;
@@ -100,16 +106,27 @@ public class RetrieveEventsTest {
     testEvent.setClientData(DummyData.getClientdata());
 
     eventsManager.createEvent(testEvent, eventsCallback);
-    Awaitility.await().until(hasCreatedEventOnline());
+    // Awaitility.await().until(hasCreatedEventOnline());
+    Awaitility.await().until(hasEventsSuccess());
     eventsSuccess = false;
+    System.out.println("RetrieveEventsTest: TEST EVENT CREATED ONE - LALALA");
+    Awaitility.await().until(hasEventsSuccess());
+    eventsSuccess = false;
+    System.out.println("RetrieveEventsTest: TEST EVENT CREATED TWO - LALALA");
+    Awaitility.await().until(hasEventsSuccess());
+    eventsSuccess = false;
+
+    System.out.println("RetrieveEventsTest: TEST EVENT CREATED THREE - LALALA");
     eventsManager.deleteEvent(createdEvent, eventsCallback);
     Awaitility.await().until(hasEventsSuccess());
+    System.out.println("RetrieveEventsTest: TEST EVENT DELETED ONE - LALALA");
     eventsSuccess = false;
     Awaitility.await().until(hasEventsSuccess());
+    System.out.println("RetrieveEventsTest: TEST EVENT DELETED TWO - LALALA");
     eventsSuccess = false;
     Awaitility.await().until(hasEventsSuccess());
+    System.out.println("RetrieveEventsTest: TEST EVENT DELETED THREE - LALALA");
     eventsSuccess = false;
-    // assertFalse(eventsError);
 
     // TODO: delete the created event.
     // retrieve id from online API response, send delete command
@@ -163,16 +180,11 @@ public class RetrieveEventsTest {
     };
   }
 
-  private Callable<Boolean> hasStreams() {
+  private Callable<Boolean> hasReceivedStreams() {
     return new Callable<Boolean>() {
-
       @Override
       public Boolean call() throws Exception {
-        if (streams != null) {
-          return streams.values().size() > 0;
-        } else {
-          return false;
-        }
+        return streamsReceived;
       }
     };
   }
@@ -255,6 +267,10 @@ public class RetrieveEventsTest {
 
       @Override
       public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+        System.out.println("RetrieveEventsTest: events success called with msg: "
+          + successMessage
+            + ", event="
+            + event);
         eventsSuccess = true;
         if (event != null) {
           createdEvent = event;
@@ -277,7 +293,7 @@ public class RetrieveEventsTest {
           + newStreams.values().size()
             + " streams");
         streams = newStreams;
-
+        streamsReceived = true;
       }
 
       @Override
