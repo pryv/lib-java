@@ -143,15 +143,29 @@ public class OnlineEventsAndStreamsManagerTest {
   public void testCreateStream() {
     Stream testStream = new Stream();
     testStream.setName("testStream name3");
+
+    // create
     online.createStream(testStream, streamsCallback);
     Awaitility.await().until(hasStreamSuccess());
     streamsSuccess = false;
     assertNotNull(createdStream);
+
+    // update
+    String nameUpdate = "testStream name3 updated - wooohooohoo";
+    createdStream.setName(nameUpdate);
+    online.updateStream(createdStream, streamsCallback);
+    Awaitility.await().until(hasStreamSuccess());
+    streamsSuccess = false;
+    assertEquals(nameUpdate, createdStream.getName());
+
+    // trash
     online.deleteStream(createdStream, false, streamsCallback);
     Awaitility.await().until(hasStreamSuccess());
     streamsSuccess = false;
     assertNotNull(createdStream);
     assertTrue(createdStream.getTrashed());
+
+    // delete
     online.deleteStream(createdStream, false, streamsCallback);
     Awaitility.await().until(hasStreamSuccess());
     assertNull(createdStream);

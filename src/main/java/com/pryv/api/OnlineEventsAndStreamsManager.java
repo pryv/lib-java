@@ -262,7 +262,28 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
 
   @Override
   public void updateStream(Stream streamToUpdate, final StreamsCallback cacheStreamsCallback) {
-    // TODO Auto-generated method stub
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          String updateUrl = streamsUrl + "/" + streamToUpdate.getId() + tokenUrlArgument;
+          logger.log("Online: update Stream: Update request at: " + updateUrl);
+          Request
+            .Put(updateUrl)
+            .bodyString(JsonConverter.toJson(streamToUpdate), ContentType.APPLICATION_JSON)
+            .execute()
+            .handleResponse(
+              new ApiResponseHandler(RequestType.UPDATE_STREAM, null, cacheStreamsCallback, null,
+                streamToUpdate));
+        } catch (ClientProtocolException e) {
+          cacheStreamsCallback.onStreamError(e.getMessage());
+          e.printStackTrace();
+        } catch (IOException e) {
+          cacheStreamsCallback.onStreamError(e.getMessage());
+          e.printStackTrace();
+        }
+      }
+    }.start();
   }
 
   /**
@@ -408,7 +429,19 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             break;
 
           case UPDATE_STREAM:
-
+            Stream updatedStream = JsonConverter.retrieveStreamFromJson(responseBody);
+            updatedStream.assignConnection(weakConnection);
+            updatedStream.setClientId(stream.getClientId());
+            logger.log("Online: stream updated successfully: cid="
+              + updatedStream.getClientId()
+                + ", id="
+                + updatedStream.getId());
+            onlineStreamsCallback.onStreamsSuccess(
+              "Online: stream with clientId="
+                + updatedStream.getClientId()
+                  + ", Id="
+                  + updatedStream.getId()
+                  + " updated on API", updatedStream);
             break;
 
           case DELETE_STREAM:
@@ -428,7 +461,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
               trashedStream.setClientId(stream.getClientId());
               onlineStreamsCallback.onStreamsSuccess("Online: stream with clientId="
                 + trashedStream.getClientId()
-                    + ", Id="
+                  + ", Id="
                   + trashedStream.getId()
                   + " trashed on API", trashedStream);
             }
