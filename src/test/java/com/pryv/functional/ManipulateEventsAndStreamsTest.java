@@ -32,7 +32,7 @@ import com.pryv.unit.DummyData;
  * @author ik
  *
  */
-public class RetrieveEventsTest {
+public class ManipulateEventsAndStreamsTest {
 
   private static EventsManager eventsManager;
   private static StreamsManager streamsManager;

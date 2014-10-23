@@ -236,8 +236,28 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   @Override
   public void deleteStream(Stream streamToDelete, boolean mergeEventsWithParent,
     StreamsCallback cacheStreamsCallback) {
-    // TODO Auto-generated method stub
-
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          String deleteUrl = streamsUrl + "/" + streamToDelete.getId() + tokenUrlArgument;
+          logger.log("Online: delete Stream: Delete request at: " + deleteUrl);
+          // TODO maybe add mergeEventsWithParent as bodyString
+          Request
+            .Delete(deleteUrl)
+            .execute()
+            .handleResponse(
+              new ApiResponseHandler(RequestType.DELETE_STREAM, null, cacheStreamsCallback, null,
+                streamToDelete));
+        } catch (ClientProtocolException e) {
+          cacheStreamsCallback.onStreamError(e.getMessage());
+          e.printStackTrace();
+        } catch (IOException e) {
+          cacheStreamsCallback.onStreamError(e.getMessage());
+          e.printStackTrace();
+        }
+      }
+    }.start();
   }
 
   @Override
@@ -355,6 +375,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
                     + " trashed on API", trashedEvent, null);
             }
             break;
+
           case GET_STREAMS:
             Map<String, Stream> receivedStreams = JsonConverter.createStreamsFromJson(responseBody);
             for (Stream receivedStream : receivedStreams.values()) {
@@ -389,9 +410,30 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
           case UPDATE_STREAM:
 
             break;
-          case DELETE_STREAM:
 
+          case DELETE_STREAM:
+            // si deleted, pas de body?
+            if (statusCode == HttpStatus.SC_NO_CONTENT) {
+              // deleted
+              onlineStreamsCallback.onStreamsSuccess(
+                "Online: stream with clientId="
+                  + stream.getClientId()
+                    + ", Id="
+                    + stream.getId()
+                    + " deleted on API", null);
+            } else {
+              // trashed
+              Stream trashedStream = JsonConverter.retrieveStreamFromJson(responseBody);
+              trashedStream.assignConnection(weakConnection);
+              trashedStream.setClientId(stream.getClientId());
+              onlineStreamsCallback.onStreamsSuccess("Online: stream with clientId="
+                + trashedStream.getClientId()
+                    + ", Id="
+                  + trashedStream.getId()
+                  + " trashed on API", trashedStream);
+            }
             break;
+
           default:
 
         }
