@@ -69,7 +69,7 @@ public class OnlineRetrieveStreamsTest {
       }
 
       @Override
-      public void onStreamsSuccess(String successMessage) {
+      public void onStreamsSuccess(String successMessage, Stream stream) {
       }
 
       @Override

@@ -200,7 +200,7 @@ public class SupervisorTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void onStreamsSuccess(String successMessage) {
+      public void onStreamsSuccess(String successMessage, Stream stream) {
         logger.log(successMessage);
       }
 

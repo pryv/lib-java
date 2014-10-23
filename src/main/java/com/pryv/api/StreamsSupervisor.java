@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 import com.pryv.utils.Logger;
 
@@ -37,6 +38,10 @@ public class StreamsSupervisor {
    */
   private Map<String, String> clientIdToId;
 
+  private EventsSupervisor eventsSupervisor;
+  private EventsCallback deleteEventsCallback;
+  private Map<String, Event> eventsOnDelete;
+
   private Logger logger = Logger.getInstance();
 
   /**
@@ -49,6 +54,11 @@ public class StreamsSupervisor {
     flatStreams = new HashMap<String, Stream>();
     idToClientId = new HashMap<String, String>();
     clientIdToId = new HashMap<String, String>();
+    instanciateDeleteEventsCallback();
+  }
+
+  public void setEventsSupervisor(EventsSupervisor pEventsSupervisor) {
+    eventsSupervisor = pEventsSupervisor;
   }
 
   /*
@@ -221,7 +231,15 @@ public class StreamsSupervisor {
         + ", parentCid="
         + oldStream.getParentClientId()
         + ")");
-    connectionCallback.onStreamsSuccess("");
+    connectionCallback.onStreamsSuccess("StreamsSupervisor: Stream with id="
+      + oldStream.getId()
+        + ", cid="
+        + oldStream.getClientId()
+        + ", name="
+        + oldStream.getName()
+        + ", parentCid="
+        + oldStream.getParentClientId()
+        + " updated.", oldStream);
 
     // update children streams
     if (streamToUpdate.getChildren() != null) {
@@ -311,8 +329,15 @@ public class StreamsSupervisor {
         + ", parentCid="
         + newStream.getParentClientId()
         + ")");
-    connectionCallback.onStreamsSuccess("");
-
+    connectionCallback.onStreamsSuccess("StreamsSupervisor: Stream with id="
+      + newStream.getId()
+        + ", cid="
+        + newStream.getClientId()
+        + ", name="
+        + newStream.getName()
+        + ", parentCid="
+        + newStream.getParentClientId()
+        + " created.", newStream);
     // add its children if any
     if (newStream.getChildren() != null) {
       for (Stream childStream : newStream.getChildren()) {
@@ -342,21 +367,47 @@ public class StreamsSupervisor {
         // delete really
 
         // delete from parent stream
-        Stream parentStream = getStreamByClientId(streamToDelete.getParentClientId());
-        parentStream.removeChildStream(streamToDelete);
+        if (streamToDelete.getParentClientId() != null) {
+          Stream parentStream = getStreamByClientId(streamToDelete.getParentClientId());
+          parentStream.removeChildStream(streamToDelete);
+        }
 
+        // behaviour not defined in API - may be added later (should also delete
+        // these streams' events)
         // delete Stream's children Streams
-        if (streamToDelete.getChildren() != null) {
-          for (String childStream : streamToDelete.getChildrenMap().keySet()) {
-            deleteStream(childStream, mergeWithParent, connectionSCallback);
+        // if (streamToDelete.getChildren() != null) {
+        // for (String childStream : streamToDelete.getChildrenMap().keySet()) {
+        // deleteStream(childStream, mergeWithParent, connectionSCallback);
+        // }
+        // }
+
+        Filter deleteFilter = new Filter();
+        deleteFilter.addStreamClientId(streamClientId);
+        eventsSupervisor.getEvents(deleteFilter, deleteEventsCallback);
+        String parentToMergeWithClientId = streamToDelete.getParentClientId();
+        if (mergeWithParent == true && parentToMergeWithClientId != null) {
+          // merge them with parent stream if any exists
+          for (Event eventToMergeWithParent : eventsOnDelete.values()) {
+            eventToMergeWithParent.setStreamClientId(parentToMergeWithClientId);
+          }
+        } else {
+          // delete events
+          for (Event eventToDelete : eventsOnDelete.values()) {
+            eventsSupervisor.deleteEvent(eventToDelete, deleteEventsCallback);
           }
         }
+
         // delete Stream
         rootStreams.remove(streamToDelete.getClientId());
         flatStreams.remove(streamToDelete.getClientId());
-        idToClientId.remove(streamToDelete.getId());
+        if (streamToDelete.getId() != null) {
+          idToClientId.remove(streamToDelete.getId());
+        }
         clientIdToId.remove(streamToDelete.getClientId());
         streamToDelete = null;
+
+        connectionSCallback.onStreamsSuccess("Stream with cid=" + streamClientId + " deleted.",
+          null);
       } else {
         // update trashed field of stream to delete and its child streams
         streamToDelete.setTrashed(true);
@@ -366,12 +417,35 @@ public class StreamsSupervisor {
         for (Stream childstream : streamToDelete.getChildrenMap().values()) {
           childstream.setTrashed(true);
         }
+        connectionSCallback.onStreamsSuccess("Stream with id=" + streamClientId + " trashed.",
+          streamToDelete);
       }
-      connectionSCallback.onStreamsSuccess("Stream with id=" + streamClientId + " deleted.");
     } else {
       // streamToDelete not found
       connectionSCallback.onStreamError("Stream with id=" + streamClientId + " not found.");
     }
+  }
+
+  private void instanciateDeleteEventsCallback() {
+    deleteEventsCallback = new EventsCallback() {
+
+      @Override
+      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+      }
+
+      @Override
+      public void onEventsRetrievalSuccess(Map<String, Event> events, double serverTime) {
+        eventsOnDelete = events;
+      }
+
+      @Override
+      public void onEventsRetrievalError(String errorMessage) {
+      }
+
+      @Override
+      public void onEventsError(String errorMessage) {
+      }
+    };
   }
 
   /**

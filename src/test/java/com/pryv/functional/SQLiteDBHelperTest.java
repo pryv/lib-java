@@ -106,14 +106,14 @@ public class SQLiteDBHelperTest {
         + stream.getClientId()
           + ", id="
           + stream.getId());
-      stream.setTrashed(true);
       stream.setModified(stream.getModified() + MODIFIED_INCREMENT);
-      db.deleteStream(stream, streamsCallback);
+      db.deleteStream(stream, false, streamsCallback);
       Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
       streamsSuccess = false;
-      db.deleteStream(stream, streamsCallback);
-      Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
-      streamsSuccess = false;
+      if (testStream != null) {
+        db.deleteStream(stream, false, streamsCallback);
+        Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
+      }
     }
   }
 
@@ -261,7 +261,7 @@ public class SQLiteDBHelperTest {
   public void test11RemoveFullStream() {
     testStream.setTrashed(true);
     testStream.setModified(testStream.getModified() + MODIFIED_INCREMENT);
-    db.deleteStream(testStream, streamsCallback);
+    db.deleteStream(testStream, false, streamsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
     db.getStreams(streamsCallback);
     Awaitility.await().until(hasRetrievedStreamSuccessfully());
@@ -490,7 +490,7 @@ public class SQLiteDBHelperTest {
       }
 
       @Override
-      public void onStreamsSuccess(String successMessage) {
+      public void onStreamsSuccess(String successMessage, Stream stream) {
         streamsSuccess = true;
       }
 

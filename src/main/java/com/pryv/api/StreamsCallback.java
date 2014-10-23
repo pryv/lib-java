@@ -36,8 +36,12 @@ public interface StreamsCallback {
    * deleteStream() execution is successful.
    *
    * @param successMessage
+   *          the success message
+   * @param stream
+   *          the updated stream, not null when update or delete (trash case) of
+   *          stream
    */
-  void onStreamsSuccess(String successMessage);
+  void onStreamsSuccess(String successMessage, Stream stream);
 
   /**
    * callback method called when an error occurs during createStream(),

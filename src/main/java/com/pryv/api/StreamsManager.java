@@ -31,19 +31,20 @@ public interface StreamsManager {
   void createStream(Stream newStream, StreamsCallback streamsCallback);
 
   /**
-   * Delete Stream
+   * Trash or delete the specified stream, depending on its current state
    *
    * @param streamToDelete
    *          the Stream to delete
-   * @param mergeWithParent
-   *          if true, Events of this Stream and its descendants will be moved
-   *          to the parent Stream if any. If false, Events will be deleted too
+   * @param mergeEventsWithParent
+   *          Done when actually deleting the stream. If true, Events of this
+   *          Stream will be moved to the parent Stream if any. If false, Events
+   *          will be deleted too
    *
    * @param streamsCallback
    *          the callback for streams deletion, notifies success or failure.
    */
-  void
-    deleteStream(Stream streamToDelete, boolean mergeWithParent, StreamsCallback streamsCallback);
+  void deleteStream(Stream streamToDelete, boolean mergeEventsWithParent,
+    StreamsCallback streamsCallback);
 
   /**
    * Update Stream

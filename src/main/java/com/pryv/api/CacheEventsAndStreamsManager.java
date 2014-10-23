@@ -196,15 +196,16 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   }
 
   @Override
-  public void deleteStream(Stream streamToDelete, boolean mergeWithParent,
+  public void deleteStream(Stream streamToDelete, boolean mergeEventsWithParent,
     StreamsCallback connectionStreamsCallback) {
     if (Pryv.isCacheActive()) {
       // delete Stream from local db
-      dbHelper.deleteStream(streamToDelete, new CacheStreamsCallback(connectionStreamsCallback));
+      dbHelper.deleteStream(streamToDelete, mergeEventsWithParent, new CacheStreamsCallback(
+        connectionStreamsCallback));
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
-      onlineStreamsManager.deleteStream(streamToDelete, mergeWithParent,
+      onlineStreamsManager.deleteStream(streamToDelete, mergeEventsWithParent,
         new OnlineManagerStreamsCallback(connectionStreamsCallback));
     }
   }
@@ -364,9 +365,9 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onStreamsSuccess(String successMessage) {
+    public void onStreamsSuccess(String successMessage, Stream stream) {
       // forward to connection
-      connectionStreamsCallback.onStreamsSuccess(successMessage);
+      connectionStreamsCallback.onStreamsSuccess(successMessage, stream);
     }
 
     @Override
@@ -409,9 +410,9 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onStreamsSuccess(String successMessage) {
+    public void onStreamsSuccess(String successMessage, Stream stream) {
       // forward to connection
-      connectionStreamsCallback.onStreamsSuccess(successMessage);
+      connectionStreamsCallback.onStreamsSuccess(successMessage, stream);
     }
 
     @Override
@@ -421,80 +422,5 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
   }
-
-  // /**
-  // * StreamsCallback used by cache class
-  // *
-  // * @author ik
-  // *
-  // */
-  // private class OldCacheStreamsCallback implements StreamsCallback {
-  //
-  // private StreamsCallback connectionStreamsCallback;
-  //
-  // public OldCacheStreamsCallback(StreamsCallback pConnectionStreamsCallback)
-  // {
-  // connectionStreamsCallback = pConnectionStreamsCallback;
-  // }
-  //
-  // @Override
-  // public void
-  // onRetrievalSuccess(Map<String, Stream> onlineStreams, double serverTime) {
-  // logger.log("Cache: Streams retrieval success");
-  //
-  // for (Stream onlineStream : onlineStreams.values()) {
-  // streamsSupervisor.updateOrCreateStream(onlineStream,
-  // connectionStreamsCallback);
-  // }
-  // connectionStreamsCallback.onRetrievalSuccess(streamsSupervisor.getRootStreams(),
-  // serverTime);
-  // dbHelper.updateOrCreateStreams(streamsSupervisor.getRootStreams().values(),
-  // this);
-  // }
-  //
-  // @Override
-  // public void onCacheRetrieveStreamSuccess(Map<String, Stream> cacheStreams)
-  // {
-  // // forward to connection
-  // logger
-  // .log("Cache: retrieved streams from cache: root streams amount: " +
-  // cacheStreams.size());
-  // for (Stream cacheStream : cacheStreams.values()) {
-  // cacheStream.assignConnection(weakConnection);
-  // }
-  // connectionStreamsCallback.onCacheRetrieveStreamSuccess(cacheStreams);
-  //
-  // // make the online request
-  // if (Pryv.isOnlineActive()) {
-  // onlineStreamsManager.getStreams(null,
-  // new OldCacheStreamsCallback(connectionStreamsCallback));
-  // }
-  // }
-  //
-  // @Override
-  // public void onStreamsRetrievalError(String message) {
-  // // forward to connection
-  // connectionStreamsCallback.onStreamsRetrievalError(message);
-  // }
-  //
-  // @Override
-  // public void onSupervisorRetrieveStreamsSuccess(Map<String, Stream>
-  // supervisorStreams) {
-  // // unused
-  // }
-  //
-  // @Override
-  // public void onStreamsSuccess(String successMessage) {
-  // // forward to connection
-  // connectionStreamsCallback.onStreamsSuccess(successMessage);
-  // }
-  //
-  // @Override
-  // public void onStreamError(String errorMessage) {
-  // // forward to connection
-  // connectionStreamsCallback.onStreamError(errorMessage);
-  // }
-  //
-  // }
 
 }

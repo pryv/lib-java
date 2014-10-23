@@ -250,6 +250,23 @@ public class QueryGenerator {
   }
 
   /**
+   * retrieve a Stream from the SQLite database.
+   *
+   * @param clientId
+   *          the client ID of the stream
+   * @return
+   */
+  public static String retrieveStream(String clientId) {
+    return "SELECT * FROM "
+      + STREAMS_TABLE_NAME
+        + " WHERE "
+        + STREAMS_CLIENT_ID_KEY
+        + "="
+        + formatTextValue(clientId)
+        + ";";
+  }
+
+  /**
    * Creates query to insert or replace stream in the SQLite database.
    *
    * @param streamToCache

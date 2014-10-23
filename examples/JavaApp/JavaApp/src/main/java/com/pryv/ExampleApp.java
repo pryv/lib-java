@@ -309,7 +309,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     displayError(message);
   }
 
-  public void onStreamsSuccess(String successMessage) {
+  public void onStreamsSuccess(String successMessage, Stream stream) {
   }
 
   public void onStreamError(String errorMessage) {

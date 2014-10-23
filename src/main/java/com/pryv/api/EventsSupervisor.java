@@ -216,7 +216,6 @@ public class EventsSupervisor {
         + eventToDelete.getClientId()
           + " not found.");
     }
-
   }
 
   /**

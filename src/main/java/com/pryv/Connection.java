@@ -67,6 +67,7 @@ public class Connection implements EventsManager, StreamsManager {
     weakConnection = new WeakReference<Connection>(this);
     streamsSupervisor = new StreamsSupervisor();
     eventsSupervisor = new EventsSupervisor(streamsSupervisor);
+    streamsSupervisor.setEventsSupervisor(eventsSupervisor);
     cacheEventsManager =
       new CacheEventsAndStreamsManager(url, token, dbInitCallback, streamsSupervisor,
         eventsSupervisor, weakConnection);
@@ -188,21 +189,21 @@ public class Connection implements EventsManager, StreamsManager {
   }
 
   @Override
-  public void deleteStream(Stream streamToDelete, boolean mergeWithParent,
+  public void deleteStream(Stream streamToDelete, boolean mergeEventsWithParent,
     StreamsCallback userStreamsCallback) {
-    streamToDelete.setTrashed(true);
-    // TODO check what to do with children
-    for (Stream childStream : streamToDelete.getChildren()) {
-      childStream.setTrashed(true);
-    }
+    // streamToDelete.setTrashed(true);
+    // // TODO check what to do with children
+    // for (Stream childStream : streamToDelete.getChildren()) {
+    // childStream.setTrashed(true);
+    // }
     if (Pryv.isSupervisorActive()) {
       // delete Stream in Supervisor
-      streamsSupervisor.deleteStream(streamToDelete.getClientId(), mergeWithParent,
+      streamsSupervisor.deleteStream(streamToDelete.getClientId(), mergeEventsWithParent,
         userStreamsCallback);
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
-      cacheStreamsManager.deleteStream(streamToDelete, mergeWithParent,
+      cacheStreamsManager.deleteStream(streamToDelete, mergeEventsWithParent,
         new CacheManagerStreamsCallback(userStreamsCallback));
     }
   }
@@ -345,8 +346,8 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onStreamsSuccess(String successMessage) {
-      userStreamsCallback.onStreamsSuccess(successMessage);
+    public void onStreamsSuccess(String successMessage, Stream stream) {
+      userStreamsCallback.onStreamsSuccess(successMessage, stream);
     }
 
     @Override

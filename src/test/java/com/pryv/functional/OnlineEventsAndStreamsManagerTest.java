@@ -1,5 +1,6 @@
-package com.pryv.unit;
+package com.pryv.functional;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -22,6 +23,7 @@ import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.api.StreamsCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
+import com.pryv.unit.DummyData;
 
 /**
  * Test of Retrieval of Events by Online module
@@ -29,7 +31,7 @@ import com.pryv.api.model.Stream;
  * @author ik
  *
  */
-public class OnlineEventsManagerTest {
+public class OnlineEventsAndStreamsManagerTest {
 
   private static OnlineEventsAndStreamsManager online;
 
@@ -45,6 +47,12 @@ public class OnlineEventsManagerTest {
   private static boolean eventsSuccess = false;
   private static boolean eventsError = false;
   private static boolean eventsRetrievalError = false;
+
+  private static Stream createdStream;
+
+  private static boolean streamsSuccess = false;
+  private static boolean streamsError = false;
+  private static boolean streamsRetrievalError = false;
 
   @Before
   public void setUp() throws Exception {
@@ -81,8 +89,7 @@ public class OnlineEventsManagerTest {
   }
 
   @Test
-  public void testCreateAndDeleteEvent() {
-    System.out.println("testManipulateEventTest begins");
+  public void testCreateUpdateAndDeleteEvent() {
     online.getStreams(null, streamsCallback);
     Awaitility.await().until(hasStreams());
     Stream chosenStream = null;
@@ -108,8 +115,17 @@ public class OnlineEventsManagerTest {
     online.createEvent(testEvent, eventsCallback);
     Awaitility.await().until(hasEventsSuccess());
     eventsSuccess = false;
+
     assertNotNull(createdEvent);
     assertNotNull(createdEvent.getId());
+
+    String newContent = "updated content - Woohoohoo";
+    createdEvent.setContent(newContent);
+    online.updateEvent(createdEvent, eventsCallback);
+    Awaitility.await().until(hasEventsSuccess());
+    eventsSuccess = false;
+    assertEquals(createdEvent.getContent(), newContent);
+
     online.deleteEvent(createdEvent, eventsCallback);
     Awaitility.await().until(hasEventsSuccess());
     eventsSuccess = false;
@@ -121,7 +137,15 @@ public class OnlineEventsManagerTest {
     online.deleteEvent(eventToDeleteReally, eventsCallback);
     Awaitility.await().until(hasEventsSuccess());
     assertNull(createdEvent);
+  }
 
+  @Test
+  public void testCreateStream() {
+    Stream testStream = new Stream();
+    testStream.setName("testStream name");
+    online.createStream(testStream, streamsCallback);
+    Awaitility.await().until(hasStreamSuccess());
+    assertNotNull(createdStream);
   }
 
   private Callable<Boolean> hasReceivedEvents() {
@@ -221,6 +245,16 @@ public class OnlineEventsManagerTest {
     };
   }
 
+  private Callable<Boolean> hasStreamSuccess() {
+    return new Callable<Boolean>() {
+
+      @Override
+      public Boolean call() throws Exception {
+        return streamsSuccess;
+      }
+    };
+  }
+
   private static void instanciateEventsCallback() {
     eventsCallback = new EventsCallback() {
 
@@ -270,11 +304,15 @@ public class OnlineEventsManagerTest {
       }
 
       @Override
-      public void onStreamsSuccess(String successMessage) {
+      public void onStreamsSuccess(String successMessage, Stream stream) {
+        System.out.println("TestStreamsCallback: success msg: " + successMessage);
+        createdStream = stream;
+        streamsSuccess = true;
       }
 
       @Override
       public void onStreamError(String errorMessage) {
+        streamsError = true;
       }
     };
   }

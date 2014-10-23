@@ -30,6 +30,7 @@ public class JsonConverter {
 
   private final static String EVENT_KEY = "event";
   private final static String EVENTS_KEY = "events";
+  private final static String STREAM_KEY = "stream";
   private final static String STREAMS_KEY = "streams";
 
   private final static String META_KEY = "meta";
@@ -136,6 +137,22 @@ public class JsonConverter {
       }
     }
     return newEvents;
+  }
+
+  /**
+   * Retrieves the stream from a JSON dictionary containing a stream entry at
+   * root level
+   *
+   * @param jsonSource
+   *          the JSON stored in a String
+   * @return
+   * @throws JsonProcessingException
+   * @throws IOException
+   */
+  public static Stream retrieveStreamFromJson(String jsonSource) throws JsonProcessingException,
+    IOException {
+    JsonNode eventNode = toJsonNode(jsonSource).get(STREAM_KEY);
+    return jsonMapper.readValue(eventNode.toString(), Stream.class);
   }
 
   /**
