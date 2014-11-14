@@ -9,6 +9,6 @@ package resources;
  *
  */
 public class TestCredentials {
-  public final static String USERNAME = "perkikiki";
-  public final static String TOKEN = "chu2cc0zy0000iawkyrw7g9gq";
+  public final static String USERNAME = "javalib";
+  public final static String TOKEN = "ci2ewnv810443t5w47tf5wd5k";
 }
