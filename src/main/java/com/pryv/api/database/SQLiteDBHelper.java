@@ -430,7 +430,7 @@ public class SQLiteDBHelper {
                 + retrievedStreamToDelete.getClientId()
                   + ", id="
                   + retrievedStreamToDelete.getId()
-                  + " deleted.", retrievedStreamToDelete);
+                  + " deleted.", null);
             } else {
               // set its trashed field to true and save it
               logger.log("SQLiteDBHelper: trash Stream with id="

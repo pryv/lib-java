@@ -149,7 +149,9 @@ public class StreamsSupervisor {
       logger.log("StreamsSupervisor: Generating new cid for Stream OH NOES");
     }
     // parent stream should already be inserted - used only when fresh from API
-    stream.updateParentClientId(idToClientId);
+    if (stream.getParentId() != null) {
+      stream.updateParentClientId(idToClientId);
+    }
     Stream oldStream = getStreamByClientId(stream.getClientId());
     if (oldStream != null) {
       // case exists: update Stream
@@ -368,6 +370,9 @@ public class StreamsSupervisor {
 
         // delete from parent stream
         if (streamToDelete.getParentClientId() != null) {
+          System.out.println("StreamsSupervisor: parentCid not null, it is: \'"
+            + streamToDelete.getParentClientId()
+              + "\'");
           Stream parentStream = getStreamByClientId(streamToDelete.getParentClientId());
           parentStream.removeChildStream(streamToDelete);
         }
@@ -391,10 +396,10 @@ public class StreamsSupervisor {
             eventToMergeWithParent.setStreamClientId(parentToMergeWithClientId);
           }
         } else {
-          // delete events
-          for (Event eventToDelete : eventsOnDelete.values()) {
-            eventsSupervisor.deleteEvent(eventToDelete, deleteEventsCallback);
-          }
+          // behaviour not defined in API - delete events
+          // for (Event eventToDelete : eventsOnDelete.values()) {
+          // eventsSupervisor.deleteEvent(eventToDelete, deleteEventsCallback);
+          // }
         }
 
         // delete Stream
@@ -406,23 +411,30 @@ public class StreamsSupervisor {
         clientIdToId.remove(streamToDelete.getClientId());
         streamToDelete = null;
 
-        connectionSCallback.onStreamsSuccess("Stream with cid=" + streamClientId + " deleted.",
+        connectionSCallback.onStreamsSuccess("StreamsSupervisor: Stream with cid="
+          + streamClientId
+            + " deleted.",
           null);
       } else {
-        // update trashed field of stream to delete and its child streams
+        // update trashed field of stream to delete
         streamToDelete.setTrashed(true);
-        for (Stream childstream : streamToDelete.getChildren()) {
-          childstream.setTrashed(true);
-        }
-        for (Stream childstream : streamToDelete.getChildrenMap().values()) {
-          childstream.setTrashed(true);
-        }
-        connectionSCallback.onStreamsSuccess("Stream with id=" + streamClientId + " trashed.",
+        // behavour not defined in API - trash its child streams
+        // for (Stream childstream : streamToDelete.getChildren()) {
+        // childstream.setTrashed(true);
+        // }
+        // for (Stream childstream : streamToDelete.getChildrenMap().values()) {
+        // childstream.setTrashed(true);
+        // }
+        connectionSCallback.onStreamsSuccess("StreamsSupervisor: Stream with id="
+          + streamClientId
+            + " trashed.",
           streamToDelete);
       }
     } else {
       // streamToDelete not found
-      connectionSCallback.onStreamError("Stream with id=" + streamClientId + " not found.");
+      connectionSCallback.onStreamError("StreamsSupervisor: Stream with id="
+        + streamClientId
+          + " not found.");
     }
   }
 

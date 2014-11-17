@@ -126,6 +126,7 @@ public class Stream {
    * Empty Constructor
    */
   public Stream() {
+    trashed = false;
   }
 
   /**
@@ -270,15 +271,17 @@ public class Stream {
    */
   public void removeChildStream(Stream childStream) {
     System.out.println("Stream: about to remove child from cid=" + clientId);
-    System.out.println("childrenSize="
-      + children.size()
-        + ", childrenMapSize="
-        + childrenMap.size());
-    childrenMap.remove(childStream.getClientId());
-    children.remove(childStream);
-    if (childrenMap.size() == 0 || children.size() == 0) {
-      childrenMap = null;
-      children = null;
+    if (children != null && childrenMap != null) {
+      System.out.println("childrenSize="
+        + children.size()
+          + ", childrenMapSize="
+          + childrenMap.size());
+      childrenMap.remove(childStream.getClientId());
+      children.remove(childStream);
+      if (childrenMap.size() == 0 || children.size() == 0) {
+        childrenMap = null;
+        children = null;
+      }
     }
   }
 

@@ -140,7 +140,7 @@ public class OnlineEventsAndStreamsManagerTest {
   }
 
   @Test
-  public void testCreateStream() {
+  public void testCreateUpdateAndDeleteStreamOnline() {
     Stream testStream = new Stream();
     testStream.setName("testStream name3");
 

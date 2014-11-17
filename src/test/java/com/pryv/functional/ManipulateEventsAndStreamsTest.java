@@ -1,6 +1,10 @@
 package com.pryv.functional;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -44,7 +48,9 @@ public class ManipulateEventsAndStreamsTest {
   private static Map<String, Stream> streams;
 
   private static Event createdEvent;
+  private static Stream testStream;
 
+  private static boolean streamsSuccess = false;
   private static boolean streamsReceived = false;
   private static boolean eventsSuccess = false;
   private static boolean eventsError = false;
@@ -105,8 +111,8 @@ public class ManipulateEventsAndStreamsTest {
     testEvent.setDescription("this is the ultimate test Event");
     testEvent.setClientData(DummyData.getClientdata());
 
+    // create
     eventsManager.createEvent(testEvent, eventsCallback);
-    // Awaitility.await().until(hasCreatedEventOnline());
     Awaitility.await().until(hasEventsSuccess());
     eventsSuccess = false;
     System.out.println("RetrieveEventsTest: TEST EVENT CREATED ONE - LALALA");
@@ -115,8 +121,9 @@ public class ManipulateEventsAndStreamsTest {
     System.out.println("RetrieveEventsTest: TEST EVENT CREATED TWO - LALALA");
     Awaitility.await().until(hasEventsSuccess());
     eventsSuccess = false;
-
     System.out.println("RetrieveEventsTest: TEST EVENT CREATED THREE - LALALA");
+
+    // delete
     eventsManager.deleteEvent(createdEvent, eventsCallback);
     Awaitility.await().until(hasEventsSuccess());
     System.out.println("RetrieveEventsTest: TEST EVENT DELETED ONE - LALALA");
@@ -132,6 +139,58 @@ public class ManipulateEventsAndStreamsTest {
     // retrieve id from online API response, send delete command
   }
 
+  @Test
+  public void testCreateUpdateAndDeleteStream() {
+    testStream = new Stream();
+    int num = 13;
+    testStream.setName("testStream name" + num);
+
+    System.out.println("### --- Create Stream phase --- ###");
+
+    // create
+    streamsManager.createStream(testStream, streamsCallback);
+    Awaitility.await().until(hasStreamsSuccess());
+    System.out.println("first create success before, streamsSuccess set to: " + streamsSuccess);
+    streamsSuccess = false;
+    assertNotNull(testStream);
+    System.out.println("first create success after, streamsSuccess set to: " + streamsSuccess);
+    Awaitility.await().until(hasStreamsSuccess());
+    System.out.println("second create success before, streamsSuccess set to: " + streamsSuccess);
+    streamsSuccess = false;
+    assertNotNull(testStream);
+    System.out.println("second create success after, streamsSuccess set to: " + streamsSuccess);
+    // Awaitility.await().until(hasStreamsSuccess());
+    System.out.println("third create success before, streamsSuccess set to: " + streamsSuccess);
+    streamsSuccess = false;
+    assertNotNull(testStream);
+
+    // update
+    System.out.println("### --- Update Stream phase --- ###");
+    String nameUpdate = "testStream name" + num + " updated - wooohooohoo";
+    testStream.setName(nameUpdate);
+    streamsManager.updateStream(testStream, streamsCallback);
+    Awaitility.await().until(hasStreamsSuccess());
+    streamsSuccess = false;
+    Awaitility.await().until(hasStreamsSuccess());
+    streamsSuccess = false;
+    assertEquals(nameUpdate, testStream.getName());
+
+    // trash
+    System.out.println("### --- Trash Stream phase --- ###");
+    streamsManager.deleteStream(testStream, false, streamsCallback);
+    Awaitility.await().until(hasStreamsSuccess());
+    streamsSuccess = false;
+    assertNotNull(testStream);
+    assertTrue(testStream.getTrashed());
+
+    // delete
+    System.out.println("### --- Delete Stream phase --- ###");
+    streamsManager.deleteStream(testStream, false, streamsCallback);
+    Awaitility.await().until(hasStreamsSuccess());
+    streamsSuccess = false;
+    Awaitility.await().until(hasStreamsSuccess());
+    assertNull(testStream);
+  }
 
   public void testFetchEventsForAStream() {
 
@@ -249,6 +308,16 @@ public class ManipulateEventsAndStreamsTest {
     };
   }
 
+  private Callable<Boolean> hasStreamsSuccess() {
+    return new Callable<Boolean>() {
+
+      @Override
+      public Boolean call() throws Exception {
+        return streamsSuccess;
+      }
+    };
+  }
+
   private static void instanciateEventsCallback() {
     eventsCallback = new EventsCallback() {
 
@@ -302,6 +371,9 @@ public class ManipulateEventsAndStreamsTest {
 
       @Override
       public void onStreamsSuccess(String successMessage, Stream stream) {
+        System.out.println("TestStreamsCallback: streams success with msg: " + successMessage);
+        streamsSuccess = true;
+        testStream = stream;
       }
 
       @Override
