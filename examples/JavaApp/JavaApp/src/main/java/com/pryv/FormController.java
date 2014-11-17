@@ -1,13 +1,20 @@
 package com.pryv;
 
+import java.util.Collection;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
@@ -49,7 +56,9 @@ public class FormController {
   @FXML
   TextField streamNameTextField;
   @FXML
-  ComboBox<String> parentComboBox;
+  ComboBox<Stream> parentComboBox;
+  @FXML
+  ComboBox<Boolean> singleActivityComboBox;
 
   // Reference to the main application
   private ExampleApp exampleApp;
@@ -77,6 +86,41 @@ public class FormController {
 
     if (parentComboBox != null) {
       // exampleApp.get
+
+      parentComboBox.setButtonCell(new ListCell<Stream>() {
+        @Override
+        protected void updateItem(Stream t, boolean bln) {
+          super.updateItem(t, bln);
+          if (t != null) {
+            setText(t.getName());
+          } else {
+            setText(null);
+          }
+        }
+      });
+
+      parentComboBox.setCellFactory(new Callback<ListView<Stream>, ListCell<Stream>>() {
+        public ListCell<Stream> call(ListView<Stream> param) {
+          final ListCell<Stream> cell = new ListCell<Stream>() {
+
+            @Override
+            public void updateItem(Stream item, boolean empty) {
+              super.updateItem(item, empty);
+              if (item != null) {
+                setText(item.getName());
+              } else {
+                setText(null);
+              }
+            }
+          };
+          return cell;
+        }
+      });
+    }
+
+    if (singleActivityComboBox != null) {
+      ObservableList<Boolean> saOptions = FXCollections.observableArrayList(true, false);
+      singleActivityComboBox.setItems(saOptions);
     }
 
     okButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -108,11 +152,21 @@ public class FormController {
     });
   }
 
+  /**
+   * loads the streams to display in the parent stream combo box.
+   *
+   * @param streams
+   */
+  public void loadParentStreams(Collection<Stream> streams) {
+    parentComboBox.getItems().addAll(streams);
+  }
+
   private void createEvent() {
     exampleApp.createEvent(editedEvent);
   }
 
   private void createStream() {
+    editedStream.setSingleActivity(singleActivityComboBox.getValue());
     exampleApp.createStream(editedStream);
   }
 

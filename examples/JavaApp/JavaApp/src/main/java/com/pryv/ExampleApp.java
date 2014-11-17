@@ -3,6 +3,7 @@ package com.pryv;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +54,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   private Connection connection;
   private EventsManager eventsManager;
   private StreamsManager streamsManager;
+  private Collection<Stream> streams;
 
   private Stage primaryStage;
   private BorderPane rootLayout;
@@ -147,6 +149,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
       }
     });
 
+    streams = new HashSet<Stream>();
     eventsManager = connection;
     streamsManager = connection;
     streamsManager.getStreams(null, this);
@@ -214,6 +217,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
       controller.setMainApp(this);
       controller.setMode(action);
       controller.setStream(streamToUpdate);
+      controller.loadParentStreams(streams);
 
       // Show the dialog and wait until the user closes it
       dialogStage.showAndWait();
@@ -278,6 +282,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
 
   public void onStreamsRetrievalSuccess(Map<String, Stream> streams, double serverTime) {
     logger.log("JavaApp: received " + streams.size() + " from online");
+    this.streams = streams.values();
     addStreamsToTree(streams);
   }
 

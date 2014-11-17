@@ -27,7 +27,7 @@
             <Label prefHeight="32.0" prefWidth="143.0" text="clientData" GridPane.rowIndex="4" />
             <TextField fx:id="streamNameTextField" promptText="name" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <ComboBox fx:id="parentComboBox" prefHeight="26.0" prefWidth="206.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <ComboBox prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <ComboBox fx:id="singleActivityComboBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <Label text="id" />
             <Label fx:id="idLabel" text="defaultId" GridPane.columnIndex="1" />
          </children>
