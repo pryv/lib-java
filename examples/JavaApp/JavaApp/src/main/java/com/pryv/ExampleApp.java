@@ -276,12 +276,16 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     streamsManager.updateStream(streamToUpdate, this);
   }
 
+  public void deleteStream(Stream streamToDelete, boolean mergeEventsWithParent) {
+    streamsManager.deleteStream(streamToDelete, mergeEventsWithParent, this);
+  }
+
   /*
    * Streams Callbacks
    */
 
   public void onStreamsRetrievalSuccess(Map<String, Stream> streams, double serverTime) {
-    logger.log("JavaApp: received " + streams.size() + " from online");
+    logger.log("JavaApp: received " + streams.size() + " streams.");
     this.streams = streams.values();
     addStreamsToTree(streams);
   }
