@@ -29,7 +29,7 @@
             <ComboBox fx:id="parentComboBox" prefHeight="26.0" prefWidth="206.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <ComboBox fx:id="singleActivityComboBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <Label text="id" />
-            <Label fx:id="idLabel" text="defaultId" GridPane.columnIndex="1" />
+            <Label fx:id="idLabel" text="[no id]" GridPane.columnIndex="1" />
          </children>
       </GridPane>
       <Button fx:id="cancelButton" layoutX="402.0" layoutY="342.0" mnemonicParsing="false" text="Cancel" />

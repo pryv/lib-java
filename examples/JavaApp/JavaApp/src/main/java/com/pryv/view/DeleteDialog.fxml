@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="147.0" prefWidth="445.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pryv.AppController">
+   <children>
+      <Label fx:id="deleteMessage" layoutX="37.0" layoutY="36.0" text="Do you really want to delete this stream?" />
+      <CheckBox fx:id="deleteMergeCheckBox" layoutX="36.0" layoutY="72.0" mnemonicParsing="false" text="Merge events in this stream to the parent of this stream" />
+      <Button fx:id="deleteYesButton" layoutX="362.0" layoutY="107.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="48.0" text="YES" />
+      <Button fx:id="deleteNoButton" layoutX="307.0" layoutY="107.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="48.0" text="NO" />
+   </children>
+</AnchorPane>
