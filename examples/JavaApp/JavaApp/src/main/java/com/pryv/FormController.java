@@ -85,7 +85,6 @@ public class FormController {
   private void initialize() {
 
     if (parentComboBox != null) {
-      // exampleApp.get
 
       parentComboBox.setButtonCell(new ListCell<Stream>() {
         @Override
