@@ -77,8 +77,9 @@ public class EventsSupervisor {
         i++;
       }
       connectionCallback.onEventsRetrievalSuccess(limitedEvents, 0);
+    } else {
+      connectionCallback.onEventsRetrievalSuccess(filteredEvents, 0);
     }
-    connectionCallback.onEventsRetrievalSuccess(filteredEvents, 0);
   }
 
   /**
