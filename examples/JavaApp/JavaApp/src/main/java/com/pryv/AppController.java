@@ -3,7 +3,6 @@ package com.pryv;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -17,10 +16,6 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.util.Callback;
-
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
-import org.controlsfx.dialog.Dialogs;
 
 import com.pryv.api.model.Attachment;
 import com.pryv.api.model.Event;
@@ -230,24 +225,25 @@ public class AppController {
 
     streamDeleteButton.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent event) {
-        Platform.runLater(new Runnable() {
-
-          public void run() {
-            Action action =
-              Dialogs
-                .create()
-                .owner(exampleApp.getPrimaryStage())
-                .title("Delete Stream")
-                .actions(Dialog.Actions.YES, Dialog.Actions.NO)
-                .message(
-                  "Do you really want to delete the stream \'" + selectedStream.getName() + "\'?")
-                .showConfirm();
-            if (action == Dialog.Actions.OK) {
-              // delete selected stream
-              exampleApp.deleteStream(selectedStream, false);
-            }
-          }
-        });
+        exampleApp.showDeleteStreamDialog(selectedStream);
+//        Platform.runLater(new Runnable() {
+//
+//          public void run() {
+//            Action action =
+//              Dialogs
+//                .create()
+//                .owner(exampleApp.getPrimaryStage())
+//                .title("Delete Stream")
+//                .actions(Dialog.Actions.YES, Dialog.Actions.NO)
+//                .message(
+//                  "Do you really want to delete the stream \'" + selectedStream.getName() + "\'?")
+//                .showConfirm();
+//            if (action == Dialog.Actions.OK) {
+//              // delete selected stream
+//              exampleApp.deleteStream(selectedStream, false);
+//            }
+//          }
+//        });
       }
     });
 

@@ -264,6 +264,32 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     }
   }
 
+  public void showDeleteStreamDialog(Stream streamToDelete) {
+    FXMLLoader loader =
+      new FXMLLoader(ExampleApp.class.getResource("view/DeleteStreamDialog.fxml"));
+    AnchorPane page;
+    try {
+      page = (AnchorPane) loader.load();
+      Stage dialogStage = new Stage();
+      dialogStage.initModality(Modality.WINDOW_MODAL);
+      dialogStage.initOwner(primaryStage);
+      Scene scene = new Scene(page);
+      dialogStage.setScene(scene);
+
+      // Give the controller access to the main app
+      DeleteDialogController controller = loader.getController();
+      controller.setMainApp(this);
+      controller.setStream(streamToDelete);
+
+      dialogStage.showAndWait();
+    } catch (IOException e) {
+      displayError(e.getMessage());
+      e.printStackTrace();
+    }
+
+//    An
+  }
+
   /*
    * Streams management
    */
