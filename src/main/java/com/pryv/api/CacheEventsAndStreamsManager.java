@@ -175,9 +175,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   public void getStreams(Filter filter, final StreamsCallback connectionStreamsCallback) {
     if (Pryv.isCacheActive()) {
       // retrieve Streams from cache
-      logger.log("Cache: retrieved Streams from cache: ");
-      // dbHelper.getStreams(new
-      // OldCacheStreamsCallback(connectionStreamsCallback));
+      logger.log("Cache: retrieving Streams from cache: ");
       dbHelper.getStreams(new CacheStreamsCallback(connectionStreamsCallback));
     }
   }
@@ -394,7 +392,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
     @Override
     public void onStreamsRetrievalSuccess(Map<String, Stream> onlineStreams, double serverTime) {
-      logger.log("CacheManager: online Streams retrieval success");
+      logger.log("OnlineManagerStreamsCallback: Streams retrieval success");
 
       for (Stream onlineStream : onlineStreams.values()) {
         streamsSupervisor.updateOrCreateStream(onlineStream, connectionStreamsCallback);

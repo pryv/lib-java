@@ -53,6 +53,7 @@ public class EventsSupervisor {
    * @param connectionCallback
    */
   public void getEvents(Filter filter, EventsCallback connectionCallback) {
+    logger.log("EventsSupervisor: fetching events");
     Map<String, Event> filteredEvents = new HashMap<String, Event>();
 
     for (Event event : events.values()) {
@@ -64,6 +65,8 @@ public class EventsSupervisor {
             + event.getClientId());
       }
     }
+
+    logger.log("EventsSupervisor: retrieved " + filteredEvents.size() + " events.");
 
     // apply limit argument
     if (filter.getLimit() != null) {

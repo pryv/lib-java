@@ -180,24 +180,28 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
    */
 
   @Override
-  public void getStreams(Filter filter, final StreamsCallback cacheStreamsCallback) {
+  public void getStreams(Filter filter, final StreamsCallback onlineManagerStreamsCallback) {
     new Thread() {
       @Override
       public void run() {
         try {
-          logger.log("Online: getStreams: Get request at: " + streamsUrl + tokenUrlArgument);
+          logger.log("Online: getStreams: Get request at: "
+            + streamsUrl
+              + tokenUrlArgument
+              + " - "
+              + Thread.currentThread().getName());
           Request
             .Get(streamsUrl + tokenUrlArgument)
             .execute()
             .handleResponse(
-              new ApiResponseHandler(RequestType.GET_STREAMS, null, cacheStreamsCallback, null,
+              new ApiResponseHandler(RequestType.GET_STREAMS, null, onlineManagerStreamsCallback, null,
                 null));
 
         } catch (ClientProtocolException e) {
-          cacheStreamsCallback.onStreamError(e.getMessage());
+          onlineManagerStreamsCallback.onStreamError(e.getMessage());
           e.printStackTrace();
         } catch (IOException e) {
-          cacheStreamsCallback.onStreamError(e.getMessage());
+          onlineManagerStreamsCallback.onStreamError(e.getMessage());
           e.printStackTrace();
         }
       }
@@ -240,7 +244,13 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       @Override
       public void run() {
         try {
-          String deleteUrl = streamsUrl + "/" + streamToDelete.getId() + tokenUrlArgument;
+          String deleteUrl =
+            streamsUrl
+              + "/"
+                + streamToDelete.getId()
+                + tokenUrlArgument
+                + "&mergeEventsWithParent="
+                + mergeEventsWithParent;
           logger.log("Online: delete Stream: Delete request at: " + deleteUrl);
           // TODO maybe add mergeEventsWithParent as bodyString
           Request

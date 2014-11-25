@@ -139,14 +139,16 @@ public class StreamsSupervisor {
         + ", cid="
         + stream.getClientId()
         + ", parentCid="
-        + stream.getParentClientId());
+        + stream.getParentClientId()
+        + " - "
+        + Thread.currentThread().getName());
 
     // 1st case: stream fresh from API
     // 2nd case: stream fresh from user
     if ((getClientId(stream.getId()) == null && stream.getClientId() == null)
       || (stream.getId() == null && stream.getClientId() == null)) {
       stream.generateClientId();
-      logger.log("StreamsSupervisor: Generating new cid for Stream OH NOES");
+      logger.log("StreamsSupervisor: Generating new cid for Stream");
     }
     // parent stream should already be inserted - used only when fresh from API
     if (stream.getParentId() != null) {
@@ -187,7 +189,9 @@ public class StreamsSupervisor {
         + streamToUpdate.getClientId()
         + ", parentCid="
         + streamToUpdate.getParentClientId()
-        + ")");
+        + ")"
+        + " - "
+        + Thread.currentThread().getName());
 
     // find out if parent has changed:
     if (oldStream.getParentClientId() == null && streamToUpdate.getParentClientId() == null) {
@@ -232,7 +236,9 @@ public class StreamsSupervisor {
         + oldStream.getName()
         + ", parentCid="
         + oldStream.getParentClientId()
-        + ")");
+        + ")"
+        + " - "
+        + Thread.currentThread().getName());
     connectionCallback.onStreamsSuccess("StreamsSupervisor: Stream with id="
       + oldStream.getId()
         + ", cid="
@@ -313,6 +319,14 @@ public class StreamsSupervisor {
    * @param connectionCallback
    */
   private void addStream(Stream newStream, StreamsCallback connectionCallback) {
+    logger.log("StreamsSupervisor: add stream (id="
+      + newStream.getId()
+        + ", cid="
+        + newStream.getClientId()
+        + ", parentCid="
+        + newStream.getParentClientId()
+        + " - "
+        + Thread.currentThread().getName());
     if (newStream.getParentClientId() == null) {
       rootStreams.put(newStream.getClientId(), newStream);
     }
@@ -330,7 +344,9 @@ public class StreamsSupervisor {
         + newStream.getName()
         + ", parentCid="
         + newStream.getParentClientId()
-        + ")");
+        + ")"
+        + " - "
+        + Thread.currentThread().getName());
     connectionCallback.onStreamsSuccess("StreamsSupervisor: Stream with id="
       + newStream.getId()
         + ", cid="

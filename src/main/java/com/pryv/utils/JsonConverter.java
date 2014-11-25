@@ -129,10 +129,13 @@ public class JsonConverter {
     Map<String, Event> newEvents = new HashMap<String, Event>();
     if (arrNode != null) {
       if (arrNode.isArray()) {
+        logger.log("JsonConverter: number of received events: " + arrNode.size());
         for (final JsonNode objNode : arrNode) {
-          Event eventToAdd = new Event();
-          resetEventFromJson(objNode.toString(), eventToAdd);
+          String str = objNode.toString();
+          logger.log("JsonConverter: deserializing event: " + str);
+          Event eventToAdd = jsonMapper.readValue(str, Event.class);
           newEvents.put(eventToAdd.getId(), eventToAdd);
+          logger.log("JsonConverter: event created: id = " + eventToAdd.getId());
         }
       }
     }

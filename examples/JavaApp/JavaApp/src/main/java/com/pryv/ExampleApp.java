@@ -379,6 +379,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    */
 
   public void onEventsRetrievalSuccess(final Map<String, Event> newEvents, double serverTime) {
+    logger.log("JavaApp: retrieved " + newEvents.size() + " events.");
     addEventsToList(newEvents);
   }
 
@@ -409,7 +410,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    * @param newEvents
    */
   private void addEventsToList(final Map<String, Event> newEvents) {
-    logger.log("ExampleApp: adding events to List: " + newEvents.values().size());
+    logger.log("ExampleApp: adding " + newEvents.values().size() + " events to List.");
     Platform.runLater(new Runnable() {
       public void run() {
         eventsObservableList.removeAll(eventsObservableList);

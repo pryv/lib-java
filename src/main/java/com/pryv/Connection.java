@@ -166,8 +166,13 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void getStreams(Filter filter, final StreamsCallback userStreamsCallback) {
-    userStreamsCallback.onStreamsRetrievalSuccess(streamsSupervisor.getRootStreams(), 0);
-    if (Pryv.isCacheActive() || Pryv.isSupervisorActive()) {
+    if (Pryv.isSupervisorActive()) {
+      logger.log("Connection: retrieving streams from Supervisor"
+        + " - "
+          + Thread.currentThread().getName());
+      userStreamsCallback.onStreamsRetrievalSuccess(streamsSupervisor.getRootStreams(), 0);
+    }
+    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
       cacheStreamsManager.getStreams(filter, new CacheManagerStreamsCallback(userStreamsCallback));
     }
@@ -323,6 +328,7 @@ public class Connection implements EventsManager, StreamsManager {
     @Override
     public void onStreamsRetrievalSuccess(Map<String, Stream> cacheManagerStreams,
       double pServerTime) {
+      logger.log("CacheManagerStreamsCallback: Streams retrieval success");
 
       if (pServerTime != 0) {
         // update server time

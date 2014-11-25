@@ -494,7 +494,10 @@ public class SQLiteDBHelper {
       public void run() {
         try {
           String cmd = QueryGenerator.retrieveStreams();
-          logger.log("SQLiteDBHelper: getStreams: " + cmd);
+          logger.log("SQLiteDBHelper: getStreams: "
+            + cmd
+              + " - "
+              + Thread.currentThread().getName());
           Statement statement = dbConnection.createStatement();
           ResultSet result = statement.executeQuery(cmd);
           Map<String, Stream> allStreams = new HashMap<String, Stream>();
