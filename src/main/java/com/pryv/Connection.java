@@ -338,9 +338,9 @@ public class Connection implements EventsManager, StreamsManager {
       }
 
       if (cacheManagerStreams != null) {
-        for (Stream stream : cacheManagerStreams.values()) {
-          streamsSupervisor.updateOrCreateStream(stream, userStreamsCallback);
-        }
+        // for (Stream stream : cacheManagerStreams.values()) {
+        // streamsSupervisor.updateOrCreateStream(stream, userStreamsCallback);
+        // }
         // forward updated Streams
         userStreamsCallback.onStreamsRetrievalSuccess(getRootStreams(), serverTime);
       }

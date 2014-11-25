@@ -346,6 +346,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         .log("Cache: retrieved streams from cache: root streams amount: " + rootsStreams.size());
       for (Stream cacheStream : rootsStreams.values()) {
         cacheStream.assignConnection(weakConnection);
+        streamsSupervisor.updateOrCreateStream(cacheStream, connectionStreamsCallback);
       }
       connectionStreamsCallback.onStreamsRetrievalSuccess(rootsStreams, 0);
 
@@ -397,7 +398,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       for (Stream onlineStream : onlineStreams.values()) {
         streamsSupervisor.updateOrCreateStream(onlineStream, connectionStreamsCallback);
       }
-      connectionStreamsCallback.onStreamsRetrievalSuccess(streamsSupervisor.getRootStreams(), serverTime);
+      connectionStreamsCallback.onStreamsRetrievalSuccess(streamsSupervisor.getRootStreams(),
+        serverTime);
       dbHelper.updateOrCreateStreams(streamsSupervisor.getRootStreams().values(), this);
     }
 
