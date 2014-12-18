@@ -167,13 +167,13 @@ public class QueryGenerator {
       // fromTime
       if (filter.getFromTime() != null) {
         filterParams.append(andSeparator + EVENTS_TIME_KEY + ">" + filter.getFromTime());
-        andSeparator.insert(0, " AND ");
+        andSeparator.replace(0, andSeparator.length(), " AND ");
       }
 
       // toTime
       if (filter.getToTime() != null) {
         filterParams.append(andSeparator + EVENTS_TIME_KEY + "<" + filter.getToTime());
-        andSeparator.insert(0, " AND ");
+        andSeparator.replace(0, andSeparator.length(), " AND ");
       }
 
       // streamIds
@@ -190,7 +190,7 @@ public class QueryGenerator {
       // modifiedSince
       if (filter.getModifiedSince() != null) {
         filterParams.append(andSeparator + EVENTS_MODIFIED_KEY + ">" + filter.getModifiedSince());
-        andSeparator.insert(0, " AND ");
+        andSeparator.replace(0, andSeparator.length(), " AND ");
       }
 
       // state
@@ -209,7 +209,7 @@ public class QueryGenerator {
           // alternative implementation
           // sb.setLength(sb.length() - andSeparator.length());
         }
-        andSeparator.insert(0, " AND ");
+        andSeparator.replace(0, andSeparator.length(), " AND ");
       }
       if (filterParams.length() != 0) {
         filterParams.insert(0, " WHERE ");
@@ -465,7 +465,7 @@ public class QueryGenerator {
         separator = " OR ";
       }
       sb.append(")");
-      andSeparator.insert(0, " AND ");
+      andSeparator.replace(0, andSeparator.length(), " AND ");
     }
   }
 
