@@ -163,17 +163,17 @@ public class QueryGenerator {
     StringBuilder filterParams = new StringBuilder();
 
     if (filter != null) {
-      String andSeparator = "";
+      StringBuilder andSeparator = new StringBuilder("");
       // fromTime
       if (filter.getFromTime() != null) {
         filterParams.append(andSeparator + EVENTS_TIME_KEY + ">" + filter.getFromTime());
-        andSeparator = " AND ";
+        andSeparator.insert(0, " AND ");
       }
 
       // toTime
       if (filter.getToTime() != null) {
         filterParams.append(andSeparator + EVENTS_TIME_KEY + "<" + filter.getToTime());
-        andSeparator = " AND ";
+        andSeparator.insert(0, " AND ");
       }
 
       // streamIds
@@ -190,7 +190,7 @@ public class QueryGenerator {
       // modifiedSince
       if (filter.getModifiedSince() != null) {
         filterParams.append(andSeparator + EVENTS_MODIFIED_KEY + ">" + filter.getModifiedSince());
-        andSeparator = " AND ";
+        andSeparator.insert(0, " AND ");
       }
 
       // state
@@ -209,7 +209,7 @@ public class QueryGenerator {
           // alternative implementation
           // sb.setLength(sb.length() - andSeparator.length());
         }
-        andSeparator = " AND ";
+        andSeparator.insert(0, " AND ");
       }
       if (filterParams.length() != 0) {
         filterParams.insert(0, " WHERE ");
@@ -453,7 +453,8 @@ public class QueryGenerator {
    * @param key
    *          the column on which the conditions are tested in the DB
    */
-  private static void formatFilterSet(String andSeparator, StringBuilder sb, Set<String> set,
+  private static void formatFilterSet(StringBuilder andSeparator, StringBuilder sb,
+    Set<String> set,
     String key) {
     if (set != null) {
       sb.append(andSeparator + "(");
@@ -464,7 +465,7 @@ public class QueryGenerator {
         separator = " OR ";
       }
       sb.append(")");
-      andSeparator = " AND ";
+      andSeparator.insert(0, " AND ");
     }
   }
 
