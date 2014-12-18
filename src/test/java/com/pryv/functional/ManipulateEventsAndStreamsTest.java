@@ -355,7 +355,7 @@ public class ManipulateEventsAndStreamsTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void onStreamsRetrievalSuccess(Map<String, Stream> newStreams, double serverTime) {
+      public void onStreamsRetrievalSuccess(Map<String, Stream> newStreams, Double serverTime) {
         System.out.println("TestStreamsCallback: success for "
           + newStreams.values().size()
             + " streams");
@@ -364,18 +364,18 @@ public class ManipulateEventsAndStreamsTest {
       }
 
       @Override
-      public void onStreamsRetrievalError(String message) {
+      public void onStreamsRetrievalError(String message, Double pServerTime) {
       }
 
       @Override
-      public void onStreamsSuccess(String successMessage, Stream stream) {
+      public void onStreamsSuccess(String successMessage, Stream stream, Double pServerTime) {
         System.out.println("TestStreamsCallback: streams success with msg: " + successMessage);
         streamsSuccess = true;
         testStream = stream;
       }
 
       @Override
-      public void onStreamError(String errorMessage) {
+      public void onStreamError(String errorMessage, Double pServerTime) {
       }
     };
   }

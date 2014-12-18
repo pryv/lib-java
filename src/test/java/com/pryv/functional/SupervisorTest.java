@@ -186,23 +186,22 @@ public class SupervisorTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void onStreamsSuccess(String successMessage, Stream stream) {
+      public void onStreamsSuccess(String successMessage, Stream stream, Double pServerTime) {
         logger.log(successMessage);
       }
 
       @Override
-      public void onStreamsRetrievalError(String errorMessage) {
+      public void onStreamsRetrievalError(String errorMessage, Double pServerTime) {
         logger.log(errorMessage);
       }
 
       @Override
-      public void onStreamError(String errorMessage) {
+      public void onStreamError(String errorMessage, Double pServerTime) {
         logger.log(errorMessage);
       }
 
       @Override
-      public void onStreamsRetrievalSuccess(Map<String, Stream> onlineStreams,
-        double serverTime) {
+      public void onStreamsRetrievalSuccess(Map<String, Stream> onlineStreams, Double serverTime) {
       }
 
     };

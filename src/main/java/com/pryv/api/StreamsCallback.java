@@ -21,15 +21,17 @@ public interface StreamsCallback {
    * @param serverTime
    *          the server time retrieved from the online message, in seconds
    */
-  void onStreamsRetrievalSuccess(Map<String, Stream> onlineStreams, double serverTime);
+  void onStreamsRetrievalSuccess(Map<String, Stream> onlineStreams, Double serverTime);
 
   /**
    * callback method called when an error occured during Streams fetching.
    *
    * @param errorMessage
    *          the error message
+   * @param serverTime
+   *          the server time retrieved from the online message, in seconds
    */
-  void onStreamsRetrievalError(String errorMessage);
+  void onStreamsRetrievalError(String errorMessage, Double serverTime);
 
   /**
    * callback method called when createStream(), updateStream() or
@@ -40,15 +42,19 @@ public interface StreamsCallback {
    * @param stream
    *          the updated stream, not null when update or delete (trash case) of
    *          stream
+   * @param serverTime
+   *          the server time retrieved from the online message, in seconds
    */
-  void onStreamsSuccess(String successMessage, Stream stream);
+  void onStreamsSuccess(String successMessage, Stream stream, Double serverTime);
 
   /**
    * callback method called when an error occurs during createStream(),
    * updateStream() or deleteStream() execution.
    *
    * @param errorMessage
+   * @param serverTime
+   *          the server time retrieved from the online message, in seconds
    */
-  void onStreamError(String errorMessage);
+  void onStreamError(String errorMessage, Double serverTime);
 
 }

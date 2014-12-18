@@ -310,7 +310,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    * Streams Callbacks
    */
 
-  public void onStreamsRetrievalSuccess(Map<String, Stream> streams, double serverTime) {
+  public void onStreamsRetrievalSuccess(Map<String, Stream> streams, Double serverTime) {
     logger.log("JavaApp: received " + streams.size() + " streams.");
     this.streams = streams.values();
     addStreamsToTree(streams);
@@ -340,14 +340,14 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     }
   }
 
-  public void onStreamsRetrievalError(String message) {
+  public void onStreamsRetrievalError(String message, Double pServerTime) {
     displayError(message);
   }
 
-  public void onStreamsSuccess(String successMessage, Stream stream) {
+  public void onStreamsSuccess(String successMessage, Stream stream, Double pServerTime) {
   }
 
-  public void onStreamError(String errorMessage) {
+  public void onStreamError(String errorMessage, Double pServerTime) {
     displayError(errorMessage);
   }
 

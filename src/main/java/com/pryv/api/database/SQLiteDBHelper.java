@@ -277,9 +277,9 @@ public class SQLiteDBHelper {
           }
           statement.close();
           cacheStreamsCallback.onStreamsSuccess("SQLiteDBHelper: Stream updated or created",
-            streamToCache);
+            streamToCache, null);
         } catch (SQLException e) {
-          cacheStreamsCallback.onStreamError(e.getMessage());
+          cacheStreamsCallback.onStreamError(e.getMessage(), null);
         }
       }
     }.start();
@@ -311,7 +311,7 @@ public class SQLiteDBHelper {
             logger.log("SQLiteDBHelper: update or create Stream: " + cmd);
             statement.executeUpdate(cmd);
             cacheStreamsCallback.onStreamsSuccess(
-              "SQLiteDBHelper: child stream updated or created", stream);
+              "SQLiteDBHelper: child stream updated or created", stream, null);
             if (stream.getChildren() != null) {
               Set<Stream> children = new HashSet<Stream>();
               retrieveAllChildren(children, stream);
@@ -321,12 +321,12 @@ public class SQLiteDBHelper {
 
                 statement.execute(cmd);
                 cacheStreamsCallback.onStreamsSuccess(
-                  "SQLiteDBHelper: child stream updated or created", childStream);
+                  "SQLiteDBHelper: child stream updated or created", childStream, null);
               }
             }
             statement.close();
           } catch (SQLException e) {
-            cacheStreamsCallback.onStreamError(e.getMessage());
+            cacheStreamsCallback.onStreamError(e.getMessage(), null);
             e.printStackTrace();
           }
         }
@@ -401,13 +401,13 @@ public class SQLiteDBHelper {
                     updateOrCreateEvent(updateEvent, null);
                   } catch (JsonParseException e) {
                     e.printStackTrace();
-                    cacheStreamsCallback.onStreamError(e.getMessage());
+                    cacheStreamsCallback.onStreamError(e.getMessage(), null);
                   } catch (JsonMappingException e) {
                     e.printStackTrace();
-                    cacheStreamsCallback.onStreamError(e.getMessage());
+                    cacheStreamsCallback.onStreamError(e.getMessage(), null);
                   } catch (IOException e) {
                     e.printStackTrace();
-                    cacheStreamsCallback.onStreamError(e.getMessage());
+                    cacheStreamsCallback.onStreamError(e.getMessage(), null);
                   }
                 }
 
@@ -423,7 +423,7 @@ public class SQLiteDBHelper {
               }
               cacheStreamsCallback.onStreamsSuccess("SQLiteDBHelper: Stream with id="
                 + retrievedStreamToDelete.getId()
-                  + " deleted.", null);
+                  + " deleted.", null, null);
             } else {
               // set its trashed field to true and save it
               logger.log("SQLiteDBHelper: trash Stream with id=" + streamToDelete.getId());
@@ -431,7 +431,7 @@ public class SQLiteDBHelper {
               updateOrCreateStream(retrievedStreamToDelete, cacheStreamsCallback);
               cacheStreamsCallback.onStreamsSuccess("SQLiteDBHelper: Stream with id="
                 + retrievedStreamToDelete.getId()
-                  + " trashed.", retrievedStreamToDelete);
+                  + " trashed.", retrievedStreamToDelete, null);
               // set child streams' trashed field to true
 
             }
@@ -465,7 +465,7 @@ public class SQLiteDBHelper {
           // }
           statement.close();
         } catch (SQLException e) {
-          cacheStreamsCallback.onStreamError(e.getMessage());
+          cacheStreamsCallback.onStreamError(e.getMessage(), null);
           e.printStackTrace();
         }
       }
@@ -526,9 +526,9 @@ public class SQLiteDBHelper {
             }
           }
 
-          cacheStreamsCallback.onStreamsRetrievalSuccess(rootStreams, 0);
+          cacheStreamsCallback.onStreamsRetrievalSuccess(rootStreams, null);
         } catch (SQLException e) {
-          cacheStreamsCallback.onStreamError(e.getMessage());
+          cacheStreamsCallback.onStreamError(e.getMessage(), null);
           e.printStackTrace();
         }
       }

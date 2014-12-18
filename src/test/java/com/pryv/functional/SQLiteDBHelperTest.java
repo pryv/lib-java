@@ -480,25 +480,25 @@ public class SQLiteDBHelperTest {
 
       @Override
       public void
-        onStreamsRetrievalSuccess(Map<String, Stream> receveiedStreams, double serverTime) {
+        onStreamsRetrievalSuccess(Map<String, Stream> receveiedStreams, Double serverTime) {
         streams = receveiedStreams;
         streamsRetrievalSuccess = true;
       }
 
       @Override
-      public void onStreamsRetrievalError(String errorMessage) {
+      public void onStreamsRetrievalError(String errorMessage, Double serverTime) {
         streamsRetrievalError = true;
       }
 
       @Override
-      public void onStreamsSuccess(String successMessage, Stream stream) {
+      public void onStreamsSuccess(String successMessage, Stream stream, Double serverTime) {
         streamsSuccess = true;
         testStream = stream;
         System.out.println("SQLite TestStreamsCallback onStreamSuccess: " + successMessage);
       }
 
       @Override
-      public void onStreamError(String errorMessage) {
+      public void onStreamError(String errorMessage, Double serverTime) {
         streamsError = true;
       }
 

@@ -316,7 +316,7 @@ public class OnlineEventsAndStreamsManagerTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void onStreamsRetrievalSuccess(Map<String, Stream> newStreams, double serverTime) {
+      public void onStreamsRetrievalSuccess(Map<String, Stream> newStreams, Double serverTime) {
         System.out.println("TestStreamsCallback: success for "
           + newStreams.values().size()
             + " streams");
@@ -325,18 +325,18 @@ public class OnlineEventsAndStreamsManagerTest {
       }
 
       @Override
-      public void onStreamsRetrievalError(String message) {
+      public void onStreamsRetrievalError(String message, Double pServerTime) {
       }
 
       @Override
-      public void onStreamsSuccess(String successMessage, Stream stream) {
+      public void onStreamsSuccess(String successMessage, Stream stream, Double pServerTime) {
         System.out.println("TestStreamsCallback: success msg: " + successMessage);
         createdStream = stream;
         streamsSuccess = true;
       }
 
       @Override
-      public void onStreamError(String errorMessage) {
+      public void onStreamError(String errorMessage, Double pServerTime) {
         streamsError = true;
       }
     };

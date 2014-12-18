@@ -341,7 +341,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onStreamsRetrievalSuccess(Map<String, Stream> rootsStreams, double serverTime) {
+    public void onStreamsRetrievalSuccess(Map<String, Stream> rootsStreams, Double serverTime) {
       // forward to connection
       logger
         .log("Cache: retrieved streams from cache: root streams amount: " + rootsStreams.size());
@@ -349,7 +349,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         cacheStream.assignConnection(weakConnection);
         streamsSupervisor.updateOrCreateStream(cacheStream, connectionStreamsCallback);
       }
-      connectionStreamsCallback.onStreamsRetrievalSuccess(rootsStreams, 0);
+      connectionStreamsCallback.onStreamsRetrievalSuccess(rootsStreams, serverTime);
 
       // make the online request
       if (Pryv.isOnlineActive()) {
@@ -359,21 +359,21 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onStreamsRetrievalError(String errorMessage) {
+    public void onStreamsRetrievalError(String errorMessage, Double serverTime) {
       // forward to connection
-      connectionStreamsCallback.onStreamsRetrievalError(errorMessage);
+      connectionStreamsCallback.onStreamsRetrievalError(errorMessage, serverTime);
     }
 
     @Override
-    public void onStreamsSuccess(String successMessage, Stream stream) {
+    public void onStreamsSuccess(String successMessage, Stream stream, Double serverTime) {
       // forward to connection
-      connectionStreamsCallback.onStreamsSuccess(successMessage, stream);
+      connectionStreamsCallback.onStreamsSuccess(successMessage, stream, serverTime);
     }
 
     @Override
-    public void onStreamError(String errorMessage) {
+    public void onStreamError(String errorMessage, Double serverTime) {
       // forward to connection
-      connectionStreamsCallback.onStreamError(errorMessage);
+      connectionStreamsCallback.onStreamError(errorMessage, serverTime);
     }
 
   }
@@ -393,7 +393,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onStreamsRetrievalSuccess(Map<String, Stream> onlineStreams, double serverTime) {
+    public void onStreamsRetrievalSuccess(Map<String, Stream> onlineStreams, Double serverTime) {
       logger.log("OnlineManagerStreamsCallback: Streams retrieval success");
 
       for (Stream onlineStream : onlineStreams.values()) {
@@ -405,21 +405,21 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onStreamsRetrievalError(String errorMessage) {
+    public void onStreamsRetrievalError(String errorMessage, Double serverTime) {
       // forward to connection
-      connectionStreamsCallback.onStreamsRetrievalError(errorMessage);
+      connectionStreamsCallback.onStreamsRetrievalError(errorMessage, serverTime);
     }
 
     @Override
-    public void onStreamsSuccess(String successMessage, Stream stream) {
+    public void onStreamsSuccess(String successMessage, Stream stream, Double serverTime) {
       // forward to connection
-      connectionStreamsCallback.onStreamsSuccess(successMessage, stream);
+      connectionStreamsCallback.onStreamsSuccess(successMessage, stream, serverTime);
     }
 
     @Override
-    public void onStreamError(String errorMessage) {
+    public void onStreamError(String errorMessage, Double serverTime) {
       // forward to connection
-      connectionStreamsCallback.onStreamError(errorMessage);
+      connectionStreamsCallback.onStreamError(errorMessage, serverTime);
     }
 
   }

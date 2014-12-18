@@ -179,7 +179,7 @@ public class Connection implements EventsManager, StreamsManager {
       logger.log("Connection: retrieving streams from Supervisor"
         + " - "
           + Thread.currentThread().getName());
-      userStreamsCallback.onStreamsRetrievalSuccess(streamsSupervisor.getRootStreams(), 0);
+      userStreamsCallback.onStreamsRetrievalSuccess(streamsSupervisor.getRootStreams(), null);
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
       // forward call to cache
@@ -346,15 +346,10 @@ public class Connection implements EventsManager, StreamsManager {
 
     @Override
     public void onStreamsRetrievalSuccess(Map<String, Stream> cacheManagerStreams,
-      double pServerTime) {
+      Double pServerTime) {
       logger.log("CacheManagerStreamsCallback: Streams retrieval success");
 
-      if (pServerTime != 0) {
-        // update server time
-        serverTime = pServerTime;
-        // compute delta time between system time and server time
-        computeDelta(pServerTime);
-      }
+      computeDelta(pServerTime);
 
       if (cacheManagerStreams != null) {
         // for (Stream stream : cacheManagerStreams.values()) {
@@ -366,18 +361,21 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onStreamsRetrievalError(String errorMessage) {
-      userStreamsCallback.onStreamsRetrievalError(errorMessage);
+    public void onStreamsRetrievalError(String errorMessage, Double pServerTime) {
+      computeDelta(pServerTime);
+      userStreamsCallback.onStreamsRetrievalError(errorMessage, pServerTime);
     }
 
     @Override
-    public void onStreamsSuccess(String successMessage, Stream stream) {
-      userStreamsCallback.onStreamsSuccess(successMessage, stream);
+    public void onStreamsSuccess(String successMessage, Stream stream, Double pServerTime) {
+      computeDelta(pServerTime);
+      userStreamsCallback.onStreamsSuccess(successMessage, stream, pServerTime);
     }
 
     @Override
-    public void onStreamError(String errorMessage) {
-      userStreamsCallback.onStreamError(errorMessage);
+    public void onStreamError(String errorMessage, Double pServerTime) {
+      computeDelta(pServerTime);
+      userStreamsCallback.onStreamError(errorMessage, pServerTime);
     }
 
   }

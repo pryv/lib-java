@@ -245,7 +245,7 @@ public class StreamsSupervisor {
         + oldStream.getName()
         + ", parentCid="
         + oldStream.getParentId()
-        + " updated.", oldStream);
+        + " updated.", oldStream, null);
 
     // update children streams
     if (streamToUpdate.getChildren() != null) {
@@ -275,11 +275,13 @@ public class StreamsSupervisor {
         logger.log("StreamsSupervisor: " + childStream.getId() + " now child of " + parentId);
       } else {
         connectionCallback
-          .onStreamError("Stream update failure: trying to add Stream to child of its children");
+.onStreamError(
+          "Stream update failure: trying to add Stream to child of its children", null);
       }
     } else {
       connectionCallback
-        .onStreamError("Stream update failure: trying to add Stream as child of unexisting Stream.");
+.onStreamError(
+        "Stream update failure: trying to add Stream as child of unexisting Stream.", null);
     }
   }
 
@@ -305,7 +307,9 @@ public class StreamsSupervisor {
       oldParent.removeChildStream(childStream);
     } else {
       connectionCallback
-        .onStreamError("Stream update failure: trying to remove Stream from unexisting Stream's children list");
+.onStreamError(
+        "Stream update failure: trying to remove Stream from unexisting Stream's children list",
+        null);
     }
   }
 
@@ -347,7 +351,7 @@ public class StreamsSupervisor {
         + newStream.getName()
         + ", parentId="
         + newStream.getParentId()
-        + " created.", newStream);
+        + " created.", newStream, null);
     // add its children if any
     if (newStream.getChildren() != null) {
       for (Stream childStream : newStream.getChildren()) {
@@ -417,7 +421,7 @@ public class StreamsSupervisor {
 
         connectionSCallback.onStreamsSuccess("StreamsSupervisor: Stream with id="
           + streamId
-            + " deleted.", null);
+            + " deleted.", null, null);
       } else {
         // update trashed field of stream to delete
         streamToDelete.setTrashed(true);
@@ -430,13 +434,13 @@ public class StreamsSupervisor {
         // }
         connectionSCallback.onStreamsSuccess("StreamsSupervisor: Stream with id="
           + streamId
-            + " trashed.", streamToDelete);
+            + " trashed.", streamToDelete, null);
       }
     } else {
       // streamToDelete not found
       connectionSCallback.onStreamError("StreamsSupervisor: Stream with id="
         + streamId
-          + " not found.");
+          + " not found.", null);
     }
   }
 
