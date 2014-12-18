@@ -98,15 +98,12 @@ public class OnlineEventsAndStreamsManagerTest {
     }
     System.out.println("i chose dat stream: name="
       + chosenStream.getName()
-        + ", cid="
-        + chosenStream.getClientId()
         + ", id="
         + chosenStream.getId());
     Event testEvent = new Event();
     testEvent.setStreamId(chosenStream.getId());
     testEvent.setTime(1410963641.0);
     testEvent.setType("note/txt");
-    testEvent.setStreamClientId(chosenStream.getClientId());
     testEvent
       .setContent("bla bla bla - awesome big content for the ultimate testing phase BRR BRR BRR");
     testEvent.setTags(DummyData.getTags());
@@ -130,7 +127,7 @@ public class OnlineEventsAndStreamsManagerTest {
     Awaitility.await().until(hasEventsSuccess());
     eventsSuccess = false;
     assertNotNull(createdEvent);
-    assertTrue(createdEvent.getTrashed());
+    assertTrue(createdEvent.isTrashed());
     Event eventToDeleteReally = new Event();
     eventToDeleteReally.setId(createdEvent.getId());
     createdEvent = null;
@@ -142,16 +139,18 @@ public class OnlineEventsAndStreamsManagerTest {
   @Test
   public void testCreateUpdateAndDeleteStreamOnline() {
     Stream testStream = new Stream();
-    testStream.setName("testStream name3");
+    testStream.setName("testStream name655");
 
     // create
+    System.out.println("### --- testCreateUpdateAndDeleteStreamOnline: create --- ###");
     online.createStream(testStream, streamsCallback);
     Awaitility.await().until(hasStreamSuccess());
     streamsSuccess = false;
     assertNotNull(createdStream);
 
     // update
-    String nameUpdate = "testStream name3 updated - wooohooohoo";
+    System.out.println("### --- testCreateUpdateAndDeleteStreamOnline: update --- ###");
+    String nameUpdate = "testStream name3123 updated - wooohooohoo";
     createdStream.setName(nameUpdate);
     online.updateStream(createdStream, streamsCallback);
     Awaitility.await().until(hasStreamSuccess());
@@ -159,13 +158,15 @@ public class OnlineEventsAndStreamsManagerTest {
     assertEquals(nameUpdate, createdStream.getName());
 
     // trash
+    System.out.println("### --- testCreateUpdateAndDeleteStreamOnline: trash --- ###");
     online.deleteStream(createdStream, false, streamsCallback);
     Awaitility.await().until(hasStreamSuccess());
     streamsSuccess = false;
     assertNotNull(createdStream);
-    assertTrue(createdStream.getTrashed());
+    assertTrue(createdStream.isTrashed());
 
     // delete
+    System.out.println("### --- testCreateUpdateAndDeleteStreamOnline: delete --- ###");
     online.deleteStream(createdStream, false, streamsCallback);
     Awaitility.await().until(hasStreamSuccess());
     assertNull(createdStream);

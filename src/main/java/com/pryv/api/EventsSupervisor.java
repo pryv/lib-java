@@ -18,7 +18,7 @@ import com.pryv.utils.Logger;
 public class EventsSupervisor {
 
   /**
-   *
+   * the Events stored in volatile memory
    */
   private Map<String, Event> events;
 
@@ -99,8 +99,8 @@ public class EventsSupervisor {
       + event.getId()
         + ", cid="
         + event.getClientId()
-        + ", streamCid="
-        + event.getStreamClientId());
+        + ", streamId="
+        + event.getStreamId());
 
     Event oldEvent = null;
     String cid = getClientId(event.getId());
@@ -117,11 +117,12 @@ public class EventsSupervisor {
       event.setClientId(cid);
     }
     // stream should already be inserted - used only when fresh from API
-    String streamCid =
-      streamsSupervisor.getStreamsIdToClientIdDictionnary().get(event.getStreamId());
-    if (streamCid != null) {
-      event.setStreamClientId(streamCid);
-    }
+    // String streamId =
+    // streamsSupervisor.getStreamsIdToClientIdDictionnary().get(event.getStreamId());
+    //
+    // if (streamId != null) {
+    // event.setStreamClientId(streamId);
+    // }
 
     if (oldEvent != null) {
       updateEvent(oldEvent, event);
@@ -144,8 +145,8 @@ public class EventsSupervisor {
       + newEvent.getId()
         + ", cid="
         + newEvent.getClientId()
-        + ", streamCid="
-        + newEvent.getStreamClientId()
+        + ", streamId="
+        + newEvent.getStreamId()
         + ")");
     if (connectionCallback != null) {
       connectionCallback.onEventsSuccess("EventsSupervisor: Event added", newEvent, 0);
@@ -165,22 +166,22 @@ public class EventsSupervisor {
       + oldEvent.getId()
         + ", cid="
         + oldEvent.getClientId()
-        + ", streamCid="
-        + oldEvent.getStreamClientId()
+        + ", streamId="
+        + oldEvent.getStreamId()
         + ") to eventToUpdate (id="
         + eventToUpdate.getId()
         + ", cid="
         + eventToUpdate.getClientId()
-        + ", streamCid="
-        + eventToUpdate.getStreamClientId()
+        + ", streamId="
+        + eventToUpdate.getStreamId()
         + ")");
     oldEvent.merge(eventToUpdate, JsonConverter.getCloner());
     logger.log("EventsSupervisor: updated Event (id="
       + oldEvent.getId()
         + ", clientId="
         + oldEvent.getClientId()
-        + ", streamCid="
-        + oldEvent.getStreamClientId()
+        + ", streamId="
+        + oldEvent.getStreamId()
         + ")");
   }
 
@@ -200,9 +201,9 @@ public class EventsSupervisor {
         + eventToDelete.getId());
     Event tmpEvent = events.get(eventToDelete.getClientId());
     System.out.println("EventsSupervisor: event to delete ref in supervisor: " + tmpEvent);
-    System.out.println("ev to Del fields: trashed=" + tmpEvent.getTrashed());
+    System.out.println("ev to Del fields: trashed=" + tmpEvent.isTrashed());
     if (events.get(eventToDelete.getClientId()) != null) {
-      if (events.get(eventToDelete.getClientId()).getTrashed() == true) {
+      if (events.get(eventToDelete.getClientId()).isTrashed() == true) {
         // delete really
         events.remove(eventToDelete.getClientId());
         eventIdToClientId.remove(eventToDelete.getId());

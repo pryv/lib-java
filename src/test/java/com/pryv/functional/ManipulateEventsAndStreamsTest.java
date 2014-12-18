@@ -96,15 +96,12 @@ public class ManipulateEventsAndStreamsTest {
     }
     System.out.println("i chose dat stream: name="
       + chosenStream.getName()
-        + ", cid="
-        + chosenStream.getClientId()
         + ", id="
         + chosenStream.getId());
     Event testEvent = new Event();
     testEvent.setStreamId(chosenStream.getId());
     testEvent.setTime(1410963641.0);
     testEvent.setType("note/txt");
-    testEvent.setStreamClientId(chosenStream.getClientId());
     testEvent
       .setContent("bla bla bla - awesome big content for the ultimate testing phase BRR BRR BRR");
     testEvent.setTags(DummyData.getTags());
@@ -142,7 +139,7 @@ public class ManipulateEventsAndStreamsTest {
   @Test
   public void testCreateUpdateAndDeleteStream() {
     testStream = new Stream();
-    int num = 13;
+    int num = 3;
     testStream.setName("testStream name" + num);
 
     System.out.println("### --- Create Stream phase --- ###");
@@ -181,7 +178,7 @@ public class ManipulateEventsAndStreamsTest {
     Awaitility.await().until(hasStreamsSuccess());
     streamsSuccess = false;
     assertNotNull(testStream);
-    assertTrue(testStream.getTrashed());
+    assertTrue(testStream.isTrashed());
 
     // delete
     System.out.println("### --- Delete Stream phase --- ###");
@@ -200,23 +197,23 @@ public class ManipulateEventsAndStreamsTest {
     eventsManager.getEvents(filter, eventsCallback);
     Awaitility.await().until(hasEvents());
 
-    // get a streamCid
-    String streamCid = null;
+    // get a streamId
+    String streamId = null;
     Iterator<Event> iterator = events.values().iterator();
-    while (streamCid == null && iterator.hasNext()) {
-      streamCid = iterator.next().getStreamClientId();
+    while (streamId == null && iterator.hasNext()) {
+      streamId = iterator.next().getStreamId();
     }
-    System.out.println("Test: We're going for dat streamcid=" + streamCid);
+    System.out.println("Test: We're going for dat streamId=" + streamId);
     filter = new Filter();
-    filter.addStreamClientId(streamCid);
+    filter.addStreamId(streamId);
     System.out.println("Test: going for dem right EVENTZZZZZ");
     eventsManager.getEvents(filter, eventsCallback);
-    Awaitility.await().until(hasFetchedRightEvents(streamCid));
+    Awaitility.await().until(hasFetchedRightEvents(streamId));
     eventsSuccess = false;
     assertFalse(eventsError);
   }
 
-  private Callable<Boolean> hasFetchedRightEvents(final String streamCid) {
+  private Callable<Boolean> hasFetchedRightEvents(final String streamId) {
     return new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
@@ -224,7 +221,7 @@ public class ManipulateEventsAndStreamsTest {
           if (events.values().size() > 0) {
             boolean match = false;
             for (Event event : events.values()) {
-              if (streamCid.equals(event.getStreamClientId())) {
+              if (streamId.equals(event.getStreamId())) {
                 match = true;
               }
             }

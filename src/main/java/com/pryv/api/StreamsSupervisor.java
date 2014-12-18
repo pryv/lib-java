@@ -18,25 +18,33 @@ import com.pryv.utils.Logger;
  */
 public class StreamsSupervisor {
 
+  // /**
+  // * Streams with no parent stream. the key is the clientId
+  // */
+  // private Map<String, Stream> rootStreams;
   /**
-   * Streams with no parent stream. the key is the clientId
+   * Streams with no parent stream. the key is the id
    */
   private Map<String, Stream> rootStreams;
 
+  // /**
+  // * All Streams stored in the Supervisor. the key is the clientId
+  // */
+  // private Map<String, Stream> flatStreams;
   /**
-   * All Streams stored in the Supervisor. the key is the clientId
+   * All Streams stored in the Supervisor. the key is the id
    */
   private Map<String, Stream> flatStreams;
 
-  /**
-   * Map: key=stream.id, value=stream.clientId
-   */
-  private Map<String, String> idToClientId;
+  // /**
+  // * Map: key=stream.id, value=stream.clientId
+  // */
+  // private Map<String, String> idToClientId;
 
-  /**
-   * Map: key=stream.clientId, value=stream.Id
-   */
-  private Map<String, String> clientIdToId;
+  // /**
+  // * Map: key=stream.clientId, value=stream.Id
+  // */
+  // private Map<String, String> clientIdToId;
 
   private EventsSupervisor eventsSupervisor;
   private EventsCallback deleteEventsCallback;
@@ -52,8 +60,8 @@ public class StreamsSupervisor {
   public StreamsSupervisor() {
     rootStreams = new HashMap<String, Stream>();
     flatStreams = new HashMap<String, Stream>();
-    idToClientId = new HashMap<String, String>();
-    clientIdToId = new HashMap<String, String>();
+    // idToClientId = new HashMap<String, String>();
+    // clientIdToId = new HashMap<String, String>();
     instanciateDeleteEventsCallback();
   }
 
@@ -74,55 +82,66 @@ public class StreamsSupervisor {
     return rootStreams;
   }
 
+  // /**
+  // * Returns Stream which has the provided client id
+  // *
+  // * @param streamClientId
+  // * the client id of the Stream you are looking for
+  // * @return the reference to the Stream
+  // */
+  // public Stream getStreamByClientId(String streamClientId) {
+  // return flatStreams.get(streamClientId);
+  // }
+
   /**
-   * Returns Stream which has the provided client id
+   * Returns Stream which has the provided id
    *
-   * @param streamClientId
+   * @param streamId
    *          the client id of the Stream you are looking for
    * @return the reference to the Stream
    */
-  public Stream getStreamByClientId(String streamClientId) {
-    return flatStreams.get(streamClientId);
+  public Stream getStreamById(String streamId) {
+    return flatStreams.get(streamId);
   }
 
-  /**
-   * Returns the clientId of the Stream whose id is provided.
-   *
-   * @param id
-   * @return the stream's clientId if it exists, else null
-   */
-  public String getClientId(String id) {
-    return idToClientId.get(id);
-  }
+  // /**
+  // * Returns the clientId of the Stream whose id is provided.
+  // *
+  // * @param id
+  // * @return the stream's clientId if it exists, else null
+  // */
+  // public String getClientId(String id) {
+  // return idToClientId.get(id);
+  // }
 
-  /**
-   * Returns the id of the Stream whose clientId is provided
-   *
-   * @param clientId
-   * @return
-   */
-  public String getId(String clientId) {
-    return clientIdToId.get(clientId);
-  }
+  // /**
+  // * Returns the id of the Stream whose clientId is provided
+  // *
+  // * @param clientId
+  // * @return
+  // */
+  // public String getId(String clientId) {
+  // return clientIdToId.get(clientId);
+  // }
 
-  /**
-   * Returns the Map that allows to translate the stream's Id to its client Id
-   *
-   * @return
-   */
-  public Map<String, String> getStreamsIdToClientIdDictionnary() {
-    return idToClientId;
-  }
+  // /**
+  // * Returns the Map that allows to translate the stream's Id to its client Id
+  // *
+  // * @return
+  // */
+  // public Map<String, String> getStreamsIdToClientIdDictionnary() {
+  // return idToClientId;
+  // }
 
-  /**
-   * Returns the Map that allows to translate the stream's client id to the
-   * stream's id
-   *
-   * @return
-   */
-  public Map<String, String> getStreamsClientIdToIdDictionnary() {
-    return clientIdToId;
-  }
+  // /**
+  // * Returns the Map that allows to translate the stream's client id to the
+  // * stream's id
+  // *
+  // * @return
+  // */
+  // public Map<String, String> getStreamsClientIdToIdDictionnary() {
+  // return clientIdToId;
+  // }
 
   /**
    * Update or create stream in Supervisor whether it already exists or not.
@@ -134,27 +153,19 @@ public class StreamsSupervisor {
    *          the callback to notify success or failure
    */
   public void updateOrCreateStream(Stream stream, StreamsCallback connectionCallback) {
-    System.out.println("StreamsSupervisor: updateOrCreateStream with id="
+    logger.log("StreamsSupervisor: updateOrCreateStream with id="
       + stream.getId()
-        + ", cid="
-        + stream.getClientId()
-        + ", parentCid="
-        + stream.getParentClientId()
+        + ", parentId="
+        + stream.getParentId()
         + " - "
         + Thread.currentThread().getName());
 
-    // 1st case: stream fresh from API
-    // 2nd case: stream fresh from user
-    if ((getClientId(stream.getId()) == null && stream.getClientId() == null)
-      || (stream.getId() == null && stream.getClientId() == null)) {
-      stream.generateClientId();
-      logger.log("StreamsSupervisor: Generating new cid for Stream");
+    if (stream.getId() == null) {
+      stream.generateId();
+      logger.log("StreamsSupervisor: Generating new id for stream: " + stream.getId());
     }
-    // parent stream should already be inserted - used only when fresh from API
-    if (stream.getParentId() != null) {
-      stream.updateParentClientId(idToClientId);
-    }
-    Stream oldStream = getStreamByClientId(stream.getClientId());
+
+    Stream oldStream = getStreamById(stream.getId());
     if (oldStream != null) {
       // case exists: update Stream
       updateStream(oldStream, stream, connectionCallback);
@@ -179,42 +190,38 @@ public class StreamsSupervisor {
     StreamsCallback connectionCallback) {
     logger.log("StreamsSupervisor: update oldStream (id="
       + oldStream.getId()
-        + ", cid="
-        + oldStream.getClientId()
-        + ", parentCid="
-        + oldStream.getParentClientId()
+        + ", parentId="
+        + oldStream.getParentId()
         + ") to streamToUpdate (id="
         + streamToUpdate.getId()
-        + ", cid="
-        + streamToUpdate.getClientId()
-        + ", parentCid="
-        + streamToUpdate.getParentClientId()
+        + ", parentId="
+        + streamToUpdate.getParentId()
         + ")"
         + " - "
         + Thread.currentThread().getName());
 
     // find out if parent has changed:
-    if (oldStream.getParentClientId() == null && streamToUpdate.getParentClientId() == null) {
+    if (oldStream.getParentId() == null && streamToUpdate.getParentId() == null) {
       // case 1: was root, still root
       // do nothing
       oldStream.merge(streamToUpdate, false);
-    } else if (oldStream.getParentClientId() == null && streamToUpdate.getParentClientId() != null) {
+    } else if (oldStream.getParentId() == null && streamToUpdate.getParentId() != null) {
       // case 2: was root, now child
       // add it to its parent's children
       oldStream.merge(streamToUpdate, false);
-      addChildStreamToParent(streamToUpdate.getParentClientId(), oldStream, connectionCallback);
-      rootStreams.remove(oldStream.getClientId());
-    } else if (oldStream.getParentClientId() != null && streamToUpdate.getParentClientId() == null) {
+      addChildStreamToParent(streamToUpdate.getParentId(), oldStream, connectionCallback);
+      rootStreams.remove(oldStream.getId());
+    } else if (oldStream.getId() != null && streamToUpdate.getId() == null) {
       // case 3: was child, now root
       // remove it from old parents children
-      String oldParent = oldStream.getParentClientId();
+      String oldParent = oldStream.getParentId();
       oldStream.merge(streamToUpdate, false);
       removeChildStreamFromParent(oldParent, oldStream, connectionCallback);
       // put it in root streams
-      rootStreams.put(streamToUpdate.getClientId(), oldStream);
+      rootStreams.put(streamToUpdate.getId(), oldStream);
     } else {
       // case 4: was child, still child
-      if (oldStream.getParentClientId().equals(streamToUpdate.getParentClientId())) {
+      if (oldStream.getParentId().equals(streamToUpdate.getParentId())) {
         // case 4a: same parent
         // do nothing
         oldStream.merge(streamToUpdate, false);
@@ -222,31 +229,27 @@ public class StreamsSupervisor {
         // case 4b: parent changed
         // remove it from old parent
         // getStreamByClientId(oldStream.getParentClientId()).removeChildStream(oldStream);
-        removeChildStreamFromParent(oldStream.getParentClientId(), oldStream, connectionCallback);
+        removeChildStreamFromParent(oldStream.getParentId(), oldStream, connectionCallback);
         // add it to new parent
         oldStream.merge(streamToUpdate, false);
-        addChildStreamToParent(streamToUpdate.getParentClientId(), oldStream, connectionCallback);
+        addChildStreamToParent(streamToUpdate.getParentId(), oldStream, connectionCallback);
       }
     }
     logger.log("StreamSupervisor: updated Stream (id="
       + oldStream.getId()
-        + ", clientId="
-        + oldStream.getClientId()
         + ", name="
         + oldStream.getName()
-        + ", parentCid="
-        + oldStream.getParentClientId()
+        + ", parentId="
+        + oldStream.getParentId()
         + ")"
         + " - "
         + Thread.currentThread().getName());
     connectionCallback.onStreamsSuccess("StreamsSupervisor: Stream with id="
       + oldStream.getId()
-        + ", cid="
-        + oldStream.getClientId()
         + ", name="
         + oldStream.getName()
         + ", parentCid="
-        + oldStream.getParentClientId()
+        + oldStream.getParentId()
         + " updated.", oldStream);
 
     // update children streams
@@ -260,21 +263,21 @@ public class StreamsSupervisor {
   /**
    * Add Stream's reference to parent's children list
    *
-   * @param parentClientId
-   *          the client id of the parent Stream
+   * @param parentId
+   *          the id of the parent Stream
    * @param childStream
    *          the reference of the Stream to add
    * @param connectionCallback
    *          the callback to notify failure
    */
-  private void addChildStreamToParent(String parentClientId, Stream childStream,
+  private void addChildStreamToParent(String parentId, Stream childStream,
     StreamsCallback connectionCallback) {
-    Stream newParent = flatStreams.get(parentClientId);
+    Stream newParent = flatStreams.get(parentId);
     if (newParent != null) {
       // verify that new parent is not the Stream's child - loop bug
-      if (!verifyParency(childStream.getClientId(), parentClientId)) {
+      if (!verifyParency(childStream.getId(), parentId)) {
         newParent.addChildStream(childStream);
-        logger.log(childStream.getClientId() + " now child of " + parentClientId);
+        logger.log("StreamsSupervisor: " + childStream.getId() + " now child of " + parentId);
       } else {
         connectionCallback
           .onStreamError("Stream update failure: trying to add Stream to child of its children");
@@ -288,21 +291,21 @@ public class StreamsSupervisor {
   /**
    * remove Stream's reference from parent's children list.
    *
-   * @param parentClientId
-   *          the client id of the parent Stream
+   * @param parentId
+   *          the id of the parent Stream
    * @param childStream
    *          the reference of the Stream to remove
    * @param connectionCallback
    *          the callback to notify failure
    */
-  private void removeChildStreamFromParent(String parentClientId, Stream childStream,
+  private void removeChildStreamFromParent(String parentId, Stream childStream,
     StreamsCallback connectionCallback) {
-    Stream oldParent = getStreamByClientId(parentClientId);
+    Stream oldParent = getStreamById(parentId);
     if (oldParent != null) {
-      logger.log("removing "
-        + childStream.getClientId()
+      logger.log("StreamsSupervisor: removing "
+        + childStream.getId()
           + " from "
-          + parentClientId
+          + parentId
           + "'s children.");
       oldParent.removeChildStream(childStream);
     } else {
@@ -321,40 +324,34 @@ public class StreamsSupervisor {
   private void addStream(Stream newStream, StreamsCallback connectionCallback) {
     logger.log("StreamsSupervisor: add stream (id="
       + newStream.getId()
-        + ", cid="
-        + newStream.getClientId()
-        + ", parentCid="
-        + newStream.getParentClientId()
+        + ", parentId="
+        + newStream.getParentId()
         + " - "
         + Thread.currentThread().getName());
-    if (newStream.getParentClientId() == null) {
-      rootStreams.put(newStream.getClientId(), newStream);
+    if (newStream.getParentId() == null) {
+      rootStreams.put(newStream.getId(), newStream);
     }
-    flatStreams.put(newStream.getClientId(), newStream);
+    flatStreams.put(newStream.getId(), newStream);
 
     // add entry in dictionnaries
-    idToClientId.put(newStream.getId(), newStream.getClientId());
-    clientIdToId.put(newStream.getClientId(), newStream.getId());
+    // idToClientId.put(newStream.getId(), newStream.getClientId());
+    // clientIdToId.put(newStream.getClientId(), newStream.getId());
 
     logger.log("StreamSupervisor: added Stream (id="
       + newStream.getId()
-        + ", clientId="
-        + newStream.getClientId()
         + ", name="
         + newStream.getName()
-        + ", parentCid="
-        + newStream.getParentClientId()
+        + ", parentId="
+        + newStream.getParentId()
         + ")"
         + " - "
         + Thread.currentThread().getName());
     connectionCallback.onStreamsSuccess("StreamsSupervisor: Stream with id="
       + newStream.getId()
-        + ", cid="
-        + newStream.getClientId()
         + ", name="
         + newStream.getName()
-        + ", parentCid="
-        + newStream.getParentClientId()
+        + ", parentId="
+        + newStream.getParentId()
         + " created.", newStream);
     // add its children if any
     if (newStream.getChildren() != null) {
@@ -369,27 +366,27 @@ public class StreamsSupervisor {
    * Delete Stream from Supervisor, if trashed is false, sets it to true, else
    * deletes it.
    *
-   * @param streamClientId
-   *          the client Id of the Stream to delete.
+   * @param streamId
+   *          the Id of the Stream to delete.
    * @param mergeWithParent
    *          true if the deleted Stream's children Streams and Events are to be
    *          merged with the parent Stream
    * @param connectionSCallback
    *          callback for the Stream deletion
    */
-  public void deleteStream(String streamClientId, boolean mergeWithParent,
+  public void deleteStream(String streamId, boolean mergeWithParent,
     StreamsCallback connectionSCallback) {
-    Stream streamToDelete = getStreamByClientId(streamClientId);
+    Stream streamToDelete = getStreamById(streamId);
     if (streamToDelete != null) {
-      if (streamToDelete.getTrashed() == true) {
+      if (streamToDelete.isTrashed() == true) {
         // delete really
 
         // delete from parent stream
-        if (streamToDelete.getParentClientId() != null) {
-          System.out.println("StreamsSupervisor: parentCid not null, it is: \'"
-            + streamToDelete.getParentClientId()
+        if (streamToDelete.getParentId() != null) {
+          System.out.println("StreamsSupervisor: parentId not null, it is: \'"
+            + streamToDelete.getParentId()
               + "\'");
-          Stream parentStream = getStreamByClientId(streamToDelete.getParentClientId());
+          Stream parentStream = getStreamById(streamToDelete.getParentId());
           parentStream.removeChildStream(streamToDelete);
         }
 
@@ -403,13 +400,13 @@ public class StreamsSupervisor {
         // }
 
         Filter deleteFilter = new Filter();
-        deleteFilter.addStreamClientId(streamClientId);
+        deleteFilter.addStreamId(streamId);
         eventsSupervisor.getEvents(deleteFilter, deleteEventsCallback);
-        String parentToMergeWithClientId = streamToDelete.getParentClientId();
-        if (mergeWithParent == true && parentToMergeWithClientId != null) {
+        String parentToMergeWithId = streamToDelete.getId();
+        if (mergeWithParent == true && parentToMergeWithId != null) {
           // merge them with parent stream if any exists
           for (Event eventToMergeWithParent : eventsOnDelete.values()) {
-            eventToMergeWithParent.setStreamClientId(parentToMergeWithClientId);
+            eventToMergeWithParent.setStreamId(parentToMergeWithId);
           }
         } else {
           // behaviour not defined in API - delete events
@@ -419,18 +416,13 @@ public class StreamsSupervisor {
         }
 
         // delete Stream
-        rootStreams.remove(streamToDelete.getClientId());
-        flatStreams.remove(streamToDelete.getClientId());
-        if (streamToDelete.getId() != null) {
-          idToClientId.remove(streamToDelete.getId());
-        }
-        clientIdToId.remove(streamToDelete.getClientId());
+        rootStreams.remove(streamToDelete.getId());
+        flatStreams.remove(streamToDelete.getId());
         streamToDelete = null;
 
-        connectionSCallback.onStreamsSuccess("StreamsSupervisor: Stream with cid="
-          + streamClientId
-            + " deleted.",
-          null);
+        connectionSCallback.onStreamsSuccess("StreamsSupervisor: Stream with id="
+          + streamId
+            + " deleted.", null);
       } else {
         // update trashed field of stream to delete
         streamToDelete.setTrashed(true);
@@ -442,14 +434,13 @@ public class StreamsSupervisor {
         // childstream.setTrashed(true);
         // }
         connectionSCallback.onStreamsSuccess("StreamsSupervisor: Stream with id="
-          + streamClientId
-            + " trashed.",
-          streamToDelete);
+          + streamId
+            + " trashed.", streamToDelete);
       }
     } else {
       // streamToDelete not found
       connectionSCallback.onStreamError("StreamsSupervisor: Stream with id="
-        + streamClientId
+        + streamId
           + " not found.");
     }
   }
@@ -477,25 +468,22 @@ public class StreamsSupervisor {
   }
 
   /**
-   * Find out if Stream with clientId="childClientId" is a descendant of Stream
-   * with clientId="parentClientId"
+   * Find out if Stream with id="childId" is a descendant of Stream with
+   * id="parentId"
    *
-   * @param childClientId
-   * @param parentClientId
-   * @return true if stream with client id "childClientId" is a descendant of
-   *         the stream with client id parentClientId
+   * @param childId
+   * @param parentId
+   * @return true if stream with id "childId" is a descendant of the stream with
+   *         id parentId
    */
-  public boolean verifyParency(String childClientId, String parentClientId) {
-    logger.log("StreamsSupervisor: verifying if "
-      + childClientId
-        + " is child of "
-        + parentClientId);
-    Stream parentStream = getStreamByClientId(parentClientId);
+  public boolean verifyParency(String childId, String parentId) {
+    logger.log("StreamsSupervisor: verifying if " + childId + " is child of " + parentId);
+    Stream parentStream = getStreamById(parentId);
     if (parentStream != null) {
       if (parentStream.getChildren() != null) {
         Set<String> children = new HashSet<String>();
         computeDescendants(children, parentStream);
-        return children.contains(childClientId);
+        return children.contains(childId);
       } else {
         return false;
       }
@@ -523,12 +511,12 @@ public class StreamsSupervisor {
   }
 
   /**
-   * Store the client ids of parentStream's descendants.
+   * Store the ids of parentStream's descendants.
    *
    * @param children
-   *          the Set<String> in which the Stream client Id's will be stored
-   * @param parentClientId
-   *          the id of the parent Stream.
+   *          the Set<String> in which the Stream Ids will be stored
+   * @param parentStream
+   *          the parent Stream.
    */
   private void computeDescendants(Set<String> children, Stream parentStream) {
     if (parentStream.getChildren() != null) {
@@ -539,7 +527,7 @@ public class StreamsSupervisor {
       // + parentStream.getChildrenMap().size()
       // + " children in map");
       for (Stream childStream : parentStream.getChildren()) {
-        children.add(childStream.getClientId());
+        children.add(childStream.getId());
         computeDescendants(children, childStream);
       }
     }

@@ -356,13 +356,13 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    */
 
   /**
-   * Fetch Events for a specific stream client id
+   * Fetch Events for a specific stream id
    *
-   * @param streamClientId
+   * @param streamId
    */
-  public void getEventsForStreamClientId(String streamClientId) {
+  public void getEventsForStreamId(String streamId) {
     Filter filter = new Filter();
-    filter.addStreamClientId(streamClientId);
+    filter.addStreamId(streamId);
     eventsManager.getEvents(filter, this);
   }
 

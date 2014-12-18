@@ -194,8 +194,8 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             .Get(streamsUrl + tokenUrlArgument)
             .execute()
             .handleResponse(
-              new ApiResponseHandler(RequestType.GET_STREAMS, null, onlineManagerStreamsCallback, null,
-                null));
+              new ApiResponseHandler(RequestType.GET_STREAMS, null, onlineManagerStreamsCallback,
+                null, null));
 
         } catch (ClientProtocolException e) {
           onlineManagerStreamsCallback.onStreamError(e.getMessage());
@@ -333,9 +333,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
         serverTime = JsonConverter.retrieveServerTime(responseBody);
       }
 
-      if (statusCode == HttpStatus.SC_CREATED
-        || statusCode == HttpStatus.SC_OK
-          || statusCode == HttpStatus.SC_NO_CONTENT) {
+      if (statusCode == HttpStatus.SC_CREATED || statusCode == HttpStatus.SC_OK) {
         // saul good
         switch (requestType) {
 
@@ -352,7 +350,6 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             Event createdEvent = JsonConverter.retrieveEventFromJson(responseBody);
             createdEvent.assignConnection(weakConnection);
             createdEvent.setClientId(event.getClientId());
-            createdEvent.setStreamClientId(event.getStreamClientId());
             logger.log("Online: event created successfully: cid="
               + createdEvent.getClientId()
                 + ", id="
@@ -369,7 +366,6 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             Event updatedEvent = JsonConverter.retrieveEventFromJson(responseBody);
             updatedEvent.assignConnection(weakConnection);
             updatedEvent.setClientId(event.getClientId());
-            updatedEvent.setStreamClientId(event.getStreamClientId());
             logger.log("Online: event updated successfully: cid="
               + updatedEvent.getClientId()
                 + ", id="
@@ -383,21 +379,15 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             break;
 
           case DELETE_EVENT:
-            // si deleted, pas de body?
-            if (statusCode == HttpStatus.SC_NO_CONTENT) {
-              // deleted
+            if (JsonConverter.hasEventDeletionField(responseBody)) {
+              // stream was deleted, retrieve streamDeletion id field
               onlineEventsCallback.onEventsSuccess(
-                "Online: event with clientId="
-                  + event.getClientId()
-                    + ", Id="
-                    + event.getId()
-                    + " deleted on API", null, null);
+                JsonConverter.retrieveDeleteEventId(responseBody), null, null);
             } else {
-              // trashed
+              // stream was trashed, forward as an update to callback
               Event trashedEvent = JsonConverter.retrieveEventFromJson(responseBody);
               trashedEvent.assignConnection(weakConnection);
               trashedEvent.setClientId(event.getClientId());
-              trashedEvent.setStreamClientId(event.getStreamClientId());
               onlineEventsCallback.onEventsSuccess(
                 "Online: event with clientId="
                   + trashedEvent.getClientId()
@@ -418,62 +408,33 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
           case CREATE_STREAM:
             Stream createdStream = JsonConverter.retrieveStreamFromJson(responseBody);
             createdStream.assignConnection(weakConnection);
-            createdStream.setClientId(stream.getClientId());
-            // // reset parent and children client IDs
-            // createdStream.setParentClientId(stream.getParentClientId());
-            // if (createdStream.getChildren() != null) {
-            // for (Stream childStream : createdStream.getChildren()) {
-            //
-            // }
-            // }
-            logger.log("Online: stream created successfully: cid="
-              + createdStream.getClientId()
-                + ", id="
-                + createdStream.getId());
+
+            logger.log("Online: stream created successfully: id=" + createdStream.getId());
             onlineStreamsCallback.onStreamsSuccess(
-              "Online: stream with clientId="
-                + createdStream.getClientId()
-                  + ", Id="
-                  + createdStream.getId()
-                  + " created on API", createdStream);
+              "Online: stream with Id=" + createdStream.getId() + " created on API", createdStream);
             break;
 
           case UPDATE_STREAM:
             Stream updatedStream = JsonConverter.retrieveStreamFromJson(responseBody);
             updatedStream.assignConnection(weakConnection);
-            updatedStream.setClientId(stream.getClientId());
-            logger.log("Online: stream updated successfully: cid="
-              + updatedStream.getClientId()
-                + ", id="
-                + updatedStream.getId());
+            logger.log("Online: stream updated successfully: id=" + updatedStream.getId());
             onlineStreamsCallback.onStreamsSuccess(
-              "Online: stream with clientId="
-                + updatedStream.getClientId()
-                  + ", Id="
-                  + updatedStream.getId()
-                  + " updated on API", updatedStream);
+              "Online: stream with Id=" + updatedStream.getId() + " updated on API", updatedStream);
             break;
 
           case DELETE_STREAM:
-            // si deleted, pas de body?
-            if (statusCode == HttpStatus.SC_NO_CONTENT) {
-              // deleted
+            if (JsonConverter.hasStreamDeletionField(responseBody)) {
+              // stream was deleted, retrieve streamDeletion id field
               onlineStreamsCallback.onStreamsSuccess(
-                "Online: stream with clientId="
-                  + stream.getClientId()
-                    + ", Id="
-                    + stream.getId()
-                    + " deleted on API", null);
+                JsonConverter.retrieveDeletedStreamId(responseBody), null);
             } else {
-              // trashed
+              // stream was trashed, forward as an update to callback
+              System.out.println("responseBody: " + responseBody);
               Stream trashedStream = JsonConverter.retrieveStreamFromJson(responseBody);
               trashedStream.assignConnection(weakConnection);
-              trashedStream.setClientId(stream.getClientId());
-              onlineStreamsCallback.onStreamsSuccess("Online: stream with clientId="
-                + trashedStream.getClientId()
-                  + ", Id="
-                  + trashedStream.getId()
-                  + " trashed on API", trashedStream);
+              onlineStreamsCallback.onStreamsSuccess(
+                "Online: stream with Id=" + trashedStream.getId() + " trashed on API",
+                trashedStream);
             }
             break;
 
@@ -483,149 +444,12 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
 
       } else {
         System.out.println("Online: issue in responseHandler");
+        onlineStreamsCallback.onStreamError(responseBody);
       }
       return null;
 
     }
 
   }
-
-  // // TODO remove old implementation
-  // /**
-  // * Thread that executes the Get Streams request to the Pryv server and
-  // returns
-  // * the response to the StreamsCallback as a String.
-  // *
-  // * @author ik
-  // *
-  // */
-  // private class FetchStreamsThread extends Thread {
-  //
-  // private StreamsCallback streamsCallback;
-  // private Filter filter;
-  //
-  // public FetchStreamsThread(Filter pFilter, StreamsCallback pStreamsCallback)
-  // {
-  // streamsCallback = pStreamsCallback;
-  // filter = pFilter;
-  // }
-  //
-  // @Override
-  // public void run() {
-  // try {
-  // Request.Get(streamsUrl).execute().handleResponse(streamsResponseHandler);
-  // } catch (ClientProtocolException e) {
-  // streamsCallback.onStreamsRetrievalError(e.getMessage());
-  // e.printStackTrace();
-  // } catch (IOException e) {
-  // streamsCallback.onStreamsRetrievalError(e.getMessage());
-  // e.printStackTrace();
-  // }
-  // }
-  //
-  // private ResponseHandler<String> streamsResponseHandler = new
-  // ResponseHandler<String>() {
-  //
-  // @Override
-  // public String handleResponse(HttpResponse response) {
-  // String textResponse;
-  // try {
-  // textResponse = EntityUtils.toString(response.getEntity());
-  // logger.log("Online received streams: " + textResponse);
-  // double serverTime = JsonConverter.retrieveServerTime(textResponse);
-  // logger.log("retrieved time: " + serverTime);
-  // Map<String, Stream> receivedStreams =
-  // JsonConverter.createStreamsFromJson(textResponse);
-  // for (Stream receivedStream : receivedStreams.values()) {
-  // receivedStream.assignConnection(weakConnection);
-  // }
-  // streamsCallback.onStreamsRetrievalSuccess(receivedStreams, serverTime);
-  // } catch (ParseException e) {
-  // streamsCallback.onStreamsRetrievalError(e.getMessage());
-  // e.printStackTrace();
-  // } catch (JsonProcessingException e) {
-  // streamsCallback.onStreamsRetrievalError(e.getMessage());
-  // e.printStackTrace();
-  // } catch (IOException e) {
-  // streamsCallback.onStreamsRetrievalError(e.getMessage());
-  // e.printStackTrace();
-  // }
-  // return null;
-  // }
-  // };
-  // }
-  //
-  // /**
-  // * Thread that executes the Get Events request to the Pryv server and
-  // returns
-  // * the response to the EventsCallback as a String.
-  // *
-  // * @author ik
-  // *
-  // */
-  // private class FetchEventsThread extends Thread {
-  // private String params = "";
-  // private EventsCallback eventsCallback;
-  // private ResponseHandler<String> eventsResponseHandler;
-  //
-  // public FetchEventsThread(String pParams, final EventsCallback
-  // pEventsCallback) {
-  // params = pParams;
-  // eventsCallback = pEventsCallback;
-  // instanciateResponseHandler();
-  // }
-  //
-  // @Override
-  // public void run() {
-  // logger.log("Online: fetching events at " + eventsUrl + params);
-  // try {
-  // Request.Get(eventsUrl +
-  // params).execute().handleResponse(eventsResponseHandler);
-  // } catch (ClientProtocolException e) {
-  // eventsCallback.onEventsRetrievalError(e.getMessage());
-  // e.printStackTrace();
-  // } catch (IOException e) {
-  // eventsCallback.onEventsRetrievalError(e.getMessage());
-  // e.printStackTrace();
-  // }
-  // }
-  //
-  // private void instanciateResponseHandler() {
-  // eventsResponseHandler = new ResponseHandler<String>() {
-  //
-  // @Override
-  // public String handleResponse(HttpResponse reply) {
-  // String response;
-  // try {
-  // response = EntityUtils.toString(reply.getEntity());
-  // logger.log("Online: received events: " + response);
-  // double serverTime = JsonConverter.retrieveServerTime(response);
-  // logger.log("retrieved time: " + serverTime);
-  // Map<String, Event> receivedEvents =
-  // JsonConverter.createEventsFromJson(response);
-  // for (Event receivedEvent : receivedEvents.values()) {
-  // receivedEvent.assignConnection(weakConnection);
-  // }
-  // logger.log("Online: received " + receivedEvents.size() +
-  // " event(s) from API.");
-  // eventsCallback.onEventsRetrievalSuccess(receivedEvents, serverTime);
-  // } catch (ParseException e) {
-  // eventsCallback.onEventsRetrievalError(e.getMessage());
-  // e.printStackTrace();
-  // } catch (JsonParseException e) {
-  // eventsCallback.onEventsRetrievalError(e.getMessage());
-  // e.printStackTrace();
-  // } catch (JsonMappingException e) {
-  // eventsCallback.onEventsRetrievalError(e.getMessage());
-  // e.printStackTrace();
-  // } catch (IOException e) {
-  // eventsCallback.onEventsRetrievalError(e.getMessage());
-  // e.printStackTrace();
-  // }
-  // return null;
-  // }
-  // };
-  // }
-  // }
 
 }

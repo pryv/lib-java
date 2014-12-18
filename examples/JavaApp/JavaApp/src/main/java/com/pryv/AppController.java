@@ -49,13 +49,9 @@ public class AppController {
   @FXML
   private Label idLabel;
   @FXML
-  private Label clientIdLabel;
-  @FXML
   private Label nameLabel;
   @FXML
   private Label parentIdLabel;
-  @FXML
-  private Label parentClientIdLabel;
   @FXML
   private Label childrenLabel;
   @FXML
@@ -77,8 +73,6 @@ public class AppController {
   private Label eClientIdLabel;
   @FXML
   private Label eStreamIdLabel;
-  @FXML
-  private Label eStreamClientIdLabel;
   @FXML
   private Label eTimeLabel;
   @FXML
@@ -271,7 +265,6 @@ public class AppController {
     eIdLabel.setText(event.getId());
     eClientIdLabel.setText(event.getClientId());
     eStreamIdLabel.setText(event.getStreamId());
-    eStreamClientIdLabel.setText(event.getStreamClientId());
     if (event.getTime() != null) {
       eTimeLabel.setText(event.getTime().toString());
     }
@@ -308,8 +301,8 @@ public class AppController {
     if (event.getClientData() != null) {
       eClientDataLabel.setText(event.formatClientDataAsString());
     }
-    if (event.getTrashed() != null) {
-      eTrashedLabel.setText(event.getTrashed().toString());
+    if (event.isTrashed() != null) {
+      eTrashedLabel.setText(event.isTrashed().toString());
     }
     if (event.getTempRefId() != null) {
       eTempRefIdLabel.setText(event.getTempRefId());
@@ -343,16 +336,14 @@ public class AppController {
 
     // stream details
     idLabel.setText(stream.getId());
-    clientIdLabel.setText(stream.getClientId());
     nameLabel.setText(stream.getName());
     parentIdLabel.setText(stream.getParentId());
-    parentClientIdLabel.setText(stream.getParentClientId());
     StringBuilder sb = new StringBuilder();
     String separator = "";
     if (stream.getChildren() != null) {
       for (Stream child : stream.getChildren()) {
         sb.append(separator);
-        sb.append(child.getClientId());
+        sb.append(child.getId());
         separator = ", ";
       }
     }
@@ -364,7 +355,7 @@ public class AppController {
     createdByLabel.setText(stream.getCreatedBy());
 
     // fetch events
-    exampleApp.getEventsForStreamClientId(stream.getClientId());
+    exampleApp.getEventsForStreamId(stream.getId());
     clearEventsLabels();
   }
 
@@ -399,7 +390,6 @@ public class AppController {
     eventsLabels.add(eModifiedLabel);
     eventsLabels.add(eReferencesLabel);
     eventsLabels.add(eStreamIdLabel);
-    eventsLabels.add(eStreamClientIdLabel);
     eventsLabels.add(eTagsLabel);
     eventsLabels.add(eTempRefIdLabel);
     eventsLabels.add(eTimeLabel);
@@ -410,10 +400,8 @@ public class AppController {
   private void bindStreamsLabels() {
     streamsLabels = new ArrayList<Label>();
     streamsLabels.add(idLabel);
-    streamsLabels.add(clientIdLabel);
     streamsLabels.add(nameLabel);
     streamsLabels.add(parentIdLabel);
-    streamsLabels.add(parentClientIdLabel);
     streamsLabels.add(childrenLabel);
     streamsLabels.add(singleActivityLabel);
     streamsLabels.add(clientDataLabel);

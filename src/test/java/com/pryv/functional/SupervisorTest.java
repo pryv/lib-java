@@ -68,26 +68,19 @@ public class SupervisorTest {
   public void testManipulateStream() {
     // parent1 parent of child, parent2 has no child
     Stream parent1 = DummyData.generateFullStream();
-    String parent1CID = "parent1CID";
     String parent1Id = "parent1id";
     parent1.setId(parent1Id);
-    parent1.setClientId(parent1CID);
     parent1.clearChildren();
 
     Stream child = DummyData.generateFullStream();
-    String childClientId = "childStreamCId";
     String childId = "childid";
     child.setId(childId);
-    child.setClientId(childClientId);
     child.setParentId(parent1Id);
-    child.setParentClientId(parent1CID);
     child.clearChildren();
     parent1.addChildStream(child);
 
-    String parent2ClientId = "parent2CID";
     String parent2Id = "parent2id";
     Stream parent2 = DummyData.generateFullStream();
-    parent2.setClientId(parent2ClientId);
     parent2.setId(parent2Id);
     parent2.clearChildren();
 
@@ -95,14 +88,14 @@ public class SupervisorTest {
 
     System.out.println("Test: first: parent1/child, parent2");
     streamsSupervisor.updateOrCreateStream(parent1, streamsCallback);
-    assertNotNull(streamsSupervisor.getRootStreams().get(parent1CID));
+    assertNotNull(streamsSupervisor.getRootStreams().get(parent1Id));
     streamsSupervisor.updateOrCreateStream(parent2, streamsCallback);
-    assertNotNull(streamsSupervisor.getRootStreams().get(parent2ClientId));
+    assertNotNull(streamsSupervisor.getRootStreams().get(parent2Id));
     streamsSupervisor.updateOrCreateStream(child, streamsCallback);
-    assertNull(streamsSupervisor.getRootStreams().get(childClientId));
-    assertNotNull(streamsSupervisor.getStreamByClientId(childClientId));
-    assertTrue(streamsSupervisor.verifyParency(childClientId, parent1CID));
-    assertFalse(streamsSupervisor.verifyParency(childClientId, parent2ClientId));
+    assertNull(streamsSupervisor.getRootStreams().get(childId));
+    assertNotNull(streamsSupervisor.getStreamById(childId));
+    assertTrue(streamsSupervisor.verifyParency(childId, parent1Id));
+    assertFalse(streamsSupervisor.verifyParency(childId, parent2Id));
 
     // change random stuff
     System.out.println("Test: second: parent1/child, parent2 - modify child's name");
@@ -110,66 +103,58 @@ public class SupervisorTest {
     Stream childUpdate1 = DummyData.generateFullStream();
     childUpdate1.clearChildren();
     childUpdate1.setId(childId);
-    childUpdate1.setClientId(childClientId);
     childUpdate1.setParentId(parent1Id);
-    childUpdate1.setParentClientId(parent1CID);
 
     childUpdate1.setName(newName);
     assertEquals(newName, childUpdate1.getName());
     childUpdate1.setModified(child.getModified() + TIME_INTERVAL);
     streamsSupervisor.updateOrCreateStream(childUpdate1, streamsCallback);
 
-    assertNotNull(streamsSupervisor.getStreamByClientId(childClientId));
-    assertEquals(newName, streamsSupervisor.getStreamByClientId(childClientId).getName());
+    assertNotNull(streamsSupervisor.getStreamById(childId));
+    assertEquals(newName, streamsSupervisor.getStreamById(childId).getName());
 
     // change parents 1->2
     System.out.println("Test: third: parent1, parent2/child");
     Stream childUpdate2 = DummyData.generateFullStream();
     childUpdate2.clearChildren();
     childUpdate2.setId(childId);
-    childUpdate2.setClientId(childClientId);
     childUpdate2.setParentId(parent2Id);
-    childUpdate2.setParentClientId(parent2ClientId);
     childUpdate2.setModified(child.getModified() + TIME_INTERVAL);
     streamsSupervisor.updateOrCreateStream(childUpdate2, streamsCallback);
-    assertFalse(streamsSupervisor.verifyParency(childClientId, parent1CID));
-    assertTrue(streamsSupervisor.verifyParency(childClientId, parent2ClientId));
+    assertFalse(streamsSupervisor.verifyParency(childId, parent1Id));
+    assertTrue(streamsSupervisor.verifyParency(childId, parent2Id));
 
     // orphan child
     System.out.println("Test: fourth: parent1, parent2, child");
     Stream childUpdate3 = DummyData.generateFullStream();
     childUpdate3.clearChildren();
     childUpdate3.setId(childId);
-    childUpdate3.setClientId(childClientId);
     childUpdate3.setParentId(null);
-    childUpdate3.setParentClientId(null);
     childUpdate3.setModified(child.getModified() + TIME_INTERVAL);
     streamsSupervisor.updateOrCreateStream(childUpdate3, streamsCallback);
-    assertFalse(streamsSupervisor.verifyParency(childClientId, parent2ClientId));
-    assertNotNull(streamsSupervisor.getStreamByClientId(childClientId));
+    assertFalse(streamsSupervisor.verifyParency(childId, parent2Id));
+    assertNotNull(streamsSupervisor.getStreamById(childId));
 
     // random change as orphan
     System.out.println("Test: fifth: parent1, parent2, child - change child's name");
     Stream childUpdate4 = DummyData.generateFullStream();
     childUpdate4.clearChildren();
-    childUpdate4.setClientId(childClientId);
     childUpdate4.setId(childId);
     String randomName = "randomName";
     childUpdate4.setName(randomName);
     childUpdate4.setModified(child.getModified() + TIME_INTERVAL);
     streamsSupervisor.updateOrCreateStream(childUpdate4, streamsCallback);
-    assertEquals(randomName, streamsSupervisor.getStreamByClientId(childClientId).getName());
+    assertEquals(randomName, streamsSupervisor.getStreamById(childId).getName());
 
     // add it a parent now
     System.out.println("Test: sixth: parent1/child, parent2");
     Stream childUpdate5 = DummyData.generateFullStream();
     childUpdate5.clearChildren();
-    childUpdate5.setClientId(childClientId);
     childUpdate5.setId(childId);
-    childUpdate5.setParentClientId(parent1CID);
+    childUpdate5.setParentId(parent1Id);
     childUpdate5.setModified(child.getModified() + TIME_INTERVAL);
     streamsSupervisor.updateOrCreateStream(childUpdate5, streamsCallback);
-    assertTrue(streamsSupervisor.verifyParency(childClientId, parent1CID));
+    assertTrue(streamsSupervisor.verifyParency(childId, parent1Id));
   }
 
   private static void instantiateEventsCallback() {

@@ -78,6 +78,7 @@ public class SQLiteDBHelperTest {
   // executed after all tests once
   @AfterClass
   public static void cleanUpTestDB() {
+    System.out.println("SQLite Test: clean up phase:");
     testEvent = null;
     db.getEvents(null, eventsCallback);
     Awaitility.await().until(hasRetrievedEventSuccessfully());
@@ -90,6 +91,7 @@ public class SQLiteDBHelperTest {
       Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
       eventsSuccess = false;
       if (testEvent != null) {
+        System.out.println("deleting again: " + testEvent.getClientId());
         db.deleteEvent(event, eventsCallback);
         Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
         eventsSuccess = false;
@@ -100,17 +102,16 @@ public class SQLiteDBHelperTest {
     testStream = null;
     db.getStreams(streamsCallback);
     Awaitility.await().until(hasRetrievedStreamSuccessfully());
-
+    streamsRetrievalSuccess = false;
+    System.out.println("going to delete " + streams.size() + " streams");
     for (Stream stream : streams.values()) {
-      System.out.println("deleting stream with clientid="
-        + stream.getClientId()
-          + ", id="
-          + stream.getId());
+      System.out.println("deleting stream with id=" + stream.getId());
       stream.setModified(stream.getModified() + MODIFIED_INCREMENT);
       db.deleteStream(stream, false, streamsCallback);
       Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
       streamsSuccess = false;
       if (testStream != null) {
+        System.out.println("deleting for real stream with id=" + testStream.getId());
         db.deleteStream(stream, false, streamsCallback);
         Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
       }
@@ -196,7 +197,7 @@ public class SQLiteDBHelperTest {
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
     db.getEvents(null, eventsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
-    assertEquals(true, events.get(testEvent.getClientId()).getTrashed());
+    assertEquals(true, events.get(testEvent.getClientId()).isTrashed());
   }
 
   @Test
@@ -231,36 +232,37 @@ public class SQLiteDBHelperTest {
     System.out.println("test insert full stream INSERTION SUCCESS");
     db.getStreams(streamsCallback);
     Awaitility.await().until(hasRetrievedStreamSuccessfully());
-    System.out.println("testStream client id: " + streams.get(testStream.getClientId()));
-    assertEquals(streams.get(testStream.getClientId()).getId(), testStream.getId());
+    System.out.println("testStream id: " + streams.get(testStream.getId()).getId());
+    assertEquals(streams.get(testStream.getId()).getId(), testStream.getId());
     System.out.println("test insert full stream END");
   }
 
   @Test
   public void test09UpdateFullStream() {
     System.out.println("test update full stream START");
-    testStream.setTrashed(!testStream.getTrashed());
-    Double newModifiedValue = testStream.getModified() + MODIFIED_INCREMENT;
-    testStream.setModified(newModifiedValue);
+    String newStreamName = "myNewStreamName - dadadaa";
+    testStream.setName(newStreamName);
     db.updateOrCreateStream(testStream, streamsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
     db.getStreams(streamsCallback);
     Awaitility.await().until(hasRetrievedStreamSuccessfully());
-    assertEquals(newModifiedValue, streams.get(testStream.getClientId()).getModified());
+    assertEquals(newStreamName, streams.get(testStream.getId()).getName());
   }
 
   @Test
   public void test10retrieveStreams() {
     db.getStreams(streamsCallback);
     Awaitility.await().until(hasRetrievedStreamSuccessfully());
-    assertTrue(streams.get(testStream.getClientId()) != null);
-    assertTrue(streams.get(testStream.getClientId()).getChildren().size() != 0);
+    assertTrue(streams.get(testStream.getId()) != null);
+    assertTrue(streams.get(testStream.getId()).getChildren().size() != 0);
   }
 
   @Test
   public void test11RemoveFullStream() {
-    testStream.setTrashed(true);
-    testStream.setModified(testStream.getModified() + MODIFIED_INCREMENT);
+    System.out.println("SQLiteDBHelperTest: test11RemoveFullStream");
+    db.deleteStream(testStream, false, streamsCallback);
+    Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
+    assertTrue(testStream.isTrashed());
     db.deleteStream(testStream, false, streamsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
     db.getStreams(streamsCallback);
@@ -307,7 +309,7 @@ public class SQLiteDBHelperTest {
       assertTrue(attachmentsMatch);
     }
     assertEquals(testedEvent.formatClientDataAsString(), retrievedEvent.formatClientDataAsString());
-    assertEquals(testedEvent.getTrashed(), retrievedEvent.getTrashed());
+    assertEquals(testedEvent.isTrashed(), retrievedEvent.isTrashed());
     assertEquals(testedEvent.getCreated(), retrievedEvent.getCreated());
     assertEquals(testedEvent.getCreatedBy(), retrievedEvent.getCreatedBy());
     assertEquals(testedEvent.getModified(), retrievedEvent.getModified());
@@ -321,20 +323,20 @@ public class SQLiteDBHelperTest {
   @Test
   public void test13RetrieveStreamCorrectly() {
     Stream testedStream = DummyData.generateFullStream();
-    String newClientId = "myNewStreamId";
-    testedStream.setClientId(newClientId);
+    String newId = "myNewStreamId";
+    testedStream.setId(newId);
     int i = 1;
     for (Stream childStream : testedStream.getChildren()) {
       childStream.setId("childid" + i);
-      childStream.setParentClientId(newClientId);
+      childStream.setParentId(newId);
       i++;
     }
-    System.out.println("inserting stream with id: " + newClientId);
+    System.out.println("inserting stream with id: " + newId);
     db.updateOrCreateStream(testedStream, streamsCallback);
     Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
     db.getStreams(streamsCallback);
     Awaitility.await().until(hasRetrievedStreamSuccessfully());
-    Stream retrievedStream = streams.get(newClientId);
+    Stream retrievedStream = streams.get(newId);
     assertEquals(testedStream.getName(), retrievedStream.getName());
     assertEquals(testedStream.getParentId(), retrievedStream.getParentId());
     assertEquals(testedStream.getSingleActivity(), retrievedStream.getSingleActivity());
@@ -350,7 +352,7 @@ public class SQLiteDBHelperTest {
       }
     }
     assertTrue(childrenMatch);
-    assertEquals(testedStream.getTrashed(), retrievedStream.getTrashed());
+    assertEquals(testedStream.isTrashed(), retrievedStream.isTrashed());
     assertEquals(testedStream.getCreated(), retrievedStream.getCreated());
     assertEquals(testedStream.getCreatedBy(), retrievedStream.getCreatedBy());
     assertEquals(testedStream.getModified(), retrievedStream.getModified());
@@ -447,7 +449,6 @@ public class SQLiteDBHelperTest {
   private static void instanciateEventsCallback() {
     eventsCallback = new EventsCallback() {
 
-
       @Override
       public void onEventsRetrievalSuccess(Map<String, Event> pEvents, double serverTime) {
         events = pEvents;
@@ -478,8 +479,7 @@ public class SQLiteDBHelperTest {
 
       @Override
       public void
-        onStreamsRetrievalSuccess(Map<String, Stream> receveiedStreams,
-        double serverTime) {
+        onStreamsRetrievalSuccess(Map<String, Stream> receveiedStreams, double serverTime) {
         streams = receveiedStreams;
         streamsRetrievalSuccess = true;
       }
@@ -492,6 +492,8 @@ public class SQLiteDBHelperTest {
       @Override
       public void onStreamsSuccess(String successMessage, Stream stream) {
         streamsSuccess = true;
+        testStream = stream;
+        System.out.println("SQLite TestStreamsCallback onStreamSuccess: " + successMessage);
       }
 
       @Override

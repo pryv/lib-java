@@ -65,7 +65,7 @@ public class StreamTest {
         assertTrue(streamToUpdate.getChildren().get(i).getId()
             .equals(testStream.getChildren().get(i).getId()));
       }
-      assertTrue(streamToUpdate.getTrashed() == testStream.getTrashed());
+      assertTrue(streamToUpdate.isTrashed() == testStream.isTrashed());
       assertTrue(streamToUpdate.getCreated().equals(testStream.getCreated()));
       assertTrue(streamToUpdate.getCreatedBy().equals(testStream.getCreatedBy()));
       assertTrue(streamToUpdate.getModified().equals(testStream.getModified()));
@@ -91,7 +91,7 @@ public class StreamTest {
     for (Stream child : pStream.getChildren()) {
       assertEquals(DummyData.getStreamChildId(), child.getId());
     }
-    assertEquals(DummyData.getStreamTrashed(), pStream.getTrashed());
+    assertEquals(DummyData.getStreamTrashed(), pStream.isTrashed());
     assertEquals(DummyData.getStreamCreated(), pStream.getCreated());
     assertEquals(DummyData.getStreamCreatedBy(), pStream.getCreatedBy());
     assertEquals(DummyData.getStreamModified(), pStream.getModified());

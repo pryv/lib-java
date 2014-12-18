@@ -37,7 +37,7 @@ public class EventTest {
   @Test
   public void testCreateEmptyEvent() {
     Event emptyEvent =
-      new Event(null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      new Event(null, null, null, null, null, null, null, null, null, null, null, null, null,
         null, null,
         null, null, null);
     assertNotNull(emptyEvent);
@@ -80,7 +80,7 @@ public class EventTest {
       assertTrue(attachmentsMatch);
     }
     assertEquals(testEvent.formatClientDataAsString(), pEvent.formatClientDataAsString());
-    assertEquals(testEvent.getTrashed(), pEvent.getTrashed());
+    assertEquals(testEvent.isTrashed(), pEvent.isTrashed());
     assertEquals(testEvent.getCreated(), pEvent.getCreated());
     assertEquals(testEvent.getCreatedBy(), pEvent.getCreatedBy());
     assertEquals(testEvent.getModified(), pEvent.getModified());

@@ -106,14 +106,13 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       // if some specific streams are requested
       if (filter.getStreamIds() != null) {
         // verify scope
-        if (filter.areStreamClientIdsContainedInScope(scope, streamsSupervisor)) {
+        if (filter.areStreamIdsContainedInScope(scope, streamsSupervisor)) {
           // make request to online for full scope with field modifiedSince set
           // to lastModified
-
         } else {
-          for (String filterStreamClientId : filter.getStreamsClientIds()) {
-            if (!streamsSupervisor.verifyParency(filterStreamClientId, scope)) {
-              scope.add(filterStreamClientId);
+          for (String filterStreamId : filter.getStreamsIds()) {
+            if (!streamsSupervisor.verifyParency(filterStreamId, scope)) {
+              scope.add(filterStreamId);
               lastOnlineRetrievalServerTime = MIN_TIME;
             }
           }
@@ -122,6 +121,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         // all streams are requested - no need to compare
       }
       // retrieve Events from cache
+      filter.setModifiedSince(lastOnlineRetrievalServerTime);
       dbHelper.getEvents(filter, new CacheEventsCallback(filter, connectionEventsCallback));
     }
 
@@ -302,7 +302,6 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         Filter onlineFilter = new Filter();
         onlineFilter.setModifiedSince(lastOnlineRetrievalServerTime);
         onlineFilter.setStreamClientIds(scope);
-        onlineFilter.generateStreamIds(streamsSupervisor.getStreamsClientIdToIdDictionnary());
         // forward call to online module
         onlineEventsManager.getEvents(onlineFilter, new OnlineManagerEventsCallback(filter,
           connectionEventsCallback));

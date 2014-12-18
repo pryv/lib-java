@@ -58,7 +58,7 @@ public class DummyData {
   private static final String STREAM_CLIENT_KEY = "testKey";
   private static final String STREAM_CLIENT_VALUE = "testValue";
   private static List<Stream> streamChildren;
-  private static final Boolean STREAM_TRASHED = true;
+  private static final Boolean STREAM_TRASHED = false;
   private static final Double STREAM_CREATED = new Double(1000);
   private static final String STREAM_CREATED_BY = "Bob";
   private static final Double STREAM_MODIFIED = new Double(1500);
@@ -87,11 +87,11 @@ public class DummyData {
     streamClientData = new HashMap<String, Object>();
     streamClientData.put(STREAM_CLIENT_KEY, STREAM_CLIENT_VALUE);
     Stream streamChild =
-      new Stream(STREAM_CHILD_CLIENT_ID, STREAM_CLIENT_ID, STREAM_CHILD_ID, STREAM_CHILD_NAME,
+      new Stream(STREAM_CHILD_ID, STREAM_CHILD_NAME,
         STREAM_ID, null, null, null, STREAM_CHILD_TRASHED, STREAM_CHILD_CREATED,
         STREAM_CHILD_CREATED_BY, STREAM_CHILD_MODIFIED, STREAM_CHILD_MODIFIED_BY);
     Stream testStream =
-      new Stream(STREAM_CLIENT_ID, null, STREAM_ID, STREAM_NAME, null, STREAM_SINGLE_ACTIVITY,
+      new Stream(STREAM_ID, STREAM_NAME, null, STREAM_SINGLE_ACTIVITY,
         streamClientData, null, STREAM_TRASHED, STREAM_CREATED, STREAM_CREATED_BY, STREAM_MODIFIED,
         STREAM_MODIFIED_BY);
     testStream.addChildStream(streamChild);
@@ -126,7 +126,7 @@ public class DummyData {
     eventAttachments = generateAttachments();
     eventClientData = new HashMap<String, Object>();
     eventClientData.put(EVENT_CLIENTKEY, EVENT_CLIENTVALUE);
-    return new Event(EVENT_CLIENT_ID, EVENT_STREAM_CLIENT_ID, EVENT_ID, EVENT_STREAM_ID,
+    return new Event(EVENT_CLIENT_ID, EVENT_ID, EVENT_STREAM_ID,
       EVENT_TIME, EVENT_DURATION, EVENT_TYPE, EVENT_CONTENT, eventTags, eventRefs,
       EVENT_DESCRIPTION, eventAttachments, eventClientData, EVENT_TRASHED, EVENT_CREATED,
       EVENT_CREATEDBY, EVENT_MODIFIED, EVENT_MODIFIED_BY, EVENT_TEMP_REF_ID);

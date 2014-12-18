@@ -2,7 +2,6 @@ package com.pryv.api;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import com.pryv.api.model.Event;
@@ -34,7 +33,7 @@ public class Filter {
   // filter fields
   private Double fromTime;
   private Double toTime;
-  private Set<String> streamsClientIds;
+  // private Set<String> streamsClientIds;
   private Set<String> streamsIds;
   private Set<String> tags;
   private Set<String> types;
@@ -76,7 +75,7 @@ public class Filter {
     State pState, Double pModifiedSince) {
     fromTime = from;
     toTime = to;
-    streamsClientIds = pStreams;
+    streamsIds = pStreams;
     tags = pTags;
     types = pTypes;
     running = pRunning;
@@ -121,10 +120,10 @@ public class Filter {
 
     // streamIds
     Boolean streamIdMatch = true;
-    if (streamsClientIds != null) {
+    if (streamsIds != null) {
       streamIdMatch = false;
-      for (String streamClientId : streamsClientIds) {
-        if (streamClientId.equals(event.getStreamClientId())) {
+      for (String streamId : streamsIds) {
+        if (streamId.equals(event.getStreamId())) {
           streamIdMatch = true;
         }
       }
@@ -158,10 +157,10 @@ public class Filter {
     // State
     Boolean stateMatch = true;
     if (state != null) {
-      if (event.getTrashed() != null) {
-        if (event.getTrashed()
+      if (event.isTrashed() != null) {
+        if (event.isTrashed()
           && state.equals(State.DEFAULT)
-            || !event.getTrashed()
+            || !event.isTrashed()
             && state.equals(State.TRASHED)) {
           stateMatch = false;
 
@@ -187,32 +186,43 @@ public class Filter {
         && modifiedSinceMatch;
   }
 
-  /**
-   * Generate the set of Stream Ids. It will be used to address the request to
-   * the API.
-   *
-   * @param streamsClientIdToId
-   *          dictionnary stream.clientId->stream.id
-   */
-  public void generateStreamIds(Map<String, String> streamsClientIdToId) {
-    if (streamsClientIds != null) {
-      streamsIds = new HashSet<String>();
-      for (String streamClientId : streamsClientIds) {
-        streamsIds.add(streamsClientIdToId.get(streamClientId));
-      }
-    }
-  }
+  // /**
+  // * Generate the set of Stream Ids. It will be used to address the request to
+  // * the API.
+  // *
+  // * @param streamsClientIdToId
+  // * dictionnary stream.clientId->stream.id
+  // */
+  // public void generateStreamIds(Map<String, String> streamsClientIdToId) {
+  // if (streamsClientIds != null) {
+  // streamsIds = new HashSet<String>();
+  // for (String streamClientId : streamsClientIds) {
+  // streamsIds.add(streamsClientIdToId.get(streamClientId));
+  // }
+  // }
+  // }
 
+  // /**
+  // * add a specific stream client id to the filter
+  // *
+  // * @param pStreamClientId
+  // */
+  // public void addStreamClientId(String pStreamClientId) {
+  // if (streamsClientIds == null) {
+  // streamsClientIds = new HashSet<String>();
+  // }
+  // streamsClientIds.add(pStreamClientId);
+  // }
   /**
-   * add a specific stream client id to the filter
+   * add a specific stream id to the filter
    *
-   * @param pStreamClientId
+   * @param pStreamId
    */
-  public void addStreamClientId(String pStreamClientId) {
-    if (streamsClientIds == null) {
-      streamsClientIds = new HashSet<String>();
+  public void addStreamId(String pStreamId) {
+    if (streamsIds == null) {
+      streamsIds = new HashSet<String>();
     }
-    streamsClientIds.add(pStreamClientId);
+    streamsIds.add(pStreamId);
   }
 
   /**
@@ -265,29 +275,29 @@ public class Filter {
   }
 
   /**
-   * verify if the filter's Stream client Ids are contained in the scope of the
-   * cache (including descendants)
+   * verify if the filter's Stream Ids are contained in the scope of the cache
+   * (including descendants)
    *
    * @param scope
-   *          the Stream client Ids representing the scope of the cache
+   *          the Stream Ids representing the scope of the cache
    * @param streamsSupervisor
    *          reference to all the streams, used to resolve Streams descendency
    *
    * @return true if it is contained in the scope, false otherwise
    */
-  public boolean areStreamClientIdsContainedInScope(Set<String> scope,
+  public boolean areStreamIdsContainedInScope(Set<String> scope,
     StreamsSupervisor streamsSupervisor) {
     boolean areContained = false;
-    for (String filterStreamClientId : streamsClientIds) {
+    for (String filterStreamId : streamsIds) {
       areContained = false;
       // check if it is part of the streams in the scope
-      if (scope.contains(filterStreamClientId)) {
+      if (scope.contains(filterStreamId)) {
         areContained = true;
       } else {
         // check if it is maybe a child of a stream in the scope
         Iterator<String> iterator = scope.iterator();
         while (areContained == false && iterator.hasNext()) {
-          if (streamsSupervisor.verifyParency(filterStreamClientId, iterator.next())) {
+          if (streamsSupervisor.verifyParency(filterStreamId, iterator.next())) {
             areContained = true;
           }
         }
@@ -305,8 +315,8 @@ public class Filter {
     return toTime;
   }
 
-  public Set<String> getStreamsClientIds() {
-    return streamsClientIds;
+  public Set<String> getStreamsIds() {
+    return streamsIds;
   }
 
   public Set<String> getStreamIds() {
@@ -357,8 +367,8 @@ public class Filter {
     this.streamsIds = pStreams;
   }
 
-  public void setStreamClientIds(Set<String> pStreamsClientIds) {
-    streamsClientIds = pStreamsClientIds;
+  public void setStreamClientIds(Set<String> pStreamsIds) {
+    streamsIds = pStreamsIds;
   }
 
   public void setTags(Set<String> pTags) {

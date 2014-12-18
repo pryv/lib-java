@@ -36,6 +36,10 @@ public class JsonConverter {
   private final static String META_KEY = "meta";
   private final static String SERVER_TIME_KEY = "serverTime";
 
+  private final static String STREAM_DELETION_KEY = "streamDeletion";
+  private final static String EVENT_DELETION_KEY = "eventDeletion";
+  private final static String ID_KEY = "id";
+
   /**
    * Deserialize JSON into an object
    *
@@ -93,6 +97,74 @@ public class JsonConverter {
     double serverTime = toJsonNode(jsonResponse).get(META_KEY).get(SERVER_TIME_KEY).doubleValue();
     logger.log("JsonConverter: retrieved time: " + serverTime);
     return serverTime;
+  }
+
+  /**
+   * Retrieves the streamDeletion field from a response from the API
+   *
+   * @param json
+   *          the JSON reponse body
+   * @return
+   * @throws JsonProcessingException
+   * @throws IOException
+   */
+  public static String retrieveDeletedStreamId(String json) throws JsonProcessingException,
+    IOException {
+    String deletedStreamId = toJsonNode(json).get(STREAM_DELETION_KEY).get(ID_KEY).textValue();
+    logger.log("JsonConverter: retrieved stream deletion id: " + deletedStreamId);
+    return deletedStreamId;
+  }
+
+  /**
+   * Retrieves the eventDeletion field from a response from the API
+   *
+   * @param json
+   *          the JSON response body
+   * @return
+   * @throws JsonProcessingException
+   * @throws IOException
+   */
+  public static String retrieveDeleteEventId(String json) throws JsonProcessingException,
+    IOException {
+    String deletedEventId = toJsonNode(json).get(EVENT_DELETION_KEY).get(ID_KEY).textValue();
+    logger.log("JsonConverter: retrieved event deletion id: " + deletedEventId);
+    return deletedEventId;
+  }
+
+  /**
+   * verify if the JSON has a "eventDeletion" field
+   *
+   * @param json
+   *          the JSON response body
+   * @return
+   * @throws JsonProcessingException
+   * @throws IOException
+   */
+  public static Boolean hasEventDeletionField(String json) throws JsonProcessingException,
+    IOException {
+    if (toJsonNode(json).findValue(EVENT_DELETION_KEY) != null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * verify if the JSON has a "streamDeletion" field
+   *
+   * @param json
+   *          the JSON response body
+   * @return
+   * @throws JsonProcessingException
+   * @throws IOException
+   */
+  public static Boolean hasStreamDeletionField(String json) throws JsonProcessingException,
+    IOException {
+    if (toJsonNode(json).findValue(STREAM_DELETION_KEY) != null) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**

@@ -166,7 +166,7 @@ public class SQLiteDBHelper {
           ResultSet result = statement.executeQuery(fetchCmd);
           while (result.next()) {
             Event retrievedEvent = new Event(result);
-            if (retrievedEvent.getTrashed() == true) {
+            if (retrievedEvent.isTrashed() == true) {
               // delete really
               String cmd = QueryGenerator.deleteEvent(retrievedEvent);
               statement.executeUpdate(cmd);
@@ -368,47 +368,34 @@ public class SQLiteDBHelper {
         String cmd;
         try {
           // retrieve Stream
-          cmd = QueryGenerator.retrieveStream(streamToDelete.getClientId());
+          cmd = QueryGenerator.retrieveStream(streamToDelete.getId());
           Statement statement = dbConnection.createStatement();
           ResultSet result = statement.executeQuery(cmd);
           while (result.next()) {
             Stream retrievedStreamToDelete = new Stream(result);
             // check trashed field
-            if (retrievedStreamToDelete.getTrashed() == true) {
+            if (retrievedStreamToDelete.isTrashed()) {
               // if true: delete Really
-              logger.log("SQLiteDBHelper: delete Stream with id="
-                + streamToDelete.getId()
-                  + ", cid="
-                  + streamToDelete.getClientId());
+              logger.log("SQLiteDBHelper: delete Stream with id=" + streamToDelete.getId());
               // find parent Stream and remove streamToDelete from its children
-              String parentStreamClientId = retrievedStreamToDelete.getParentClientId();
               String parentId = retrievedStreamToDelete.getParentId();
-              if (parentStreamClientId != null) {
-                cmd = QueryGenerator.retrieveStream(parentStreamClientId);
-                result = statement.executeQuery(cmd);
-                while (result.next()) {
-                  Stream parentStream = new Stream(result);
-                  parentStream.removeChildStream(retrievedStreamToDelete);
-                  cmd = QueryGenerator.insertOrReplaceStream(parentStream);
-                }
-              }
+
               // delete Stream
               cmd = QueryGenerator.deleteStream(retrievedStreamToDelete);
               statement.executeUpdate(cmd);
 
-              if (mergeEventsWithParent == true && parentStreamClientId != null) {
+              if (mergeEventsWithParent == true && parentId != null) {
                 // if mergeEventsWithParent is true
-                // fetch all these events, modify their parent stream id and cid
+                // fetch all these events, modify their parent stream id
                 // and save them
                 Filter deleteFilter = new Filter();
-                deleteFilter.addStreamClientId(retrievedStreamToDelete.getClientId());
+                deleteFilter.addStreamId(retrievedStreamToDelete.getId());
                 cmd = QueryGenerator.retrieveEvents(deleteFilter);
                 result = statement.executeQuery(cmd);
                 Event updateEvent = null;
                 while (result.next()) {
                   try {
                     updateEvent = new Event(result);
-                    updateEvent.setStreamClientId(parentStreamClientId);
                     updateEvent.setStreamId(parentId);
                     updateOrCreateEvent(updateEvent, null);
                   } catch (JsonParseException e) {
@@ -426,24 +413,26 @@ public class SQLiteDBHelper {
               } else {
                 // else do nothing (or delete them?)
               }
-              cacheStreamsCallback.onStreamsSuccess("SQLiteDBHelper: Stream with cid="
-                + retrievedStreamToDelete.getClientId()
-                  + ", id="
-                  + retrievedStreamToDelete.getId()
+              // delete child streams
+              if (retrievedStreamToDelete.getChildren() != null) {
+                for (Stream childstream : retrievedStreamToDelete.getChildren()) {
+                  cmd = QueryGenerator.deleteStream(childstream);
+                  statement.executeUpdate(cmd);
+                }
+              }
+              cacheStreamsCallback.onStreamsSuccess("SQLiteDBHelper: Stream with id="
+                + retrievedStreamToDelete.getId()
                   + " deleted.", null);
             } else {
               // set its trashed field to true and save it
-              logger.log("SQLiteDBHelper: trash Stream with id="
-                + streamToDelete.getId()
-                  + ", cid="
-                  + streamToDelete.getClientId());
+              logger.log("SQLiteDBHelper: trash Stream with id=" + streamToDelete.getId());
               retrievedStreamToDelete.setTrashed(true);
               updateOrCreateStream(retrievedStreamToDelete, cacheStreamsCallback);
-              cacheStreamsCallback.onStreamsSuccess("SQLiteDBHelper: Stream with cid="
-                + retrievedStreamToDelete.getClientId()
-                  + ", id="
-                  + retrievedStreamToDelete.getId()
+              cacheStreamsCallback.onStreamsSuccess("SQLiteDBHelper: Stream with id="
+                + retrievedStreamToDelete.getId()
                   + " trashed.", retrievedStreamToDelete);
+              // set child streams' trashed field to true
+
             }
           }
 
@@ -504,27 +493,37 @@ public class SQLiteDBHelper {
           while (result.next()) {
             // get the requested Streams
             Stream retrievedStream = new Stream(result);
-            allStreams.put(retrievedStream.getClientId(), retrievedStream);
+            allStreams.put(retrievedStream.getId(), retrievedStream);
           }
           logger.log("SQLiteDBHelper: retrieved " + allStreams.size() + " stream(s).");
           Map<String, Stream> rootStreams = new HashMap<String, Stream>();
-          for (Stream stream : allStreams.values()) {
-            String pid = stream.getParentClientId();
-            if (pid != null) {
-              // add this stream as a child
-              logger.log("SQLiteDBHelper: adding childStream: cid="
-                + stream.getClientId()
+
+          String pid = null;
+          for (Stream parentStream : allStreams.values()) {
+            pid = parentStream.getParentId();
+            if (pid == null) {
+              logger.log("SQLiteDBHelper: adding rootStream: id="
+                + parentStream.getId()
                   + ", name="
-                  + stream.getName());
-              allStreams.get(pid).addChildStream(stream);
-            } else {
-              logger.log("SQLiteDBHelper: adding rootStream: cid="
-                + stream.getClientId()
-                  + ", name="
-                  + stream.getName());
-              rootStreams.put(stream.getClientId(), stream);
+                  + parentStream.getName());
+              rootStreams.put(parentStream.getId(), parentStream);
+              allStreams.remove(parentStream.getId());
             }
           }
+
+          for (Stream childStream : allStreams.values()) {
+            pid = childStream.getParentId();
+            if (rootStreams.containsKey(pid)) {
+              logger.log("SQLiteDBHelper: adding childStream: id="
+                + childStream.getId()
+                  + ", name="
+                  + childStream.getName()
+                  + " to "
+                  + pid);
+              rootStreams.get(pid).addChildStream(childStream);
+            }
+          }
+
           cacheStreamsCallback.onStreamsRetrievalSuccess(rootStreams, 0);
         } catch (SQLException e) {
           cacheStreamsCallback.onStreamError(e.getMessage());

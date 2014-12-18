@@ -87,14 +87,23 @@ public class Connection implements EventsManager, StreamsManager {
     return streamsSupervisor.getRootStreams();
   }
 
+  // /**
+  // * Returns a reference to the Stream that has the provided client Id.
+  // *
+  // * @param streamClientId
+  // * @return
+  // */
+  // public Stream getStreamByClientId(String streamClientId) {
+  // return streamsSupervisor.getStreamByClientId(streamClientId);
+  // }
   /**
-   * Returns a reference to the Stream that has the provided client Id.
+   * Returns a reference to the Stream that has the provided Id.
    *
-   * @param streamClientId
+   * @param streamId
    * @return
    */
-  public Stream getStreamByClientId(String streamClientId) {
-    return streamsSupervisor.getStreamByClientId(streamClientId);
+  public Stream getStreamById(String streamId) {
+    return streamsSupervisor.getStreamById(streamId);
   }
 
   /*
@@ -104,7 +113,7 @@ public class Connection implements EventsManager, StreamsManager {
   @Override
   public void getEvents(Filter filter, EventsCallback userEventsCallback) {
     // generate the set of stream Ids, which will be passed to the online module
-    filter.generateStreamIds(streamsSupervisor.getStreamsClientIdToIdDictionnary());
+    // filter.generateStreamIds(streamsSupervisor.getStreamsClientIdToIdDictionnary());
     if (Pryv.isSupervisorActive()) {
       // make sync request to supervisor
       eventsSupervisor.getEvents(filter, userEventsCallback);
@@ -203,7 +212,7 @@ public class Connection implements EventsManager, StreamsManager {
     // }
     if (Pryv.isSupervisorActive()) {
       // delete Stream in Supervisor
-      streamsSupervisor.deleteStream(streamToDelete.getClientId(), mergeEventsWithParent,
+      streamsSupervisor.deleteStream(streamToDelete.getId(), mergeEventsWithParent,
         userStreamsCallback);
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
