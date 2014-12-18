@@ -79,9 +79,9 @@ public class EventsSupervisor {
         limitedEvents.put(temp.getClientId(), temp);
         i++;
       }
-      connectionCallback.onEventsRetrievalSuccess(limitedEvents, 0);
+      connectionCallback.onEventsRetrievalSuccess(limitedEvents, null);
     } else {
-      connectionCallback.onEventsRetrievalSuccess(filteredEvents, 0);
+      connectionCallback.onEventsRetrievalSuccess(filteredEvents, null);
     }
   }
 
@@ -149,7 +149,7 @@ public class EventsSupervisor {
         + newEvent.getStreamId()
         + ")");
     if (connectionCallback != null) {
-      connectionCallback.onEventsSuccess("EventsSupervisor: Event added", newEvent, 0);
+      connectionCallback.onEventsSuccess("EventsSupervisor: Event added", newEvent, null, null);
     }
   }
 
@@ -208,18 +208,21 @@ public class EventsSupervisor {
         events.remove(eventToDelete.getClientId());
         eventIdToClientId.remove(eventToDelete.getId());
         connectionCallback.onEventsSuccess(
-          "EventsSupervisor: Event with cid=" + eventToDelete.getClientId() + " deleted.", null, 0);
+          "EventsSupervisor: Event with cid=" + eventToDelete.getClientId() + " deleted.", null,
+          null,
+          null);
       } else {
         // update "trashed" field
         eventToDelete.setTrashed(true);
         updateEvent(null, eventToDelete);
         connectionCallback.onEventsSuccess(
-          "EventsSupervisor: Event with cid=" + eventToDelete.getClientId() + " trashed.", null, 0);
+          "EventsSupervisor: Event with cid=" + eventToDelete.getClientId() + " trashed.", null,
+          null, null);
       }
     } else {
       connectionCallback.onEventsError("EventsSupervisor: Event with cid="
         + eventToDelete.getClientId()
-          + " not found.");
+ + " not found.", null);
     }
   }
 

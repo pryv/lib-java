@@ -95,12 +95,13 @@ public class SQLiteDBHelper {
           statement.execute(cmd);
           statement.close();
           if (cacheEventsCallback != null) {
-            cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event cached", eventToCache, null);
+            cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event cached", eventToCache, null,
+              null);
           }
         } catch (SQLException e) {
-          cacheEventsCallback.onEventsError(e.getMessage());
+          cacheEventsCallback.onEventsError(e.getMessage(), null);
         } catch (JsonProcessingException e) {
-          cacheEventsCallback.onEventsError(e.getMessage());
+          cacheEventsCallback.onEventsError(e.getMessage(), null);
         }
       }
     }.start();
@@ -130,14 +131,14 @@ public class SQLiteDBHelper {
             logger.log("inserted " + event.getClientId() + " into DB.");
             statement.close();
           } catch (SQLException e) {
-            cacheEventsCallback.onEventsError(e.getMessage());
+            cacheEventsCallback.onEventsError(e.getMessage(), null);
             e.printStackTrace();
           } catch (JsonProcessingException e) {
-            cacheEventsCallback.onEventsError(e.getMessage());
+            cacheEventsCallback.onEventsError(e.getMessage(), null);
             e.printStackTrace();
           }
         }
-        cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Events updated", null, null);
+        cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Events updated", null, null, null);
 
       }
     }.start();
@@ -172,7 +173,7 @@ public class SQLiteDBHelper {
               statement.executeUpdate(cmd);
               cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event with clientId="
                 + eventToDelete.getClientId()
-                  + " is deleted.", null, null);
+                  + " is deleted.", null, null, null);
             } else {
               // set to trashed
               retrievedEvent.setTrashed(true);
@@ -182,21 +183,21 @@ public class SQLiteDBHelper {
                 + retrievedEvent.getClientId());
               cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event with clientId="
                 + retrievedEvent.getClientId()
-                  + " is trashed.", retrievedEvent, null);
+                  + " is trashed.", retrievedEvent, null, null);
             }
           }
           statement.close();
         } catch (SQLException e) {
-          cacheEventsCallback.onEventsError(e.getMessage());
+          cacheEventsCallback.onEventsError(e.getMessage(), null);
           e.printStackTrace();
         } catch (JsonParseException e) {
-          cacheEventsCallback.onEventsError(e.getMessage());
+          cacheEventsCallback.onEventsError(e.getMessage(), null);
           e.printStackTrace();
         } catch (JsonMappingException e) {
-          cacheEventsCallback.onEventsError(e.getMessage());
+          cacheEventsCallback.onEventsError(e.getMessage(), null);
           e.printStackTrace();
         } catch (IOException e) {
-          cacheEventsCallback.onEventsError(e.getMessage());
+          cacheEventsCallback.onEventsError(e.getMessage(), null);
           e.printStackTrace();
         }
       }
@@ -228,18 +229,18 @@ public class SQLiteDBHelper {
             Event retrievedEvent = new Event(result);
             retrievedEvents.put(retrievedEvent.getClientId(), retrievedEvent);
           }
-          cacheEventsCallback.onEventsRetrievalSuccess(retrievedEvents, 0);
+          cacheEventsCallback.onEventsRetrievalSuccess(retrievedEvents, null);
         } catch (SQLException e) {
-          cacheEventsCallback.onEventsRetrievalError(e.getMessage());
+          cacheEventsCallback.onEventsRetrievalError(e.getMessage(), null);
           e.printStackTrace();
         } catch (JsonParseException e) {
-          cacheEventsCallback.onEventsRetrievalError(e.getMessage());
+          cacheEventsCallback.onEventsRetrievalError(e.getMessage(), null);
           e.printStackTrace();
         } catch (JsonMappingException e) {
-          cacheEventsCallback.onEventsRetrievalError(e.getMessage());
+          cacheEventsCallback.onEventsRetrievalError(e.getMessage(), null);
           e.printStackTrace();
         } catch (IOException e) {
-          cacheEventsCallback.onEventsRetrievalError(e.getMessage());
+          cacheEventsCallback.onEventsRetrievalError(e.getMessage(), null);
           e.printStackTrace();
         }
       }

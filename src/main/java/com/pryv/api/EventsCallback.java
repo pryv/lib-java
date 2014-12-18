@@ -21,16 +21,17 @@ public interface EventsCallback {
    * @param serverTime
    *          the time of the server in seconds
    */
-  void onEventsRetrievalSuccess(Map<String, Event> events, double serverTime);
-
+  void onEventsRetrievalSuccess(Map<String, Event> events, Double serverTime);
 
   /**
    * callback method called when an error occured during Event fetching.
    *
    * @param errorMessage
    *          the error message
+   * @param serverTime
+   *          the time of the server in seconds
    */
-  void onEventsRetrievalError(String errorMessage);
+  void onEventsRetrievalError(String errorMessage, Double serverTime);
 
   /**
    * callback method called when createEvent(), updateEvent() or deleteEvent()
@@ -44,8 +45,10 @@ public interface EventsCallback {
    *          Only in singleActivity streams. If set, indicates the id of the
    *          previously running period event that was stopped as a consequence
    *          of inserting the new event.
+   * @param serverTime
+   *          the time of the server in seconds
    */
-  void onEventsSuccess(String successMessage, Event event, Integer stoppedId);
+  void onEventsSuccess(String successMessage, Event event, Integer stoppedId, Double serverTime);
 
   /**
    * callback method called when an error occurs during createEvent(),
@@ -53,7 +56,9 @@ public interface EventsCallback {
    *
    * @param errorMessage
    *          the error message
+   * @param serverTime
+   *          the time of the server in seconds
    */
-  void onEventsError(String errorMessage);
+  void onEventsError(String errorMessage, Double serverTime);
 
 }

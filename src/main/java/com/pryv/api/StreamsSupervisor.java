@@ -160,11 +160,6 @@ public class StreamsSupervisor {
         + " - "
         + Thread.currentThread().getName());
 
-    if (stream.getId() == null) {
-      stream.generateId();
-      logger.log("StreamsSupervisor: Generating new id for stream: " + stream.getId());
-    }
-
     Stream oldStream = getStreamById(stream.getId());
     if (oldStream != null) {
       // case exists: update Stream
@@ -449,20 +444,21 @@ public class StreamsSupervisor {
     deleteEventsCallback = new EventsCallback() {
 
       @Override
-      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
+        Double pServerTime) {
       }
 
       @Override
-      public void onEventsRetrievalSuccess(Map<String, Event> events, double serverTime) {
+      public void onEventsRetrievalSuccess(Map<String, Event> events, Double pServerTime) {
         eventsOnDelete = events;
       }
 
       @Override
-      public void onEventsRetrievalError(String errorMessage) {
+      public void onEventsRetrievalError(String errorMessage, Double pServerTime) {
       }
 
       @Override
-      public void onEventsError(String errorMessage) {
+      public void onEventsError(String errorMessage, Double pServerTime) {
       }
     };
   }

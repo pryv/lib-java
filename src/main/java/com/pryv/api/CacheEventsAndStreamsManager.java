@@ -240,7 +240,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onEventsRetrievalSuccess(Map<String, Event> onlineEvents, double pServerTime) {
+    public void onEventsRetrievalSuccess(Map<String, Event> onlineEvents, Double pServerTime) {
       // update Events in cache and send result to connection
       serverTime = pServerTime;
       lastOnlineRetrievalServerTime = pServerTime;
@@ -254,22 +254,23 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onEventsRetrievalError(String errorMessage) {
-      connectionEventsCallback.onEventsRetrievalError(errorMessage);
+    public void onEventsRetrievalError(String errorMessage, Double pServerTime) {
+      connectionEventsCallback.onEventsRetrievalError(errorMessage, pServerTime);
     }
 
     @Override
-    public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+    public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
+      Double pServerTime) {
       if (event != null) {
         dbHelper.updateOrCreateEvent(event, new CacheEventsCallback(filter,
           connectionEventsCallback));
       }
-      connectionEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
+      connectionEventsCallback.onEventsSuccess(successMessage, event, stoppedId, pServerTime);
     }
 
     @Override
-    public void onEventsError(String errorMessage) {
-      connectionEventsCallback.onEventsError(errorMessage);
+    public void onEventsError(String errorMessage, Double pServerTime) {
+      connectionEventsCallback.onEventsError(errorMessage, pServerTime);
     }
 
   }
@@ -291,7 +292,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onEventsRetrievalSuccess(Map<String, Event> cacheEvents, double pServerTime) {
+    public void onEventsRetrievalSuccess(Map<String, Event> cacheEvents, Double pServerTime) {
       logger.log("Cache: retrieved events from cache: events amount: " + cacheEvents.size());
       for (Event cacheEvent : cacheEvents.values()) {
         cacheEvent.assignConnection(weakConnection);
@@ -309,18 +310,19 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
 
     @Override
-    public void onEventsRetrievalError(String message) {
-      connectionEventsCallback.onEventsRetrievalError(message);
+    public void onEventsRetrievalError(String message, Double pServerTime) {
+      connectionEventsCallback.onEventsRetrievalError(message, pServerTime);
     }
 
     @Override
-    public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
-      connectionEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
+    public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
+      Double pServerTime) {
+      connectionEventsCallback.onEventsSuccess(successMessage, event, stoppedId, pServerTime);
     }
 
     @Override
-    public void onEventsError(String errorMessage) {
-      connectionEventsCallback.onEventsError(errorMessage);
+    public void onEventsError(String errorMessage, Double pServerTime) {
+      connectionEventsCallback.onEventsError(errorMessage, pServerTime);
     }
   }
 

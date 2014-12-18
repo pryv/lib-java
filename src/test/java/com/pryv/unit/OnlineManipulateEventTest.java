@@ -81,22 +81,23 @@ public class OnlineManipulateEventTest {
     callback = new EventsCallback() {
 
       @Override
-      public void onEventsRetrievalSuccess(Map<String, Event> onlineEvents, double serverTime) {
+      public void onEventsRetrievalSuccess(Map<String, Event> onlineEvents, Double serverTime) {
         events = onlineEvents;
       }
 
       @Override
-      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
+        Double pServerTime) {
         success = true;
       }
 
       @Override
-      public void onEventsRetrievalError(String errorMessage) {
+      public void onEventsRetrievalError(String errorMessage, Double pServerTime) {
         error = true;
       }
 
       @Override
-      public void onEventsError(String errorMessage) {
+      public void onEventsError(String errorMessage, Double pServerTime) {
         error = true;
       }
     };

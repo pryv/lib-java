@@ -161,21 +161,22 @@ public class SupervisorTest {
     eventsCallback = new EventsCallback() {
 
       @Override
-      public void onEventsRetrievalSuccess(Map<String, Event> onlineEvents, double serverTime) {
+      public void onEventsRetrievalSuccess(Map<String, Event> onlineEvents, Double serverTime) {
       }
 
       @Override
-      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
+        Double pServerTime) {
         logger.log(successMessage);
       }
 
       @Override
-      public void onEventsRetrievalError(String errorMessage) {
+      public void onEventsRetrievalError(String errorMessage, Double pServerTime) {
         logger.log(errorMessage);
       }
 
       @Override
-      public void onEventsError(String errorMessage) {
+      public void onEventsError(String errorMessage, Double pServerTime) {
         logger.log(errorMessage);
       }
     };

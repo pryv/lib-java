@@ -378,29 +378,22 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    * Events Callbacks
    */
 
-  public void onEventsRetrievalSuccess(final Map<String, Event> newEvents, double serverTime) {
+  public void onEventsRetrievalSuccess(final Map<String, Event> newEvents, Double serverTime) {
     logger.log("JavaApp: retrieved " + newEvents.size() + " events.");
     addEventsToList(newEvents);
   }
 
-  public void onCacheRetrieveEventsSuccess(Map<String, Event> newEvents) {
-    addEventsToList(newEvents);
-  }
-
-  public void onSupervisorRetrieveEventsSuccess(Map<String, Event> supervisorEvents) {
-    addEventsToList(supervisorEvents);
-  }
-
-  public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+  public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
+    Double pServerTime) {
 
   }
 
 
-  public void onEventsError(String errorMessage) {
+  public void onEventsError(String errorMessage, Double pServerTime) {
     displayError(errorMessage);
   }
 
-  public void onEventsRetrievalError(String message) {
+  public void onEventsRetrievalError(String message, Double pServerTime) {
     displayError(message);
   }
 

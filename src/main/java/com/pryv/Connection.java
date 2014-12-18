@@ -191,6 +191,9 @@ public class Connection implements EventsManager, StreamsManager {
   public void createStream(Stream newStream, StreamsCallback userStreamsCallback) {
     newStream.assignConnection(weakConnection);
 
+    newStream.generateId();
+    logger.log("Connection: Generating new id for stream: " + newStream.getId());
+
     if (Pryv.isSupervisorActive()) {
       // create Stream in Supervisor
       streamsSupervisor.updateOrCreateStream(newStream, userStreamsCallback);
@@ -251,8 +254,10 @@ public class Connection implements EventsManager, StreamsManager {
    *
    * @param pServerTime
    */
-  private void computeDelta(double pServerTime) {
-    deltaTime = pServerTime - System.currentTimeMillis() / millisToSeconds;
+  private void computeDelta(Double pServerTime) {
+    if (pServerTime != null) {
+      deltaTime = pServerTime - System.currentTimeMillis() / millisToSeconds;
+    }
   }
 
   /**
@@ -272,7 +277,7 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onEventsRetrievalSuccess(Map<String, Event> cacheEvents, double pServerTime) {
+    public void onEventsRetrievalSuccess(Map<String, Event> cacheEvents, Double pServerTime) {
       computeDelta(pServerTime);
       // update existing Events with those retrieved from the cache
       for (Event cacheEvent : cacheEvents.values()) {
@@ -283,12 +288,16 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onEventsRetrievalError(String message) {
-      userEventsCallback.onEventsRetrievalError(message);
+    public void onEventsRetrievalError(String message, Double pServerTime) {
+      computeDelta(pServerTime);
+      userEventsCallback.onEventsRetrievalError(message, pServerTime);
     }
 
     @Override
-    public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+    public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
+      Double pServerTime) {
+      computeDelta(pServerTime);
+
       if (event != null) {
         if (event.getId() != null) {
           eventsSupervisor.updateOrCreateEvent(event, userEventsCallback);
@@ -296,20 +305,21 @@ public class Connection implements EventsManager, StreamsManager {
 
         if (event.getClientId() != null) {
           userEventsCallback.onEventsSuccess(successMessage,
-            eventsSupervisor.getEventByClientId(event.getClientId()), stoppedId);
+            eventsSupervisor.getEventByClientId(event.getClientId()), stoppedId, pServerTime);
         } else {
           userEventsCallback.onEventsSuccess(successMessage,
             eventsSupervisor.getEventByClientId(eventsSupervisor.getClientId(event.getId())),
-            stoppedId);
+            stoppedId, pServerTime);
         }
       } else {
-        userEventsCallback.onEventsSuccess(successMessage, event, stoppedId);
+        userEventsCallback.onEventsSuccess(successMessage, event, stoppedId, pServerTime);
       }
     }
 
     @Override
-    public void onEventsError(String errorMessage) {
-      userEventsCallback.onEventsError(errorMessage);
+    public void onEventsError(String errorMessage, Double pServerTime) {
+      computeDelta(pServerTime);
+      userEventsCallback.onEventsError(errorMessage, pServerTime);
     }
   }
 

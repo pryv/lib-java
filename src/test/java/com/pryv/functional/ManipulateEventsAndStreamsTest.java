@@ -319,7 +319,7 @@ public class ManipulateEventsAndStreamsTest {
     eventsCallback = new EventsCallback() {
 
       @Override
-      public void onEventsRetrievalSuccess(Map<String, Event> newEvents, double serverTime) {
+      public void onEventsRetrievalSuccess(Map<String, Event> newEvents, Double serverTime) {
         System.out.println("TestEventsCallback: success with "
           + newEvents.values().size()
             + " events");
@@ -327,12 +327,13 @@ public class ManipulateEventsAndStreamsTest {
       }
 
       @Override
-      public void onEventsRetrievalError(String message) {
+      public void onEventsRetrievalError(String message, Double pServerTime) {
         eventsRetrievalError = true;
       }
 
       @Override
-      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
+        Double pServerTime) {
         System.out.println("RetrieveEventsTest: events success called with msg: "
           + successMessage
             + ", event="
@@ -344,7 +345,7 @@ public class ManipulateEventsAndStreamsTest {
       }
 
       @Override
-      public void onEventsError(String errorMessage) {
+      public void onEventsError(String errorMessage, Double pServerTime) {
         eventsError = true;
       }
     };

@@ -283,7 +283,7 @@ public class OnlineEventsAndStreamsManagerTest {
     eventsCallback = new EventsCallback() {
 
       @Override
-      public void onEventsRetrievalSuccess(Map<String, Event> newEvents, double serverTime) {
+      public void onEventsRetrievalSuccess(Map<String, Event> newEvents, Double serverTime) {
         System.out.println("TestEventsCallback: success with "
           + newEvents.values().size()
             + " events");
@@ -291,12 +291,13 @@ public class OnlineEventsAndStreamsManagerTest {
       }
 
       @Override
-      public void onEventsRetrievalError(String message) {
+      public void onEventsRetrievalError(String message, Double pServerTime) {
         eventsRetrievalError = true;
       }
 
       @Override
-      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
+        Double pServerTime) {
         System.out.println("OnlineEventsManagerTest: eventsSuccess msg: " + successMessage);
         eventsSuccess = true;
         if (event != null) {
@@ -305,7 +306,7 @@ public class OnlineEventsAndStreamsManagerTest {
       }
 
       @Override
-      public void onEventsError(String errorMessage) {
+      public void onEventsError(String errorMessage, Double pServerTime) {
         eventsError = true;
       }
     };

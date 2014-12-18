@@ -450,24 +450,25 @@ public class SQLiteDBHelperTest {
     eventsCallback = new EventsCallback() {
 
       @Override
-      public void onEventsRetrievalSuccess(Map<String, Event> pEvents, double serverTime) {
+      public void onEventsRetrievalSuccess(Map<String, Event> pEvents, Double serverTime) {
         events = pEvents;
         eventsRetrievalSuccess = true;
       }
 
       @Override
-      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId) {
+      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
+        Double pServerTime) {
         testEvent = event;
         eventsSuccess = true;
       }
 
       @Override
-      public void onEventsRetrievalError(String errorMessage) {
+      public void onEventsRetrievalError(String errorMessage, Double pServerTime) {
         eventsRetrievalError = true;
       }
 
       @Override
-      public void onEventsError(String errorMessage) {
+      public void onEventsError(String errorMessage, Double pServerTime) {
         eventsError = true;
       }
 
