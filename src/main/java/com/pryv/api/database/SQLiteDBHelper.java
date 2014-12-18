@@ -507,20 +507,21 @@ public class SQLiteDBHelper {
                   + ", name="
                   + parentStream.getName());
               rootStreams.put(parentStream.getId(), parentStream);
-              allStreams.remove(parentStream.getId());
             }
           }
 
           for (Stream childStream : allStreams.values()) {
             pid = childStream.getParentId();
-            if (rootStreams.containsKey(pid)) {
-              logger.log("SQLiteDBHelper: adding childStream: id="
-                + childStream.getId()
-                  + ", name="
-                  + childStream.getName()
-                  + " to "
-                  + pid);
-              rootStreams.get(pid).addChildStream(childStream);
+            if (pid != null) {
+              if (rootStreams.containsKey(pid)) {
+                logger.log("SQLiteDBHelper: adding childStream: id="
+                  + childStream.getId()
+                    + ", name="
+                    + childStream.getName()
+                    + " to "
+                    + pid);
+                rootStreams.get(pid).addChildStream(childStream);
+              }
             }
           }
 
