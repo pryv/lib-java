@@ -137,6 +137,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
       }
     });
     connection = new Connection(username, token, new DBinitCallback() {
+      @Override
       public void onError(String message) {
         displayError(message);
       }

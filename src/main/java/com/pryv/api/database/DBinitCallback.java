@@ -1,5 +1,7 @@
 package com.pryv.api.database;
 
+import com.pryv.utils.Logger;
+
 /**
  * Callback interface used to forward errors to cache module when DB init isn't
  * working.
@@ -8,7 +10,9 @@ package com.pryv.api.database;
  * @author ik
  *
  */
-public interface DBinitCallback {
+public class DBinitCallback {
+
+  private Logger logger = Logger.getInstance();
 
   /**
    * database initialization error.
@@ -16,6 +20,8 @@ public interface DBinitCallback {
    * @param message
    *          the error message to display
    */
-  void onError(String message);
+  public void onError(String message) {
+    logger.log("DB initialization error: " + message);
+  }
 
 }
