@@ -1,14 +1,11 @@
 package com.pryv.functional;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.apache.http.client.ClientProtocolException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -63,15 +60,7 @@ public class AuthenticationTest {
   public void testStartLoginAndPoll() {
     AuthController authenticator =
       new AuthControllerImpl(reqAppId, permissions, lang, returnURL, new FakeAuthView());
-    try {
-      authenticator.signIn();
-    } catch (ClientProtocolException e) {
-      fail("fail login");
-      e.printStackTrace();
-    } catch (IOException e) {
-      fail("fail login");
-      e.printStackTrace();
-    }
+    authenticator.signIn();
     Awaitility.await().until(hasDisplayedLoginView());
     assertTrue(displayLoginViewExecuted);
   }
@@ -80,18 +69,9 @@ public class AuthenticationTest {
   public void testStartLoginWithBadPermissions() {
     AuthController authenticator =
       new AuthControllerImpl(null, null, null, null, new FakeAuthView());
-    try {
-      authenticator.signIn();
-      Awaitility.await().until(hasDisplayedFailure());
-      assertTrue(displayFailureExecuted);
-    } catch (ClientProtocolException e) {
-      fail("fail login with bad arguments");
-      e.printStackTrace();
-    } catch (IOException e) {
-      fail("fail login with bad arguments");
-      e.printStackTrace();
-    }
-
+    authenticator.signIn();
+    Awaitility.await().until(hasDisplayedFailure());
+    assertTrue(displayFailureExecuted);
   }
 
   private Callable<Boolean> hasDisplayedLoginView() {
@@ -124,7 +104,6 @@ public class AuthenticationTest {
     };
   }
 
-
   /**
    * authentication view used for testing
    *
@@ -132,8 +111,6 @@ public class AuthenticationTest {
    *
    */
   private class FakeAuthView implements AuthView {
-
-
 
     @Override
     public void displayLoginVew(String loginURL) {
@@ -146,7 +123,12 @@ public class AuthenticationTest {
     }
 
     @Override
-    public void onAuthFailure(String msg) {
+    public void onAuthError(String msg) {
+      displayFailureExecuted = true;
+    }
+
+    @Override
+    public void onAuthRefused(int reasonId, String message, String detail) {
       displayFailureExecuted = true;
     }
 

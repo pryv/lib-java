@@ -11,6 +11,7 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.apache.http.util.EntityUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
@@ -38,13 +39,19 @@ public class AuthModelImpl implements AuthModel {
   }
 
   @Override
-  public void startLogin() throws ClientProtocolException, IOException {
-
-    String jsonRequest;
-    jsonRequest = JsonConverter.toJson(authRequest);
-    logger.log("AuthController: start login request: " + jsonRequest);
-    Request.Post(Pryv.REGISTRATION_URL).bodyString(jsonRequest, ContentType.APPLICATION_JSON)
-      .execute().handleResponse(signInResponseHandler);
+  public void startLogin() {
+    try {
+      String jsonRequest = JsonConverter.toJson(authRequest);
+      logger.log("AuthController: start login request: " + jsonRequest);
+      Request.Post(Pryv.REGISTRATION_URL).bodyString(jsonRequest, ContentType.APPLICATION_JSON)
+        .execute().handleResponse(signInResponseHandler);
+    } catch (JsonProcessingException e) {
+      controller.onError(e.getMessage());
+    } catch (ClientProtocolException e) {
+      controller.onError(e.getMessage());
+    } catch (IOException e) {
+      controller.onError(e.getMessage());
+    }
   }
 
   /**
@@ -63,7 +70,7 @@ public class AuthModelImpl implements AuthModel {
     private final static String USERNAME_KEY = "username";
     private final static String TOKEN_KEY = "token";
     private final static String MESSAGE_KEY = "message";
-    private final static String ERROR_ID_KEY = "id";
+    private final static String REASON_ID_KEY = "id";
     private final static String DETAIL_KEY = "detail";
 
     /**
@@ -103,20 +110,20 @@ public class AuthModelImpl implements AuthModel {
 
         } else if (state.equals(REFUSED_VALUE)) {
           String message = jsonResponse.get(MESSAGE_KEY).textValue();
-          controller.onFailure(0, message, null);
+          controller.onError(message);
 
         } else if (state.equals(ERROR_VALUE)) {
-          int errorId = jsonResponse.get(ERROR_ID_KEY).intValue();
+          int reasonId = jsonResponse.get(REASON_ID_KEY).intValue();
           String message = jsonResponse.get(MESSAGE_KEY).textValue();
           String detail = jsonResponse.get(DETAIL_KEY).textValue();
-          controller.onFailure(errorId, message, detail);
+          controller.onRefused(reasonId, message, detail);
 
         } else {
-          controller.onFailure(0, "unknown-error", null);
+          controller.onError("unknown-error");
         }
 
       } else {
-        controller.onFailure(statusCode, reply, null);
+        controller.onError(reply);
       }
       return null;
     }

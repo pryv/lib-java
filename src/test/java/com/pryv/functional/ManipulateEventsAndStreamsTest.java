@@ -139,7 +139,7 @@ public class ManipulateEventsAndStreamsTest {
   @Test
   public void testCreateUpdateAndDeleteStream() {
     testStream = new Stream();
-    int num = 3;
+    int num = 54;
     testStream.setName("testStream name" + num);
 
     System.out.println("### --- Create Stream phase --- ###");

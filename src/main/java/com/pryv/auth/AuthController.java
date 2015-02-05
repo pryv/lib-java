@@ -1,9 +1,5 @@
 package com.pryv.auth;
 
-import java.io.IOException;
-
-import org.apache.http.client.ClientProtocolException;
-
 /**
  *
  * callback used by poller after login successful
@@ -16,7 +12,7 @@ public interface AuthController {
   /**
    * begin login sequence
    */
-  void signIn() throws ClientProtocolException, IOException;
+  void signIn();
 
   /**
    * login successfull callback, returns username and auth token
@@ -27,12 +23,20 @@ public interface AuthController {
   void onSuccess(String username, String token);
 
   /**
-   * error message
+   * auth error
    *
-   * @param detail
-   * @param errorId
+   * @param message
    */
-  void onFailure(int errorId, String jsonMessage, String detail);
+  void onError(String message);
+
+  /**
+   * auth refused
+   *
+   * @param reasonId
+   * @param message
+   * @param detail
+   */
+  void onRefused(int reasonId, String message, String detail);
 
   /**
    * display web view

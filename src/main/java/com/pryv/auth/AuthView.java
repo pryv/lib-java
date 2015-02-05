@@ -31,5 +31,14 @@ public interface AuthView {
    *
    * @param message
    */
-  void onAuthFailure(String message);
+  void onAuthError(String message);
+
+  /**
+   * callback method when auth was refused.
+   *
+   * @param reasonId
+   * @param message
+   * @param detail
+   */
+  void onAuthRefused(int reasonId, String message, String detail);
 }

@@ -176,6 +176,7 @@ public class FormController {
 
   private void updateStream() {
     editedStream.setName(streamNameTextField.getText());
+    editedStream.setParentId(parentComboBox.getPromptText());
     exampleApp.updateStream(editedStream);
   }
 

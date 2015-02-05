@@ -44,13 +44,13 @@ public class PollingThread extends Thread {
         + Thread.currentThread().getName());
 
     } catch (ClientProtocolException e) {
-      controller.onFailure(0, e.getMessage(), null);
+      controller.onError(e.getMessage());
       e.printStackTrace();
     } catch (IOException e) {
-      controller.onFailure(0, e.getMessage(), null);
+      controller.onError(e.getMessage());
       e.printStackTrace();
     } catch (InterruptedException e) {
-      controller.onFailure(0, e.getMessage(), null);
+      controller.onError(e.getMessage());
       e.printStackTrace();
     }
   }

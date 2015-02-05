@@ -1,9 +1,6 @@
 package com.pryv.auth;
 
-import java.io.IOException;
 import java.util.List;
-
-import org.apache.http.client.ClientProtocolException;
 
 import com.pryv.api.model.Permission;
 import com.pryv.utils.Logger;
@@ -40,7 +37,7 @@ public class AuthControllerImpl implements AuthController {
    * @param pReturnURL
    *          optional: The URL to redirect the user to after auth completes
    * @param pView
-   *          the view in which the URL for login is dislpayed
+   *          the view in which the URL for login is displayed
    */
   public AuthControllerImpl(String pRequestingAppId, List<Permission> pPermissions, String pLang,
     String pReturnURL, AuthView pView) {
@@ -56,7 +53,7 @@ public class AuthControllerImpl implements AuthController {
   }
 
   @Override
-  public void signIn() throws ClientProtocolException, IOException {
+  public void signIn() {
     model = new AuthModelImpl(this, requestingAppId, permissions, language, returnURL);
     model.startLogin();
   }
@@ -68,9 +65,20 @@ public class AuthControllerImpl implements AuthController {
   }
 
   @Override
-  public void onFailure(int errorId, String jsonMessage, String detail) {
-    logger.log("AuthController: failure: id=" + errorId + ", message=" + jsonMessage);
-    view.onAuthFailure("AuthController: failure: id=" + errorId + ", message=" + jsonMessage);
+  public void onError(String message) {
+    logger.log("AuthController: failure: message=" + message);
+    view.onAuthError("AuthController: failure: message=" + message);
+  }
+
+  @Override
+  public void onRefused(int reasonId, String message, String detail) {
+    logger.log("AuthController: refused: reasonId="
+      + reasonId
+        + ", message="
+        + message
+        + ", detail="
+        + detail);
+    view.onAuthRefused(reasonId, message, detail);
   }
 
   @Override

@@ -1,8 +1,5 @@
 package com.pryv.auth;
 
-import java.io.IOException;
-
-import org.apache.http.client.ClientProtocolException;
 
 /**
  *
@@ -15,9 +12,6 @@ public interface AuthModel {
 
   /**
    * start login protocol
-   *
-   * @throws ClientProtocolException
-   * @throws IOException
    */
-  void startLogin() throws ClientProtocolException, IOException;
+  void startLogin();
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import org.apache.http.client.ClientProtocolException;
 import org.controlsfx.dialog.Dialogs;
 
 import com.pryv.api.EventsCallback;
@@ -62,6 +62,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   private ObservableList<Event> eventsObservableList = FXCollections.observableArrayList();
   private ObservableList<TreeItem<Stream>> streamTreeItemsObservableList = FXCollections
     .observableArrayList();
+  private TreeItem<Stream> root;
 
   public static void main(String[] args) {
     Pryv.setStaging();
@@ -87,21 +88,13 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     // authentication
     showAuthView();
 
-    Permission testPermission = new Permission("*", Permission.Level.manage, null);
+    Permission testPermission = new Permission("*", Permission.Level.manage, "Example App");
     List<Permission> permissions = new ArrayList<Permission>();
     permissions.add(testPermission);
 
     AuthController authenticator =
       new AuthControllerImpl(REQUESTING_APP_ID, permissions, "en", "", this);
-    try {
-      authenticator.signIn();
-    } catch (ClientProtocolException e) {
-      displayError(e.getMessage());
-      e.printStackTrace();
-    } catch (IOException e) {
-      displayError(e.getMessage());
-      e.printStackTrace();
-    }
+    authenticator.signIn();
 
   }
 
@@ -161,9 +154,14 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   /*
    * auth failure
    */
-  public void onAuthFailure(String msg) {
-    logger.log("JavaApp: onDisplayFailure");
-    displayError("auth failure: " + msg);
+  public void onAuthError(String msg) {
+    logger.log("JavaApp: auth error");
+    displayError("auth error: " + msg);
+  }
+
+  public void onAuthRefused(int reasonId, String msg, String detail) {
+    logger.log("JavaApp: auth refused");
+    displayError("auth refused: " + msg);
   }
 
   /*
@@ -239,8 +237,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   public void showEventForm(FormController.Mode action, Event eventToUpdate) {
     try {
       // Load the fxml file and set into the center of the main layout
-      FXMLLoader loader =
- new FXMLLoader(ExampleApp.class.getResource("view/EventFormWindow.fxml"));
+      FXMLLoader loader = new FXMLLoader(ExampleApp.class.getResource("view/EventFormWindow.fxml"));
       AnchorPane page = (AnchorPane) loader.load();
 
       Stage dialogStage = new Stage();
@@ -287,7 +284,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
       e.printStackTrace();
     }
 
-//    An
+    // An
   }
 
   /*
@@ -320,7 +317,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     Platform.runLater(new Runnable() {
 
       public void run() {
-        TreeItem<Stream> root = new TreeItem<Stream>();
+        root = new TreeItem<Stream>();
         root.setExpanded(true);
         buildStreamTree(root, newStreams.values());
         streamTreeItemsObservableList.add(root);
@@ -340,11 +337,24 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     }
   }
 
+  private Stream getStreamById(String id) {
+    // streamTreeItemsObservableList.
+    for (Iterator iterator = root.getChildren().listIterator(); iterator.hasNext();) {
+      TreeItem<Stream> node = (TreeItem<Stream>) iterator.next();
+      if (node.getValue().getId().equals(id)) {
+        return node.getValue();
+      }
+    }
+    return null;
+  }
+
   public void onStreamsRetrievalError(String message, Double pServerTime) {
     displayError(message);
   }
 
   public void onStreamsSuccess(String successMessage, Stream stream, Double pServerTime) {
+    Stream streamToUpdate = getStreamById(stream.getId());
+    streamToUpdate = stream;
   }
 
   public void onStreamError(String errorMessage, Double pServerTime) {
@@ -387,7 +397,6 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     Double pServerTime) {
 
   }
-
 
   public void onEventsError(String errorMessage, Double pServerTime) {
     displayError(errorMessage);
