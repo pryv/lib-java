@@ -1,6 +1,7 @@
 package com.pryv;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javafx.beans.value.ChangeListener;
@@ -21,8 +22,6 @@ import com.pryv.api.model.Attachment;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 import com.pryv.utils.Logger;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * Controller of the Example Java Application. is instanciated on successful
