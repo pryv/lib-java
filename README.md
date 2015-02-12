@@ -62,9 +62,9 @@ Install [Maven](http://books.sonatype.com/mvnref-book/reference/installation-sec
 
 ### Java Example App
 
-This is a Java demo JavaFX Application located in the examples/JavaApp/JavaApp subdirectory.
+This is a Java demo JavaFX Application. It requires Java 1.8 to run.
 
-This App connects to the "web-app-test" application, requiring permissions to access all streams with "manage" level. After a successful login, the app allows to manipulate Streams and Events in a simple way.
+This App connects to the "pryv-lib-java-example" application, requiring permissions to access all streams with "manage" level. After a successful login, the app allows to manipulate Streams and Events in a simple way.
 
 to run it:
 
@@ -72,7 +72,7 @@ to run it:
 
 - `mvn package` to generate the executable JAR.
 
-- `java -jar target/JavaApp-0.1.0-jar-with-dependencies` to run the JAR.
+- `java -jar target/JavaApp-0.1.0-jar-with-dependencies.jar` to run the JAR.
 
 ## License
 
