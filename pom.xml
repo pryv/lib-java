@@ -2,23 +2,88 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.pryv</groupId>
-	<artifactId>lib-java</artifactId>
+	<artifactId>java-lib</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0-SNAPSHOT</version>
-	<name>lib-java</name>
-	<url>http://maven.apache.org</url>
+	<version>0.1.0</version>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>Java and Android library to authorize, authenticate and access Pryv users data as defined in the Pryv API.</description>
+	<url>https://github.com/pryv/lib-java</url>
+
+	<licenses>
+		<license>
+			<name>BSD revised License</name>
+			<url>https://github.com/pryv/documents/blob/master/license-bsd-revised.md</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Ilia Kebets</name>
+			<email>ilia.kebets@epfl.ch</email>
+			<organization>Pryv</organization>
+			<organizationUrl>https://github.com/kebetsi</organizationUrl>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:git@github.com:juven/git-demo.git</connection>
+		<developerConnection>scm:git:git@github.com:juven/git-demo.git</developerConnection>
+		<url>git@github.com:juven/git-demo.git</url>
+	</scm>
 
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<checkstyle.config.location>checkstyle.xml</checkstyle.config.location>
+		<skip.unit.tests>false</skip.unit.tests>
+		<skip.install>false</skip.install>
 	</properties>
+
+	<profiles>
+		<profile>
+			<id>liteDeploy</id>
+			<properties>
+				<skip.install>true</skip.install>
+				<skip.unit.tests>true</skip.unit.tests>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>doclint-java8-disable</id>
+			<activation>
+				<jdk>[1.8,)</jdk>
+			</activation>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<repositories>
 		<repository>
 			<id>org.jacoco</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</repository>
-
 	</repositories>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
 	<dependencies>
 		<dependency>
@@ -33,19 +98,20 @@
 			<groupId>org.jacoco</groupId>
 			<artifactId>jacoco-maven-plugin</artifactId>
 			<version>0.7.1.201405082137</version>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- HTTP library for java -->
 		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.3.4</version>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>fluent-hc</artifactId>
-			<version>4.3.4</version>
+			<version>4.4</version>
 		</dependency>
 
 		<!-- Json library -->
@@ -98,6 +164,75 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>2.5.2</version>
+				<configuration>
+					<skip>${skip.install}</skip>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.3</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<useAgent>false</useAgent>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
@@ -179,7 +314,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.15</version>
+				<version>2.18.1</version>
 				<configuration>
 					<!-- Sets the VM argument line used when unit tests are run. -->
 					<argLine>${surefireArgLine}</argLine>
