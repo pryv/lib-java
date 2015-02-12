@@ -51,7 +51,6 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
 
   private final static String REQUESTING_APP_ID = "pryv-lib-java-example";
 
-  private Connection connection;
   private EventsManager eventsManager;
   private StreamsManager streamsManager;
   private Collection<Stream> streams;
@@ -119,7 +118,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   }
 
   /*
-   * load auth in browser
+   * load login page in default browser
    */
   public void displayLoginVew(String loginURL) {
     new AuthBrowserView().displayLoginVew(loginURL);
@@ -136,7 +135,10 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
         showMainView();
       }
     });
-    connection = new Connection(username, token, new DBinitCallback() {
+    // instanciate Connection object, through which we will interact with the
+    // API through the streamsManager and EventsManager interfaces
+    // the DBinitCallback is used in case the local database fails to open
+    Connection connection = new Connection(username, token, new DBinitCallback() {
       @Override
       public void onError(String message) {
         displayError(message);
@@ -186,6 +188,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     } catch (IOException e) {
       // Exception gets thrown if the fxml file could not be loaded
       e.printStackTrace();
+      displayError("ExampleApp: error in loading main view. " + e.getMessage());
     }
   }
 
@@ -203,7 +206,6 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
       FXMLLoader loader =
         new FXMLLoader(ExampleApp.class.getResource("view/StreamFormWindow.fxml"));
       AnchorPane page = (AnchorPane) loader.load();
-      // rootLayout.setCenter(overviewPage);
 
       Stage dialogStage = new Stage();
       dialogStage.initModality(Modality.WINDOW_MODAL);
@@ -224,6 +226,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     } catch (IOException e) {
       // Exception gets thrown if the fxml file could not be loaded
       e.printStackTrace();
+      displayError("ExampleApp: error in loading stream form view. " + e.getMessage());
     }
   }
 
@@ -259,9 +262,15 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     } catch (IOException e) {
       // Exception gets thrown if the fxml file could not be loaded
       e.printStackTrace();
+      displayError("ExampleApp: error in loading event form view. " + e.getMessage());
     }
   }
 
+  /**
+   * delete Stream dialog display
+   *
+   * @param streamToDelete
+   */
   public void showDeleteStreamDialog(Stream streamToDelete) {
     FXMLLoader loader =
       new FXMLLoader(ExampleApp.class.getResource("view/DeleteStreamDialog.fxml"));
@@ -281,11 +290,10 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
 
       dialogStage.showAndWait();
     } catch (IOException e) {
-      displayError(e.getMessage());
       e.printStackTrace();
+      displayError("ExampleApp: error in loading stream delete view. " + e.getMessage());
     }
 
-    // An
   }
 
   /*
@@ -309,7 +317,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    */
 
   public void onStreamsRetrievalSuccess(Map<String, Stream> streams, Double serverTime) {
-    logger.log("JavaApp: received " + streams.size() + " streams.");
+    logger.log("ExampleApp: received " + streams.size() + " streams.");
     this.streams = streams.values();
     addStreamsToTree(streams);
   }

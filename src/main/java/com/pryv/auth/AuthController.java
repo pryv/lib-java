@@ -40,6 +40,9 @@ public interface AuthController {
 
   /**
    * display web view
+   *
+   * @param the
+   *          url of the login page
    */
   void displayLoginView(String url);
 
