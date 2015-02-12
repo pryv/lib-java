@@ -17,7 +17,7 @@
 
 		<dependency>
 			<groupId>com.pryv</groupId>
-			<artifactId>java-lib</artifactId>
+			<artifactId>lib</artifactId>
 			<version>0.1.0</version>
 		</dependency>
 
