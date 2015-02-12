@@ -68,7 +68,7 @@ This App connects to the "web-app-test" application, requiring permissions to ac
 
 to run it:
 
-- `cd example/JavaApp/JavaApp` 
+- `cd examples/JavaApp/JavaApp/` 
 
 - `mvn package` to generate the executable JAR.
 
