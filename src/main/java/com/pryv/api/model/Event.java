@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -23,7 +24,6 @@ import com.pryv.api.database.QueryGenerator;
 import com.pryv.utils.JsonConverter;
 import com.rits.cloning.Cloner;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * Event data structure from Pryv

@@ -361,7 +361,7 @@ public class SQLiteDBHelper {
    *          callback to notify success or failure
    *
    */
-  public void deleteStream(final Stream streamToDelete, boolean mergeEventsWithParent,
+  public void deleteStream(final Stream streamToDelete, final boolean mergeEventsWithParent,
     final StreamsCallback cacheStreamsCallback) {
     new Thread() {
       @Override

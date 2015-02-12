@@ -125,7 +125,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   }
 
   @Override
-  public void deleteEvent(Event eventToDelete, final EventsCallback cacheEventsCallback) {
+  public void deleteEvent(final Event eventToDelete, final EventsCallback cacheEventsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -150,7 +150,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   }
 
   @Override
-  public void updateEvent(Event eventToUpdate, final EventsCallback cacheEventsCallback) {
+  public void updateEvent(final Event eventToUpdate, final EventsCallback cacheEventsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -180,7 +180,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
    */
 
   @Override
-  public void getStreams(Filter filter, final StreamsCallback onlineManagerStreamsCallback) {
+  public void getStreams(final Filter filter, final StreamsCallback onlineManagerStreamsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -209,7 +209,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   }
 
   @Override
-  public void createStream(Stream newStream, final StreamsCallback cacheStreamsCallback) {
+  public void createStream(final Stream newStream, final StreamsCallback cacheStreamsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -238,8 +238,8 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   }
 
   @Override
-  public void deleteStream(Stream streamToDelete, boolean mergeEventsWithParent,
-    StreamsCallback cacheStreamsCallback) {
+  public void deleteStream(final Stream streamToDelete, final boolean mergeEventsWithParent,
+    final StreamsCallback cacheStreamsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -271,7 +271,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
   }
 
   @Override
-  public void updateStream(Stream streamToUpdate, final StreamsCallback cacheStreamsCallback) {
+  public void updateStream(final Stream streamToUpdate, final StreamsCallback cacheStreamsCallback) {
     new Thread() {
       @Override
       public void run() {
