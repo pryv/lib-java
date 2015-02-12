@@ -11,8 +11,8 @@ Java and Android library to authorize, authenticate and access Pryv users data a
 ```
 <dependency>
 		<groupId>com.pryv</groupId>
-		<artifactId>lib-java</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<artifactId>lib</artifactId>
+		<version>0.1.0</version>
 </dependency>
 ```
 
@@ -20,7 +20,7 @@ If the library is not yet deployed to the remote repository, you first need to i
 
 #### JAR
 
-After running `mvn package`, include the `lib-java-1.0-SNAPSHOT-jar-with-dependencies.jar` file in your classpath.
+After running `mvn package`, include the `lib-java-0.1.0-jar-with-dependencies.jar` file in your classpath.
 
 ### Examples
 
@@ -56,7 +56,7 @@ Install [Maven](http://books.sonatype.com/mvnref-book/reference/installation-sec
 
 ## Examples
 
-### Java Demo App
+### Java Example App
 
 This is a Java demo JavaFX Application located in the examples/JavaApp/JavaApp subdirectory.
 
@@ -66,7 +66,7 @@ to run it:
 
 - `mvn package` to generate the executable JAR.
 
-- `java -jar target/JavaApp-1.0-SNAPSHOT-jar-with-dependencies` to run the JAR.
+- `java -jar target/JavaApp-0.1.0-jar-with-dependencies` to run the JAR.
 
 ## License
 
