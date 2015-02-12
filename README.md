@@ -68,6 +68,8 @@ This App connects to the "web-app-test" application, requiring permissions to ac
 
 to run it:
 
+- `cd example/JavaApp/JavaApp` 
+
 - `mvn package` to generate the executable JAR.
 
 - `java -jar target/JavaApp-0.1.0-jar-with-dependencies` to run the JAR.
