@@ -136,7 +136,7 @@ public class ManipulateEventsAndStreamsTest {
     // retrieve id from online API response, send delete command
   }
 
-  @Test
+  // @Test
   public void testCreateUpdateAndDeleteStream() {
     testStream = new Stream();
     int num = 54;
