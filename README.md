@@ -22,6 +22,10 @@ If the library is not yet deployed to the remote repository, you first need to i
 
 After running `mvn package`, include the `lib-java-0.1.0-jar-with-dependencies.jar` file in your classpath.
 
+### Docs
+
+- [Getting started guide](http://pryv.github.io/getting-started/java/)
+
 ### Examples
 
 ```
