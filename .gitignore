@@ -1,9 +1,4 @@
 #
-# database
-#
-sqlite-db/
-
-#
 # maven specific
 #
 
