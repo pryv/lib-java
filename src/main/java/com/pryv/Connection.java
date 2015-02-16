@@ -1,8 +1,10 @@
 package com.pryv;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.joda.time.DateTime;
 
 import com.pryv.api.CacheEventsAndStreamsManager;
@@ -27,11 +29,11 @@ import com.pryv.utils.Logger;
  */
 public class Connection implements EventsManager, StreamsManager {
 
-  private String username;
-  private String token;
+  private String userID;
+  private String accessToken;
   private String apiDomain = Pryv.API_DOMAIN; // pryv.io or pryv.in
   private String apiScheme = "https";
-  private String url;
+  private String url; // generated from apiScheme, apiDomain and username
 
   private WeakReference<Connection> weakConnection;
 
@@ -61,17 +63,53 @@ public class Connection implements EventsManager, StreamsManager {
    * @param dbInitCallback
    */
   public Connection(String pUsername, String pToken, DBinitCallback dbInitCallback) {
-    username = pUsername;
-    token = pToken;
-    url = apiScheme + "://" + username + "." + apiDomain + "/";
+    userID = pUsername;
+    accessToken = pToken;
+    url = getApiBaseUrl();
+    String cacheFolder = null;
+    // generate caching folder
+    if (Pryv.isCacheActive()) {
+      cacheFolder = "cache/" + getIdCaching();
+      new File(cacheFolder).mkdirs();
+      // new File("kk/blob").mkdirs();
+    }
     weakConnection = new WeakReference<Connection>(this);
     streamsSupervisor = new StreamsSupervisor();
     eventsSupervisor = new EventsSupervisor(streamsSupervisor);
     streamsSupervisor.setEventsSupervisor(eventsSupervisor);
     cacheEventsManager =
-      new CacheEventsAndStreamsManager(url, token, dbInitCallback, streamsSupervisor,
+      new CacheEventsAndStreamsManager(cacheFolder, url, accessToken, dbInitCallback,
+        streamsSupervisor,
         eventsSupervisor, weakConnection);
     cacheStreamsManager = (StreamsManager) cacheEventsManager;
+  }
+
+  /**
+   * returns the API URL, built from the API scheme, the userID and the API
+   * domain.
+   *
+   * @return
+   */
+  private String getApiBaseUrl() {
+    return apiScheme + "://" + userID + "." + apiDomain + "/";
+  }
+
+  /**
+   * returns the API URL with the access token
+   *
+   * @return
+   */
+  private String getIdUrl() {
+    return getApiBaseUrl() + "?auth=" + accessToken;
+  }
+
+  /**
+   * returns the caching folder id
+   *
+   * @return
+   */
+  public String getIdCaching() {
+    return DigestUtils.md5Hex(getIdUrl()) + "_" + userID + apiDomain + "_" + accessToken;
   }
 
   /*
@@ -380,12 +418,12 @@ public class Connection implements EventsManager, StreamsManager {
 
   }
 
-  public String getUsername() {
-    return username;
+  public String getUserID() {
+    return userID;
   }
 
-  public String getToken() {
-    return token;
+  public String getAccessToken() {
+    return accessToken;
   }
 
   public String getApiDomain() {
@@ -396,8 +434,5 @@ public class Connection implements EventsManager, StreamsManager {
     return apiScheme;
   }
 
-  public String getUrl() {
-    return url;
-  }
 
 }

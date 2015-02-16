@@ -66,6 +66,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
    * Cache constructor. Instanciates online module to which it passes url and
    * token parameters.
    *
+   * @param cacheFolder
+   *          the path to the cache folder
    * @param url
    *          the url to which online requests are made.
    * @param token
@@ -80,7 +82,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
    *          a reference to the connection object - used to assign
    *          weakreference
    */
-  public CacheEventsAndStreamsManager(String url, String token, DBinitCallback initCallback,
+  public CacheEventsAndStreamsManager(String cacheFolder, String url, String token,
+    DBinitCallback initCallback,
     StreamsSupervisor pStreams, EventsSupervisor pEventsSupervisor,
     WeakReference<Connection> pWeakConnection) {
     weakConnection = pWeakConnection;
@@ -89,7 +92,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     streamsSupervisor = pStreams;
     eventsSupervisor = pEventsSupervisor;
     if (Pryv.isCacheActive()) {
-      dbHelper = new SQLiteDBHelper(Pryv.DATABASE_NAME, initCallback);
+      dbHelper = new SQLiteDBHelper(cacheFolder, initCallback);
       scope = new HashSet<String>();
     }
   }

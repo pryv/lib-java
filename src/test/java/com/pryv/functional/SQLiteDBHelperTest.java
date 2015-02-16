@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -66,7 +67,9 @@ public class SQLiteDBHelperTest {
     instanciateEventsCallback();
     instanciateStreamsCallback();
 
-    db = new SQLiteDBHelper("test.db", new DBinitCallback() {
+    String cacheFolder = "cache/test";
+    new File(cacheFolder).mkdirs();
+    db = new SQLiteDBHelper(cacheFolder, new DBinitCallback() {
 
       @Override
       public void onError(String message) {

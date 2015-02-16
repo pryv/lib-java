@@ -15,6 +15,7 @@ import java.util.Set;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.pryv.Pryv;
 import com.pryv.api.EventsCallback;
 import com.pryv.api.Filter;
 import com.pryv.api.StreamsCallback;
@@ -33,7 +34,6 @@ import com.pryv.utils.Logger;
  */
 public class SQLiteDBHelper {
 
-  private final String dbPath = "sqlite-db/";
   private final String initDBerrorMessage = "Database initialization error: ";
 
   private Connection dbConnection;
@@ -44,14 +44,14 @@ public class SQLiteDBHelper {
    * SQLiteDBHelper constructor. Creates and Connects to the SQLite database
    * located in ./sqlite-db/name. Creates the tables if required.
    *
-   * @param name
-   *          the name of the database
+   * @param cacheFolder
+   *          the path to the caching folder
    * @param initCallback
    *          callback to notify failure
    */
-  public SQLiteDBHelper(String name, DBinitCallback initCallback) {
-    logger.log("SQLiteDBHelper: init DB in: " + dbPath + name);
-    initDB(dbPath + name, initCallback);
+  public SQLiteDBHelper(String cacheFolder, DBinitCallback initCallback) {
+    logger.log("SQLiteDBHelper: init DB in: " + cacheFolder + Pryv.DATABASE_NAME);
+    initDB(cacheFolder + Pryv.DATABASE_NAME, initCallback);
   }
 
   /**
