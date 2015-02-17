@@ -40,8 +40,6 @@ public class Event {
    */
   @JsonIgnore
   private String clientId;
-  // @JsonIgnore
-  // private String streamClientId;
 
   private String id;
   private String streamId;
@@ -107,7 +105,6 @@ public class Event {
     Map<String, Object> pClientData, Boolean pTrashed, Double pCreated, String pCreatedBy,
     Double pModified, String pModifiedBy, String pTempRefId) {
     clientId = pClientId;
-    // streamClientId = pStreamClientID;
     id = pId;
     streamId = pStreamId;
     time = pTime;
@@ -151,8 +148,6 @@ public class Event {
   public Event(ResultSet result) throws SQLException, JsonParseException, JsonMappingException,
     IOException {
     clientId = result.getString(QueryGenerator.EVENTS_CLIENT_ID_KEY);
-    // streamClientId =
-    // result.getString(QueryGenerator.EVENTS_STREAM_CLIENT_ID_KEY);
     id = result.getString(QueryGenerator.EVENTS_ID_KEY);
     streamId = result.getString(QueryGenerator.EVENTS_STREAM_ID_KEY);
     time = result.getDouble(QueryGenerator.EVENTS_TIME_KEY);
@@ -188,18 +183,6 @@ public class Event {
     clientId = UUID.randomUUID().toString();
   }
 
-  // /**
-  // * translates the StreamClientId
-  // *
-  // * @param streamIdToClientId
-  // * the dictionnary streamId->streamClientId
-  // */
-  // public void updateStreamClientId(Map<String, String> streamIdToClientId) {
-  // if (streamIdToClientId.get(streamIdToClientId) != null) {
-  // streamClientId = streamIdToClientId.get(streamId);
-  // }
-  // }
-
   /**
    * Assign a weak reference to the Connection
    *
@@ -229,7 +212,6 @@ public class Event {
    */
   public void merge(Event temp, Cloner cloner) {
     clientId = temp.clientId;
-    // streamClientId = temp.streamClientId;
     weakConnection = temp.weakConnection;
     id = temp.id;
     streamId = temp.streamId;
@@ -341,10 +323,6 @@ public class Event {
     return clientId;
   }
 
-  // public String getStreamClientId() {
-  // return streamClientId;
-  // }
-
   public String getId() {
     return id;
   }
@@ -416,10 +394,6 @@ public class Event {
   public void setClientId(String pClientId) {
     clientId = pClientId;
   }
-
-  // public void setStreamClientId(String pStreamClientd) {
-  // streamClientId = pStreamClientd;
-  // }
 
   public void setId(String pid) {
     this.id = pid;
