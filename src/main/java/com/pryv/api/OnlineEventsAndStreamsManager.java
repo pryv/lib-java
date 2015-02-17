@@ -310,6 +310,23 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
     private Event event;
     private Stream stream;
 
+    /**
+     * Constructor for ApiResponseHandler. Depending on wether the requests
+     * concerns Streams or Events, a pStreamsCallback or a pEventsCallback needs
+     * to be provided. pEvent or pStream is used when updating or creating an
+     * item to retrieve the clientId on the server response.
+     *
+     * @param type
+     *          the request type
+     * @param pEventsCallback
+     *          optional
+     * @param pStreamsCallback
+     *          optional
+     * @param pEvent
+     *          optional
+     * @param pStream
+     *          optional
+     */
     public ApiResponseHandler(RequestType type, final EventsCallback pEventsCallback,
       final StreamsCallback pStreamsCallback, final Event pEvent, final Stream pStream) {
       event = pEvent;

@@ -62,7 +62,7 @@ public class JsonConverter {
    *
    * @param source
    *          the Object to serialize
-   * @return
+   * @return the Object's parameters in JSON format stored in a String
    * @throws JsonProcessingException
    */
   public static String toJson(Object source) throws JsonProcessingException {
