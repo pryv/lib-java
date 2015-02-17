@@ -35,13 +35,11 @@ public class PollingThread extends Thread {
   public void run() {
 
     try {
-      logger.log("PollingThread: sending poll request on thread: "
-        + Thread.currentThread().getName());
+      logger.log("PollingThread: sending poll request");
       sleep(pollRate);
       Request.Get(pollURL).execute().handleResponse(responseHandler);
 
-      logger.log("PollingThread: polling request sent by thread: "
-        + Thread.currentThread().getName());
+      logger.log("PollingThread: polling request sent");
 
     } catch (ClientProtocolException e) {
       controller.onError(e.getMessage());

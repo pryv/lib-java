@@ -214,9 +214,7 @@ public class Connection implements EventsManager, StreamsManager {
   @Override
   public void getStreams(Filter filter, final StreamsCallback userStreamsCallback) {
     if (Pryv.isSupervisorActive()) {
-      logger.log("Connection: retrieving streams from Supervisor"
-        + " - "
-          + Thread.currentThread().getName());
+      logger.log("Connection: retrieving streams from Supervisor");
       userStreamsCallback.onStreamsRetrievalSuccess(streamsSupervisor.getRootStreams(), null);
     }
     if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {

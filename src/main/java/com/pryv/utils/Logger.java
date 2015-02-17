@@ -32,11 +32,11 @@ public class Logger {
 
   /**
    * writes message in the defined PrintStream (system.out by default)
-   * 
+   *
    * @param message
    */
   public void log(String message) {
-    stream.println(message);
+    stream.println(message + " - Thread:" + Thread.currentThread().getName());
   }
 
   /**

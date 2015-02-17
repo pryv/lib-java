@@ -42,7 +42,7 @@ public class AuthModelImpl implements AuthModel {
   public void startLogin() {
     try {
       String jsonRequest = JsonConverter.toJson(authRequest);
-      logger.log("AuthController: start login request: " + jsonRequest);
+      logger.log("AuthModelImpl: start login request: " + jsonRequest);
       Request.Post(Pryv.REGISTRATION_URL).bodyString(jsonRequest, ContentType.APPLICATION_JSON)
         .execute().handleResponse(signInResponseHandler);
     } catch (JsonProcessingException e) {
@@ -82,8 +82,8 @@ public class AuthModelImpl implements AuthModel {
 
       int statusCode = response.getStatusLine().getStatusCode();
       String reply = EntityUtils.toString(response.getEntity());
-      logger.log("signInResponseHandler: response status code: " + statusCode);
-      logger.log("signInResponseHandler: handling reply entity : " + reply);
+      logger.log("AuthModelImpl: signInResponseHandler: response status code: " + statusCode);
+      logger.log("sAuthModelImpl: ignInResponseHandler: handling reply entity : " + reply);
       if (statusCode == HttpStatus.SC_CREATED || statusCode == HttpStatus.SC_OK) {
 
         JsonNode jsonResponse = JsonConverter.toJsonNode(reply);

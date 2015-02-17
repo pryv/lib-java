@@ -66,13 +66,13 @@ public class AuthControllerImpl implements AuthController {
 
   @Override
   public void onError(String message) {
-    logger.log("AuthController: failure: message=" + message);
+    logger.log("AuthControllerImpl: failure: message=" + message);
     view.onAuthError("AuthController: failure: message=" + message);
   }
 
   @Override
   public void onRefused(int reasonId, String message, String detail) {
-    logger.log("AuthController: refused: reasonId="
+    logger.log("AuthControllerImpl: refused: reasonId="
       + reasonId
         + ", message="
         + message

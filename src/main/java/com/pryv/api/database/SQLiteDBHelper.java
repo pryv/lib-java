@@ -90,7 +90,7 @@ public class SQLiteDBHelper {
       public void run() {
         try {
           String cmd = QueryGenerator.insertOrReplaceEvent(eventToCache);
-          logger.log("SQLiteDBHelper: update or replace event: " + cmd);
+          logger.log("SQLiteDBHelper: update or Create event: " + cmd);
           Statement statement = dbConnection.createStatement();
           statement.execute(cmd);
           statement.close();
@@ -128,7 +128,7 @@ public class SQLiteDBHelper {
             String cmd = QueryGenerator.insertOrReplaceEvent(event);
             logger.log("SQLiteDBHelper: update or create event : " + cmd);
             statement.execute(cmd);
-            logger.log("inserted " + event.getClientId() + " into DB.");
+            logger.log("SQLiteDBHelper: inserted " + event.getClientId() + " into DB.");
             statement.close();
           } catch (SQLException e) {
             cacheEventsCallback.onEventsError(e.getMessage(), null);
@@ -299,7 +299,7 @@ public class SQLiteDBHelper {
     new Thread() {
       @Override
       public void run() {
-        logger.log("update streamS called");
+        logger.log("SQLiteDBHelper: update or create streams");
         for (Stream stream : streamsToCache) {
           try {
             Statement statement = dbConnection.createStatement();

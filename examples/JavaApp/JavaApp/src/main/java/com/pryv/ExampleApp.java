@@ -85,8 +85,6 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     }
 
     // authentication
-    showAuthView();
-
     Permission testPermission = new Permission("*", Permission.Level.manage, "Example App");
     List<Permission> permissions = new ArrayList<Permission>();
     permissions.add(testPermission);
@@ -104,13 +102,14 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   /*
    * Displays simple view during auth phase.
    */
-  public void showAuthView() {
-
+  public void showAuthView(String url) {
     try {
       FXMLLoader loader =
         new FXMLLoader(ExampleApp.class.getResource("view/AuthenticationView.fxml"));
       BorderPane overviewPage = (BorderPane) loader.load();
       rootLayout.setCenter(overviewPage);
+      AuthWindowController authController = loader.getController();
+      authController.setUrl(url);
     } catch (IOException e) {
       displayError(e.getMessage());
       e.printStackTrace();
@@ -121,6 +120,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    * load login page in default browser
    */
   public void displayLoginVew(String loginURL) {
+    showAuthView(loginURL);
     new AuthBrowserView().displayLoginVew(loginURL);
   }
 
@@ -128,7 +128,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    * auth success, start main view, load all Streams and 20 random Events
    */
   public void onAuthSuccess(String username, String token) {
-    logger.log("JavaApp: onSignInSuccess");
+    logger.log("ExampleApp: onSignInSuccess");
 
     Platform.runLater(new Runnable() {
       public void run() {
@@ -158,12 +158,12 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    * auth failure
    */
   public void onAuthError(String msg) {
-    logger.log("JavaApp: auth error");
+    logger.log("ExampleApp: auth error");
     displayError("auth error: " + msg);
   }
 
   public void onAuthRefused(int reasonId, String msg, String detail) {
-    logger.log("JavaApp: auth refused");
+    logger.log("ExampleApp: auth refused");
     displayError("auth refused: " + msg);
   }
 
@@ -398,7 +398,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    */
 
   public void onEventsRetrievalSuccess(final Map<String, Event> newEvents, Double serverTime) {
-    logger.log("JavaApp: retrieved " + newEvents.size() + " events.");
+    logger.log("ExampleApp: retrieved " + newEvents.size() + " events.");
     addEventsToList(newEvents);
   }
 

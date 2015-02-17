@@ -83,8 +83,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
    *          weakreference
    */
   public CacheEventsAndStreamsManager(String cacheFolder, String url, String token,
-    DBinitCallback initCallback,
-    StreamsSupervisor pStreams, EventsSupervisor pEventsSupervisor,
+    DBinitCallback initCallback, StreamsSupervisor pStreams, EventsSupervisor pEventsSupervisor,
     WeakReference<Connection> pWeakConnection) {
     weakConnection = pWeakConnection;
     onlineEventsManager = new OnlineEventsAndStreamsManager(url, token, pWeakConnection);
@@ -178,7 +177,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   public void getStreams(Filter filter, final StreamsCallback connectionStreamsCallback) {
     if (Pryv.isCacheActive()) {
       // retrieve Streams from cache
-      logger.log("Cache: retrieving Streams from cache: ");
+      logger.log("CacheEventsAndStreamsManager: retrieving Streams from cache: ");
       dbHelper.getStreams(new CacheStreamsCallback(connectionStreamsCallback));
     }
   }
@@ -247,7 +246,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       // update Events in cache and send result to connection
       serverTime = pServerTime;
       lastOnlineRetrievalServerTime = pServerTime;
-      logger.log("Cache: received online Events with serverTime " + serverTime);
+      logger.log("OnlineManagerEventsCallback: received online Events with serverTime "
+        + serverTime);
 
       for (Event onlineEvent : onlineEvents.values()) {
         // merge with supervisor
@@ -296,7 +296,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
     @Override
     public void onEventsRetrievalSuccess(Map<String, Event> cacheEvents, Double pServerTime) {
-      logger.log("Cache: retrieved events from cache: events amount: " + cacheEvents.size());
+      logger.log("CacheEventsCallback: retrieved events from cache: events amount: "
+        + cacheEvents.size());
       for (Event cacheEvent : cacheEvents.values()) {
         cacheEvent.assignConnection(weakConnection);
       }
@@ -346,8 +347,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     @Override
     public void onStreamsRetrievalSuccess(Map<String, Stream> rootsStreams, Double serverTime) {
       // forward to connection
-      logger
-        .log("Cache: retrieved streams from cache: root streams amount: " + rootsStreams.size());
+      logger.log("CacheStreamsCallback: retrieved streams from cache: root streams amount: "
+        + rootsStreams.size());
       for (Stream cacheStream : rootsStreams.values()) {
         cacheStream.assignConnection(weakConnection);
         streamsSupervisor.updateOrCreateStream(cacheStream, connectionStreamsCallback);

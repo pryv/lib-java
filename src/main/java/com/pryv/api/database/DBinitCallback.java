@@ -21,7 +21,7 @@ public class DBinitCallback {
    *          the error message to display
    */
   public void onError(String message) {
-    logger.log("DB initialization error: " + message);
+    logger.log("DBinitCallback: initialization error: " + message);
   }
 
 }

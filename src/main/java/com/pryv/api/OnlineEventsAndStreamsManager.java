@@ -75,7 +75,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       @Override
       public void run() {
         try {
-          logger.log("Online: getEvents: Get request at: "
+          logger.log("OnlineEventsAndStreamsManager: getEvents: Get request at: "
             + eventsUrl
               + tokenUrlArgument
               + filter.toUrlParameters());
@@ -101,7 +101,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       @Override
       public void run() {
         try {
-          logger.log("Online: createEvent: Post request at: "
+          logger.log("OnlineEventsAndStreamsManager: createEvent: Post request at: "
             + eventsUrl
               + tokenUrlArgument
               + ", body: "
@@ -131,7 +131,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       public void run() {
         try {
           String deleteUrl = eventsUrl + "/" + eventToDelete.getId() + tokenUrlArgument;
-          logger.log("Online: deleteEvent: Delete request at: " + deleteUrl);
+          logger.log("OnlineEventsAndStreamsManager: deleteEvent: Delete request at: " + deleteUrl);
           Request
             .Delete(deleteUrl)
             .execute()
@@ -156,7 +156,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       public void run() {
         try {
           String updateUrl = eventsUrl + "/" + eventToUpdate.getId() + tokenUrlArgument;
-          logger.log("Online: updateEvent: Update request at: " + updateUrl);
+          logger.log("OnlineEventsAndStreamsManager: updateEvent: Update request at: " + updateUrl);
           Request
             .Put(updateUrl)
             .bodyString(JsonConverter.toJson(eventToUpdate), ContentType.APPLICATION_JSON)
@@ -185,11 +185,9 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       @Override
       public void run() {
         try {
-          logger.log("Online: getStreams: Get request at: "
+          logger.log("OnlineEventsAndStreamsManager: getStreams: Get request at: "
             + streamsUrl
-              + tokenUrlArgument
-              + " - "
-              + Thread.currentThread().getName());
+              + tokenUrlArgument);
           Request
             .Get(streamsUrl + tokenUrlArgument)
             .execute()
@@ -214,7 +212,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       @Override
       public void run() {
         try {
-          logger.log("Online: createStream: Post request at: "
+          logger.log("OnlineEventsAndStreamsManager: createStream: Post request at: "
             + streamsUrl
               + tokenUrlArgument
               + ", body: "
@@ -251,7 +249,8 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
                 + tokenUrlArgument
                 + "&mergeEventsWithParent="
                 + mergeEventsWithParent;
-          logger.log("Online: delete Stream: Delete request at: " + deleteUrl);
+          logger.log("OnlineEventsAndStreamsManager: delete Stream: Delete request at: "
+            + deleteUrl);
           // TODO maybe add mergeEventsWithParent as bodyString
           Request
             .Delete(deleteUrl)
@@ -277,7 +276,8 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
       public void run() {
         try {
           String updateUrl = streamsUrl + "/" + streamToUpdate.getId() + tokenUrlArgument;
-          logger.log("Online: update Stream: Update request at: " + updateUrl);
+          logger.log("OnlineEventsAndStreamsManager: update Stream: Update request at: "
+            + updateUrl);
           Request
             .Put(updateUrl)
             .bodyString(JsonConverter.toJson(streamToUpdate), ContentType.APPLICATION_JSON)
@@ -359,7 +359,9 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             for (Event receivedEvent : receivedEvents.values()) {
               receivedEvent.assignConnection(weakConnection);
             }
-            logger.log("Online: received " + receivedEvents.size() + " event(s) from API.");
+            logger.log("ApiResponseHandler: received "
+              + receivedEvents.size()
+                + " event(s) from API.");
             onlineEventsCallback.onEventsRetrievalSuccess(receivedEvents, serverTime);
             break;
 
@@ -367,7 +369,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             Event createdEvent = JsonConverter.retrieveEventFromJson(responseBody);
             createdEvent.assignConnection(weakConnection);
             createdEvent.setClientId(event.getClientId());
-            logger.log("Online: event created successfully: cid="
+            logger.log("ApiResponseHandler: event created successfully: cid="
               + createdEvent.getClientId()
                 + ", id="
                 + createdEvent.getId());
@@ -383,7 +385,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             Event updatedEvent = JsonConverter.retrieveEventFromJson(responseBody);
             updatedEvent.assignConnection(weakConnection);
             updatedEvent.setClientId(event.getClientId());
-            logger.log("Online: event updated successfully: cid="
+            logger.log("ApiResponseHandler: event updated successfully: cid="
               + updatedEvent.getClientId()
                 + ", id="
                 + updatedEvent.getId());
@@ -426,7 +428,8 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             Stream createdStream = JsonConverter.retrieveStreamFromJson(responseBody);
             createdStream.assignConnection(weakConnection);
 
-            logger.log("Online: stream created successfully: id=" + createdStream.getId());
+            logger.log("ApiResponseHandler: stream created successfully: id="
+              + createdStream.getId());
             onlineStreamsCallback.onStreamsSuccess(
               "Online: stream with Id=" + createdStream.getId() + " created on API", createdStream,
               serverTime);
@@ -435,7 +438,8 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
           case UPDATE_STREAM:
             Stream updatedStream = JsonConverter.retrieveStreamFromJson(responseBody);
             updatedStream.assignConnection(weakConnection);
-            logger.log("Online: stream updated successfully: id=" + updatedStream.getId());
+            logger.log("ApiResponseHandler: stream updated successfully: id="
+              + updatedStream.getId());
             onlineStreamsCallback.onStreamsSuccess(
               "Online: stream with Id=" + updatedStream.getId() + " updated on API", updatedStream,
               serverTime);
