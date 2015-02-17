@@ -254,6 +254,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         eventsSupervisor.updateOrCreateEvent(onlineEvent, connectionEventsCallback);
       }
       dbHelper.updateOrCreateEvents(onlineEvents.values(), connectionEventsCallback);
+      connectionEventsCallback.onEventsRetrievalSuccess(onlineEvents, pServerTime);
     }
 
     @Override
@@ -298,8 +299,11 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     public void onEventsRetrievalSuccess(Map<String, Event> cacheEvents, Double pServerTime) {
       logger.log("CacheEventsCallback: retrieved events from cache: events amount: "
         + cacheEvents.size());
+
+      // assign connection, update in supervisor
       for (Event cacheEvent : cacheEvents.values()) {
         cacheEvent.assignConnection(weakConnection);
+        eventsSupervisor.updateOrCreateEvent(cacheEvent, this);
       }
       connectionEventsCallback.onEventsRetrievalSuccess(cacheEvents, pServerTime);
 
@@ -349,11 +353,14 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       // forward to connection
       logger.log("CacheStreamsCallback: retrieved streams from cache: root streams amount: "
         + rootsStreams.size());
+
+      // assign connection, update in supervisor
       for (Stream cacheStream : rootsStreams.values()) {
         cacheStream.assignConnection(weakConnection);
         streamsSupervisor.updateOrCreateStream(cacheStream, connectionStreamsCallback);
       }
-      connectionStreamsCallback.onStreamsRetrievalSuccess(rootsStreams, serverTime);
+      connectionStreamsCallback.onStreamsRetrievalSuccess(streamsSupervisor.getRootStreams(),
+        serverTime);
 
       // make the online request
       if (Pryv.isOnlineActive()) {
@@ -400,6 +407,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     public void onStreamsRetrievalSuccess(Map<String, Stream> onlineStreams, Double serverTime) {
       logger.log("OnlineManagerStreamsCallback: Streams retrieval success");
 
+      // update in supervisor
       for (Stream onlineStream : onlineStreams.values()) {
         streamsSupervisor.updateOrCreateStream(onlineStream, connectionStreamsCallback);
       }

@@ -57,28 +57,27 @@ public class Connection implements EventsManager, StreamsManager {
    * done using the provided username and API domain and Scheme from the Pryv
    * object. Instanciates Supervisor and CacheEventsAndStreamsManager.
    *
-   * @param pUsername
+   * @param pUserId
    *          username used
-   * @param pToken
-   * @param dbInitCallback
+   * @param pAccessToken
+   * @param pDBInitCallback
    */
-  public Connection(String pUsername, String pToken, DBinitCallback dbInitCallback) {
-    userID = pUsername;
-    accessToken = pToken;
+  public Connection(String pUserId, String pAccessToken, DBinitCallback pDBInitCallback) {
+    userID = pUserId;
+    accessToken = pAccessToken;
     url = getApiBaseUrl();
     String cacheFolder = null;
     // generate caching folder
     if (Pryv.isCacheActive()) {
       cacheFolder = "cache/" + getIdCaching();
       new File(cacheFolder).mkdirs();
-      // new File("kk/blob").mkdirs();
     }
     weakConnection = new WeakReference<Connection>(this);
     streamsSupervisor = new StreamsSupervisor();
     eventsSupervisor = new EventsSupervisor(streamsSupervisor);
     streamsSupervisor.setEventsSupervisor(eventsSupervisor);
     cacheEventsManager =
-      new CacheEventsAndStreamsManager(cacheFolder, url, accessToken, dbInitCallback,
+      new CacheEventsAndStreamsManager(cacheFolder, url, accessToken, pDBInitCallback,
         streamsSupervisor,
         eventsSupervisor, weakConnection);
     cacheStreamsManager = (StreamsManager) cacheEventsManager;
@@ -125,15 +124,6 @@ public class Connection implements EventsManager, StreamsManager {
     return streamsSupervisor.getRootStreams();
   }
 
-  // /**
-  // * Returns a reference to the Stream that has the provided client Id.
-  // *
-  // * @param streamClientId
-  // * @return
-  // */
-  // public Stream getStreamByClientId(String streamClientId) {
-  // return streamsSupervisor.getStreamByClientId(streamClientId);
-  // }
   /**
    * Returns a reference to the Stream that has the provided Id.
    *
@@ -150,8 +140,6 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void getEvents(Filter filter, EventsCallback userEventsCallback) {
-    // generate the set of stream Ids, which will be passed to the online module
-    // filter.generateStreamIds(streamsSupervisor.getStreamsClientIdToIdDictionnary());
     if (Pryv.isSupervisorActive()) {
       // make sync request to supervisor
       eventsSupervisor.getEvents(filter, userEventsCallback);
@@ -180,7 +168,6 @@ public class Connection implements EventsManager, StreamsManager {
 
   @Override
   public void deleteEvent(Event eventToDelete, EventsCallback userEventsCallback) {
-    // eventToDelete.setTrashed(true);
 
     if (Pryv.isSupervisorActive()) {
       // delete Event in Supervisor
@@ -244,7 +231,6 @@ public class Connection implements EventsManager, StreamsManager {
   @Override
   public void deleteStream(Stream streamToDelete, boolean mergeEventsWithParent,
     StreamsCallback userStreamsCallback) {
-    // streamToDelete.setTrashed(true);
     // // TODO check what to do with children
     // for (Stream childStream : streamToDelete.getChildren()) {
     // childStream.setTrashed(true);
@@ -275,7 +261,6 @@ public class Connection implements EventsManager, StreamsManager {
   }
 
   /**
-   *
    *
    * @param time
    * @return
@@ -313,13 +298,10 @@ public class Connection implements EventsManager, StreamsManager {
     }
 
     @Override
-    public void onEventsRetrievalSuccess(Map<String, Event> cacheEvents, Double pServerTime) {
+    public void onEventsRetrievalSuccess(Map<String, Event> cacheManagerEvents, Double pServerTime) {
       computeDelta(pServerTime);
-      // update existing Events with those retrieved from the cache
-      for (Event cacheEvent : cacheEvents.values()) {
-        eventsSupervisor.updateOrCreateEvent(cacheEvent, userEventsCallback);
-      }
-      // return merged events from Supervisor
+      // return merged events from Supervisor - cacheEvents aren't used because
+      // they don't contain the merged events
       eventsSupervisor.getEvents(filter, userEventsCallback);
     }
 
@@ -388,11 +370,8 @@ public class Connection implements EventsManager, StreamsManager {
       computeDelta(pServerTime);
 
       if (cacheManagerStreams != null) {
-        // for (Stream stream : cacheManagerStreams.values()) {
-        // streamsSupervisor.updateOrCreateStream(stream, userStreamsCallback);
-        // }
         // forward updated Streams
-        userStreamsCallback.onStreamsRetrievalSuccess(getRootStreams(), serverTime);
+        userStreamsCallback.onStreamsRetrievalSuccess(cacheManagerStreams, serverTime);
       }
     }
 
