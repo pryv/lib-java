@@ -319,7 +319,8 @@ public class JsonConverter {
   public static Set<Attachment> deserializeAttachments(String jsonAttachments)
     throws JsonParseException, JsonMappingException, IOException {
     if (jsonAttachments != null) {
-      return jsonMapper.readValue(jsonAttachments, new TypeReference<Set<Attachment>>() {
+      return jsonMapper.readValue(jsonAttachments.replace("\\\'", "\'"),
+        new TypeReference<Set<Attachment>>() {
       });
     } else {
       return null;
