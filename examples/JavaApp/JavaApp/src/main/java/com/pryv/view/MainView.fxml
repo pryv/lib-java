@@ -27,7 +27,6 @@
                     </columnConstraints>
                     <rowConstraints>
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -39,25 +38,23 @@
                     </rowConstraints>
                      <children>
                         <Label text="id" />
-                        <Label text="name" GridPane.rowIndex="2" />
-                        <Label text="parentId" GridPane.rowIndex="3" />
-                        <Label text="children" GridPane.rowIndex="5" />
-                        <Label text="singleActivity" GridPane.rowIndex="6" />
-                        <Label text="client Data" GridPane.rowIndex="7" />
-                        <Label text="created" GridPane.rowIndex="8" />
-                        <Label text="created By" GridPane.rowIndex="9" />
-                        <Label fx:id="createdByLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="9" />
-                        <Label fx:id="createdLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                        <Label fx:id="clientDataLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                        <Label fx:id="singleActivityLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                        <Label fx:id="childrenLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                        <Label fx:id="parentIdLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                        <Label fx:id="nameLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Label text="name" GridPane.rowIndex="1" />
+                        <Label text="parentId" GridPane.rowIndex="2" />
+                        <Label text="children" GridPane.rowIndex="4" />
+                        <Label text="singleActivity" GridPane.rowIndex="5" />
+                        <Label text="client Data" GridPane.rowIndex="6" />
+                        <Label text="created" GridPane.rowIndex="7" />
+                        <Label text="created By" GridPane.rowIndex="8" />
+                        <Label fx:id="createdByLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                        <Label fx:id="createdLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                        <Label fx:id="clientDataLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <Label fx:id="singleActivityLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <Label fx:id="childrenLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <Label fx:id="parentIdLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Label fx:id="nameLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <Label fx:id="idLabel" text="empty" GridPane.columnIndex="1" />
-                        <Label text="clientId" GridPane.rowIndex="1" />
-                        <Label fx:id="clientIdLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Label prefHeight="16.0" prefWidth="107.0" text="parentClientID" GridPane.rowIndex="4" />
-                        <Label fx:id="parentClientIdLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <Label prefHeight="16.0" prefWidth="107.0" text="parentClientID" GridPane.rowIndex="3" />
+                        <Label fx:id="parentClientIdLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                      </children>
                   </GridPane>
                   <Label layoutX="56.0" layoutY="607.0" prefHeight="13.0" prefWidth="64.0" text="Details:" AnchorPane.leftAnchor="56.0" AnchorPane.topAnchor="607.0" />
@@ -86,7 +83,6 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -95,43 +91,41 @@
                     </rowConstraints>
                      <children>
                         <Label text="id" />
-                        <Label text="time" GridPane.rowIndex="4" />
-                        <Label text="type" GridPane.rowIndex="5" />
-                        <Label text="created" GridPane.rowIndex="6" />
-                        <Label text="createdBy" GridPane.rowIndex="7" />
-                        <Label text="modified" GridPane.rowIndex="8" />
-                        <Label text="modifiedBy" GridPane.rowIndex="9" />
-                        <Label text="duration" GridPane.rowIndex="10" />
-                        <Label text="content" GridPane.rowIndex="11" />
-                        <Label text="tags" GridPane.rowIndex="12" />
-                        <Label text="references" GridPane.rowIndex="13" />
-                        <Label text="description" GridPane.rowIndex="14" />
-                        <Label text="clientData" GridPane.rowIndex="16" />
-                        <Label text="trashed" GridPane.rowIndex="17" />
-                        <Label text="attachments" GridPane.rowIndex="15" />
-                        <Label fx:id="eModifiedLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                        <Label fx:id="eCreatedByLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                        <Label fx:id="eCreatedLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                        <Label fx:id="eTypeLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                        <Label fx:id="eTimeLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <Label text="time" GridPane.rowIndex="3" />
+                        <Label text="type" GridPane.rowIndex="4" />
+                        <Label text="created" GridPane.rowIndex="5" />
+                        <Label text="createdBy" GridPane.rowIndex="6" />
+                        <Label text="modified" GridPane.rowIndex="7" />
+                        <Label text="modifiedBy" GridPane.rowIndex="8" />
+                        <Label text="duration" GridPane.rowIndex="9" />
+                        <Label text="content" GridPane.rowIndex="10" />
+                        <Label text="tags" GridPane.rowIndex="11" />
+                        <Label text="references" GridPane.rowIndex="12" />
+                        <Label text="description" GridPane.rowIndex="13" />
+                        <Label text="clientData" GridPane.rowIndex="15" />
+                        <Label text="trashed" GridPane.rowIndex="16" />
+                        <Label text="attachments" GridPane.rowIndex="14" />
+                        <Label fx:id="eModifiedLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                        <Label fx:id="eCreatedByLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <Label fx:id="eCreatedLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <Label fx:id="eTypeLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <Label fx:id="eTimeLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                         <Label fx:id="eStreamIdLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         <Label text="streamId" GridPane.rowIndex="2" />
                         <Label fx:id="eIdLabel" text="empty" GridPane.columnIndex="1" />
-                        <Label fx:id="eTrashedLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="17" />
-                        <Label fx:id="eModifiedByLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="9" />
-                        <Label fx:id="eDurationLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="10" />
-                        <Label text="tempRefId" GridPane.rowIndex="18" />
-                        <Label fx:id="eContentLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="11" />
-                        <Label fx:id="eTagsLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="12" />
-                        <Label fx:id="eReferencesLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="13" />
-                        <Label fx:id="eDescriptionLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="14" />
-                        <Label fx:id="eAttachmentsLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="15" />
-                        <Label fx:id="eClientDataLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="16" />
-                        <Label fx:id="eTempRefIdLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="18" />
+                        <Label fx:id="eTrashedLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="16" />
+                        <Label fx:id="eModifiedByLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                        <Label fx:id="eDurationLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                        <Label text="tempRefId" GridPane.rowIndex="17" />
+                        <Label fx:id="eContentLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+                        <Label fx:id="eTagsLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                        <Label fx:id="eReferencesLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+                        <Label fx:id="eDescriptionLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+                        <Label fx:id="eAttachmentsLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="14" />
+                        <Label fx:id="eClientDataLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="15" />
+                        <Label fx:id="eTempRefIdLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="17" />
                         <Label text="clientId" GridPane.rowIndex="1" />
-                        <Label text="streamClientId" GridPane.rowIndex="3" />
                         <Label fx:id="eClientIdLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Label fx:id="eStreamClientIdLabel" text="empty" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                      </children>
                   </GridPane>
                   <HBox layoutX="294.0" layoutY="16.0" prefHeight="26.0" prefWidth="166.0" spacing="10.0">
