@@ -69,7 +69,7 @@ public class Connection implements EventsManager, StreamsManager {
     String cacheFolder = null;
     // generate caching folder
     if (Pryv.isCacheActive()) {
-      cacheFolder = "cache/" + getIdCaching();
+      cacheFolder = "cache/" + getIdCaching() + "/";
       new File(cacheFolder).mkdirs();
     }
     weakConnection = new WeakReference<Connection>(this);
