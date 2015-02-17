@@ -67,7 +67,7 @@ public class SQLiteDBHelperTest {
     instanciateEventsCallback();
     instanciateStreamsCallback();
 
-    String cacheFolder = "cache/test";
+    String cacheFolder = "cache/test/";
     new File(cacheFolder).mkdirs();
     db = new SQLiteDBHelper(cacheFolder, new DBinitCallback() {
 
@@ -81,7 +81,7 @@ public class SQLiteDBHelperTest {
   // executed after all tests once
   @AfterClass
   public static void cleanUpTestDB() {
-    System.out.println("SQLite Test: clean up phase:");
+    System.out.println("SQLiteDBHelperTest: clean up phase:");
     testEvent = null;
     db.getEvents(null, eventsCallback);
     Awaitility.await().until(hasRetrievedEventSuccessfully());
