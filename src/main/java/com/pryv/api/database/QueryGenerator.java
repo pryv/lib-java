@@ -510,7 +510,7 @@ public class QueryGenerator {
    */
   private static String formatTextValue(Object obj) {
     if (obj != null && !obj.equals("null")) {
-      return "\'" + obj + "\'";
+      return "\'" + ((String) obj).replace("\"", "\\\"") + "\'";
     } else {
       return "NULL";
     }
