@@ -30,7 +30,6 @@ After running `mvn package`, include the `lib-java-0.1.0-jar-with-dependencies.j
 
 ```
 // connect to the API
-
 Permission testPermission = new Permission("*", Permission.Level.manage, null);
 List<Permission> permissions = new ArrayList<Permission>();
     
@@ -68,7 +67,7 @@ This App connects to the "pryv-lib-java-example" application, requiring permissi
 
 to run it:
 
-- `cd examples/JavaApp/JavaApp/` 
+- `cd examples/JavaApp/` 
 
 - `mvn package` to generate the executable JAR.
 
