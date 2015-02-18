@@ -95,7 +95,7 @@ public class EventsSupervisor {
    *          the callback to notify success or failure
    */
   public void updateOrCreateEvent(Event event, EventsCallback connectionCallback) {
-    System.out.println("EventsSupervisor: updateOrCreateEvent with id="
+    logger.log("EventsSupervisor: updateOrCreateEvent with id="
       + event.getId()
         + ", cid="
         + event.getClientId()
@@ -200,8 +200,8 @@ public class EventsSupervisor {
         + ", id="
         + eventToDelete.getId());
     Event tmpEvent = events.get(eventToDelete.getClientId());
-    System.out.println("EventsSupervisor: event to delete ref in supervisor: " + tmpEvent);
-    System.out.println("ev to Del fields: trashed=" + tmpEvent.isTrashed());
+    logger.log("EventsSupervisor: event to delete ref in supervisor: " + tmpEvent);
+    logger.log("ev to Del fields: trashed=" + tmpEvent.isTrashed());
     if (events.get(eventToDelete.getClientId()) != null) {
       if (events.get(eventToDelete.getClientId()).isTrashed() == true) {
         // delete really
@@ -209,8 +209,7 @@ public class EventsSupervisor {
         eventIdToClientId.remove(eventToDelete.getId());
         connectionCallback.onEventsSuccess(
           "EventsSupervisor: Event with cid=" + eventToDelete.getClientId() + " deleted.", null,
-          null,
-          null);
+          null, null);
       } else {
         // update "trashed" field
         eventToDelete.setTrashed(true);
@@ -220,9 +219,8 @@ public class EventsSupervisor {
           null, null);
       }
     } else {
-      connectionCallback.onEventsError("EventsSupervisor: Event with cid="
-        + eventToDelete.getClientId()
- + " not found.", null);
+      connectionCallback.onEventsError(
+        "EventsSupervisor: Event with cid=" + eventToDelete.getClientId() + " not found.", null);
     }
   }
 

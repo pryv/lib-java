@@ -47,4 +47,16 @@ public class Logger {
   public synchronized void setOutputStream(OutputStream outputStream) {
     stream = new PrintStream(outputStream);
   }
+
+  /**
+   * turn off logging
+   */
+  public void turnOff() {
+    stream = new PrintStream(new OutputStream() {
+      @Override
+      public void write(int b) {
+        // do nothing
+      }
+    });
+  }
 }
