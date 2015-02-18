@@ -14,17 +14,17 @@ import com.pryv.api.model.Event;
 public interface EventsCallback {
 
   /**
-   * callback method for successful events retrieval retrieval
+   * callback method for successful events retrieval
    *
    * @param events
-   *          the events retrieved
+   *          the retrieved events
    * @param serverTime
    *          the time of the server in seconds
    */
   void onEventsRetrievalSuccess(Map<String, Event> events, Double serverTime);
 
   /**
-   * callback method called when an error occured during Event fetching.
+   * callback method called when an error occured during Events retrieval.
    *
    * @param errorMessage
    *          the error message
@@ -40,7 +40,8 @@ public interface EventsCallback {
    * @param successMessage
    *          the success message
    * @param event
-   *          updated Event, returned after an update is executed on the event.
+   *          updated or created Event, returned after an update/creation is
+   *          executed on the event.
    * @param stoppedId
    *          Only in singleActivity streams. If set, indicates the id of the
    *          previously running period event that was stopped as a consequence

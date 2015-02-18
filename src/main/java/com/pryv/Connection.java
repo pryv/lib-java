@@ -22,7 +22,7 @@ import com.pryv.utils.Logger;
 
 /**
  *
- * Pryv API connection
+ * Pryv API connection - Object used to manipulate Events and Streams data.
  *
  * @author ik
  *

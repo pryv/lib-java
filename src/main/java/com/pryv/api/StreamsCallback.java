@@ -14,14 +14,14 @@ import com.pryv.api.model.Stream;
 public interface StreamsCallback {
 
   /**
-   * callback method for successful online retrieval
+   * callback method for successful streams retrieval
    *
-   * @param onlineStreams
-   *          the Streams retrieved from the online message
+   * @param streams
+   *          the retrieved streams
    * @param serverTime
    *          the server time retrieved from the online message, in seconds
    */
-  void onStreamsRetrievalSuccess(Map<String, Stream> onlineStreams, Double serverTime);
+  void onStreamsRetrievalSuccess(Map<String, Stream> streams, Double serverTime);
 
   /**
    * callback method called when an error occured during Streams fetching.
@@ -52,6 +52,7 @@ public interface StreamsCallback {
    * updateStream() or deleteStream() execution.
    *
    * @param errorMessage
+   *          the error message
    * @param serverTime
    *          the server time retrieved from the online message, in seconds
    */

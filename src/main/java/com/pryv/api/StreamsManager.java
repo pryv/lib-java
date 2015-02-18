@@ -3,7 +3,8 @@ package com.pryv.api;
 import com.pryv.api.model.Stream;
 
 /**
- * interface used by Connection, Online and Cache to fetch Streams
+ * interface used by Connection, OnlineEventsAndStreamManager and
+ * CacheEventsAndStreamManager to manipulate Streams
  *
  * @author ik
  *
@@ -50,7 +51,7 @@ public interface StreamsManager {
    * Update Stream
    *
    * @param streamToUpdate
-   *          the Stream object containing the new fields
+   *          the Stream object containing the updated fields
    * @param streamsCallback
    *          the callback for streams update, notifies success or failure.
    */

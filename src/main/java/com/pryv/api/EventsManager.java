@@ -4,7 +4,8 @@ import com.pryv.api.model.Event;
 
 /**
  *
- * interface used by Connection, Online and Cache to fetch Events
+ * interface used by Connection, OnlineEventsAndStreamsManager and
+ * CacheEventsAndStreamsManager to manipulate Events
  *
  * @author ik
  *
@@ -47,7 +48,7 @@ public interface EventsManager {
    * Update Event.
    *
    * @param eventToUpdate
-   *          Event object containing the new fields.
+   *          Event object containing the updated fields.
    *
    * @param eventsCallback
    *          the callback for events update, notifies success or failure
