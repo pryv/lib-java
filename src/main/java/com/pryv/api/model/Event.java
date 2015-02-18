@@ -24,7 +24,6 @@ import com.pryv.api.database.QueryGenerator;
 import com.pryv.utils.JsonConverter;
 import com.rits.cloning.Cloner;
 
-
 /**
  * Event data structure from Pryv
  *
@@ -99,11 +98,10 @@ public class Event {
    * @param pTempRefId
    *          optional
    */
-  public Event(String pClientId, String pId, String pStreamId,
-    Double pTime, Double pDuration, String pType, String pContent, Set<String> pTags,
-    Set<String> pReferences, String pDescription, Set<Attachment> pAttachments,
-    Map<String, Object> pClientData, Boolean pTrashed, Double pCreated, String pCreatedBy,
-    Double pModified, String pModifiedBy, String pTempRefId) {
+  public Event(String pClientId, String pId, String pStreamId, Double pTime, Double pDuration,
+    String pType, String pContent, Set<String> pTags, Set<String> pReferences, String pDescription,
+    Set<Attachment> pAttachments, Map<String, Object> pClientData, Boolean pTrashed,
+    Double pCreated, String pCreatedBy, Double pModified, String pModifiedBy, String pTempRefId) {
     clientId = pClientId;
     id = pId;
     streamId = pStreamId;
@@ -317,6 +315,11 @@ public class Event {
       }
       clientData.put(cdPairs[0], cdPairs[1]);
     }
+  }
+
+  @Override
+  public String toString() {
+    return "Event: id=" + id + ", streamId=" + streamId;
   }
 
   public String getClientId() {

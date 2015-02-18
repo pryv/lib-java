@@ -115,7 +115,10 @@ public class BasicExample implements AuthView, EventsCallback, StreamsCallback {
 
   @Override
   public void onEventsRetrievalSuccess(Map<String, Event> events, Double serverTime) {
-    System.out.println("Events retrieved");
+    System.out.println("Events retrieved:");
+    for (Event event : events.values()) {
+      System.out.println(event);
+    }
     this.events = events;
   }
 
@@ -137,7 +140,10 @@ public class BasicExample implements AuthView, EventsCallback, StreamsCallback {
 
   @Override
   public void onStreamsRetrievalSuccess(Map<String, Stream> streams, Double serverTime) {
-    System.out.println("Streams retrieved");
+    System.out.println("Streams retrieved:");
+    for (Stream stream : streams.values()) {
+      System.out.println(stream);
+    }
     this.streams = streams;
   }
 
