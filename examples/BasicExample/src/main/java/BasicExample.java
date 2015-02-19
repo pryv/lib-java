@@ -1,5 +1,3 @@
-
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,9 +36,6 @@ public class BasicExample implements AuthView, EventsCallback, StreamsCallback {
 
   public static void main(String[] args) {
 
-    System.out
-      .println("Use your own staging account credentials or user \'perkikiki\' and password \'poilonez\'");
-
     // turn off logging
     Logger logger = Logger.getInstance();
     logger.turnOff();
@@ -77,6 +72,7 @@ public class BasicExample implements AuthView, EventsCallback, StreamsCallback {
 
   @Override
   public void displayLoginVew(String loginURL) {
+    printExampleMessage(loginURL);
     new AuthBrowserView().displayLoginVew(loginURL);
   }
 
@@ -96,11 +92,18 @@ public class BasicExample implements AuthView, EventsCallback, StreamsCallback {
     eventsManager = connection;
     streamsManager = connection;
 
+    // Retrieve data
+    // the retrieval produces 3 callback executions: a synchronous callback from
+    // the Supervisors (volatile memory), an asynchronous callback from the
+    // cache database and an asynchronous callback from the online API.
+
     // Retrieve the Streams structure
-    streamsManager.getStreams(new Filter(), this);
+    streamsManager.getStreams(null, this);
 
     // Retrieve 20 Events
-    eventsManager.getEvents(new Filter(), this);
+    Filter eventsFilter = new Filter();
+    eventsFilter.setLimit(20);
+    eventsManager.getEvents(eventsFilter, this);
   }
 
   @Override
@@ -115,7 +118,7 @@ public class BasicExample implements AuthView, EventsCallback, StreamsCallback {
 
   @Override
   public void onEventsRetrievalSuccess(Map<String, Event> events, Double serverTime) {
-    System.out.println("Events retrieved:");
+    System.out.println(events.size() + " Event(s) retrieved:");
     for (Event event : events.values()) {
       System.out.println(event);
     }
@@ -140,7 +143,7 @@ public class BasicExample implements AuthView, EventsCallback, StreamsCallback {
 
   @Override
   public void onStreamsRetrievalSuccess(Map<String, Stream> streams, Double serverTime) {
-    System.out.println("Streams retrieved:");
+    System.out.println(streams.size() + " Stream(s) retrieved:");
     for (Stream stream : streams.values()) {
       System.out.println(stream);
     }
@@ -160,6 +163,21 @@ public class BasicExample implements AuthView, EventsCallback, StreamsCallback {
   @Override
   public void onStreamError(String errorMessage, Double serverTime) {
     // unused in this example
+  }
+
+  /**
+   * print informative message
+   *
+   * @param loginUrl
+   */
+  private static void printExampleMessage(String loginUrl) {
+    System.out.println("#########################################################");
+    System.out.println("##                  Basic Example started              ##");
+    System.out.println("#########################################################\n");
+    System.out.println("Sign in the open web page or copy this link in your browser:\n");
+    System.out.println(loginUrl + "\n");
+    System.out
+      .println("Use your own staging account credentials or user \'perkikiki\' and password \'poilonez\'");
   }
 
 }
