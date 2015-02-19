@@ -177,7 +177,7 @@ public class BasicExample implements AuthView, EventsCallback, StreamsCallback {
     System.out.println("Sign in the open web page or copy this link in your browser:\n");
     System.out.println(loginUrl + "\n");
     System.out
-      .println("Use your own staging account credentials or user \'perkikiki\' and password \'poilonez\'");
+      .println("Use your own staging account credentials or user \'perkikiki\' and password \'poilonez\'\n");
   }
 
 }
