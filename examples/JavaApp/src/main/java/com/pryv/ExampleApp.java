@@ -39,7 +39,10 @@ import com.pryv.utils.Logger;
 
 /**
  * Example JavaFX application to demonstrate the way to use the Pryv Java
- * library.
+ * library. This App connects to the "pryv-lib-java-example" application,
+ * requiring permissions to access all streams with "manage" level. After a
+ * successful login, the app allows to manipulate Streams and Events with the
+ * help of a GUI.
  *
  * @author ik
  *
