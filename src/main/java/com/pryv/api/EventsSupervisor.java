@@ -105,27 +105,23 @@ public class EventsSupervisor {
     Event oldEvent = null;
     String cid = getClientId(event.getId());
 
-    // 1st case: event fresh from API
-    // 2nd case: event fresh from user
-    // 3rd case: existing event loaded from API
-    if ((getClientId(event.getId()) == null && event.getClientId() == null)
+    if ((cid == null && event.getClientId() == null)
       || (event.getId() == null && event.getClientId() == null)) {
+      // new event from API or new event from user
       event.generateClientId();
-    } else if (event.getClientId() == null && getClientId(event.getId()) != null) {
-      // set clientId
-      oldEvent = getEventByClientId(cid);
+    } else if (event.getClientId() == null && cid != null) {
+      // existing event loaded from API
       event.setClientId(cid);
     }
-    // stream should already be inserted - used only when fresh from API
-    // String streamId =
-    // streamsSupervisor.getStreamsIdToClientIdDictionnary().get(event.getStreamId());
-    //
-    // if (streamId != null) {
-    // event.setStreamClientId(streamId);
-    // }
+    // if event is fresh from DB but not synchronized with API, cid = null, but
+    // event.getClientId() != null
+
+    if (cid != null) {
+      oldEvent = getEventByClientId(cid);
+    }
 
     if (oldEvent != null) {
-      updateEvent(oldEvent, event);
+      updateEvent(oldEvent, event, connectionCallback);
     } else {
       addEvent(event, connectionCallback);
     }
@@ -161,7 +157,7 @@ public class EventsSupervisor {
    * @param eventToUpdate
    *          the event that may replace the one in place if newer.
    */
-  private void updateEvent(Event oldEvent, Event eventToUpdate) {
+  private void updateEvent(Event oldEvent, Event eventToUpdate, EventsCallback connectionCallback) {
     logger.log("EventsSupervisor: update oldEvent (id="
       + oldEvent.getId()
         + ", cid="
@@ -175,6 +171,7 @@ public class EventsSupervisor {
         + ", streamId="
         + eventToUpdate.getStreamId()
         + ")");
+    System.out.println("Supervisor: merging " + eventToUpdate + " into " + oldEvent);
     oldEvent.merge(eventToUpdate, JsonConverter.getCloner());
     logger.log("EventsSupervisor: updated Event (id="
       + oldEvent.getId()
@@ -183,6 +180,10 @@ public class EventsSupervisor {
         + ", streamId="
         + oldEvent.getStreamId()
         + ")");
+    if (connectionCallback != null) {
+      connectionCallback.onEventsSuccess("EventsSupervisor: Event updated", eventToUpdate, null,
+        null);
+    }
   }
 
   /**
@@ -199,9 +200,8 @@ public class EventsSupervisor {
       + eventToDelete.getClientId()
         + ", id="
         + eventToDelete.getId());
-    Event tmpEvent = events.get(eventToDelete.getClientId());
-    logger.log("EventsSupervisor: event to delete ref in supervisor: " + tmpEvent);
-    logger.log("ev to Del fields: trashed=" + tmpEvent.isTrashed());
+    Event oldEvent = events.get(eventToDelete.getClientId());
+
     if (events.get(eventToDelete.getClientId()) != null) {
       if (events.get(eventToDelete.getClientId()).isTrashed() == true) {
         // delete really
@@ -213,10 +213,7 @@ public class EventsSupervisor {
       } else {
         // update "trashed" field
         eventToDelete.setTrashed(true);
-        updateEvent(null, eventToDelete);
-        connectionCallback.onEventsSuccess(
-          "EventsSupervisor: Event with cid=" + eventToDelete.getClientId() + " trashed.", null,
-          null, null);
+        updateEvent(oldEvent, eventToDelete, connectionCallback);
       }
     } else {
       connectionCallback.onEventsError(
@@ -243,6 +240,16 @@ public class EventsSupervisor {
    */
   public String getClientId(String id) {
     return eventIdToClientId.get(id);
+  }
+
+  /**
+   * Returns the Event with id eventId or null if no such event exists.
+   *
+   * @param eventId
+   * @return
+   */
+  public Event getEventById(String eventId) {
+    return events.get(getClientId(eventId));
   }
 
 }
