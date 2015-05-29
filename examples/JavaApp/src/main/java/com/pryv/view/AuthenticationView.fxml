@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pryv.AuthWindowController">
    <center>
-      <Label fx:id="authLabel" text="Authenticate in Browser" BorderPane.alignment="CENTER" />
+      <TextArea fx:id="authLabel" prefHeight="200.0" prefWidth="200.0" text="Authenticate in Browser" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>
