@@ -3,6 +3,7 @@ package com.pryv.api;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.pryv.api.model.Event;
 import com.pryv.utils.JsonConverter;
@@ -37,8 +38,8 @@ public class EventsSupervisor {
    */
   public EventsSupervisor(StreamsSupervisor pStreamsSupervisor) {
     streamsSupervisor = pStreamsSupervisor;
-    events = new HashMap<String, Event>();
-    eventIdToClientId = new HashMap<String, String>();
+    events = new ConcurrentHashMap<String, Event>();
+    eventIdToClientId = new ConcurrentHashMap<String, String>();
   }
 
   /*

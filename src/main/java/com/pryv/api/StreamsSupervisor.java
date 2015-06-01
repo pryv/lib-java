@@ -1,9 +1,9 @@
 package com.pryv.api;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
@@ -40,8 +40,8 @@ public class StreamsSupervisor {
    *
    */
   public StreamsSupervisor() {
-    rootStreams = new HashMap<String, Stream>();
-    flatStreams = new HashMap<String, Stream>();
+    rootStreams = new ConcurrentHashMap<String, Stream>();
+    flatStreams = new ConcurrentHashMap<String, Stream>();
     instanciateDeleteEventsCallback();
   }
 
