@@ -175,7 +175,7 @@ public class Event {
   }
 
   /**
-   * Assign unique identifier to the Stream - to execute ONCE upon creation
+   * Assign unique identifier to the Event - to execute ONCE upon creation
    */
   public void generateClientId() {
     clientId = UUID.randomUUID().toString();

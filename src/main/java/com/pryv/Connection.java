@@ -78,8 +78,7 @@ public class Connection implements EventsManager, StreamsManager {
     streamsSupervisor.setEventsSupervisor(eventsSupervisor);
     cacheEventsManager =
       new CacheEventsAndStreamsManager(cacheFolder, url, accessToken, pDBInitCallback,
-        streamsSupervisor,
-        eventsSupervisor, weakConnection);
+        streamsSupervisor, eventsSupervisor, weakConnection);
     cacheStreamsManager = (StreamsManager) cacheEventsManager;
   }
 
@@ -214,8 +213,11 @@ public class Connection implements EventsManager, StreamsManager {
   public void createStream(Stream newStream, StreamsCallback userStreamsCallback) {
     newStream.assignConnection(weakConnection);
 
-    newStream.generateId();
-    logger.log("Connection: Generating new id for stream: " + newStream.getId());
+    // generate an id if it wasn't set during creation
+    if (newStream.getId() == null) {
+      newStream.generateId();
+      logger.log("Connection: Generated new id for stream: " + newStream.getId());
+    }
 
     if (Pryv.isSupervisorActive()) {
       // create Stream in Supervisor
@@ -261,8 +263,10 @@ public class Connection implements EventsManager, StreamsManager {
   }
 
   /**
+   * Returns a DateTime object representing the time in the system reference.
    *
    * @param time
+   *          the time in the server reference
    * @return
    */
   public DateTime serverTimeInSystemDate(double time) {
@@ -410,6 +414,5 @@ public class Connection implements EventsManager, StreamsManager {
   public String getApiScheme() {
     return apiScheme;
   }
-
 
 }
