@@ -58,7 +58,6 @@ public class QueryGenerator {
   public static final String STREAMS_CREATED_BY_KEY = "CREATED_BY";
   public static final String STREAMS_MODIFIED_KEY = "MODIFIED";
   public static final String STREAMS_MODIFIED_BY_KEY = "MODIFIED_BY";
-  public static final String STREAMS_CHILDREN_KEY = "CHILDREN";
 
   /**
    * Create query to insert or replace Event.
@@ -290,8 +289,6 @@ public class QueryGenerator {
         + ", "
         + STREAMS_NAME_KEY
         + ", "
-        + STREAMS_CHILDREN_KEY
-        + ", "
         + STREAMS_PARENT_ID_KEY
         + ", "
         + STREAMS_SINGLE_ACTIVITY_KEY
@@ -311,11 +308,6 @@ public class QueryGenerator {
         + " VALUES (");
     sb.append(formatTextValue(streamToCache.getId()) + ",");
     sb.append(formatTextValue(streamToCache.getName()) + ",");
-    if (streamToCache.getChildrenMap() != null) {
-      sb.append(formatSetValue(streamToCache.getChildrenMap().keySet()) + ",");
-    } else {
-      sb.append("NULL,");
-    }
     sb.append(formatTextValue(streamToCache.getParentId()) + ",");
     sb.append(formatBooleanValue(streamToCache.getSingleActivity()) + ",");
     sb.append(formatTextValue(streamToCache.formatClientDataAsString()) + ",");
@@ -423,8 +415,6 @@ public class QueryGenerator {
         + STREAMS_MODIFIED_KEY
         + " INTEGER, "
         + STREAMS_MODIFIED_BY_KEY
-        + " TEXT, "
-        + STREAMS_CHILDREN_KEY
         + " TEXT, "
         + STREAMS_PARENT_ID_KEY
         + " TEXT REFERENCES "
