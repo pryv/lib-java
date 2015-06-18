@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
@@ -42,7 +43,6 @@ public class StreamTest {
     checkStreamParams(testStream);
   }
 
-
   @Test
   public void testCreateStreamFromMerge() {
     Stream streamToUpdate = new Stream();
@@ -58,12 +58,11 @@ public class StreamTest {
         for (String key2 : streamToUpdate.getClientData().keySet()) {
           assertTrue(key.equals(key2));
           assertTrue(testStream.getClientData().get(key)
-              .equals(streamToUpdate.getClientData().get(key2)));
+            .equals(streamToUpdate.getClientData().get(key2)));
         }
       }
-      for (int i = 0; i < streamToUpdate.getChildren().size(); i++) {
-        assertTrue(streamToUpdate.getChildren().get(i).getId()
-            .equals(testStream.getChildren().get(i).getId()));
+      for (Stream childStream : streamToUpdate.getChildrenMap().values()) {
+        assertTrue(testStream.getChildrenMap().keySet().contains(childStream.getId()));
       }
       assertTrue(streamToUpdate.isTrashed() == testStream.isTrashed());
       assertTrue(streamToUpdate.getCreated().equals(testStream.getCreated()));
@@ -71,13 +70,13 @@ public class StreamTest {
       assertTrue(streamToUpdate.getModified().equals(testStream.getModified()));
       assertTrue(streamToUpdate.getModifiedBy().equals(testStream.getModifiedBy()));
     } catch (JsonParseException e) {
-      // TODO Auto-generated catch block
+      fail("parsing error");
       e.printStackTrace();
     } catch (JsonMappingException e) {
-      // TODO Auto-generated catch block
+      fail("parsing error");
       e.printStackTrace();
     } catch (IOException e) {
-      // TODO Auto-generated catch block
+      fail("parsing error");
       e.printStackTrace();
     }
   }

@@ -417,7 +417,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             break;
 
           case GET_STREAMS:
-            Map<String, Stream> receivedStreams = JsonConverter.createStreamsFromJson(responseBody);
+            Map<String, Stream> receivedStreams = JsonConverter.createStreamsTreeFromJson(responseBody);
             for (Stream receivedStream : receivedStreams.values()) {
               receivedStream.assignConnection(weakConnection);
             }

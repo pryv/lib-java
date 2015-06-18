@@ -1,6 +1,7 @@
 package com.pryv.api.database;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -36,7 +37,11 @@ public class SQLiteDBHelper {
 
   private final String initDBerrorMessage = "Database initialization error: ";
 
+  // the DB Connection
   private Connection dbConnection;
+
+  // weak reference to Pryv's Connection
+  private WeakReference<com.pryv.Connection> weakConnection;
 
   private Logger logger = Logger.getInstance();
 
@@ -49,7 +54,9 @@ public class SQLiteDBHelper {
    * @param initCallback
    *          callback to notify failure
    */
-  public SQLiteDBHelper(String cacheFolder, DBinitCallback initCallback) {
+  public SQLiteDBHelper(String cacheFolder, WeakReference<com.pryv.Connection> weakConnection,
+    DBinitCallback initCallback) {
+    this.weakConnection = weakConnection;
     logger.log("SQLiteDBHelper: init DB in: " + cacheFolder + Pryv.DATABASE_NAME);
     initDB(cacheFolder + Pryv.DATABASE_NAME, initCallback);
   }
@@ -473,7 +480,8 @@ public class SQLiteDBHelper {
   }
 
   /**
-   * Retrieves Streams from the SQLite database
+   * Retrieves Streams tree from the SQLite database (streams unreachable from
+   * the root are not included)
    *
    * @param cacheStreamsCallback
    *          callback to which the streams are returned.
@@ -494,6 +502,7 @@ public class SQLiteDBHelper {
           while (result.next()) {
             // get the requested Streams
             Stream retrievedStream = new Stream(result);
+            retrievedStream.assignConnection(weakConnection);
             allStreams.put(retrievedStream.getId(), retrievedStream);
           }
           logger.log("SQLiteDBHelper: retrieved " + allStreams.size() + " stream(s).");
@@ -514,14 +523,14 @@ public class SQLiteDBHelper {
           for (Stream childStream : allStreams.values()) {
             pid = childStream.getParentId();
             if (pid != null) {
-              if (rootStreams.containsKey(pid)) {
+              if (allStreams.containsKey(pid)) {
                 logger.log("SQLiteDBHelper: adding childStream: id="
                   + childStream.getId()
                     + ", name="
                     + childStream.getName()
                     + " to "
                     + pid);
-                rootStreams.get(pid).addChildStream(childStream);
+                allStreams.get(pid).addChildStream(childStream);
               }
             }
           }

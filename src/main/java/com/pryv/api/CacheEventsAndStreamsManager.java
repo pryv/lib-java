@@ -91,7 +91,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     streamsSupervisor = pStreams;
     eventsSupervisor = pEventsSupervisor;
     if (Pryv.isCacheActive()) {
-      dbHelper = new SQLiteDBHelper(cacheFolder, initCallback);
+      dbHelper = new SQLiteDBHelper(cacheFolder, pWeakConnection, initCallback);
       scope = new HashSet<String>();
     }
   }
@@ -354,11 +354,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       logger.log("CacheStreamsCallback: retrieved streams from cache: root streams amount: "
         + rootsStreams.size());
 
-      // assign connection, update in supervisor
-      for (Stream cacheStream : rootsStreams.values()) {
-        cacheStream.assignConnection(weakConnection);
-        streamsSupervisor.updateOrCreateStream(cacheStream, connectionStreamsCallback);
-      }
+      streamsSupervisor.updateOrCreateStreams(rootsStreams, connectionStreamsCallback);
+
       connectionStreamsCallback.onStreamsRetrievalSuccess(streamsSupervisor.getRootStreams(),
         serverTime);
 
@@ -407,13 +404,14 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     public void onStreamsRetrievalSuccess(Map<String, Stream> onlineStreams, Double serverTime) {
       logger.log("OnlineManagerStreamsCallback: Streams retrieval success");
 
-      // update in supervisor
-      for (Stream onlineStream : onlineStreams.values()) {
-        streamsSupervisor.updateOrCreateStream(onlineStream, connectionStreamsCallback);
-      }
+      streamsSupervisor.updateOrCreateStreams(onlineStreams, connectionStreamsCallback);
+
       connectionStreamsCallback.onStreamsRetrievalSuccess(streamsSupervisor.getRootStreams(),
         serverTime);
-      dbHelper.updateOrCreateStreams(streamsSupervisor.getRootStreams().values(), this);
+
+      if (Pryv.isCacheActive()) {
+        dbHelper.updateOrCreateStreams(streamsSupervisor.getRootStreams().values(), this);
+      }
     }
 
     @Override

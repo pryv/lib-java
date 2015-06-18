@@ -3,10 +3,10 @@ package com.pryv.api.model;
 import java.lang.ref.WeakReference;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -42,10 +42,13 @@ public class Stream {
 
   // optional
   private Boolean trashed;
-  private List<Stream> children;
+  private Set<Stream> children; // should be removed - but need to find a way
+                                 // to serialize map properly
   @JsonIgnore
   private Map<String, Stream> childrenMap;
+
   private String parentId;
+
   private Boolean singleActivity;
   private Map<String, Object> clientData;
 
@@ -68,7 +71,7 @@ public class Stream {
    * @param pModifiedBy
    */
   public Stream(String pId, String pName, String pParentId, Boolean pSingleActivity,
-    Map<String, Object> pClientData, List<Stream> pChildren, Boolean pTrashed, Double pCreated,
+    Map<String, Object> pClientData, Set<Stream> pChildren, Boolean pTrashed, Double pCreated,
     String pCreatedBy, Double pModified, String pModifiedBy) {
     id = pId;
     name = pName;
@@ -152,7 +155,7 @@ public class Stream {
     weakConnection = temp.weakConnection;
     id = temp.id;
     name = temp.name;
-    parentId = temp.parentId;
+    setParentId(temp.parentId);
     singleActivity = temp.singleActivity;
     if (temp.clientData != null) {
       clientData = new HashMap<String, Object>();
@@ -161,11 +164,9 @@ public class Stream {
       }
     }
     if (temp.children != null && withChildren == true) {
-      children = new ArrayList<Stream>();
-      childrenMap = new HashMap<String, Stream>();
+      this.clearChildren();
       for (Stream childStream : temp.children) {
-        children.add(childStream);
-        childrenMap.put(childStream.getId(), childStream);
+        addChildStream(childStream);
       }
     }
     trashed = temp.trashed;
@@ -173,7 +174,6 @@ public class Stream {
     createdBy = temp.createdBy;
     modified = temp.modified;
     modifiedBy = temp.modifiedBy;
-
     temp = null;
   }
 
@@ -224,7 +224,7 @@ public class Stream {
    */
   public void addChildStream(Stream childStream) {
     if (childrenMap == null || children == null) {
-      children = new ArrayList<Stream>();
+      children = new HashSet<Stream>();
       childrenMap = new HashMap<String, Stream>();
     }
     children.add(childStream);
@@ -266,7 +266,17 @@ public class Stream {
 
   @Override
   public String toString() {
-    return "Stream: id=" + id;
+    StringBuffer buffer = new StringBuffer("Stream: id= " + id);
+    if (children != null) {
+      buffer.append("[");
+      String prefix = "";
+      for (Stream child : children) {
+        buffer.append(prefix + child);
+        prefix = ",";
+      }
+      buffer.append("]");
+    }
+    return buffer.toString();
   }
 
   public String getId() {
@@ -293,7 +303,7 @@ public class Stream {
     return childrenMap;
   }
 
-  public List<Stream> getChildren() {
+  public Set<Stream> getChildren() {
     return children;
   }
 
@@ -337,7 +347,7 @@ public class Stream {
     this.clientData = pClientData;
   }
 
-  public void setChildren(List<Stream> pChildren) {
+  public void setChildren(Set<Stream> pChildren) {
     this.children = pChildren;
     if (pChildren != null) {
       for (Stream stream : pChildren) {

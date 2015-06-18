@@ -238,7 +238,7 @@ public class JsonConverter {
    * @return
    * @throws IOException
    */
-  public static Map<String, Stream> createStreamsFromJson(String jsonStreamsArray)
+  public static Map<String, Stream> createStreamsTreeFromJson(String jsonStreamsArray)
     throws IOException {
     JsonNode arrNode = toJsonNode(jsonStreamsArray).get(STREAMS_KEY);
     Map<String, Stream> newStreams = new HashMap<String, Stream>();
@@ -248,7 +248,6 @@ public class JsonConverter {
         String str = objNode.toString();
         logger.log("JsonConverter: deserializing stream: " + str);
         Stream streamToAdd = jsonMapper.readValue(str, Stream.class);
-        // streamToAdd.initChildMap();
         newStreams.put(streamToAdd.getId(), streamToAdd);
         logger.log("JsonConverter: stream created: id = " + streamToAdd.getId());
       }

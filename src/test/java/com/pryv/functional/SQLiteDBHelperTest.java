@@ -69,7 +69,7 @@ public class SQLiteDBHelperTest {
 
     String cacheFolder = "cache/test/";
     new File(cacheFolder).mkdirs();
-    db = new SQLiteDBHelper(cacheFolder, new DBinitCallback() {
+    db = new SQLiteDBHelper(cacheFolder, null, new DBinitCallback() {
 
       @Override
       public void onError(String message) {

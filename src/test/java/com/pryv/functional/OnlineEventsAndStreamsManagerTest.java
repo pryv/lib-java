@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import resources.TestCredentials;
@@ -54,8 +55,8 @@ public class OnlineEventsAndStreamsManagerTest {
   private static boolean streamsError = false;
   private static boolean streamsRetrievalError = false;
 
-  @Before
-  public void setUp() throws Exception {
+  @BeforeClass
+  public static void setUp() throws Exception {
     Pryv.setStaging();
 
     instanciateEventsCallback();
@@ -65,10 +66,24 @@ public class OnlineEventsAndStreamsManagerTest {
     online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
   }
 
+  @Before
+  public void beforeEachTest() throws Exception {
+    streams = null;
+    events = null;
+  }
+
+  @Test
+  public void testFetchStreams() {
+    online.getStreams(null, streamsCallback);
+    Awaitility.await().until(hasRetrievedStreamsSuccess());
+    assertNotNull(streams);
+  }
+
   @Test
   public void testFetchEventsWithEmptyFilterAndDeserializeJSON() {
     online.getEvents(new Filter(), eventsCallback);
     Awaitility.await().until(hasReceivedEvents());
+    assertNotNull(events);
   }
 
   @Test
@@ -269,6 +284,15 @@ public class OnlineEventsAndStreamsManagerTest {
     };
   }
 
+  private Callable<Boolean> hasRetrievedStreamsSuccess() {
+    return new Callable<Boolean>() {
+      @Override
+      public Boolean call() throws Exception {
+        return streams != null;
+      }
+    };
+  }
+
   private Callable<Boolean> hasStreamSuccess() {
     return new Callable<Boolean>() {
 
@@ -321,7 +345,6 @@ public class OnlineEventsAndStreamsManagerTest {
           + newStreams.values().size()
             + " streams");
         streams = newStreams;
-
       }
 
       @Override
