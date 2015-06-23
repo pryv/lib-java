@@ -217,9 +217,11 @@ public class Event {
     duration = temp.duration;
     type = temp.type;
     content = temp.content;
-    tags = new HashSet<String>();
-    for (String tag : temp.tags) {
-      tags.add(tag);
+    if (temp.tags != null) {
+      tags = new HashSet<String>();
+      for (String tag : temp.tags) {
+        tags.add(tag);
+      }
     }
 
     if (temp.references != null) {
@@ -251,10 +253,39 @@ public class Event {
   }
 
   /**
+   * creates a map <attachmentId, Attachment> and returns it
+   *
+   * @return
+   */
+  @JsonIgnore
+  public Map<String, Attachment> getAttachmentsMap() {
+    Map<String, Attachment> attachmentsMap = new HashMap<String, Attachment>();
+    for (Attachment attachment : attachments) {
+      attachmentsMap.put(attachment.getId(), attachment);
+    }
+    return attachmentsMap;
+  }
+
+  /**
+   * returns the first attachment that is retrieved from the Set of attachments.
+   * This method is implemented because most events have a single attachment.
+   *
+   * @return
+   */
+  @JsonIgnore
+  public Attachment getFirstAttachment() {
+    for (Attachment attachment : attachments) {
+      return attachment;
+    }
+    return null;
+  }
+
+  /**
    * Returns the time of the Event wrapped in a Joda DateTime object
    *
    * @return
    */
+  @JsonIgnore
   public DateTime getDate() {
     if (time == null) {
       return null;
@@ -307,6 +338,7 @@ public class Event {
    *
    * @param source
    */
+  @JsonIgnore
   public void setClientDataFromAstring(String source) {
     if (source != null) {
       String[] cdPairs = source.split(":");
@@ -314,6 +346,36 @@ public class Event {
         clientData = new HashMap<String, Object>();
       }
       clientData.put(cdPairs[0], cdPairs[1]);
+    }
+  }
+
+  /**
+   * add an attachment to the event.
+   *
+   * @param attachment
+   *          the attachment we wish to add
+   */
+  public void addAttachment(Attachment attachment) {
+    if (attachments == null) {
+      attachments = new HashSet<Attachment>();
+    }
+    attachments.add(attachment);
+  }
+
+  /**
+   * remove an attachment from the event.
+   *
+   * @param attachmentId
+   *          the id of the attachment we wish to remove
+   */
+  public void removeAttachment(String attachmentId) {
+    for (Attachment attachment : attachments) {
+      if (attachment.getId().equals(attachmentId)) {
+        attachments.remove(attachment);
+        if (attachments.size() == 0) {
+          attachments = null;
+        }
+      }
     }
   }
 

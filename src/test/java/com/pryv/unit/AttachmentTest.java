@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
@@ -55,7 +56,6 @@ public class AttachmentTest {
 
       Set<Attachment> deserializedAttachments =
         JsonConverter.deserializeAttachments(jsonAttachments);
-      System.out.println("deserialized attachments type: " + deserializedAttachments.getClass());
 
       for (Attachment testedAttachment : deserializedAttachments) {
         boolean attachmentsMatch = false;
@@ -88,5 +88,15 @@ public class AttachmentTest {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  @Test
+  public void testAddFileToAttachment() {
+    Attachment attachment = new Attachment();
+    File attachmentFile =
+      new File(getClass().getClassLoader().getResource("resources/photo.PNG").getPath());
+    attachment.setFile(attachmentFile);
+    assertNotNull(attachment.getFile());
+    assertTrue(attachment.getFile().length() > 0);
   }
 }

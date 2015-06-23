@@ -5,11 +5,15 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.util.EntityUtils;
 
 import com.pryv.Connection;
@@ -20,7 +24,7 @@ import com.pryv.utils.Logger;
 
 /**
  *
- * OnlineEventsAndStreamsManager fetches data from online Pryv API
+ * OnlineEventsAndStreamsManager manages data from online Pryv API
  *
  * @author ik
  *
@@ -40,7 +44,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
    */
   private enum RequestType {
     GET_EVENTS, CREATE_EVENT, UPDATE_EVENT, DELETE_EVENT, GET_STREAMS, CREATE_STREAM,
-    UPDATE_STREAM, DELETE_STREAM
+    UPDATE_STREAM, DELETE_STREAM, ADD_ATTACHMENT, GET_ATTACHMENT, DELETE_ATTACHMENT
   }
 
   private WeakReference<Connection> weakConnection;
@@ -63,6 +67,57 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
     streamsUrl = pUrl + "streams"; // ?auth=" + token;
     tokenUrlArgument = "?auth=" + token;
     weakConnection = pWeakConnection;
+  }
+
+  /*
+   * Attachments
+   */
+
+  /**
+   * Create a new Event with an attachment
+   *
+   * @param eventWithAttachment
+   * @param cacheEventsCallback
+   */
+  public void createEventWithAttachment(final Event eventWithAttachment,
+    final EventsCallback cacheEventsCallback) {
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          // create Multipart HTTP Entity
+          FileBody file = new FileBody(eventWithAttachment.getFirstAttachment().getFile());
+
+          // use event without attachments to create this because attachments
+          // field is illegal in API
+          Event eventWithoutAttachments = new Event();
+          eventWithoutAttachments.merge(eventWithAttachment, JsonConverter.getCloner());
+          eventWithoutAttachments.setAttachments(null);
+
+          // create the Entity
+          StringBody jsonEvent =
+            new StringBody(JsonConverter.toJson(eventWithoutAttachments),
+              ContentType.APPLICATION_JSON);
+          HttpEntity reqEntity =
+            MultipartEntityBuilder.create().addPart("file", file).addPart("event", jsonEvent)
+              .build();
+
+          Request
+            .Post(eventsUrl + tokenUrlArgument)
+            .body(reqEntity)
+            .execute()
+            .handleResponse(
+              new ApiResponseHandler(RequestType.CREATE_EVENT, cacheEventsCallback, null,
+                eventWithAttachment, null));
+        } catch (ClientProtocolException e) {
+          cacheEventsCallback.onEventsError(e.getMessage(), null);
+          e.printStackTrace();
+        } catch (IOException e) {
+          cacheEventsCallback.onEventsError(e.getMessage(), null);
+          e.printStackTrace();
+        }
+      }
+    }.start();
   }
 
   /*
@@ -417,7 +472,8 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             break;
 
           case GET_STREAMS:
-            Map<String, Stream> receivedStreams = JsonConverter.createStreamsTreeFromJson(responseBody);
+            Map<String, Stream> receivedStreams =
+              JsonConverter.createStreamsTreeFromJson(responseBody);
             for (Stream receivedStream : receivedStreams.values()) {
               receivedStream.assignConnection(weakConnection);
             }

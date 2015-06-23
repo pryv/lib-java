@@ -1,6 +1,11 @@
 package com.pryv.api.model;
 
+import java.io.File;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
  *
@@ -10,13 +15,20 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  *
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(Include.NON_NULL)
 public class Attachment implements Cloneable {
 
   private String id;
   private String fileName;
   private String type;
+  /**
+   * the size in Bytes
+   */
   private int size;
   private String readToken;
+
+  @JsonIgnore
+  private File file;
 
   /**
    * empty constructor
@@ -41,6 +53,26 @@ public class Attachment implements Cloneable {
     readToken = pReadToken;
   }
 
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public void setFileName(String fileName) {
+    this.fileName = fileName;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public void setSize(int size) {
+    this.size = size;
+  }
+
+  public void setReadToken(String readToken) {
+    this.readToken = readToken;
+  }
+
   public String getId() {
     return id;
   }
@@ -59,14 +91,17 @@ public class Attachment implements Cloneable {
 
   public String getReadToken() {
     return readToken;
+  }
 
+  public File getFile() {
+    return file;
   }
 
   /**
    * copy all fields from temp to the calling Attachment
    *
    * @param temp
-   *          other Attachment which fields are copied
+   *          other Attachment whose fields are copied
    */
   public void merge(Attachment temp) {
     id = temp.getId();
@@ -74,6 +109,10 @@ public class Attachment implements Cloneable {
     type = temp.getType();
     size = temp.getSize();
     readToken = temp.getReadToken();
+  }
+
+  public void setFile(File file) {
+    this.file = file;
   }
 
 }
