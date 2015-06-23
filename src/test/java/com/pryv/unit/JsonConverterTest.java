@@ -15,8 +15,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -34,14 +32,6 @@ import com.pryv.utils.JsonConverter;
  *
  */
 public class JsonConverterTest {
-
-  @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
-  }
-
-  @Before
-  public void setUp() throws Exception {
-  }
 
   @Test
   public void testCreateStreamsTreeFromJson() {

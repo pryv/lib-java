@@ -59,9 +59,6 @@ public class SupervisorTest {
     Event testEvent = DummyData.generateFullEvent();
     eventsSupervisor.updateOrCreateEvent(testEvent, eventsCallback);
     assertNotNull(eventsSupervisor.getEventByClientId(testEvent.getClientId()));
-    Event updateEvent = DummyData.generateFullEvent();
-    updateEvent.setDuration(2232.0);
-    eventsSupervisor.updateOrCreateEvent(updateEvent, eventsCallback);
   }
 
   @Test
@@ -118,9 +115,6 @@ public class SupervisorTest {
 
     // orphan child
     logger.log("Test: fourth: parent1, parent2, child");
-    // Stream childUpdate3 = DummyData.generateFullStream();
-    // childUpdate3.clearChildren();
-    // childUpdate3.setId(childId);
     child.setParentId(null);
     child.setModified(child.getModified() + TIME_INTERVAL);
     logger.log("test3: " + parent1 + ", " + parent2);
