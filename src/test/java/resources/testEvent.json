@@ -1,0 +1,24 @@
+{
+  "event": {
+    "streamId": "onlineModuleStreamID",
+    "type": "picture/attached",
+    "description": "This is a test event with an image.",
+    "trashed": false,
+    "time": 1434988422.412,
+    "tags": [],
+    "created": 1434988422.412,
+    "createdBy": "ci2ewnv820444t5w4ei2m6m0s",
+    "modified": 1434988422.412,
+    "modifiedBy": "ci2ewnv820444t5w4ei2m6m0s",
+    "id": "cib83213g002f1nmw1kspsrzn",
+    "attachments": [
+      {
+        "id": "cib83213j002g1nmwr9kjn7ns",
+        "fileName": "photo.PNG",
+        "type": "application/octet-stream",
+        "size": 265767,
+        "readToken": "ci2ewnv820444t5w4ei2m6m0s-i1875pVtiZ7ZWbiaT3Ns4TmpiBM"
+      }
+    ]
+  }
+}
