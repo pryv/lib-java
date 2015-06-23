@@ -8,8 +8,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -44,14 +42,6 @@ public class SupervisorTest {
     eventsSupervisor = new EventsSupervisor(streamsSupervisor);
     instantiateStreamsCallback();
     instantiateEventsCallback();
-  }
-
-  @AfterClass
-  public static void tearDownAfterClass() throws Exception {
-  }
-
-  @Before
-  public void setUp() throws Exception {
   }
 
   @Test
