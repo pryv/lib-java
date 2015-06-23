@@ -265,14 +265,14 @@ public class JsonConverter {
    * @throws JsonMappingException
    * @throws IOException
    */
-  public static void updateAttachmentFromJson(String json, Attachment toUpdate)
+  public static void resetAttachmentFromJson(String json, Attachment toUpdate)
     throws JsonParseException, JsonMappingException, IOException {
     Attachment temp = jsonMapper.readValue(json, Attachment.class);
     toUpdate.merge(temp);
   }
 
   /**
-   * resets all fields of Event toUpdate to values from JSON glossary json
+   * reset all fields of Event toUpdate to values from JSON glossary json
    *
    * @param json
    *          The glossary containing the values to which the Event's fields are
