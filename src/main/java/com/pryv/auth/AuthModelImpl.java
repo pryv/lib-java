@@ -3,8 +3,8 @@ package com.pryv.auth;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.fluent.Request;
