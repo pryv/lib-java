@@ -118,6 +118,17 @@ public class Stream {
   }
 
   /**
+   * minimal Constructor
+   *
+   * @param id
+   * @param name
+   */
+  public Stream(String id, String name) {
+    this.id = id;
+    this.name = name;
+  }
+
+  /**
    * Assign unique ID to the Stream - to execute ONCE upon creation
    */
   public void generateId() {

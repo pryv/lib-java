@@ -135,6 +135,20 @@ public class Event {
   }
 
   /**
+   * minimal constructor
+   *
+   * @param streamId
+   * @param time
+   * @param type
+   */
+  public Event(String streamId, Double time, String type) {
+    trashed = false;
+    this.streamId = streamId;
+    this.time = time;
+    this.type = type;
+  }
+
+  /**
    * build Event when retrieved from cache
    *
    * @param result
@@ -347,6 +361,30 @@ public class Event {
       }
       clientData.put(cdPairs[0], cdPairs[1]);
     }
+  }
+
+  /**
+   * add a tag to the event
+   *
+   * @param tag
+   */
+  public void addTag(String tag) {
+    if (tags == null) {
+      tags = new HashSet<String>();
+    }
+    tags.add(tag);
+  }
+
+  /**
+   * add a reference to the event
+   *
+   * @param reference
+   */
+  public void addReference(String reference) {
+    if (references == null) {
+      references = new HashSet<String>();
+    }
+    references.add(reference);
   }
 
   /**
