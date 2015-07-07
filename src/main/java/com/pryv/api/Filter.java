@@ -33,8 +33,7 @@ public class Filter {
   // filter fields
   private Double fromTime;
   private Double toTime;
-  // private Set<String> streamsClientIds;
-  private Set<String> streamsIds;
+  private Set<String> streamIds;
   private Set<String> tags;
   private Set<String> types;
   private Boolean running;
@@ -51,39 +50,39 @@ public class Filter {
    *          from time
    * @param to
    *          to time
-   * @param pStreams
+   * @param streamIds
    *          stream ids
-   * @param pTags
+   * @param tags
    *          tags
-   * @param pTypes
+   * @param types
    *          types
-   * @param pRunning
+   * @param running
    *          running
-   * @param pSortAscending
+   * @param sortAscending
    *          sort ascending
-   * @param pSkip
+   * @param skip
    *          skip how much
-   * @param pLimit
+   * @param limit
    *          how many to get
-   * @param pState
+   * @param state
    *          which state
-   * @param pModifiedSince
+   * @param modifiedSince
    *          since when is it modified
    */
-  public Filter(Double from, Double to, Set<String> pStreams, Set<String> pTags,
-    Set<String> pTypes, Boolean pRunning, Boolean pSortAscending, Integer pSkip, Integer pLimit,
-    State pState, Double pModifiedSince) {
-    fromTime = from;
-    toTime = to;
-    streamsIds = pStreams;
-    tags = pTags;
-    types = pTypes;
-    running = pRunning;
-    sortAscending = pSortAscending;
-    skip = pSkip;
-    limit = pLimit;
-    state = pState;
-    modifiedSince = pModifiedSince;
+  public Filter(Double from, Double to, Set<String> streamIds, Set<String> tags,
+    Set<String> types, Boolean running, Boolean sortAscending, Integer skip, Integer limit,
+    State state, Double modifiedSince) {
+    this.fromTime = from;
+    this.toTime = to;
+    this.streamIds = streamIds;
+    this.tags = tags;
+    this.types = types;
+    this.running = running;
+    this.sortAscending = sortAscending;
+    this.skip = skip;
+    this.limit = limit;
+    this.state = state;
+    this.modifiedSince = modifiedSince;
   }
 
   /**
@@ -120,9 +119,9 @@ public class Filter {
 
     // streamIds
     Boolean streamIdMatch = true;
-    if (streamsIds != null) {
+    if (streamIds != null) {
       streamIdMatch = false;
-      for (String streamId : streamsIds) {
+      for (String streamId : streamIds) {
         if (streamId.equals(event.getStreamId())) {
           streamIdMatch = true;
         }
@@ -186,43 +185,40 @@ public class Filter {
         && modifiedSinceMatch;
   }
 
-  // /**
-  // * Generate the set of Stream Ids. It will be used to address the request to
-  // * the API.
-  // *
-  // * @param streamsClientIdToId
-  // * dictionnary stream.clientId->stream.id
-  // */
-  // public void generateStreamIds(Map<String, String> streamsClientIdToId) {
-  // if (streamsClientIds != null) {
-  // streamsIds = new HashSet<String>();
-  // for (String streamClientId : streamsClientIds) {
-  // streamsIds.add(streamsClientIdToId.get(streamClientId));
-  // }
-  // }
-  // }
-
-  // /**
-  // * add a specific stream client id to the filter
-  // *
-  // * @param pStreamClientId
-  // */
-  // public void addStreamClientId(String pStreamClientId) {
-  // if (streamsClientIds == null) {
-  // streamsClientIds = new HashSet<String>();
-  // }
-  // streamsClientIds.add(pStreamClientId);
-  // }
   /**
-   * add a specific stream id to the filter
+   * add a stream id to the filter
    *
    * @param pStreamId
    */
   public void addStreamId(String pStreamId) {
-    if (streamsIds == null) {
-      streamsIds = new HashSet<String>();
+    if (streamIds == null) {
+      streamIds = new HashSet<String>();
     }
-    streamsIds.add(pStreamId);
+    streamIds.add(pStreamId);
+  }
+
+  /**
+   * add a tag to the filter
+   *
+   * @param pTag
+   */
+  public void addTag(String pTag) {
+    if (tags == null) {
+      tags = new HashSet<String>();
+    }
+    tags.add(pTag);
+  }
+
+  /**
+   * add a type to the filter
+   *
+   * @param pType
+   */
+  public void addType(String pType) {
+    if (types == null) {
+      types = new HashSet<String>();
+    }
+    types.add(pType);
   }
 
   /**
@@ -238,8 +234,8 @@ public class Filter {
     if (toTime != null) {
       sb.append("&" + TO_TIME_URL_KEY + "=" + toTime);
     }
-    if (streamsIds != null) {
-      for (String streamId : streamsIds) {
+    if (streamIds != null) {
+      for (String streamId : streamIds) {
         sb.append("&" + STREAMS_URL_KEY + "=" + streamId);
       }
     }
@@ -288,7 +284,7 @@ public class Filter {
   public boolean areStreamIdsContainedInScope(Set<String> scope,
     StreamsSupervisor streamsSupervisor) {
     boolean areContained = false;
-    for (String filterStreamId : streamsIds) {
+    for (String filterStreamId : streamIds) {
       areContained = false;
       // check if it is part of the streams in the scope
       if (scope.contains(filterStreamId)) {
@@ -315,12 +311,8 @@ public class Filter {
     return toTime;
   }
 
-  public Set<String> getStreamsIds() {
-    return streamsIds;
-  }
-
   public Set<String> getStreamIds() {
-    return streamsIds;
+    return streamIds;
   }
 
   public Set<String> getTags() {
@@ -364,11 +356,7 @@ public class Filter {
   }
 
   public void setStreamIds(Set<String> pStreams) {
-    this.streamsIds = pStreams;
-  }
-
-  public void setStreamClientIds(Set<String> pStreamsIds) {
-    streamsIds = pStreamsIds;
+    this.streamIds = pStreams;
   }
 
   public void setTags(Set<String> pTags) {

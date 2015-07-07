@@ -227,13 +227,15 @@ public class StreamsSupervisor {
         + ")"
         + " - "
         + Thread.currentThread().getName());
-    connectionCallback.onStreamsSuccess("StreamsSupervisor: Stream with id="
-      + newStream.getId()
-        + ", name="
-        + newStream.getName()
-        + ", parentId="
-        + newStream.getParentId()
-        + " created.", newStream, null);
+    if (connectionCallback != null) {
+      connectionCallback.onStreamsSuccess("StreamsSupervisor: Stream with id="
+        + newStream.getId()
+          + ", name="
+          + newStream.getName()
+          + ", parentId="
+          + newStream.getParentId()
+          + " created.", newStream, null);
+    }
     // add its children if any
     if (newStream.getChildren() != null) {
       for (Stream childStream : newStream.getChildren()) {

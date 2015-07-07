@@ -112,7 +112,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
           // make request to online for full scope with field modifiedSince set
           // to lastModified
         } else {
-          for (String filterStreamId : filter.getStreamsIds()) {
+          for (String filterStreamId : filter.getStreamIds()) {
             if (!streamsSupervisor.verifyParency(filterStreamId, scope)) {
               scope.add(filterStreamId);
               lastOnlineRetrievalServerTime = MIN_TIME;
@@ -310,7 +310,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       if (Pryv.isOnlineActive()) {
         Filter onlineFilter = new Filter();
         onlineFilter.setModifiedSince(lastOnlineRetrievalServerTime);
-        onlineFilter.setStreamClientIds(scope);
+        onlineFilter.setStreamIds(scope);
         // forward call to online module
         onlineEventsManager.getEvents(onlineFilter, new OnlineManagerEventsCallback(filter,
           connectionEventsCallback));
