@@ -126,10 +126,10 @@ public class DummyData {
     eventAttachments = generateAttachments();
     eventClientData = new HashMap<String, Object>();
     eventClientData.put(EVENT_CLIENTKEY, EVENT_CLIENTVALUE);
-    return new Event(EVENT_CLIENT_ID, EVENT_ID, EVENT_STREAM_ID,
-      EVENT_TIME, EVENT_DURATION, EVENT_TYPE, EVENT_CONTENT, eventTags, eventRefs,
-      EVENT_DESCRIPTION, eventAttachments, eventClientData, EVENT_TRASHED, EVENT_CREATED,
-      EVENT_CREATEDBY, EVENT_MODIFIED, EVENT_MODIFIED_BY, EVENT_TEMP_REF_ID);
+    return new Event(EVENT_CLIENT_ID, EVENT_ID, EVENT_STREAM_ID, EVENT_TIME, EVENT_DURATION,
+      EVENT_TYPE, EVENT_CONTENT, eventTags, eventRefs, EVENT_DESCRIPTION, eventAttachments,
+      eventClientData, EVENT_TRASHED, EVENT_CREATED, EVENT_CREATEDBY, EVENT_MODIFIED,
+      EVENT_MODIFIED_BY, EVENT_TEMP_REF_ID);
 
   }
 
