@@ -42,8 +42,8 @@ public class Stream {
 
   // optional
   private Boolean trashed;
-  private Set<Stream> children; // should be removed - but need to find a way
-                                 // to serialize map properly
+  private Set<Stream> children;
+
   @JsonIgnore
   private Map<String, Stream> childrenMap;
 

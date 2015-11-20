@@ -29,8 +29,6 @@ public class StreamsSupervisor {
   private Map<String, Stream> flatStreams;
 
   private EventsSupervisor eventsSupervisor;
-  private EventsCallback deleteEventsCallback;
-  private Map<String, Event> eventsOnDelete;
 
   private Logger logger = Logger.getInstance();
 
@@ -42,7 +40,6 @@ public class StreamsSupervisor {
   public StreamsSupervisor() {
     rootStreams = new ConcurrentHashMap<String, Stream>();
     flatStreams = new ConcurrentHashMap<String, Stream>();
-    instanciateDeleteEventsCallback();
   }
 
   public void setEventsSupervisor(EventsSupervisor pEventsSupervisor) {
@@ -59,7 +56,7 @@ public class StreamsSupervisor {
    * @return
    */
   public Map<String, Stream> getRootStreams() {
-    recomputeTree();
+    recomputeRootStreamsTree();
     return rootStreams;
   }
 
@@ -96,7 +93,6 @@ public class StreamsSupervisor {
     Stream oldStream = getStreamById(stream.getId());
     if (oldStream != null) {
       updateStream(oldStream, stream, connectionCallback);
-      recomputeTree();
     } else {
       addStream(stream, connectionCallback);
     }
@@ -121,9 +117,8 @@ public class StreamsSupervisor {
       } else {
         addStream(stream, connectionCallback);
       }
-      recomputeTree();
     }
-    connectionCallback.onStreamsRetrievalSuccess(getRootStreams(), null);
+    connectionCallback.onStreamsRetrievalSuccess(rootStreams, null);
   }
 
   /**
@@ -161,6 +156,7 @@ public class StreamsSupervisor {
         + ")"
         + " - "
         + Thread.currentThread().getName());
+    recomputeRootStreamsTree();
     connectionCallback.onStreamsSuccess("StreamsSupervisor: Stream with id="
       + oldStream.getId()
         + ", name="
@@ -212,7 +208,6 @@ public class StreamsSupervisor {
         + newStream.getParentId()
         + " - "
         + Thread.currentThread().getName());
-
     if (newStream.getParentId() == null) {
       rootStreams.put(newStream.getId(), newStream);
     }
@@ -227,6 +222,7 @@ public class StreamsSupervisor {
         + ")"
         + " - "
         + Thread.currentThread().getName());
+    recomputeRootStreamsTree();
     if (connectionCallback != null) {
       connectionCallback.onStreamsSuccess("StreamsSupervisor: Stream with id="
         + newStream.getId()
@@ -266,36 +262,39 @@ public class StreamsSupervisor {
 
         // delete from parent stream
         if (streamToDelete.getParentId() != null) {
-          System.out.println("StreamsSupervisor: parentId not null, it is: \'"
-            + streamToDelete.getParentId()
-              + "\'");
           Stream parentStream = getStreamById(streamToDelete.getParentId());
           parentStream.removeChildStream(streamToDelete);
         }
 
-        // behaviour not defined in API - may be added later (should also delete
-        // these streams' events)
-        // delete Stream's children Streams
-        // if (streamToDelete.getChildren() != null) {
-        // for (String childStream : streamToDelete.getChildrenMap().keySet()) {
-        // deleteStream(childStream, mergeWithParent, connectionSCallback);
-        // }
-        // }
-
-        Filter deleteFilter = new Filter();
-        deleteFilter.addStreamId(streamId);
-        eventsSupervisor.getEvents(deleteFilter, deleteEventsCallback);
         String parentToMergeWithId = streamToDelete.getId();
+        // merge them with parent stream if any exists
         if (mergeWithParent == true && parentToMergeWithId != null) {
-          // merge them with parent stream if any exists
-          for (Event eventToMergeWithParent : eventsOnDelete.values()) {
-            eventToMergeWithParent.setStreamId(parentToMergeWithId);
-          }
-        } else {
-          // behaviour not defined in API - delete events
-          // for (Event eventToDelete : eventsOnDelete.values()) {
-          // eventsSupervisor.deleteEvent(eventToDelete, deleteEventsCallback);
-          // }
+          Filter eventsToMergeFilter = new Filter();
+          eventsToMergeFilter.addStreamId(streamId);
+
+          eventsSupervisor.getEvents(eventsToMergeFilter, new EventsCallback() {
+
+            @Override
+            public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
+              Double serverTime) {
+            }
+
+            @Override
+            public void onEventsRetrievalSuccess(Map<String, Event> events, Double serverTime) {
+              for (Event eventToMergeWithParent : events.values()) {
+                eventToMergeWithParent.setStreamId(parentToMergeWithId);
+              }
+            }
+
+            @Override
+            public void onEventsRetrievalError(String errorMessage, Double serverTime) {
+            }
+
+            @Override
+            public void onEventsError(String errorMessage, Double serverTime) {
+            }
+          });
+
         }
 
         // delete Stream
@@ -309,13 +308,6 @@ public class StreamsSupervisor {
       } else {
         // update trashed field of stream to delete
         streamToDelete.setTrashed(true);
-        // behavour not defined in API - trash its child streams
-        // for (Stream childstream : streamToDelete.getChildren()) {
-        // childstream.setTrashed(true);
-        // }
-        // for (Stream childstream : streamToDelete.getChildrenMap().values()) {
-        // childstream.setTrashed(true);
-        // }
         connectionSCallback.onStreamsSuccess("StreamsSupervisor: Stream with id="
           + streamId
             + " trashed.", streamToDelete, null);
@@ -326,29 +318,6 @@ public class StreamsSupervisor {
         + streamId
           + " not found.", null);
     }
-  }
-
-  private void instanciateDeleteEventsCallback() {
-    deleteEventsCallback = new EventsCallback() {
-
-      @Override
-      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
-        Double pServerTime) {
-      }
-
-      @Override
-      public void onEventsRetrievalSuccess(Map<String, Event> events, Double pServerTime) {
-        eventsOnDelete = events;
-      }
-
-      @Override
-      public void onEventsRetrievalError(String errorMessage, Double pServerTime) {
-      }
-
-      @Override
-      public void onEventsError(String errorMessage, Double pServerTime) {
-      }
-    };
   }
 
   /**
@@ -377,17 +346,17 @@ public class StreamsSupervisor {
   }
 
   /**
-   * Find out if Stream with clientId="childClientId" is a child of any Stream
-   * whose clientId is contained in parentClientIds
+   * Find out if Stream with id="childId" is a child of any Stream whose id is
+   * contained in parentIds
    *
-   * @param childClientId
-   * @param parentClientIds
-   * @return true if stream with client id "childClientId" is a descendant of
-   *         one of the streams whose client id is in the set parentClientIds
+   * @param childId
+   * @param parentIds
+   * @return true if stream with id "childId" is a descendant of one of the
+   *         streams whose id is in the set parentIds
    */
-  public boolean verifyParency(String childClientId, Set<String> parentClientIds) {
-    for (String parentClientId : parentClientIds) {
-      if (verifyParency(childClientId, parentClientId)) {
+  public boolean verifyParency(String childId, Set<String> parentIds) {
+    for (String parentClientId : parentIds) {
+      if (verifyParency(childId, parentClientId)) {
         return true;
       }
     }
@@ -420,12 +389,13 @@ public class StreamsSupervisor {
   /**
    * fixes Streams' children properties based on parentIds
    */
-  private void recomputeTree() {
+  private void recomputeRootStreamsTree() {
     rootStreams.clear();
 
     String pid = null;
-    // fix root streams
+    // set root streams
     for (Stream potentialRootStream : flatStreams.values()) {
+      // clear children fields
       potentialRootStream.clearChildren();
       pid = potentialRootStream.getParentId();
       if (pid == null) {
