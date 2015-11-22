@@ -1,8 +1,16 @@
 package com.pryv.backup;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.pryv.Connection;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
@@ -16,6 +24,10 @@ import com.pryv.api.model.Stream;
 public class PryvBackup {
 
   private Connection connection;
+  private CsvMapper mapper = new CsvMapper();
+  private CsvSchema streamsSchema = mapper.schemaFor(Stream.class);
+  private CsvSchema eventsSchema = mapper.schemaFor(Event.class);
+  private String backupFolderName;
 
   /**
    * Basic constructor, requires a connection object to access the data stored
@@ -25,6 +37,8 @@ public class PryvBackup {
    */
   public PryvBackup(Connection connection) {
     this.connection = connection;
+    backupFolderName = "backup/" + connection.getIdCaching() + "/";
+    new File(backupFolderName).mkdirs();
   }
 
   /**
@@ -34,7 +48,22 @@ public class PryvBackup {
    * @param callback
    */
   public void saveStreams(BackupCallback callback) {
-    // TODO
+    File streamsBackup = new File(backupFolderName + "streams.csv");
+    try {
+      FileOutputStream streamsFos = new FileOutputStream(streamsBackup);
+      for (Stream stream : connection.getRootStreams().values()) {
+        mapper.writer(streamsSchema).writeValue(streamsFos, stream);
+      }
+    } catch (FileNotFoundException e) {
+      callback.onSaveStreamsError(e.getMessage());
+    } catch (JsonGenerationException e) {
+      callback.onSaveStreamsError(e.getMessage());
+    } catch (JsonMappingException e) {
+      callback.onSaveStreamsError(e.getMessage());
+    } catch (IOException e) {
+      callback.onSaveStreamsError(e.getMessage());
+    }
+    callback.onSaveStreamsSuccess(connection.getRootStreams().size());
   }
 
   /**
@@ -88,6 +117,7 @@ public class PryvBackup {
    */
   public void clearBackup(BackupCallback callback) {
     // TODO
+    callback.onClearBackupSuccess();
   }
 
 }

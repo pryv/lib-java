@@ -79,6 +79,9 @@ public class LocalBackupTest {
   @Test
   public void testSaveStreamsSuccessfully() {
     createStreams();
+    for (Stream stream : connection.getRootStreams().values()) {
+      System.out.println("created " + stream.getId() + ", " + stream.getName());
+    }
     backupTool.saveStreams(backupCallback);
     Awaitility.await().until(isTrue(backupOperationDone));
     assertTrue(backupSuccess);
