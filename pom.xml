@@ -93,6 +93,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-csv</artifactId>
+			<version>2.5.3</version>
+		</dependency>
+
 		<!-- code coverage lib -->
 		<dependency>
 			<groupId>org.jacoco</groupId>
