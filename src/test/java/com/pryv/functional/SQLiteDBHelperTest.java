@@ -222,7 +222,9 @@ public class SQLiteDBHelperTest {
 
   @Test
   public void test07InsertEmptyStreamShouldFail() {
-    db.updateOrCreateStream(new Stream(), streamsCallback);
+    Stream incorrectStream = new Stream(null, null);
+    incorrectStream.setId(null);
+    db.updateOrCreateStream(incorrectStream, streamsCallback);
     Awaitility.await().until(hasErrorWhileInsertingUpdatingDeletingStream());
     assertTrue(streamsError);
   }

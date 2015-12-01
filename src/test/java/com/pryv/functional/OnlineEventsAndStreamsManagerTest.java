@@ -63,9 +63,7 @@ public class OnlineEventsAndStreamsManagerTest {
     String url = "https://" + TestCredentials.USERNAME + "." + Pryv.API_DOMAIN + "/";
     online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
 
-    testSupportStream = new Stream();
-    testSupportStream.setId("onlineModuleStreamID");
-    testSupportStream.setName("javaLibTestSupportStream");
+    testSupportStream = new Stream("onlineModuleStreamID", "javaLibTestSupportStream");
     online.createStream(testSupportStream, streamsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
@@ -178,8 +176,7 @@ public class OnlineEventsAndStreamsManagerTest {
 
   // @Test
   public void testCreateUpdateAndDeleteStream() {
-    Stream testStream = new Stream();
-    testStream.setName("onlineModuleTestStream");
+    Stream testStream = new Stream(null, "onlineModuleTestStream");
 
     // create
     online.createStream(testStream, streamsCallback);

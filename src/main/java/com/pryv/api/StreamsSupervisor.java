@@ -1,6 +1,5 @@
 package com.pryv.api;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -147,7 +146,7 @@ public class StreamsSupervisor {
 
     oldStream.merge(streamToUpdate, true);
 
-    logger.log("StreamSupervisor: updated Stream (id="
+    logger.log("StreamsSupervisor: updated Stream (id="
       + oldStream.getId()
         + ", name="
         + oldStream.getName()
@@ -181,7 +180,7 @@ public class StreamsSupervisor {
     Stream newParent = flatStreams.get(parentId);
     if (newParent != null) {
       // verify that new parent is not the Stream's child - loop bug
-      if (!verifyParency(childStream.getId(), parentId)) {
+      if (!childStream.hasChild(parentId)) {
         newParent.addChildStream(childStream);
         logger.log("StreamsSupervisor: " + childStream.getId() + " now child of " + parentId);
       } else {
@@ -213,7 +212,7 @@ public class StreamsSupervisor {
     }
     flatStreams.put(newStream.getId(), newStream);
 
-    logger.log("StreamSupervisor: added Stream (id="
+    logger.log("StreamsSupervisor: added Stream (id="
       + newStream.getId()
         + ", name="
         + newStream.getName()
@@ -321,31 +320,6 @@ public class StreamsSupervisor {
   }
 
   /**
-   * Find out if Stream with id="childId" is a descendant of Stream with
-   * id="parentId"
-   *
-   * @param childId
-   * @param parentId
-   * @return true if stream with id "childId" is a descendant of the stream with
-   *         id parentId
-   */
-  public boolean verifyParency(String childId, String parentId) {
-    logger.log("StreamsSupervisor: verifying if " + childId + " is child of " + parentId);
-    Stream parentStream = getStreamById(parentId);
-    if (parentStream != null) {
-      if (parentStream.getChildren() != null) {
-        Set<String> children = new HashSet<String>();
-        computeDescendants(children, parentStream);
-        return children.contains(childId);
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-
-  /**
    * Find out if Stream with id="childId" is a child of any Stream whose id is
    * contained in parentIds
    *
@@ -355,35 +329,14 @@ public class StreamsSupervisor {
    *         streams whose id is in the set parentIds
    */
   public boolean verifyParency(String childId, Set<String> parentIds) {
-    for (String parentClientId : parentIds) {
-      if (verifyParency(childId, parentClientId)) {
+    Stream parent = null;
+    for (String parentId : parentIds) {
+      parent = getStreamById(parentId);
+      if (parent.hasChild(childId)) {
         return true;
       }
     }
     return false;
-  }
-
-  /**
-   * Store the ids of parentStream's descendants.
-   *
-   * @param children
-   *          the Set<String> in which the Stream Ids will be stored
-   * @param parentStream
-   *          the parent Stream.
-   */
-  private void computeDescendants(Set<String> children, Stream parentStream) {
-    if (parentStream.getChildren() != null) {
-      logger.log("StreamSupervisor: this Stream has "
-        + parentStream.getChildren().size()
-          + " children in list");
-      logger.log("StreamSupervisor: this Stream has "
-        + parentStream.getChildrenMap().size()
-          + " children in map");
-      for (Stream childStream : parentStream.getChildren()) {
-        children.add(childStream.getId());
-        computeDescendants(children, childStream);
-      }
-    }
   }
 
   /**

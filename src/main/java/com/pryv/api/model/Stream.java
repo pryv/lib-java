@@ -111,28 +111,36 @@ public class Stream {
   }
 
   /**
-   * Empty Constructor
+   * minimal Constructor. Requires only mandatory fields. If id field is null a
+   * random id is generated using the UUID algorithm.
+   *
+   * @param id
+   *          optional (leave null if not useful)
+   * @param name
+   *          mandatory
    */
-  public Stream() {
-    trashed = false;
+  public Stream(String id, String name) {
+    this.trashed = false;
+    if (id == null) {
+      generateId();
+    } else {
+      this.id = id;
+    }
+    this.name = name;
   }
 
   /**
-   * minimal Constructor
-   *
-   * @param id
-   * @param name
+   * empty constructor
    */
-  public Stream(String id, String name) {
-    this.id = id;
-    this.name = name;
+  public Stream() {
+    this.trashed = false;
   }
 
   /**
    * Assign unique ID to the Stream - to execute ONCE upon creation
    */
   public void generateId() {
-    id = UUID.randomUUID().toString();
+    this.id = UUID.randomUUID().toString();
   }
 
   /**
@@ -224,6 +232,27 @@ public class Stream {
         clientData.put(cdPairs[0], cdPairs[1]);
       }
     }
+  }
+
+  /**
+   * Returns <tt>true</tt> if the stream with id <tt>streamId</tt> is a child or
+   * descendent, <tt>false</tt> otherwise.
+   *
+   * @param streamId
+   *          the id of the potential child stream
+   * @return
+   */
+  public boolean hasChild(String streamId) {
+    if (this.id.equals(streamId)) {
+      return true;
+    }
+    boolean res = false;
+    if (children != null) {
+      for (Stream child : children) {
+        res = child.hasChild(streamId);
+      }
+    }
+    return res;
   }
 
   /**

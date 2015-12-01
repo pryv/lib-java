@@ -45,7 +45,7 @@ public class StreamTest {
 
   @Test
   public void testCreateStreamFromMerge() {
-    Stream streamToUpdate = new Stream();
+    Stream streamToUpdate = new Stream(null, null);
     Stream baseStreamRef = streamToUpdate;
     try {
       JsonConverter.resetStreamFromJson(jsonStream, streamToUpdate);
@@ -79,6 +79,26 @@ public class StreamTest {
       fail("parsing error");
       e.printStackTrace();
     }
+  }
+
+  @Test
+  public void testIsChildTrue() {
+    Stream parent = new Stream("parentId", null);
+    Stream child = new Stream("childId", null);
+    Stream grandChild = new Stream("grandChildId", null);
+    parent.addChildStream(child);
+    child.addChildStream(grandChild);
+    assertTrue(parent.hasChild(grandChild.getId()));
+  }
+
+  @Test
+  public void testIsChildFalse() {
+    Stream parent = new Stream("parentId", null);
+    Stream child = new Stream("childId", null);
+    Stream grandChild = new Stream("grandChildId", null);
+    parent.addChildStream(child);
+    child.addChildStream(grandChild);
+    assertFalse(parent.hasChild("blop"));
   }
 
   private void checkStreamParams(Stream pStream) {
