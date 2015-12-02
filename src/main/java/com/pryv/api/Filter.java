@@ -272,7 +272,7 @@ public class Filter {
 
   /**
    * verify if the filter's Stream Ids are contained in the scope of the cache
-   * (including descendants)
+   * (including descendants of the scope)
    *
    * @param scope
    *          the Stream Ids representing the scope of the cache

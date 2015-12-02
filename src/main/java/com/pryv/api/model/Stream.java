@@ -265,8 +265,13 @@ public class Stream {
       children = new HashSet<Stream>();
       childrenMap = new HashMap<String, Stream>();
     }
-    children.add(childStream);
-    childrenMap.put(childStream.getId(), childStream);
+    if (!childStream.hasChild(this.id)) {
+      childStream.setParentId(this.id);
+      children.add(childStream);
+      childrenMap.put(childStream.getId(), childStream);
+    } else {
+      System.out.println("Error: Stream.addChildStream() - no cycles allowed");
+    }
   }
 
   /**
@@ -278,19 +283,16 @@ public class Stream {
    *          the child Stream to remove
    */
   public void removeChildStream(Stream childStream) {
-    // System.out.println("Stream: about to remove child from cid=" + clientId);
-    System.out.println("Stream: about to remove child from id=" + id);
     if (children != null && childrenMap != null) {
-      System.out.println("childrenSize="
-        + children.size()
-          + ", childrenMapSize="
-          + childrenMap.size());
       childrenMap.remove(childStream.getId());
       children.remove(childStream);
+      childStream.setParentId(null);
       if (childrenMap.size() == 0 || children.size() == 0) {
         childrenMap = null;
         children = null;
       }
+    } else {
+      System.out.println("Error: Trying to remove a child that is not registered as such.");
     }
   }
 

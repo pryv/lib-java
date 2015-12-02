@@ -166,34 +166,6 @@ public class StreamsSupervisor {
   }
 
   /**
-   * Add Stream's reference to parent's children list
-   *
-   * @param parentId
-   *          the id of the parent Stream
-   * @param childStream
-   *          the reference of the Stream to add
-   * @param connectionCallback
-   *          the callback to notify failure
-   */
-  private void addChildStreamToParent(String parentId, Stream childStream,
-    StreamsCallback connectionCallback) {
-    Stream newParent = flatStreams.get(parentId);
-    if (newParent != null) {
-      // verify that new parent is not the Stream's child - loop bug
-      if (!childStream.hasChild(parentId)) {
-        newParent.addChildStream(childStream);
-        logger.log("StreamsSupervisor: " + childStream.getId() + " now child of " + parentId);
-      } else {
-        connectionCallback.onStreamError(
-          "Stream update failure: trying to add Stream to child of its children", null);
-      }
-    } else {
-      connectionCallback.onStreamError(
-        "Stream update failure: trying to add Stream as child of unexisting Stream.", null);
-    }
-  }
-
-  /**
    * Add Stream in Supervisor
    *
    * @param newStream
@@ -345,13 +317,13 @@ public class StreamsSupervisor {
   private void recomputeRootStreamsTree() {
     rootStreams.clear();
 
-    String pid = null;
+    String parentId = null;
     // set root streams
     for (Stream potentialRootStream : flatStreams.values()) {
       // clear children fields
       potentialRootStream.clearChildren();
-      pid = potentialRootStream.getParentId();
-      if (pid == null) {
+      parentId = potentialRootStream.getParentId();
+      if (parentId == null) {
         logger.log("StreamsSupervisor: adding rootStream: id="
           + potentialRootStream.getId()
             + ", name="
@@ -362,16 +334,19 @@ public class StreamsSupervisor {
 
     // assign children
     for (Stream childStream : flatStreams.values()) {
-      pid = childStream.getParentId();
-      if (pid != null) {
-        if (flatStreams.containsKey(pid)) {
+      parentId = childStream.getParentId();
+      if (parentId != null) {
+        if (flatStreams.containsKey(parentId)) {
           logger.log("StreamsSupervisor: adding childStream: id="
             + childStream.getId()
               + ", name="
               + childStream.getName()
               + " to "
-              + pid);
-          addChildStreamToParent(pid, childStream, null);
+              + parentId);
+          Stream parent = flatStreams.get(parentId);
+          if (parent != null) {
+            parent.addChildStream(childStream);
+          }
         }
       }
     }

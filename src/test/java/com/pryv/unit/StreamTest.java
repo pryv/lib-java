@@ -3,6 +3,7 @@ package com.pryv.unit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -26,14 +27,10 @@ public class StreamTest {
 
   private Stream testStream;
   private String jsonStream;
-  private Stream testChildStream;
 
   @Before
   public void setUp() throws Exception {
     testStream = DummyData.generateFullStream();
-    for (Stream testChildren : testStream.getChildren()) {
-      testChildStream = testChildren;
-    }
     jsonStream = DummyData.generateJsonStream();
   }
 
@@ -79,6 +76,18 @@ public class StreamTest {
       fail("parsing error");
       e.printStackTrace();
     }
+  }
+
+  @Test
+  public void testAddAndRemoveChild() {
+    Stream parent = new Stream("parentId", "parentName");
+    Stream child = new Stream("childId", "childName");
+    parent.addChildStream(child);
+    assertEquals(parent.getId(), child.getParentId());
+    parent.removeChildStream(child);
+    assertNull(child.getParentId());
+    assertNull(parent.getChildren());
+    assertNull(parent.getChildrenMap());
   }
 
   @Test
