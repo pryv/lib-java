@@ -120,7 +120,6 @@ public class Stream {
    *          mandatory
    */
   public Stream(String id, String name) {
-    this.trashed = false;
     if (id == null) {
       generateId();
     } else {
@@ -133,7 +132,6 @@ public class Stream {
    * empty constructor
    */
   public Stream() {
-    this.trashed = false;
   }
 
   /**
@@ -348,7 +346,10 @@ public class Stream {
   }
 
   public Boolean isTrashed() {
-    return trashed;
+    if (trashed == null) {
+      return false;
+    } else
+      return trashed;
   }
 
   public Double getCreated() {
