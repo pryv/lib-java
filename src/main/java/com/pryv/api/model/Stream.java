@@ -161,37 +161,36 @@ public class Stream {
   }
 
   /**
-   * Copy all of stream temp's values into the caller Stream.
+   * Copy all of Stream <tt>updatedStream</tt> values into the caller Stream.
    *
-   * @param temp
-   *          the stream whose fields are copied
+   * @param updatedStream
+   *          the Stream whose fields are copied
    * @param withChildren
-   *          if set to true, children are also merged
+   *          if set to <tt>true</tt>, children are also merged
    */
-  public void merge(Stream temp, boolean withChildren) {
-    weakConnection = temp.weakConnection;
-    id = temp.id;
-    name = temp.name;
-    setParentId(temp.parentId);
-    singleActivity = temp.singleActivity;
-    if (temp.clientData != null) {
+  public void merge(Stream updatedStream, boolean withChildren) {
+    weakConnection = updatedStream.weakConnection;
+    setId(updatedStream.id);
+    setName(updatedStream.name);
+    setParentId(updatedStream.parentId);
+    setSingleActivity(updatedStream.singleActivity);
+    setTrashed(updatedStream.trashed);
+    setCreated(updatedStream.created);
+    setCreatedBy(updatedStream.createdBy);
+    setModified(updatedStream.modified);
+    setModifiedBy(updatedStream.modifiedBy);
+    if (updatedStream.clientData != null) {
       clientData = new HashMap<String, Object>();
-      for (String key : temp.clientData.keySet()) {
-        clientData.put(key, temp.clientData.get(key));
+      for (String key : updatedStream.clientData.keySet()) {
+        clientData.put(key, updatedStream.clientData.get(key));
       }
     }
-    if (temp.children != null && withChildren == true) {
+    if (updatedStream.children != null && withChildren == true) {
       this.clearChildren();
-      for (Stream childStream : temp.children) {
+      for (Stream childStream : updatedStream.children) {
         addChildStream(childStream);
       }
     }
-    trashed = temp.trashed;
-    created = temp.created;
-    createdBy = temp.createdBy;
-    modified = temp.modified;
-    modifiedBy = temp.modifiedBy;
-    temp = null;
   }
 
   /**

@@ -145,6 +145,7 @@ public class StreamsSupervisor {
         + Thread.currentThread().getName());
 
     oldStream.merge(streamToUpdate, true);
+    addChildrenStreamsToFlatStreams(oldStream);
 
     logger.log("StreamsSupervisor: updated Stream (id="
       + oldStream.getId()
@@ -183,6 +184,7 @@ public class StreamsSupervisor {
       rootStreams.put(newStream.getId(), newStream);
     }
     flatStreams.put(newStream.getId(), newStream);
+    addChildrenStreamsToFlatStreams(newStream);
 
     logger.log("StreamsSupervisor: added Stream (id="
       + newStream.getId()
@@ -203,13 +205,22 @@ public class StreamsSupervisor {
           + newStream.getParentId()
           + " created.", newStream, null);
     }
-    // add its children if any
-    if (newStream.getChildren() != null) {
-      for (Stream childStream : newStream.getChildren()) {
-        updateOrCreateStream(childStream, connectionCallback);
+  }
+
+  /**
+   * Adds the children of the parent Stream to flatStreams if it has any.
+   *
+   * @param parent
+   *          the Stream whose children are added
+   */
+  private void addChildrenStreamsToFlatStreams(Stream parent) {
+    Set<Stream> children = parent.getChildren();
+    if (children != null) {
+      for (Stream child : children) {
+        flatStreams.put(child.getId(), child);
+        addChildrenStreamsToFlatStreams(child);
       }
     }
-
   }
 
   /**
