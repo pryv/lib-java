@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -71,11 +69,9 @@ public class PryvBackup {
    *
    * @param callback
    *
-   * @return
    */
-  public Map<String, Stream> loadStreams(BackupCallback callback) {
+  public void loadStreams(BackupCallback callback) {
     // TODO
-    return new HashMap<String, Stream>();
   }
 
   /**
@@ -93,11 +89,9 @@ public class PryvBackup {
    *
    * @param callback
    *
-   * @return
    */
-  public Map<String, Event> loadEvents(BackupCallback callback) {
+  public void loadEvents(BackupCallback callback) {
     // TODO
-    return new HashMap<String, Event>();
   }
 
   /**
