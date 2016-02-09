@@ -111,28 +111,34 @@ public class Stream {
   }
 
   /**
-   * Empty Constructor
+   * minimal Constructor. Requires only mandatory fields. If id field is null a
+   * random id is generated using the UUID algorithm.
+   *
+   * @param id
+   *          optional (leave null if not useful)
+   * @param name
+   *          mandatory
    */
-  public Stream() {
-    trashed = false;
+  public Stream(String id, String name) {
+    if (id == null) {
+      generateId();
+    } else {
+      this.id = id;
+    }
+    this.name = name;
   }
 
   /**
-   * minimal Constructor
-   *
-   * @param id
-   * @param name
+   * empty constructor
    */
-  public Stream(String id, String name) {
-    this.id = id;
-    this.name = name;
+  public Stream() {
   }
 
   /**
    * Assign unique ID to the Stream - to execute ONCE upon creation
    */
   public void generateId() {
-    id = UUID.randomUUID().toString();
+    this.id = UUID.randomUUID().toString();
   }
 
   /**
@@ -155,37 +161,36 @@ public class Stream {
   }
 
   /**
-   * Copy all of stream temp's values into the caller Stream.
+   * Copy all of Stream <tt>updatedStream</tt> values into the caller Stream.
    *
-   * @param temp
-   *          the stream whose fields are copied
+   * @param updatedStream
+   *          the Stream whose fields are copied
    * @param withChildren
-   *          if set to true, children are also merged
+   *          if set to <tt>true</tt>, children are also merged
    */
-  public void merge(Stream temp, boolean withChildren) {
-    weakConnection = temp.weakConnection;
-    id = temp.id;
-    name = temp.name;
-    setParentId(temp.parentId);
-    singleActivity = temp.singleActivity;
-    if (temp.clientData != null) {
+  public void merge(Stream updatedStream, boolean withChildren) {
+    weakConnection = updatedStream.weakConnection;
+    setId(updatedStream.id);
+    setName(updatedStream.name);
+    setParentId(updatedStream.parentId);
+    setSingleActivity(updatedStream.singleActivity);
+    setTrashed(updatedStream.trashed);
+    setCreated(updatedStream.created);
+    setCreatedBy(updatedStream.createdBy);
+    setModified(updatedStream.modified);
+    setModifiedBy(updatedStream.modifiedBy);
+    if (updatedStream.clientData != null) {
       clientData = new HashMap<String, Object>();
-      for (String key : temp.clientData.keySet()) {
-        clientData.put(key, temp.clientData.get(key));
+      for (String key : updatedStream.clientData.keySet()) {
+        clientData.put(key, updatedStream.clientData.get(key));
       }
     }
-    if (temp.children != null && withChildren == true) {
+    if (updatedStream.children != null && withChildren == true) {
       this.clearChildren();
-      for (Stream childStream : temp.children) {
+      for (Stream childStream : updatedStream.children) {
         addChildStream(childStream);
       }
     }
-    trashed = temp.trashed;
-    created = temp.created;
-    createdBy = temp.createdBy;
-    modified = temp.modified;
-    modifiedBy = temp.modifiedBy;
-    temp = null;
   }
 
   /**
@@ -227,6 +232,27 @@ public class Stream {
   }
 
   /**
+   * Returns <tt>true</tt> if the stream with id <tt>streamId</tt> is a child or
+   * descendent, <tt>false</tt> otherwise.
+   *
+   * @param streamId
+   *          the id of the potential child stream
+   * @return
+   */
+  public boolean hasChild(String streamId) {
+    if (this.id.equals(streamId)) {
+      return true;
+    }
+    boolean res = false;
+    if (children != null) {
+      for (Stream child : children) {
+        res = child.hasChild(streamId);
+      }
+    }
+    return res;
+  }
+
+  /**
    * Add a stream as child to caller. If children list & map are null,
    * instantiates them. The child's parentId and parentClientId fields are
    * updated.
@@ -238,8 +264,13 @@ public class Stream {
       children = new HashSet<Stream>();
       childrenMap = new HashMap<String, Stream>();
     }
-    children.add(childStream);
-    childrenMap.put(childStream.getId(), childStream);
+    if (!childStream.hasChild(this.id)) {
+      childStream.setParentId(this.id);
+      children.add(childStream);
+      childrenMap.put(childStream.getId(), childStream);
+    } else {
+      System.out.println("Error: Stream.addChildStream() - no cycles allowed");
+    }
   }
 
   /**
@@ -251,19 +282,16 @@ public class Stream {
    *          the child Stream to remove
    */
   public void removeChildStream(Stream childStream) {
-    // System.out.println("Stream: about to remove child from cid=" + clientId);
-    System.out.println("Stream: about to remove child from id=" + id);
     if (children != null && childrenMap != null) {
-      System.out.println("childrenSize="
-        + children.size()
-          + ", childrenMapSize="
-          + childrenMap.size());
       childrenMap.remove(childStream.getId());
       children.remove(childStream);
+      childStream.setParentId(null);
       if (childrenMap.size() == 0 || children.size() == 0) {
         childrenMap = null;
         children = null;
       }
+    } else {
+      System.out.println("Error: Trying to remove a child that is not registered as such.");
     }
   }
 
@@ -319,7 +347,10 @@ public class Stream {
   }
 
   public Boolean isTrashed() {
-    return trashed;
+    if (trashed == null) {
+      return false;
+    } else
+      return trashed;
   }
 
   public Double getCreated() {

@@ -1,10 +1,10 @@
 package com.pryv.api;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import com.pryv.api.model.Event;
+import com.pryv.api.model.Stream;
 
 /**
  * Filter used in Events fetching. All its fields are optional. Either
@@ -272,7 +272,7 @@ public class Filter {
 
   /**
    * verify if the filter's Stream Ids are contained in the scope of the cache
-   * (including descendants)
+   * (including descendants of the scope)
    *
    * @param scope
    *          the Stream Ids representing the scope of the cache
@@ -283,24 +283,19 @@ public class Filter {
    */
   public boolean areStreamIdsContainedInScope(Set<String> scope,
     StreamsSupervisor streamsSupervisor) {
-    boolean areContained = false;
     for (String filterStreamId : streamIds) {
-      areContained = false;
-      // check if it is part of the streams in the scope
-      if (scope.contains(filterStreamId)) {
-        areContained = true;
-      } else {
-        // check if it is maybe a child of a stream in the scope
-        Iterator<String> iterator = scope.iterator();
-        while (areContained == false && iterator.hasNext()) {
-          if (streamsSupervisor.verifyParency(filterStreamId, iterator.next())) {
-            areContained = true;
-          }
+      boolean isParentFound = false;
+      for (String scopeStreamId : scope) {
+        Stream parent = streamsSupervisor.getStreamById(scopeStreamId);
+        if (parent.hasChild(filterStreamId)) {
+          isParentFound = true;
         }
       }
-
+      if (isParentFound == false) {
+        return false;
+      }
     }
-    return areContained;
+    return true;
   }
 
   public Double getFromTime() {

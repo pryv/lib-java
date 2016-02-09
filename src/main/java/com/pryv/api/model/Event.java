@@ -119,11 +119,7 @@ public class Event {
     description = pDescription;
     attachments = pAttachments;
     clientData = pClientData;
-    if (trashed != null) {
-      trashed = pTrashed;
-    } else {
-      trashed = false;
-    }
+    trashed = pTrashed;
     tempRefId = pTempRefId;
   }
 
@@ -131,7 +127,6 @@ public class Event {
    * empty Event constructor
    */
   public Event() {
-    trashed = false;
   }
 
   /**
@@ -142,7 +137,6 @@ public class Event {
    * @param type
    */
   public Event(String streamId, Double time, String type) {
-    trashed = false;
     this.streamId = streamId;
     this.time = time;
     this.type = type;
@@ -487,7 +481,11 @@ public class Event {
   }
 
   public Boolean isTrashed() {
-    return trashed;
+    if (trashed == null) {
+      return false;
+    } else {
+      return trashed;
+    }
   }
 
   public String getTempRefId() {

@@ -59,12 +59,9 @@ public class JsonConverterTest {
 
   @Test
   public void testMarshallStream() {
-    Stream parent = new Stream();
-    Stream child1 = new Stream();
-    Stream child2 = new Stream();
-    parent.generateId();
-    child1.generateId();
-    child2.generateId();
+    Stream parent = new Stream(null, null);
+    Stream child1 = new Stream(null, null);
+    Stream child2 = new Stream(null, null);
     parent.addChildStream(child1);
     parent.addChildStream(child2);
     try {

@@ -105,22 +105,19 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     // TODO when verifying if filter is included in scope, maybe clean the cache
     // when the scope is becoming smaller.
     if (Pryv.isCacheActive()) {
-      // if some specific streams are requested
       if (filter.getStreamIds() != null) {
-        // verify scope
+        // case when some specific streams are requested
         if (filter.areStreamIdsContainedInScope(scope, streamsSupervisor)) {
           // make request to online for full scope with field modifiedSince set
           // to lastModified
         } else {
-          for (String filterStreamId : filter.getStreamIds()) {
-            if (!streamsSupervisor.verifyParency(filterStreamId, scope)) {
-              scope.add(filterStreamId);
-              lastOnlineRetrievalServerTime = MIN_TIME;
-            }
-          }
+          // filter contains streams that are not in the scope, scope is updated
+          // and request is done for full history (retrieval time set to MIN)
+          scope.addAll(filter.getStreamIds());
+          lastOnlineRetrievalServerTime = MIN_TIME;
         }
       } else {
-        // all streams are requested - no need to compare
+        // all streams are requested - no need to compare with scope
       }
       // retrieve Events from cache
       filter.setModifiedSince(lastOnlineRetrievalServerTime);

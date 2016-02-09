@@ -54,25 +54,21 @@ public class SupervisorTest {
   @Test
   public void testManipulateStream() {
     // parent1 parent of child, parent2 has no child
-    Stream parent1 = new Stream();
     String parent1Id = "parent1id";
-    parent1.setId(parent1Id);
+    Stream parent1 = new Stream(parent1Id, "blop");
     parent1.setModified(123.0);
 
-    Stream child = new Stream();
     String childId = "childid";
-    child.setId(childId);
+    Stream child = new Stream(childId, "blip");
     child.setModified(123.0);
     child.setParentId(parent1Id);
     parent1.addChildStream(child);
 
     String parent2Id = "parent2id";
-    Stream parent2 = new Stream();
-    parent2.setId(parent2Id);
+    Stream parent2 = new Stream(parent2Id, null);
     parent2.setModified(123.0);
 
     // insert parent1 & parent2 and child in supervisor
-
     logger.log("Test: first: parent1/child, parent2");
     streamsSupervisor.updateOrCreateStream(parent1, streamsCallback);
     assertNotNull(streamsSupervisor.getRootStreams().get(parent1Id));
@@ -81,8 +77,8 @@ public class SupervisorTest {
     streamsSupervisor.updateOrCreateStream(child, streamsCallback);
     assertNull(streamsSupervisor.getRootStreams().get(childId));
     assertNotNull(streamsSupervisor.getStreamById(childId));
-    assertTrue(streamsSupervisor.verifyParency(childId, parent1Id));
-    assertFalse(streamsSupervisor.verifyParency(childId, parent2Id));
+    assertTrue(streamsSupervisor.getStreamById(parent1Id).hasChild(childId));
+    assertFalse(streamsSupervisor.getStreamById(parent2Id).hasChild(childId));
     logger.log("test1: " + parent1 + ", " + parent2);
 
     // change random stuff
@@ -100,8 +96,8 @@ public class SupervisorTest {
     logger.log("test2a: " + parent1 + ", " + parent2);
     streamsSupervisor.updateOrCreateStream(child, streamsCallback);
     logger.log("test2b: " + parent1 + ", " + parent2);
-    assertFalse(streamsSupervisor.verifyParency(childId, parent1Id));
-    assertTrue(streamsSupervisor.verifyParency(childId, parent2Id));
+    assertFalse(streamsSupervisor.getStreamById(parent1Id).hasChild(childId));
+    assertTrue(streamsSupervisor.getStreamById(parent2Id).hasChild(childId));
 
     // orphan child
     logger.log("Test: fourth: parent1, parent2, child");
@@ -109,7 +105,7 @@ public class SupervisorTest {
     child.setModified(child.getModified() + TIME_INTERVAL);
     logger.log("test3: " + parent1 + ", " + parent2);
     streamsSupervisor.updateOrCreateStream(child, streamsCallback);
-    assertFalse(streamsSupervisor.verifyParency(childId, parent2Id));
+    assertFalse(streamsSupervisor.getStreamById(parent2Id).hasChild(childId));
     assertNotNull(streamsSupervisor.getStreamById(childId));
 
     // random change as orphan
@@ -125,7 +121,7 @@ public class SupervisorTest {
     child.setParentId(parent1Id);
     child.setModified(child.getModified() + TIME_INTERVAL);
     streamsSupervisor.updateOrCreateStream(child, streamsCallback);
-    assertTrue(streamsSupervisor.verifyParency(childId, parent1Id));
+    assertTrue(streamsSupervisor.getStreamById(parent1Id).hasChild(childId));
   }
 
   private static void instantiateEventsCallback() {
