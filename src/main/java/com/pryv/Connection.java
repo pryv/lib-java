@@ -31,7 +31,7 @@ public class Connection implements EventsManager, StreamsManager {
 
   private String userID;
   private String accessToken;
-  private String apiDomain = Pryv.API_DOMAIN; // pryv.io or pryv.in
+  private String apiDomain = Pryv.DOMAIN;
   private String apiScheme = "https";
   private String url; // generated from apiScheme, apiDomain and username
 

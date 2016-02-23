@@ -18,7 +18,6 @@ import resources.TestCredentials;
 
 import com.jayway.awaitility.Awaitility;
 import com.pryv.Connection;
-import com.pryv.Pryv;
 import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsManager;
 import com.pryv.api.Filter;
@@ -58,7 +57,6 @@ public class ManipulateEventsAndStreamsTest {
 
   @BeforeClass
   public static void setUp() throws Exception {
-    Pryv.setStaging();
 
     instanciateEventsCallback();
     instanciateStreamsCallback();
@@ -77,6 +75,17 @@ public class ManipulateEventsAndStreamsTest {
   public void beforeEachTest() {
     events = null;
     streams = null;
+    streamsSuccess = false;
+    streamsReceived = false;
+    eventsSuccess = false;
+    eventsError = false;
+    eventsRetrievalError = false;
+  }
+
+  @Test
+  public void testFetchEvents() {
+    eventsManager.getEvents(new Filter(), eventsCallback);
+    Awaitility.await().until(hasEvents());
   }
 
   // TODO create full scenario test: create, update, get, delete
@@ -282,12 +291,6 @@ public class ManipulateEventsAndStreamsTest {
         return eventsRetrievalError;
       }
     };
-  }
-
-  @Test
-  public void testFetchEvents() {
-    eventsManager.getEvents(new Filter(), eventsCallback);
-    Awaitility.await().until(hasEvents());
   }
 
   private Callable<Boolean> hasEvents() {

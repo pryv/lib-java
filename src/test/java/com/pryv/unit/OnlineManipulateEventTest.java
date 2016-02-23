@@ -33,9 +33,8 @@ public class OnlineManipulateEventTest {
 
   // @BeforeClass
   public static void setUpBeforeClass() throws Exception {
-    Pryv.setStaging();
 
-    String url = "https://" + TestCredentials.USERNAME + "." + Pryv.API_DOMAIN + "/";
+    String url = "https://" + TestCredentials.USERNAME + "." + Pryv.DOMAIN + "/";
     online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
 
   }

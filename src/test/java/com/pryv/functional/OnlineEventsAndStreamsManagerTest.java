@@ -55,12 +55,11 @@ public class OnlineEventsAndStreamsManagerTest {
 
   @BeforeClass
   public static void setUp() throws Exception {
-    Pryv.setStaging();
 
     instanciateEventsCallback();
     instanciateStreamsCallback();
 
-    String url = "https://" + TestCredentials.USERNAME + "." + Pryv.API_DOMAIN + "/";
+    String url = "https://" + TestCredentials.USERNAME + "." + Pryv.DOMAIN + "/";
     online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
 
     testSupportStream = new Stream("onlineModuleStreamID", "javaLibTestSupportStream");

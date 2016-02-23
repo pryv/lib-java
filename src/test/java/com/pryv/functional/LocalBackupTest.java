@@ -51,7 +51,6 @@ public class LocalBackupTest {
 
   @BeforeClass
   public static void setUpBeforeAllTests() throws Exception {
-    Pryv.setStaging();
     connection =
       new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, new DBinitCallback());
     // to simplify things
