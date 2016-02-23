@@ -70,4 +70,4 @@ local.properties
 
 # TeXlipse plugin
 .texlipse
-lib-java.iml
+*.iml

@@ -248,7 +248,7 @@ public class StreamsSupervisor {
           parentStream.removeChildStream(streamToDelete);
         }
 
-        String parentToMergeWithId = streamToDelete.getId();
+        final String parentToMergeWithId = streamToDelete.getId();
         // merge them with parent stream if any exists
         if (mergeWithParent == true && parentToMergeWithId != null) {
           Filter eventsToMergeFilter = new Filter();
