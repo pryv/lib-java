@@ -1,15 +1,8 @@
 package com.pryv.auth;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.List;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.entity.ContentType;
-import org.apache.http.util.EntityUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,6 +10,12 @@ import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
 import com.pryv.utils.JsonConverter;
 import com.pryv.utils.Logger;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  *
@@ -43,11 +42,17 @@ public class AuthModelImpl implements AuthModel {
     try {
       String jsonRequest = JsonConverter.toJson(authRequest);
       logger.log("AuthModelImpl: start login request: " + jsonRequest);
-      Request.Post(Pryv.REGISTRATION_URL).bodyString(jsonRequest, ContentType.APPLICATION_JSON)
-        .execute().handleResponse(signInResponseHandler);
+
+      OkHttpClient client = new OkHttpClient();
+      RequestBody bodyString = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), jsonRequest);
+      Request request = new Request.Builder()
+              .url(Pryv.REGISTRATION_URL)
+              .post(bodyString)
+              .build();
+      Response response = client.newCall(request).execute();
+      new SignInResponseHandler().handleResponse(response);
+
     } catch (JsonProcessingException e) {
-      controller.onError(e.getMessage());
-    } catch (ClientProtocolException e) {
       controller.onError(e.getMessage());
     } catch (IOException e) {
       controller.onError(e.getMessage());
@@ -57,7 +62,7 @@ public class AuthModelImpl implements AuthModel {
   /**
    * handles response to initial authorization request and to polling replies
    */
-  private ResponseHandler<String> signInResponseHandler = new ResponseHandler<String>() {
+  public class SignInResponseHandler {
 
     private final static String SERVER_URL_KEY = "url";
     private final static String STATUS_KEY = "status";
@@ -77,14 +82,13 @@ public class AuthModelImpl implements AuthModel {
      * unique class method that retrieves HttpResponse's components and calls
      * the appropriate controller's methods
      */
-    @Override
-    public String handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
+    public String handleResponse(Response response) throws IOException {
 
-      int statusCode = response.getStatusLine().getStatusCode();
-      String reply = EntityUtils.toString(response.getEntity());
+      int statusCode = response.code();
+      String reply = response.body().string();
       logger.log("AuthModelImpl: signInResponseHandler: response status code: " + statusCode);
       logger.log("sAuthModelImpl: ignInResponseHandler: handling reply entity : " + reply);
-      if (statusCode == HttpStatus.SC_CREATED || statusCode == HttpStatus.SC_OK) {
+      if (statusCode == HttpURLConnection.HTTP_CREATED || statusCode == HttpURLConnection.HTTP_OK) {
 
         JsonNode jsonResponse = JsonConverter.toJsonNode(reply);
 
@@ -101,7 +105,7 @@ public class AuthModelImpl implements AuthModel {
           long rate = jsonResponse.get(POLL_RATE_MS_KEY).longValue();
           String pollURL = jsonResponse.get(POLL_URL_KEY).textValue();
           logger.log("signInResponseHandler: polling at address: " + pollURL);
-          new PollingThread(pollURL, rate, signInResponseHandler, controller).start();
+          new PollingThread(pollURL, rate, this, controller).start();
 
         } else if (state.equals(ACCEPTED_VALUE)) {
           String username = jsonResponse.get(USERNAME_KEY).textValue();
