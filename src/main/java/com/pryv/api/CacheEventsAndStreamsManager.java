@@ -262,7 +262,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     @Override
     public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
       Double pServerTime) {
-      if (event != null) {
+      if (event != null && Pryv.isCacheActive()) {
         dbHelper.updateOrCreateEvent(event, new CacheEventsCallback(filter,
           connectionEventsCallback));
       }
