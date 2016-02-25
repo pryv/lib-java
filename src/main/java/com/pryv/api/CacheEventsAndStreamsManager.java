@@ -250,7 +250,9 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         // merge with supervisor
         eventsSupervisor.updateOrCreateEvent(onlineEvent, connectionEventsCallback);
       }
-      dbHelper.updateOrCreateEvents(onlineEvents.values(), connectionEventsCallback);
+      if(Pryv.isCacheActive()) {
+        dbHelper.updateOrCreateEvents(onlineEvents.values(), connectionEventsCallback);
+      }
       connectionEventsCallback.onEventsRetrievalSuccess(onlineEvents, pServerTime);
     }
 
