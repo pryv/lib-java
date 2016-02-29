@@ -113,7 +113,7 @@ public class AuthenticationTest {
   private class FakeAuthView implements AuthView {
 
     @Override
-    public void displayLoginVew(String loginURL) {
+    public void displayLoginView(String loginURL) {
       displayLoginViewExecuted = true;
     }
 

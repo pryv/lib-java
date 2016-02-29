@@ -124,7 +124,7 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    */
   public void displayLoginVew(String loginURL) {
     showAuthView(loginURL);
-    new AuthBrowserView().displayLoginVew(loginURL);
+    new AuthBrowserView().displayLoginView(loginURL);
   }
 
   /*

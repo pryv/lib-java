@@ -73,7 +73,7 @@ public class BasicExample implements AuthView, EventsCallback, StreamsCallback {
   @Override
   public void displayLoginVew(String loginURL) {
     printExampleMessage(loginURL);
-    new AuthBrowserView().displayLoginVew(loginURL);
+    new AuthBrowserView().displayLoginView(loginURL);
   }
 
   @Override
