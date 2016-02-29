@@ -9,8 +9,11 @@ package com.pryv;
  */
 public class Pryv {
 
-  public static String REGISTRATION_URL = "https://reg.pryv.io/access";
-  public static String API_DOMAIN = "pryv.io";
+  public static String DOMAIN = "pryv.io";
+  public static String USERNAME = "javalib";
+  public static String REGISTRATION_URL = "https://reg." + DOMAIN + "/access";
+  public static String URL = "https://" + USERNAME + "." + DOMAIN;
+
   public static final String DATABASE_NAME = "pryv-sqlite.db";
 
   private static boolean cacheActivated = true;
@@ -18,11 +21,28 @@ public class Pryv {
   private static boolean supervisorActivated = true;
 
   /**
-   * makes the library use staging mode from online.
+   * set the domain
+   *
+   * @param domain
    */
-  public static void setStaging() {
-    REGISTRATION_URL = "https://reg.pryv.in/access";
-    API_DOMAIN = "pryv.in";
+  public static void setDomain(String domain) {
+    DOMAIN = domain;
+    updateUrls();
+  }
+
+  /**
+   * set the username
+   *
+   * @param username
+   */
+  public static void setUsername(String username) {
+    USERNAME = username;
+    updateUrls();
+  }
+
+  private static void updateUrls() {
+    REGISTRATION_URL = "https://reg." + DOMAIN + "/access";
+    URL = "https://" + USERNAME + "." + DOMAIN;
   }
 
   /**

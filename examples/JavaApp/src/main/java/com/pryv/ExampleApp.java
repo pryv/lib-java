@@ -67,7 +67,6 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   private TreeItem<Stream> root;
 
   public static void main(String[] args) {
-    Pryv.setStaging();
     launch(args);
   }
 
