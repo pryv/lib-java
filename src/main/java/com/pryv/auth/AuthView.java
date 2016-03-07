@@ -16,7 +16,7 @@ public interface AuthView {
    *
    * @param loginURL
    */
-  void displayLoginVew(String loginURL);
+  void displayLoginView(String loginURL);
 
   /**
    * callback method when auth is successful. Displays success message.

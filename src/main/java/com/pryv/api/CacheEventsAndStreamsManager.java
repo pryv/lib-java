@@ -250,7 +250,9 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         // merge with supervisor
         eventsSupervisor.updateOrCreateEvent(onlineEvent, connectionEventsCallback);
       }
-      dbHelper.updateOrCreateEvents(onlineEvents.values(), connectionEventsCallback);
+      if(Pryv.isCacheActive()) {
+        dbHelper.updateOrCreateEvents(onlineEvents.values(), connectionEventsCallback);
+      }
       connectionEventsCallback.onEventsRetrievalSuccess(onlineEvents, pServerTime);
     }
 
@@ -262,7 +264,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     @Override
     public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
       Double pServerTime) {
-      if (event != null) {
+      if (event != null && Pryv.isCacheActive()) {
         dbHelper.updateOrCreateEvent(event, new CacheEventsCallback(filter,
           connectionEventsCallback));
       }

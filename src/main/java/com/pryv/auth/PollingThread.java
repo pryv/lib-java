@@ -1,12 +1,12 @@
 package com.pryv.auth;
 
+import com.pryv.utils.Logger;
+
 import java.io.IOException;
 
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.fluent.Request;
-
-import com.pryv.utils.Logger;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  *
@@ -19,10 +19,10 @@ public class PollingThread extends Thread {
   private AuthController controller;
   private String pollURL;
   private long pollRate;
-  private ResponseHandler<String> responseHandler;
+  private AuthModelImpl.SignInResponseHandler responseHandler;
   private Logger logger = Logger.getInstance();
 
-  public PollingThread(String url, long rate, ResponseHandler<String> handler,
+  public PollingThread(String url, long rate, AuthModelImpl.SignInResponseHandler handler,
     AuthController pController) {
     controller = pController;
     logger.log("PollingThread instanciated");
@@ -37,13 +37,17 @@ public class PollingThread extends Thread {
     try {
       logger.log("PollingThread: sending poll request");
       sleep(pollRate);
-      Request.Get(pollURL).execute().handleResponse(responseHandler);
+
+      OkHttpClient client = new OkHttpClient();
+      Request request = new Request.Builder()
+              .url(pollURL)
+              .get()
+              .build();
+      Response response = client.newCall(request).execute();
+      responseHandler.handleResponse(response);
 
       logger.log("PollingThread: polling request sent");
 
-    } catch (ClientProtocolException e) {
-      controller.onError(e.getMessage());
-      e.printStackTrace();
     } catch (IOException e) {
       controller.onError(e.getMessage());
       e.printStackTrace();

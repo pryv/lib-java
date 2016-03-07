@@ -32,7 +32,7 @@ public class AuthBrowserView extends Applet implements AuthView {
   }
 
   @Override
-  public void displayLoginVew(String loginURL) {
+  public void displayLoginView(String loginURL) {
     try {
       URL url = new URL(loginURL);
       openWebpage(url.toURI());

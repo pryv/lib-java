@@ -3,7 +3,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.pryv.Connection;
-import com.pryv.Pryv;
 import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsManager;
 import com.pryv.api.Filter;
@@ -42,10 +41,6 @@ public class BasicExample implements AuthView, EventsCallback, StreamsCallback {
 
     AuthView exampleUser = new BasicExample();
 
-    // Preliminary step: use staging environment (remove for use on production
-    // infrastructure)
-    Pryv.setStaging();
-
     // Authenticate user
 
     // Application settings
@@ -73,7 +68,7 @@ public class BasicExample implements AuthView, EventsCallback, StreamsCallback {
   @Override
   public void displayLoginVew(String loginURL) {
     printExampleMessage(loginURL);
-    new AuthBrowserView().displayLoginVew(loginURL);
+    new AuthBrowserView().displayLoginView(loginURL);
   }
 
   @Override

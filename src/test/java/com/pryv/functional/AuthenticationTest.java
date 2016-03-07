@@ -11,7 +11,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.jayway.awaitility.Awaitility;
-import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
 import com.pryv.auth.AuthController;
 import com.pryv.auth.AuthControllerImpl;
@@ -47,7 +46,6 @@ public class AuthenticationTest {
 
   @BeforeClass
   public static void beforeAllTests() {
-    Pryv.setStaging();
   }
 
   @Before
@@ -113,7 +111,7 @@ public class AuthenticationTest {
   private class FakeAuthView implements AuthView {
 
     @Override
-    public void displayLoginVew(String loginURL) {
+    public void displayLoginView(String loginURL) {
       displayLoginViewExecuted = true;
     }
 

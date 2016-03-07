@@ -83,7 +83,7 @@ public class AuthControllerImpl implements AuthController {
 
   @Override
   public void displayLoginView(String url) {
-    view.displayLoginVew(url);
+    view.displayLoginView(url);
   }
 
 }

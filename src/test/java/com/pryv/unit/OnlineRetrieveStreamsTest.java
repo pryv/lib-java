@@ -30,8 +30,7 @@ public class OnlineRetrieveStreamsTest {
   @Before
   public void setUp() throws Exception {
     instanciateCallback();
-    Pryv.setStaging();
-    String url = "https://" + TestCredentials.USERNAME + "." + Pryv.API_DOMAIN + "/";
+    String url = "https://" + TestCredentials.USERNAME + "." + Pryv.DOMAIN + "/";
     online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
   }
 

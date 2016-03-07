@@ -51,7 +51,6 @@ public class LocalBackupTest {
 
   @BeforeClass
   public static void setUpBeforeAllTests() throws Exception {
-    Pryv.setStaging();
     connection =
       new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, new DBinitCallback());
     // to simplify things
@@ -257,7 +256,7 @@ public class LocalBackupTest {
     };
   }
 
-  private static Callable<Boolean> hasCreatedStream(String streamId) {
+  private static Callable<Boolean> hasCreatedStream(final String streamId) {
     return new Callable<Boolean>() {
 
       @Override
@@ -268,7 +267,7 @@ public class LocalBackupTest {
     };
   }
 
-  private static Callable<Boolean> isTrue(boolean testedVariable) {
+  private static Callable<Boolean> isTrue(final boolean testedVariable) {
     return new Callable<Boolean>() {
 
       @Override
