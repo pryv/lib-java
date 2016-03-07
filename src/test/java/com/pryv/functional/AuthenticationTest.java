@@ -14,7 +14,7 @@ import com.jayway.awaitility.Awaitility;
 import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
 import com.pryv.auth.AuthController;
-import com.pryv.auth.AuthControllerImpl;
+import com.pryv.auth.AuthController;
 import com.pryv.auth.AuthView;
 
 /**
@@ -59,7 +59,7 @@ public class AuthenticationTest {
   @Test
   public void testStartLoginAndPoll() {
     AuthController authenticator =
-      new AuthControllerImpl(reqAppId, permissions, lang, returnURL, new FakeAuthView());
+      new AuthController(reqAppId, permissions, lang, returnURL, new FakeAuthView());
     authenticator.signIn();
     Awaitility.await().until(hasDisplayedLoginView());
     assertTrue(displayLoginViewExecuted);
@@ -68,7 +68,7 @@ public class AuthenticationTest {
   @Test
   public void testStartLoginWithBadPermissions() {
     AuthController authenticator =
-      new AuthControllerImpl(null, null, null, null, new FakeAuthView());
+      new AuthController(null, null, null, null, new FakeAuthView());
     authenticator.signIn();
     Awaitility.await().until(hasDisplayedFailure());
     assertTrue(displayFailureExecuted);
@@ -113,7 +113,7 @@ public class AuthenticationTest {
   private class FakeAuthView implements AuthView {
 
     @Override
-    public void displayLoginVew(String loginURL) {
+    public void displayLoginView(String loginURL) {
       displayLoginViewExecuted = true;
     }
 
