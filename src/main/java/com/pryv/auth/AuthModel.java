@@ -1,6 +1,4 @@
 package com.pryv.auth;
-
-
 /**
  *
  * MVC model for logic of login sequence
@@ -9,9 +7,8 @@ package com.pryv.auth;
  *
  */
 public interface AuthModel {
-
-  /**
-   * start login protocol
-   */
-  void startLogin();
+	/**
+	 * start login protocol
+	 */
+	void startLogin();
 }

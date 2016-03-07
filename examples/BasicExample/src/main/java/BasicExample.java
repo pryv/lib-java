@@ -14,7 +14,6 @@ import com.pryv.api.model.Permission;
 import com.pryv.api.model.Stream;
 import com.pryv.auth.AuthBrowserView;
 import com.pryv.auth.AuthController;
-import com.pryv.auth.AuthControllerImpl;
 import com.pryv.auth.AuthView;
 import com.pryv.utils.Logger;
 
