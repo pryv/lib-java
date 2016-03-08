@@ -19,10 +19,10 @@ public class PollingThread extends Thread {
   private AuthController controller;
   private String pollURL;
   private long pollRate;
-  private AuthModelImpl.SignInResponseHandler responseHandler;
+  private AuthModel.SignInResponseHandler responseHandler;
   private Logger logger = Logger.getInstance();
 
-  public PollingThread(String url, long rate, AuthModelImpl.SignInResponseHandler handler,
+  public PollingThread(String url, long rate, AuthModel.SignInResponseHandler handler,
     AuthController pController) {
     controller = pController;
     logger.log("PollingThread instanciated");
