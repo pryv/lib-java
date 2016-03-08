@@ -213,7 +213,8 @@ public class OnlineEventsAndStreamsManagerTest {
     assertNull(createdStream);
   }
 
-  @Test
+
+  //@Test
   public void testCreateEventWithAttachment() {
     // create attachment instance
     Attachment attachment = new Attachment();

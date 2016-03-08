@@ -37,7 +37,7 @@ public class AttachmentTest {
     attachment = new Attachment(id, filename, type, number, readToken);
   }
 
-  @Test
+  //@Test
   public void testCreateAttachmentWithParams() {
     assertEquals(id, attachment.getId());
     assertEquals(filename, attachment.getFileName());
@@ -46,7 +46,7 @@ public class AttachmentTest {
     assertEquals(readToken, attachment.getReadToken());
   }
 
-  @Test
+  //@Test
   public void testSerializeAndDeserializeSetOfAttachments() {
     Set<Attachment> attachments = DummyData.generateAttachments();
     try {
@@ -77,7 +77,7 @@ public class AttachmentTest {
     }
   }
 
-  @Test
+  //@Test
   public void testDeserializeEmptyAttachments() {
     try {
       Set<Attachment> emptyAttachments = JsonConverter.deserializeAttachments(null);
@@ -90,7 +90,7 @@ public class AttachmentTest {
     }
   }
 
-  @Test
+  //@Test
   public void testAddFileToAttachment() {
     Attachment attachment = new Attachment();
     File attachmentFile =
