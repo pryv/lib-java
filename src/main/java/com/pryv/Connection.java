@@ -73,9 +73,11 @@ public class Connection implements EventsManager, StreamsManager {
       new File(cacheFolder).mkdirs();
     }
     weakConnection = new WeakReference<Connection>(this);
-    streamsSupervisor = new StreamsSupervisor();
-    eventsSupervisor = new EventsSupervisor(streamsSupervisor);
-    streamsSupervisor.setEventsSupervisor(eventsSupervisor);
+    if (Pryv.isSupervisorActive()) {
+      streamsSupervisor = new StreamsSupervisor();
+      eventsSupervisor = new EventsSupervisor(streamsSupervisor);
+      streamsSupervisor.setEventsSupervisor(eventsSupervisor);
+    }
     cacheEventsManager =
       new CacheEventsAndStreamsManager(cacheFolder, url, accessToken, pDBInitCallback,
         streamsSupervisor, eventsSupervisor, weakConnection);
@@ -306,7 +308,11 @@ public class Connection implements EventsManager, StreamsManager {
       computeDelta(pServerTime);
       // return merged events from Supervisor - cacheEvents aren't used because
       // they don't contain the merged events
-      eventsSupervisor.getEvents(filter, userEventsCallback);
+      if (Pryv.isSupervisorActive()) {
+        eventsSupervisor.getEvents(filter, userEventsCallback);
+      } else {
+        userEventsCallback.onEventsRetrievalSuccess(cacheManagerEvents, pServerTime);
+      }
     }
 
     @Override
