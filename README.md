@@ -6,7 +6,21 @@ Java library to authorize, authenticate and access Pryv users data as defined in
 
 ### imports
 
-#### Maven Project
+We have not yet published the library on Gradle, but you can load it in your **Gradle** build using [JitPack](https://jitpack.io/) as follows:  
+
+```
+repositories {
+    maven {
+        url "https://jitpack.io"
+    }
+}
+
+dependencies {
+	compile 'com.github.Pryv:lib-java:v0.1'
+}
+```
+
+To add a dependency using **Maven**, use the following:
 
 ```
 <dependency>
@@ -16,7 +30,7 @@ Java library to authorize, authenticate and access Pryv users data as defined in
 </dependency>
 ```
 
-#### JAR
+### JAR
 
 After running `mvn package`, include the `lib-java-0.1.0-jar-with-dependencies.jar` file in your classpath.
 
