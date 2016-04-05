@@ -18,6 +18,7 @@ import resources.TestCredentials;
 
 import com.jayway.awaitility.Awaitility;
 import com.pryv.Connection;
+import com.pryv.Pryv;
 import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsManager;
 import com.pryv.api.Filter;
@@ -68,6 +69,7 @@ public class ManipulateEventsAndStreamsTest {
           System.out.println("DB init Error: " + message);
         }
       });
+    Pryv.setDomain("pryv.li");
     streamsManager = (StreamsManager) eventsManager;
   }
 
