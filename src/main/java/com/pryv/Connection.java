@@ -156,6 +156,8 @@ public class Connection implements EventsManager, StreamsManager {
   public void createEvent(Event newEvent, EventsCallback userEventsCallback) {
     newEvent.assignConnection(weakConnection);
 
+    logger.log("Creating event...");
+
     if (Pryv.isSupervisorActive()) {
       // make sync request to supervisor
       eventsSupervisor.updateOrCreateEvent(newEvent, userEventsCallback);
