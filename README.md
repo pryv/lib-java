@@ -4,9 +4,7 @@ Java library to authorize, authenticate and access Pryv users data as defined in
 
 ## Usage
 
-### imports
-
-We have not yet published the library on Gradle, but you can load it in your **Gradle** build using [JitPack](https://jitpack.io/) as follows:  
+We have not yet published the library on Gradle, but you can load it in yor **Gradle** build using [JitPack](https://jitpack.io/) as follows:
 
 ```
 repositories {
@@ -40,7 +38,21 @@ After running `mvn package`, include the `lib-java-0.1.0-jar-with-dependencies.j
 
 ## Contribute
 
-### Installation
+### Gradle
+
+`./gradlew` installs the appropriate version of gradle. You can also install it manually [here](https://docs.gradle.org/current/userguide/installation.html).
+
+### Build and tests
+
+`gradle` compiles the source files.
+
+`gradle test` runs the tests.
+
+`gradle -Dtest.single={TestClassName} test` runs a single test class.
+
+`gradle jar` builds the JAR with
+
+### Maven
 
 Install [Maven](http://books.sonatype.com/mvnref-book/reference/installation-sect-maven-install.html).
 
