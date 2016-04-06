@@ -92,7 +92,7 @@ public class OnlineEventsAndStreamsManagerTest {
     createdStream = null;
   }
 
-  // @Test
+  @Test
   public void testFetchStreams() {
     online.getStreams(null, streamsCallback);
     Awaitility.await().until(hasResult());
@@ -100,7 +100,7 @@ public class OnlineEventsAndStreamsManagerTest {
     assertTrue(streams.size() > 0);
   }
 
-  // @Test
+  @Test
   public void testFetchEventsWithEmptyFilter() {
     online.getEvents(new Filter(), eventsCallback);
     Awaitility.await().until(hasResult());
@@ -108,7 +108,7 @@ public class OnlineEventsAndStreamsManagerTest {
     assertTrue(events.size() > 0);
   }
 
-  // @Test
+  @Test
   public void testFetchEventsForAStream() {
     // create event
     Event testEvent = new Event();
@@ -136,7 +136,7 @@ public class OnlineEventsAndStreamsManagerTest {
     }
   }
 
-  //@Test
+  @Test
   public void testCreateUpdateAndDeleteEvent() {
 
     // create event
@@ -176,7 +176,7 @@ public class OnlineEventsAndStreamsManagerTest {
     assertNull(createdEvent);
   }
 
-  //@Test
+  @Test
   public void testCreateUpdateAndDeleteStream() {
     Stream testStream = new Stream(null, "onlineModuleTestStream");
 
@@ -221,10 +221,10 @@ public class OnlineEventsAndStreamsManagerTest {
   public void testCreateEventWithAttachment() {
     // create attachment instance
     Attachment attachment = new Attachment();
-    File attachmentFile = new File(getClass().getClassLoader().getResource("bob.txt").getPath());
+    File attachmentFile = new File(getClass().getClassLoader().getResource("photo.PNG").getPath());
     attachment.setFile(attachmentFile);
     assertTrue(attachment.getFile().length() > 0);
-    attachment.setType("text/plain");
+    attachment.setType("image/png");
     attachment.setFileName(attachmentFile.getName());
 
     // create encapsulating event
@@ -232,7 +232,7 @@ public class OnlineEventsAndStreamsManagerTest {
       eventWithAttachment.setStreamId(testSupportStream.getId());
     eventWithAttachment.addAttachment(attachment);
     eventWithAttachment.setStreamId(testSupportStream.getId());
-    eventWithAttachment.setType("file/attached");
+    eventWithAttachment.setType("picture/attached");
     eventWithAttachment.setDescription("This is a test event with an image.");
 
     // create event with attachment

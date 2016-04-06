@@ -81,22 +81,23 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             @Override
             public void run() {
                 try {
+                    Event eventWithoutAttachments = new Event();
+                    eventWithoutAttachments.merge(eventWithAttachment, JsonConverter.getCloner());
+                    eventWithoutAttachments.setAttachments(null);
+                    String jsonEvent = JsonConverter.toJson(eventWithoutAttachments);
+
                     logger.log("OnlineEventsAndStreamsManager: createEventWithAttachment: POST request at: "
                             + eventsUrl
                             + tokenUrlArgument
                             + ", body: "
-                            + JsonConverter.toJson(eventWithAttachment));
+                            + jsonEvent);
 
                     File file = eventWithAttachment.getFirstAttachment().getFile();
-
-                    Event eventWithoutAttachments = new Event();
-                    eventWithoutAttachments.merge(eventWithAttachment, JsonConverter.getCloner());
-                    eventWithoutAttachments.setAttachments(null);
 
                     // create Multipart HTTP Entity
                     RequestBody body = new MultipartBody.Builder()
                             .setType(MultipartBody.FORM)
-                            .addFormDataPart("event", JsonConverter.toJson(eventWithoutAttachments))
+                            .addFormDataPart("event", jsonEvent)
                             .addFormDataPart("file", file.getName(), RequestBody.create(null, file))
                             .build();
 
@@ -104,13 +105,6 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
                             .url(eventsUrl + tokenUrlArgument)
                             .post(body)
                             .build();
-
-                    Buffer buffer = new Buffer();
-                    request.body().writeTo(buffer);
-                    System.out.println("buffer: " + buffer.readUtf8());
-
-                    System.out.println("sending dis request yo: " + request);
-                    System.out.println("wid dat body yo: " + request.body() + ", wid dat length: " + request.body().contentLength());
 
                     Response response = client.newCall(request).execute();
                     new ApiResponseHandler(RequestType.CREATE_EVENT, cacheEventsCallback, null,
@@ -160,13 +154,14 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             @Override
             public void run() {
                 try {
+                    String jsonEvent = JsonConverter.toJson(newEvent);
                     logger.log("OnlineEventsAndStreamsManager: createEvent: Post request at: "
                             + eventsUrl
                             + tokenUrlArgument
                             + ", body: "
-                            + JsonConverter.toJson(newEvent));
+                            + jsonEvent);
 
-                    RequestBody bodyString = RequestBody.create(JSON, JsonConverter.toJson(newEvent));
+                    RequestBody bodyString = RequestBody.create(JSON, jsonEvent);
                     Request request = new Request.Builder()
                             .url(eventsUrl + tokenUrlArgument)
                             .post(bodyString)
@@ -271,13 +266,14 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
             @Override
             public void run() {
                 try {
+                    String jsonStream = JsonConverter.toJson(newStream);
                     logger.log("OnlineEventsAndStreamsManager: createStream: Post request at: "
                             + streamsUrl
                             + tokenUrlArgument
                             + ", body: "
-                            + JsonConverter.toJson(newStream));
+                            + jsonStream);
 
-                    RequestBody bodyString = RequestBody.create(JSON, JsonConverter.toJson(newStream));
+                    RequestBody bodyString = RequestBody.create(JSON, jsonStream);
                     Request request = new Request.Builder()
                             .url(streamsUrl + tokenUrlArgument)
                             .post(bodyString)
