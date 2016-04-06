@@ -11,6 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.jayway.awaitility.Awaitility;
+import com.pryv.Pryv;
 import com.pryv.api.model.Permission;
 import com.pryv.auth.AuthController;
 import com.pryv.auth.AuthController;
@@ -46,6 +47,7 @@ public class AuthenticationTest {
 
   @BeforeClass
   public static void beforeAllTests() {
+    Pryv.setDomain("pryv.li");
   }
 
   @Before

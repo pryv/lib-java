@@ -61,6 +61,7 @@ public class ManipulateEventsAndStreamsTest {
 
     instanciateEventsCallback();
     instanciateStreamsCallback();
+    Pryv.setDomain("pryv.li");
 
     eventsManager =
       new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, new DBinitCallback() {
@@ -69,7 +70,7 @@ public class ManipulateEventsAndStreamsTest {
           System.out.println("DB init Error: " + message);
         }
       });
-    Pryv.setDomain("pryv.li");
+
     streamsManager = (StreamsManager) eventsManager;
   }
 
@@ -199,6 +200,7 @@ public class ManipulateEventsAndStreamsTest {
     assertNull(testStream);
   }
 
+  @Test
   public void testFetchEventsForAStream() {
 
     Filter filter = new Filter();

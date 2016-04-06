@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -59,7 +60,9 @@ public class OnlineEventsAndStreamsManagerTest {
     instanciateEventsCallback();
     instanciateStreamsCallback();
 
+    Pryv.setDomain("pryv.li");
     String url = "https://" + TestCredentials.USERNAME + "." + Pryv.DOMAIN + "/";
+
     online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
 
     testSupportStream = new Stream("onlineModuleStreamID", "javaLibTestSupportStream");
@@ -89,7 +92,7 @@ public class OnlineEventsAndStreamsManagerTest {
     createdStream = null;
   }
 
-  @Test
+  // @Test
   public void testFetchStreams() {
     online.getStreams(null, streamsCallback);
     Awaitility.await().until(hasResult());
@@ -97,7 +100,7 @@ public class OnlineEventsAndStreamsManagerTest {
     assertTrue(streams.size() > 0);
   }
 
-  @Test
+  // @Test
   public void testFetchEventsWithEmptyFilter() {
     online.getEvents(new Filter(), eventsCallback);
     Awaitility.await().until(hasResult());
@@ -105,7 +108,7 @@ public class OnlineEventsAndStreamsManagerTest {
     assertTrue(events.size() > 0);
   }
 
-  @Test
+  // @Test
   public void testFetchEventsForAStream() {
     // create event
     Event testEvent = new Event();
@@ -133,7 +136,7 @@ public class OnlineEventsAndStreamsManagerTest {
     }
   }
 
-  @Test
+  //@Test
   public void testCreateUpdateAndDeleteEvent() {
 
     // create event
@@ -173,7 +176,7 @@ public class OnlineEventsAndStreamsManagerTest {
     assertNull(createdEvent);
   }
 
-  // @Test
+  //@Test
   public void testCreateUpdateAndDeleteStream() {
     Stream testStream = new Stream(null, "onlineModuleTestStream");
 
@@ -214,12 +217,11 @@ public class OnlineEventsAndStreamsManagerTest {
   }
 
 
-  //@Test
+  @Test
   public void testCreateEventWithAttachment() {
     // create attachment instance
     Attachment attachment = new Attachment();
-    File attachmentFile =
-      new File(getClass().getClassLoader().getResource("resources/photo.PNG").getPath());
+    File attachmentFile = new File(getClass().getClassLoader().getResource("photo.PNG").getPath());
     attachment.setFile(attachmentFile);
     assertTrue(attachment.getFile().length() > 0);
     attachment.setType("image/png");
