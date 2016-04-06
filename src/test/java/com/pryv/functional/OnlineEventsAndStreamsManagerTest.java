@@ -229,6 +229,7 @@ public class OnlineEventsAndStreamsManagerTest {
 
     // create encapsulating event
     Event eventWithAttachment = new Event();
+      eventWithAttachment.setStreamId(testSupportStream.getId());
     eventWithAttachment.addAttachment(attachment);
     eventWithAttachment.setStreamId(testSupportStream.getId());
     eventWithAttachment.setType("picture/attached");
