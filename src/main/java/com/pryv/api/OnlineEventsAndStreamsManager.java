@@ -12,6 +12,7 @@ import com.pryv.api.model.Stream;
 import com.pryv.utils.JsonConverter;
 import com.pryv.utils.Logger;
 
+import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -78,28 +79,43 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
         new Thread() {
             @Override
             public void run() {
-                // create Multipart HTTP Entity
-                File file = eventWithAttachment.getFirstAttachment().getFile();
-
-                // use event without attachments to create this because attachments
-                // field is illegal in API
-                Event eventWithoutAttachments = new Event();
-                eventWithoutAttachments.merge(eventWithAttachment, JsonConverter.getCloner());
-                eventWithoutAttachments.setAttachments(null);
-
                 try {
+                    logger.log("OnlineEventsAndStreamsManager: createEventWithAttachment: POST request at: "
+                            + eventsUrl
+                            + tokenUrlArgument
+                            + ", body: "
+                            + JsonConverter.toJson(eventWithAttachment));
+
+                    // create Multipart HTTP Entity
+                    File file = eventWithAttachment.getFirstAttachment().getFile();
+
+                    // use event without attachments to create this because attachments
+                    // field is illegal in API
+                    /*Event eventWithoutAttachments = new Event();
+                    eventWithoutAttachments.merge(eventWithAttachment, JsonConverter.getCloner());
+                    eventWithoutAttachments.setAttachments(null);*/
+
                     // TODO: check fileName for second part (for now jsonEvent) + handle type???
-                    RequestBody requestBody = new MultipartBody.Builder()
-                            .addFormDataPart("file", file.getName(),
-                                    RequestBody.create(MediaType.parse("text/csv"), file))
-                            .addFormDataPart("event", "jsonEvent",
-                                    RequestBody.create(JSON, JsonConverter.toJson(eventWithoutAttachments)))
+                    MultipartBody body = new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("event", JsonConverter.toJson(eventWithAttachment))
+                            .addFormDataPart("file", null, RequestBody.create(null, file))
                             .build();
+
+                    /*RequestBody requestBody = new MultipartBody.Builder()
+                            .addPart(RequestBody.create(JSON,
+                                    JsonConverter.toJson(eventWithAttachment)))
+                            .addPart(
+                                    RequestBody.create(null, file))
+                            .build();*/
 
                     Request request = new Request.Builder()
                             .url(eventsUrl + tokenUrlArgument)
-                            .post(requestBody)
+                            .post(body)
                             .build();
+
+                    System.out.println("sending dis request yo: " + request);
+                    System.out.println("wid dat body yo: " + request.body() + ", wid dat length: " + request.body().contentLength());
 
                     Response response = client.newCall(request).execute();
                     new ApiResponseHandler(RequestType.CREATE_EVENT, cacheEventsCallback, null,
