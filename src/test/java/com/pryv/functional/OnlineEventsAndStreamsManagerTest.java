@@ -221,18 +221,18 @@ public class OnlineEventsAndStreamsManagerTest {
   public void testCreateEventWithAttachment() {
     // create attachment instance
     Attachment attachment = new Attachment();
-    File attachmentFile = new File(getClass().getClassLoader().getResource("photo.PNG").getPath());
+    File attachmentFile = new File(getClass().getClassLoader().getResource("bob.txt").getPath());
     attachment.setFile(attachmentFile);
     assertTrue(attachment.getFile().length() > 0);
-    attachment.setType("image/png");
-    attachment.setFileName("testImage");
+    attachment.setType("text/plain");
+    attachment.setFileName(attachmentFile.getName());
 
     // create encapsulating event
     Event eventWithAttachment = new Event();
       eventWithAttachment.setStreamId(testSupportStream.getId());
     eventWithAttachment.addAttachment(attachment);
     eventWithAttachment.setStreamId(testSupportStream.getId());
-    eventWithAttachment.setType("picture/attached");
+    eventWithAttachment.setType("file/attached");
     eventWithAttachment.setDescription("This is a test event with an image.");
 
     // create event with attachment

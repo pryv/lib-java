@@ -24,7 +24,7 @@ public class Attachment implements Cloneable {
   /**
    * the size in Bytes
    */
-  private int size;
+  private long size;
   private String readToken;
 
   @JsonIgnore
@@ -65,7 +65,7 @@ public class Attachment implements Cloneable {
     this.type = type;
   }
 
-  public void setSize(int size) {
+  public void setSize(long size) {
     this.size = size;
   }
 
@@ -85,7 +85,7 @@ public class Attachment implements Cloneable {
     return type;
   }
 
-  public int getSize() {
+  public long getSize() {
     return size;
   }
 
@@ -113,6 +113,7 @@ public class Attachment implements Cloneable {
 
   public void setFile(File file) {
     this.file = file;
+    this.size = file.length();
   }
 
 }

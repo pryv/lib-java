@@ -19,6 +19,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okio.Buffer;
 
 /**
  * OnlineEventsAndStreamsManager manages data from online Pryv API
@@ -86,33 +87,27 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
                             + ", body: "
                             + JsonConverter.toJson(eventWithAttachment));
 
-                    // create Multipart HTTP Entity
                     File file = eventWithAttachment.getFirstAttachment().getFile();
 
-                    // use event without attachments to create this because attachments
-                    // field is illegal in API
-                    /*Event eventWithoutAttachments = new Event();
+                    Event eventWithoutAttachments = new Event();
                     eventWithoutAttachments.merge(eventWithAttachment, JsonConverter.getCloner());
-                    eventWithoutAttachments.setAttachments(null);*/
+                    eventWithoutAttachments.setAttachments(null);
 
-                    // TODO: check fileName for second part (for now jsonEvent) + handle type???
-                    MultipartBody body = new MultipartBody.Builder()
+                    // create Multipart HTTP Entity
+                    RequestBody body = new MultipartBody.Builder()
                             .setType(MultipartBody.FORM)
-                            .addFormDataPart("event", JsonConverter.toJson(eventWithAttachment))
-                            .addFormDataPart("file", null, RequestBody.create(null, file))
+                            .addFormDataPart("event", JsonConverter.toJson(eventWithoutAttachments))
+                            .addFormDataPart("file", file.getName(), RequestBody.create(null, file))
                             .build();
-
-                    /*RequestBody requestBody = new MultipartBody.Builder()
-                            .addPart(RequestBody.create(JSON,
-                                    JsonConverter.toJson(eventWithAttachment)))
-                            .addPart(
-                                    RequestBody.create(null, file))
-                            .build();*/
 
                     Request request = new Request.Builder()
                             .url(eventsUrl + tokenUrlArgument)
                             .post(body)
                             .build();
+
+                    Buffer buffer = new Buffer();
+                    request.body().writeTo(buffer);
+                    System.out.println("buffer: " + buffer.readUtf8());
 
                     System.out.println("sending dis request yo: " + request);
                     System.out.println("wid dat body yo: " + request.body() + ", wid dat length: " + request.body().contentLength());
