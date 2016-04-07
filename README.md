@@ -11,6 +11,7 @@ repositories {
     maven {
         url "https://jitpack.io"
     }
+	jcenter()
 }
 
 dependencies {
