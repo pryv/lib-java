@@ -122,6 +122,8 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       // retrieve Events from cache
       filter.setModifiedSince(lastOnlineRetrievalServerTime);
       dbHelper.getEvents(filter, new CacheEventsCallback(filter, connectionEventsCallback));
+    } else if (Pryv.isOnlineActive()) {
+      onlineEventsManager.getEvents(filter, connectionEventsCallback);
     }
 
   }

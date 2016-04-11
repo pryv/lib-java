@@ -27,7 +27,7 @@ public class DummyData {
   private static final String EVENT_STREAM_ID = "testStreamID";
   private static final Double EVENT_TIME = new Double(10000);
   private static final Double EVENT_DURATION = new Double(20); // opt
-  private static final String EVENT_TYPE = "testType";
+  private static final String EVENT_TYPE = "note/txt";
   private static final String EVENT_CONTENT = "testContent its a string"; // opt
   private static Set<String> eventTags;
   private static final String EVENT_TAGTEST = "test";

@@ -414,6 +414,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
                         break;
 
                     case CREATE_EVENT:
+                        String stoppedId = JsonConverter.retrieveStoppedIdFromJson(responseBody);
                         Event createdEvent = JsonConverter.retrieveEventFromJson(responseBody);
                         createdEvent.assignConnection(weakConnection);
                         createdEvent.setClientId(event.getClientId());

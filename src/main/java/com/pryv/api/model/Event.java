@@ -135,11 +135,13 @@ public class Event {
    * @param streamId
    * @param time
    * @param type
+   * @param content
    */
-  public Event(String streamId, Double time, String type) {
+  public Event(String streamId, Double time, String type, Object content) {
     this.streamId = streamId;
     this.time = time;
     this.type = type;
+    this.content = content;
   }
 
   /**

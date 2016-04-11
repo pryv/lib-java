@@ -33,6 +33,8 @@ public class JsonConverter {
   private final static String STREAM_KEY = "stream";
   private final static String STREAMS_KEY = "streams";
 
+  private final static String STOPPED_ID_KEY = "stoppedId";
+
   private final static String META_KEY = "meta";
   private final static String SERVER_TIME_KEY = "serverTime";
 
@@ -181,6 +183,27 @@ public class JsonConverter {
     IOException {
     JsonNode eventNode = toJsonNode(jsonSource).get(EVENT_KEY);
     return jsonMapper.readValue(eventNode.toString(), Event.class);
+  }
+
+  /**
+   * Retrieves the stoppedId value from a JSON dictionnary containing a stoppedId entry at
+   * root level
+   *
+   * @param jsonSource the JSON stored in a String
+   * @return
+   * @throws JsonProcessingException
+   * @throws IOException
+   */
+  public static String retrieveStoppedIdFromJson(String jsonSource) throws JsonProcessingException,
+          IOException {
+    JsonNode stoppedIdNode = toJsonNode(jsonSource).get(STOPPED_ID_KEY);
+    if (stoppedIdNode != null) {
+      String stoppedId = stoppedIdNode.toString();
+      logger.log("JsonConverter: retrieved stoppedId: " + stoppedId);
+      return stoppedId;
+    } else {
+      return null;
+    }
   }
 
   /**

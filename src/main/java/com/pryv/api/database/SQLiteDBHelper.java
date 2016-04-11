@@ -123,13 +123,13 @@ public class SQLiteDBHelper {
    * @param cacheEventsCallback
    *          callback to notify success or failure
    */
-  public void updateOrCreateEvents(final Collection<Event> eventsToUpdate,
+  public void updateOrCreateEvents(final Collection<Event> eventsToCache,
     final EventsCallback cacheEventsCallback) {
     new Thread() {
       @Override
       public void run() {
 
-        for (Event event : eventsToUpdate) {
+        for (Event event : eventsToCache) {
           try {
             Statement statement = dbConnection.createStatement();
             String cmd = QueryGenerator.insertOrReplaceEvent(event);

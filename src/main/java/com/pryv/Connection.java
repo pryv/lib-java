@@ -326,7 +326,7 @@ public class Connection implements EventsManager, StreamsManager {
       Double pServerTime) {
       computeDelta(pServerTime);
 
-      if (event != null) {
+      if (eventsSupervisor != null) {
         if (event.getId() != null) {
           eventsSupervisor.updateOrCreateEvent(event, userEventsCallback);
         }

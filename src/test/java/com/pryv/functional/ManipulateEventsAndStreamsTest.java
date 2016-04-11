@@ -88,6 +88,7 @@ public class ManipulateEventsAndStreamsTest {
   @Test
   public void testFetchEvents() {
     eventsManager.getEvents(new Filter(), eventsCallback);
+    Awaitility.await().until(hasEventsSuccess());
     Awaitility.await().until(hasEvents());
   }
 

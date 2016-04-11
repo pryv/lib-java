@@ -15,7 +15,7 @@ public interface EventsManager {
   /**
    * retrieve events
    *
-   * @param params
+   * @param filter
    *          optional filter parameters
    * @param eventsCallback
    *          the callback for events retrieval
