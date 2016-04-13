@@ -30,12 +30,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by ik on 4/10/16.
- */
 public class ConnectionEventsTest {
-
-    private static OnlineEventsAndStreamsManager online;
 
     private static EventsCallback eventsCallback;
     private static StreamsCallback streamsCallback;
