@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.joda.time.DateTime;
 
@@ -49,12 +51,6 @@ public class Event {
   private Double modified;
   private String modifiedBy;
 
-  /**
-   * a weak reference to the connection to which the Event is linked
-   */
-  @JsonIgnore
-  private WeakReference<Connection> weakConnection;
-
   // optional
   private Double duration;
   private Object content;
@@ -64,7 +60,22 @@ public class Event {
   private Set<Attachment> attachments;
   private Map<String, Object> clientData;
   private Boolean trashed;
-  private String tempRefId;
+
+  /**
+   * a weak reference to the connection to which the Event is linked
+   */
+  @JsonIgnore
+  private WeakReference<Connection> weakConnection;
+
+  /**
+   * used in order to prevent instanciating an Event multiple times.
+   */
+  private static Map<String, Event> supervisor = new WeakHashMap<String, Event>();
+
+  /**
+   * Used to map ids to clientIds
+   */
+  private static Map<String, String> idToClientId = new ConcurrentHashMap<String, String>();
 
   /**
    * Construct Event object from parameters
@@ -95,8 +106,6 @@ public class Event {
    *          optional
    * @param pTrashed
    *          optional
-   * @param pTempRefId
-   *          optional
    */
   public Event(String pClientId, String pId, String pStreamId, Double pTime, Double pDuration,
     String pType, String pContent, Set<String> pTags, Set<String> pReferences, String pDescription,
@@ -120,7 +129,8 @@ public class Event {
     attachments = pAttachments;
     clientData = pClientData;
     trashed = pTrashed;
-    tempRefId = pTempRefId;
+    supervisor.put(this.clientId, this);
+    idToClientId.put(this.id, this.clientId);
   }
 
   /**
@@ -145,59 +155,86 @@ public class Event {
   }
 
   /**
-   * build Event when retrieved from cache
+   * Build an event from a ResultSet, used when retrieving Event objects from the SQLite Cache.
+   * This takes care of instanciating a new Event only in the case when it isn't existing yet.
    *
-   * @param result
+   * @param result The
+   * @return
    * @throws SQLException
    * @throws IOException
-   * @throws JsonMappingException
-   * @throws JsonParseException
    */
-  public Event(ResultSet result) throws SQLException, JsonParseException, JsonMappingException,
-    IOException {
-    clientId = result.getString(QueryGenerator.EVENTS_CLIENT_ID_KEY);
-    id = result.getString(QueryGenerator.EVENTS_ID_KEY);
-    streamId = result.getString(QueryGenerator.EVENTS_STREAM_ID_KEY);
-    time = result.getDouble(QueryGenerator.EVENTS_TIME_KEY);
-    type = result.getString(QueryGenerator.EVENTS_TYPE_KEY);
-    created = result.getDouble(QueryGenerator.EVENTS_CREATED_KEY);
-    createdBy = result.getString(QueryGenerator.EVENTS_CREATED_BY_KEY);
-    modified = result.getDouble(QueryGenerator.EVENTS_MODIFIED_KEY);
-    modifiedBy = result.getString(QueryGenerator.EVENTS_MODIFIED_BY_KEY);
-    duration = result.getDouble(QueryGenerator.EVENTS_DURATION_KEY);
-    content = result.getObject(QueryGenerator.EVENTS_CONTENT_KEY);
+  public static Event createOrReuse(ResultSet result) throws SQLException, IOException {
+    String clientId = result.getString(QueryGenerator.EVENTS_CLIENT_ID_KEY);
+    Event event = supervisor.get(clientId);
+    if (event == null) {
+      event = new Event();
+    }
+    event.setId(result.getString(QueryGenerator.EVENTS_ID_KEY));
+    event.setStreamId(result.getString(QueryGenerator.EVENTS_STREAM_ID_KEY));
+    event.setTime(result.getDouble(QueryGenerator.EVENTS_TIME_KEY));
+    event.setType(result.getString(QueryGenerator.EVENTS_TYPE_KEY));
+    event.setCreated(result.getDouble(QueryGenerator.EVENTS_CREATED_KEY));
+    event.setCreatedBy(result.getString(QueryGenerator.EVENTS_CREATED_BY_KEY));
+    event.setModified(result.getDouble(QueryGenerator.EVENTS_MODIFIED_KEY));
+    event.setModifiedBy(result.getString(QueryGenerator.EVENTS_MODIFIED_BY_KEY));
+    event.setDuration(result.getDouble(QueryGenerator.EVENTS_DURATION_KEY));
+    event.setContent(result.getObject(QueryGenerator.EVENTS_CONTENT_KEY));
     String tagsString = result.getString(QueryGenerator.EVENTS_TAGS_KEY);
     if (tagsString != null) {
-      tags = new HashSet<String>(Arrays.asList(tagsString.split(",")));
+      event.setTags(new HashSet<String>(Arrays.asList(tagsString.split(","))));
     }
     String referencesString = result.getString(QueryGenerator.EVENTS_REFS_KEY);
     if (referencesString != null) {
-      references = new HashSet<String>(Arrays.asList(referencesString.split(",")));
+      event.setReferences(new HashSet<String>(Arrays.asList(referencesString.split(","))));
     }
 
-    description = result.getString(QueryGenerator.EVENTS_DESCRIPTION_KEY);
+    event.setDescription(result.getString(QueryGenerator.EVENTS_DESCRIPTION_KEY));
     // TODO fetch Attachments elsewhere
-    setClientDataFromAstring(result.getString(QueryGenerator.EVENTS_CLIENT_DATA_KEY));
-    trashed = result.getBoolean(QueryGenerator.EVENTS_TRASHED_KEY);
-    tempRefId = result.getString(QueryGenerator.EVENTS_TEMP_REF_ID_KEY);
-    attachments =
-      JsonConverter.deserializeAttachments(result.getString(QueryGenerator.EVENTS_ATTACHMENTS_KEY));
+    event.setClientDataFromAstring(result.getString(QueryGenerator.EVENTS_CLIENT_DATA_KEY));
+    event.setTrashed(result.getBoolean(QueryGenerator.EVENTS_TRASHED_KEY));
+    event.setAttachments(JsonConverter.deserializeAttachments(result.getString(QueryGenerator.EVENTS_ATTACHMENTS_KEY)));
+    return event;
+  }
+
+  /**
+   * saves the Event in the supervisor if needed
+   *
+   * @param event
+   * @return
+   */
+  public static Event createOrReuse(Event event) {
+    String id = event.getId();
+    String clientId = event.getClientId();
+    if (id != null && clientId == null) {
+      clientId = idToClientId.get(id);
+    }
+
+    if (clientId == null) {
+      clientId = event.generateClientId();
+    }
+    supervisor.put(clientId, event);
+
+    if (id != null) {
+      idToClientId.put(id, clientId);
+    }
+    return event;
   }
 
   /**
    * Assign unique identifier to the Event - to execute ONCE upon creation
    */
-  public void generateClientId() {
-    clientId = UUID.randomUUID().toString();
+  public String generateClientId() {
+    this.clientId = UUID.randomUUID().toString();
+    return this.clientId;
   }
 
   /**
    * Assign a weak reference to the Connection
    *
-   * @param connection
+   * @param weakconnection
    */
-  public void assignConnection(WeakReference<Connection> pWeakconnection) {
-    weakConnection = pWeakconnection;
+  public void assignConnection(WeakReference<Connection> weakconnection) {
+    this.weakConnection = weakconnection;
   }
 
   /**
@@ -215,7 +252,7 @@ public class Event {
    *
    * @param temp
    *          the Event from which the fields are merged
-   * @param Cloner
+   * @param cloner
    *          com.rits.cloning.Cloner instance from JsonConverter util class
    */
   public void merge(Event temp, Cloner cloner) {
@@ -490,16 +527,24 @@ public class Event {
     }
   }
 
-  public String getTempRefId() {
-    return tempRefId;
+  /**
+   * Assigns a clientId and saves it in the supervisor
+   *
+   * @param clientId
+   */
+  public void setClientId(String clientId) {
+    this.clientId = clientId;
+    supervisor.put(this.clientId, this);
   }
 
-  public void setClientId(String pClientId) {
-    clientId = pClientId;
-  }
-
+  /**
+   * Assigns an id and puts an entry in the idToClientId table
+   *
+   * @param pid
+   */
   public void setId(String pid) {
     this.id = pid;
+    idToClientId.put(this.id, this.clientId);
   }
 
   public void setStreamId(String pstreamId) {
@@ -562,8 +607,5 @@ public class Event {
     this.trashed = ptrashed;
   }
 
-  public void setTempRefId(String ptempRefId) {
-    this.tempRefId = ptempRefId;
-  }
 
 }

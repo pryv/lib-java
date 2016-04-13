@@ -406,6 +406,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
                         Map<String, Event> receivedEvents = JsonConverter.createEventsFromJson(responseBody);
                         for (Event receivedEvent : receivedEvents.values()) {
                             receivedEvent.assignConnection(weakConnection);
+                            Event.createOrReuse(receivedEvent);
                         }
                         logger.log("ApiResponseHandler: received "
                                 + receivedEvents.size()
@@ -416,8 +417,9 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
                     case CREATE_EVENT:
                         String stoppedId = JsonConverter.retrieveStoppedIdFromJson(responseBody);
                         Event createdEvent = JsonConverter.retrieveEventFromJson(responseBody);
-                        createdEvent.assignConnection(weakConnection);
                         createdEvent.setClientId(event.getClientId());
+                        createdEvent.assignConnection(weakConnection);
+                        Event.createOrReuse(createdEvent);
                         logger.log("ApiResponseHandler: event created successfully: cid="
                                 + createdEvent.getClientId()
                                 + ", id="
@@ -434,6 +436,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
                         Event updatedEvent = JsonConverter.retrieveEventFromJson(responseBody);
                         updatedEvent.assignConnection(weakConnection);
                         updatedEvent.setClientId(event.getClientId());
+                        Event.createOrReuse(updatedEvent);
                         logger.log("ApiResponseHandler: event updated successfully: cid="
                                 + updatedEvent.getClientId()
                                 + ", id="
@@ -456,6 +459,7 @@ public class OnlineEventsAndStreamsManager implements EventsManager, StreamsMana
                             Event trashedEvent = JsonConverter.retrieveEventFromJson(responseBody);
                             trashedEvent.assignConnection(weakConnection);
                             trashedEvent.setClientId(event.getClientId());
+                            Event.createOrReuse(trashedEvent);
                             onlineEventsCallback.onEventsSuccess(
                                     "Online: event with clientId="
                                             + trashedEvent.getClientId()

@@ -210,7 +210,7 @@ public class SQLiteDBHelper {
           Statement statement = dbConnection.createStatement();
           ResultSet result = statement.executeQuery(fetchCmd);
           while (result.next()) {
-            Event retrievedEvent = new Event(result);
+            Event retrievedEvent = Event.createOrReuse(result);
             if (retrievedEvent.isTrashed() == true) {
               // delete really
               String cmd = QueryGenerator.deleteEvent(retrievedEvent);
@@ -270,7 +270,7 @@ public class SQLiteDBHelper {
           ResultSet result = statement.executeQuery(cmd);
           Map<String, Event> retrievedEvents = new HashMap<String, Event>();
           while (result.next()) {
-            Event retrievedEvent = new Event(result);
+            Event retrievedEvent = Event.createOrReuse(result);
             retrievedEvents.put(retrievedEvent.getClientId(), retrievedEvent);
           }
           cacheEventsCallback.onEventsRetrievalSuccess(retrievedEvents, null);
@@ -440,7 +440,7 @@ public class SQLiteDBHelper {
                 Event updateEvent = null;
                 while (result.next()) {
                   try {
-                    updateEvent = new Event(result);
+                    updateEvent = Event.createOrReuse(result);
                     updateEvent.setStreamId(parentId);
                     updateEvent(updateEvent, null);
                   } catch (JsonParseException e) {
