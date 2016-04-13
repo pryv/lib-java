@@ -91,13 +91,13 @@ public class SQLiteDBHelper {
    *          callback to notify success or failure
    */
   public void
-    updateOrCreateEvent(final Event eventToCache, final EventsCallback cacheEventsCallback) {
+    createEvent(final Event eventToCache, final EventsCallback cacheEventsCallback) {
     new Thread() {
       @Override
       public void run() {
         try {
           String cmd = QueryGenerator.insertOrReplaceEvent(eventToCache);
-          logger.log("SQLiteDBHelper: update or Create event: " + cmd);
+          logger.log("SQLiteDBHelper: create event: " + cmd);
           Statement statement = dbConnection.createStatement();
           statement.execute(cmd);
           statement.close();
@@ -106,9 +106,46 @@ public class SQLiteDBHelper {
               null);
           }
         } catch (SQLException e) {
-          cacheEventsCallback.onEventsError(e.getMessage(), null);
+          if (cacheEventsCallback != null) {
+            cacheEventsCallback.onEventsError(e.getMessage(), null);
+          }
         } catch (JsonProcessingException e) {
-          cacheEventsCallback.onEventsError(e.getMessage(), null);
+          if (cacheEventsCallback != null) {
+            cacheEventsCallback.onEventsError(e.getMessage(), null);
+          }
+        }
+      }
+    }.start();
+  }
+
+  /**
+   * update Event in the SQLite database
+   *
+   * @param eventToUpdate
+   * @param cacheEventsCallback
+   */
+  public void updateEvent(final Event eventToUpdate, final EventsCallback cacheEventsCallback) {
+    new Thread() {
+
+      public void run() {
+        try {
+          String cmd = QueryGenerator.updateEvent(eventToUpdate);
+          logger.log("SQLiteDBHelper: update event: " + cmd);
+          Statement statement = dbConnection.createStatement();
+          int num = statement.executeUpdate(cmd);
+            if (cacheEventsCallback != null) {
+              cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: " + num
+                              + " event(s) updated in cache", eventToUpdate, null, null);
+            }
+          statement.close();
+        } catch (SQLException e) {
+          if (cacheEventsCallback != null) {
+            cacheEventsCallback.onEventsError(e.getMessage(), null);
+          }
+        } catch (JsonProcessingException e) {
+          if (cacheEventsCallback != null) {
+            cacheEventsCallback.onEventsError(e.getMessage(), null);
+          }
         }
       }
     }.start();
@@ -405,7 +442,7 @@ public class SQLiteDBHelper {
                   try {
                     updateEvent = new Event(result);
                     updateEvent.setStreamId(parentId);
-                    updateOrCreateEvent(updateEvent, null);
+                    updateEvent(updateEvent, null);
                   } catch (JsonParseException e) {
                     e.printStackTrace();
                     cacheStreamsCallback.onStreamError(e.getMessage(), null);

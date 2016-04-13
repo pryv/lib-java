@@ -1,11 +1,14 @@
-package com.pryv.functional;
+package com.pryv.unit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -37,33 +40,27 @@ import com.pryv.unit.DummyData;
 public class SQLiteDBHelperTest {
 
   private static SQLiteDBHelper db;
+
   private static EventsCallback eventsCallback;
   private static StreamsCallback streamsCallback;
 
-  private static Map<String, Stream> streams;
-  private static Map<String, Event> events;
+  private static Map<String, Stream> streams = new HashMap<String, Stream>();
+  private static Map<String, Event> events = new HashMap<String, Event>();
 
-  private static Event testEvent;
-  private static Stream testStream;
+  private static Event singleEvent;
+  private static Stream singleStream;
 
   private static final long MODIFIED_INCREMENT = 50;
 
   // create, update, delete
-  private static boolean eventsSuccess = false;
-  private static boolean eventsError = false;
-  private static boolean streamsSuccess = false;
-  private static boolean streamsError = false;
-  // get
-  private static boolean eventsRetrievalSuccess = false;
-  private static boolean eventsRetrievalError = false;
-  private static boolean streamsRetrievalSuccess = false;
-  private static boolean streamsRetrievalError = false;
+  private static boolean success = false;
+  private static boolean error = false;
 
   // executed before all tests once
   @BeforeClass
   public static void beforeClass() {
-    testEvent = DummyData.generateFullEvent();
-    testStream = DummyData.generateFullStream();
+    singleEvent = DummyData.generateFullEvent();
+    singleStream = DummyData.generateFullStream();
     instanciateEventsCallback();
     instanciateStreamsCallback();
 
@@ -76,221 +73,318 @@ public class SQLiteDBHelperTest {
         System.out.println(message);
       }
     });
+
   }
 
-  // executed after all tests once
   @AfterClass
   public static void cleanUpTestDB() {
     System.out.println("SQLiteDBHelperTest: clean up phase:");
-    testEvent = null;
+    singleEvent = null;
     db.getEvents(null, eventsCallback);
-    Awaitility.await().until(hasRetrievedEventSuccessfully());
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
     for (Event event : events.values()) {
-      System.out.println("deleting event with clientId="
+      System.out.println("trashing event with clientId="
         + event.getClientId()
           + ", cid="
           + event.getClientId());
       db.deleteEvent(event, eventsCallback);
-      Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
-      eventsSuccess = false;
-      if (testEvent != null) {
-        System.out.println("deleting again: " + testEvent.getClientId());
+      Awaitility.await().until(hasResult());
+      assertTrue(success);
+      success = false;
+      if (singleEvent != null) {
+        System.out.println("deleting again: " + singleEvent.getClientId());
         db.deleteEvent(event, eventsCallback);
-        Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
-        eventsSuccess = false;
+        Awaitility.await().until(hasResult());
+        assertTrue(success);
+        success = false;
       }
-      testEvent = null;
+      singleEvent = null;
     }
 
-    testStream = null;
+    singleStream = null;
     db.getStreams(streamsCallback);
-    Awaitility.await().until(hasRetrievedStreamSuccessfully());
-    streamsRetrievalSuccess = false;
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
     System.out.println("going to delete " + streams.size() + " streams");
     for (Stream stream : streams.values()) {
       System.out.println("deleting stream with id=" + stream.getId());
       stream.setModified(stream.getModified() + MODIFIED_INCREMENT);
       db.deleteStream(stream, false, streamsCallback);
-      Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
-      streamsSuccess = false;
-      if (testStream != null) {
-        System.out.println("deleting for real stream with id=" + testStream.getId());
+      Awaitility.await().until(hasResult());
+      assertTrue(success);
+      success = false;
+      if (singleStream != null) {
+        System.out.println("deleting for real stream with id=" + singleStream.getId());
         db.deleteStream(stream, false, streamsCallback);
-        Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
+        Awaitility.await().until(hasResult());
+        assertTrue(success);
+        success = false;
       }
     }
   }
 
-  // executed before each test
   @Before
   public void beforeEachTest() {
-    eventsSuccess = false;
-    eventsError = false;
-    streamsSuccess = false;
-    streamsError = false;
-    eventsRetrievalSuccess = false;
-    eventsRetrievalError = false;
-    streamsRetrievalSuccess = false;
-    streamsRetrievalError = false;
+    success = false;
+    error = false;
+    singleEvent = null;
+    singleStream = null;
+    events = null;
+    streams = null;
   }
 
   @Test
-  public void test01InsertEmpyEvent() {
+  public void testInsertIncompleteEventShouldGenerateError() {
     System.out.println("test2");
     Event emptyEvent = new Event();
-    db.updateOrCreateEvent(emptyEvent, eventsCallback);
-    Awaitility.await().until(hasErrorWhileInsertingUpdatingDeletingEvent());
+    emptyEvent.setClientId("yolo");
+    emptyEvent.setStreamId("testStreamId");
+    emptyEvent.setContent("i am missing mandatory fields");
+    db.createEvent(emptyEvent, eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(error);
   }
 
   @Test
-  public void test02InsertFullEvent() {
-    db.updateOrCreateEvent(testEvent, eventsCallback);
-    Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
-  }
+  public void testInsertValidEvent() {
+    Event newEvent = new Event();
+    newEvent.setClientId("newEventClientId");
+    newEvent.setStreamId("myStreamId");
+    newEvent.setType("activity/plain");
+    db.createEvent(newEvent, eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
 
-  @Test
-  public void test03UpdateEvent() {
-    String newStreamId = "otherStream";
-    testEvent.setStreamId(newStreamId);
-    testEvent.setModified(testEvent.getModified() + MODIFIED_INCREMENT);
-    db.updateOrCreateEvent(testEvent, eventsCallback);
-    Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
-    db.getEvents(null, eventsCallback);
-    Awaitility.await().until(hasRetrievedEventSuccessfully());
-    Event modifiedEvent = events.get(testEvent.getClientId());
-    if (modifiedEvent != null) {
-      assertEquals(
-        "new sid: " + modifiedEvent.getStreamId() + " should be : " + testEvent.getStreamId(),
-        newStreamId, modifiedEvent.getStreamId());
-    } else {
-      fail("fail update event");
-    }
-
+    db.getEvents(new Filter(), eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    assertNotNull(events.get(newEvent.getClientId()));
   }
 
   // TODO implement modified_time comparison for this to work
-  // @Test
-  public void test03UpdateEventShouldDoNothingBecauseOfModifiedFields() {
-    String previousContent = (String) testEvent.getContent();
-    testEvent.setContent("new updated content, " +
+  @Test
+  public void testUpdateEventShouldDoNothingBecauseOfModifiedFields() {
+    Event eventToUpdate = new Event();
+    eventToUpdate.setClientId("myUpdatedEventCid");
+    eventToUpdate.setStreamId("someStreamId");
+    eventToUpdate.setType("note/txt");
+    eventToUpdate.setContent("I will be updated youhou");
+    eventToUpdate.setModified(1000.0);
+
+    db.createEvent(eventToUpdate, eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
+
+    eventToUpdate.setContent("new updated content, " +
             "shouldnt be stored in cache because of modified time");
-    db.updateOrCreateEvent(testEvent, eventsCallback);
-    Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
+    db.updateEvent(eventToUpdate, eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
+
+    db.getEvents(new Filter(), eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    assertNotEquals(events.get(eventToUpdate.getClientId()).getContent(), eventToUpdate.getContent());
+  }
+
+  @Test
+  public void testUpdateEventShouldModify() {
+    Event eventToUpdate = new Event();
+    eventToUpdate.setClientId("myUpdatedEventCid");
+    eventToUpdate.setStreamId("someStreamId");
+    eventToUpdate.setType("note/txt");
+    eventToUpdate.setContent("I will be updated youhou");
+    eventToUpdate.setModified(1000.0);
+
+    db.createEvent(eventToUpdate, eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
+
+    eventToUpdate.setContent("new updated content, " +
+            "should be stored because modified time is later");
+    eventToUpdate.setModified(eventToUpdate.getModified() + 500.0);
+    db.updateEvent(eventToUpdate, eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
+
+    singleEvent.setModified(singleEvent.getModified() + MODIFIED_INCREMENT);
+    db.updateEvent(singleEvent, eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
+
+    db.getEvents(new Filter(), eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    assertEquals(events.get(eventToUpdate.getClientId()).getContent(), eventToUpdate.getContent());
+  }
+
+  @Test
+  public void testDeleteEventCalledOnceShouldUpdateItAsTrashed() {
+    Event eventToDelete = new Event();
+    eventToDelete.setClientId("newEventClientId");
+    eventToDelete.setStreamId("myStreamId");
+    eventToDelete.setType("activity/plain");
+    db.createEvent(eventToDelete, eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
+
+    db.deleteEvent(eventToDelete, eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
+
     db.getEvents(null, eventsCallback);
-    Awaitility.await().until(hasRetrievedEventSuccessfully());
-    Event notModifiedEvent = events.get(testEvent.getClientId());
-    assertEquals(notModifiedEvent.getContent(), previousContent);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    assertEquals(true, events.get(eventToDelete.getClientId()).isTrashed());
   }
 
   @Test
-  public void test03UpdateEventShouldModify() {
-    testEvent.setModified(testEvent.getModified() + MODIFIED_INCREMENT);
-    db.updateOrCreateEvent(testEvent, eventsCallback);
-    Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
+  public void testDeleteEventCalledTwiceShouldDeleteIt() {
+    Event eventToDelete = new Event();
+    eventToDelete.setClientId("newEventClientId");
+    eventToDelete.setStreamId("myStreamId");
+    eventToDelete.setType("activity/plain");
+    db.createEvent(eventToDelete, eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
+
+    db.deleteEvent(eventToDelete, eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
+
+    db.deleteEvent(eventToDelete, eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
+
     db.getEvents(null, eventsCallback);
-    Awaitility.await().until(hasRetrievedEventSuccessfully());
-    Event modifiedEvent = events.get(testEvent.getClientId());
-    assertTrue("new value: "
-      + modifiedEvent.getModified()
-        + " should be higher than old value: "
-        + DummyData.getModified(), modifiedEvent.getModified() > DummyData.getModified());
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    assertNull(events.get(eventToDelete.getClientId()));
   }
 
   @Test
-  public void test04RemoveFullEvent() {
-    testEvent.setModified(testEvent.getModified() + MODIFIED_INCREMENT);
-    db.deleteEvent(testEvent, eventsCallback);
-    Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
-    db.getEvents(null, eventsCallback);
-    Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
-    assertEquals(true, events.get(testEvent.getClientId()).isTrashed());
-  }
+  public void testGetEventsShouldReturnEventsMatchingTheProvidedFilter() {
+    Event noteEvent = new Event("myStream", null, "note/txt", "hi");
+    noteEvent.setClientId("myClientId");
+    db.createEvent(noteEvent, eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
 
-  @Test
-  public void test05RetrieveEventsForFullFilter() {
-    Filter filter = DummyData.generateFullFilter();
-    db.getEvents(filter, eventsCallback);
-    Awaitility.await().until(hasRetrievedEventSuccessfully());
-    assertTrue(eventsRetrievalSuccess);
-  }
+    Event activityEvent = new Event("myStream", null, "activity/plain", null);
+    activityEvent.setClientId("otherClientId");
+    db.createEvent(activityEvent, eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
 
-  @Test
-  public void test06RetrieveEventForStateEqualsAllFilter() {
     Filter filter = new Filter();
-    filter.setState(Filter.State.ALL);
+    String filterType = "note/txt";
+    filter.addType(filterType);
     db.getEvents(filter, eventsCallback);
-    Awaitility.await().until(hasRetrievedEventSuccessfully());
-    assertTrue(eventsRetrievalSuccess);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    assertTrue(events.size() > 0);
+    for (Event event: events.values()) {
+      assertEquals(event.getType(), filterType);
+    }
   }
 
   @Test
-  public void test07InsertEmptyStreamShouldFail() {
-    Stream incorrectStream = new Stream(null, null);
-    incorrectStream.setId(null);
+  public void createStreamWithMissingRequiredFieldsShouldGenerateAnError() {
+    Stream incorrectStream = new Stream("myId", null);
     db.updateOrCreateStream(incorrectStream, streamsCallback);
-    Awaitility.await().until(hasErrorWhileInsertingUpdatingDeletingStream());
-    assertTrue(streamsError);
+    Awaitility.await().until(hasResult());
+    assertTrue(error);
   }
 
   @Test
-  public void test08InsertFullStream() {
-    System.out.println("test insert full stream START");
-    db.updateOrCreateStream(testStream, streamsCallback);
-    Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
-    System.out.println("test insert full stream INSERTION SUCCESS");
+  public void createStreamWithValidFieldsShouldPass() {
+    Stream validStream = new Stream("myValidStreamId", "Valid stream yo");
+    db.updateOrCreateStream(validStream, streamsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
+
     db.getStreams(streamsCallback);
-    Awaitility.await().until(hasRetrievedStreamSuccessfully());
-    System.out.println("testStream id: " + streams.get(testStream.getId()).getId());
-    assertEquals(streams.get(testStream.getId()).getId(), testStream.getId());
-    System.out.println("test insert full stream END");
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    assertNotNull(streams.get(validStream.getId()));
   }
 
   @Test
-  public void test09UpdateFullStream() {
+  public void testUpdateStreamShouldNotModifyEventIfItsField() {
     System.out.println("test update full stream START");
     String newStreamName = "myNewStreamName - dadadaa";
-    testStream.setName(newStreamName);
-    db.updateOrCreateStream(testStream, streamsCallback);
-    Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
+    singleStream.setName(newStreamName);
+    db.updateOrCreateStream(singleStream, streamsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
     db.getStreams(streamsCallback);
-    Awaitility.await().until(hasRetrievedStreamSuccessfully());
-    assertEquals(newStreamName, streams.get(testStream.getId()).getName());
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    assertEquals(newStreamName, streams.get(singleStream.getId()).getName());
   }
 
-  @Test
+  //@Test
   public void test10retrieveStreams() {
     db.getStreams(streamsCallback);
-    Awaitility.await().until(hasRetrievedStreamSuccessfully());
-    assertTrue(streams.get(testStream.getId()) != null);
-    assertTrue(streams.get(testStream.getId()).getChildren().size() != 0);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    assertTrue(streams.get(singleStream.getId()) != null);
+    assertTrue(streams.get(singleStream.getId()).getChildren().size() != 0);
   }
 
-  @Test
+  //@Test
   public void test11RemoveFullStream() {
     System.out.println("SQLiteDBHelperTest: test11RemoveFullStream");
-    db.deleteStream(testStream, false, streamsCallback);
-    Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
-    assertTrue(testStream.isTrashed());
-    db.deleteStream(testStream, false, streamsCallback);
-    Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
+    db.deleteStream(singleStream, false, streamsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
+    assertTrue(singleStream.isTrashed());
+    db.deleteStream(singleStream, false, streamsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
     db.getStreams(streamsCallback);
-    Awaitility.await().until(hasRetrievedStreamSuccessfully());
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
     for (Stream stream : streams.values()) {
-      if (stream.getId() == testStream.getId()) {
+      if (stream.getId() == singleStream.getId()) {
         fail("stream delete fail");
       }
     }
   }
 
-  @Test
+  //@Test
   public void test14RetrieveCorrectEvent() {
     Event testedEvent = DummyData.generateFullEvent();
     String newClientId = "myNewClientID";
     testedEvent.setClientId(newClientId);
-    db.updateOrCreateEvent(testedEvent, eventsCallback);
-    Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
+    db.createEvent(testedEvent, eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
     db.getEvents(null, eventsCallback);
-    Awaitility.await().until(hasRetrievedEventSuccessfully());
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
     Event retrievedEvent = events.get(newClientId);
     assertEquals(testedEvent.getClientId(), retrievedEvent.getClientId());
     assertEquals(testedEvent.getStreamId(), retrievedEvent.getStreamId());
@@ -325,10 +419,11 @@ public class SQLiteDBHelperTest {
     testedEvent.setTrashed(true);
     testedEvent.setModified(testedEvent.getModified() + MODIFIED_INCREMENT);
     db.deleteEvent(testedEvent, eventsCallback);
-    Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
   }
 
-  @Test
+  //@Test
   public void test13RetrieveStreamCorrectly() {
     Stream testedStream = DummyData.generateFullStream();
     String newId = "myNewStreamId";
@@ -341,9 +436,12 @@ public class SQLiteDBHelperTest {
     }
     System.out.println("inserting stream with id: " + newId);
     db.updateOrCreateStream(testedStream, streamsCallback);
-    Awaitility.await().until(hasInsertedUpdatedDeletedStreamSuccessfully());
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
     db.getStreams(streamsCallback);
-    Awaitility.await().until(hasRetrievedStreamSuccessfully());
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
     Stream retrievedStream = streams.get(newId);
     assertEquals(testedStream.getName(), retrievedStream.getName());
     assertEquals(testedStream.getParentId(), retrievedStream.getParentId());
@@ -367,89 +465,28 @@ public class SQLiteDBHelperTest {
     assertEquals(testedStream.getModifiedBy(), retrievedStream.getModifiedBy());
   }
 
-  @Test
+  //@Test
   public void testInsertAndRetrieveEventWithNullAttachments() {
     Event eventWithoutAttachments = DummyData.generateFullEvent();
     eventWithoutAttachments.setAttachments(null);
     String clientId = "eventWithoutAttachmentsID";
     eventWithoutAttachments.setClientId(clientId);
-    db.updateOrCreateEvent(eventWithoutAttachments, eventsCallback);
-    Awaitility.await().until(hasInsertedUpdatedDeletedEventSuccessfully());
+    db.createEvent(eventWithoutAttachments, eventsCallback);
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
+    success = false;
     db.getEvents(null, eventsCallback);
-    Awaitility.await().until(hasRetrievedEventSuccessfully());
+    Awaitility.await().until(hasResult());
+    assertTrue(success);
     assertNull(events.get(clientId).getAttachments());
   }
 
-  private static Callable<Boolean> hasRetrievedEventSuccessfully() {
-    return new Callable<Boolean>() {
-      @Override
-      public Boolean call() throws Exception {
-        return eventsRetrievalSuccess;
-      }
-    };
-  }
-
-  private Callable<Boolean> hasErrorWhileRetrievingEvent() {
-    return new Callable<Boolean>() {
-      @Override
-      public Boolean call() throws Exception {
-        return eventsRetrievalError;
-      }
-    };
-  }
-
-  private static Callable<Boolean> hasInsertedUpdatedDeletedEventSuccessfully() {
-    return new Callable<Boolean>() {
-      @Override
-      public Boolean call() throws Exception {
-        return eventsSuccess;
-      }
-    };
-  }
-
-  private Callable<Boolean> hasErrorWhileInsertingUpdatingDeletingEvent() {
+  private static Callable<Boolean> hasResult() {
     return new Callable<Boolean>() {
 
       @Override
       public Boolean call() throws Exception {
-        return eventsError;
-      }
-    };
-  }
-
-  private static Callable<Boolean> hasRetrievedStreamSuccessfully() {
-    return new Callable<Boolean>() {
-      @Override
-      public Boolean call() throws Exception {
-        return streamsRetrievalSuccess;
-      }
-    };
-  }
-
-  private Callable<Boolean> hasErrorWhileRetrievingStream() {
-    return new Callable<Boolean>() {
-      @Override
-      public Boolean call() throws Exception {
-        return streamsRetrievalError;
-      }
-    };
-  }
-
-  private static Callable<Boolean> hasInsertedUpdatedDeletedStreamSuccessfully() {
-    return new Callable<Boolean>() {
-      @Override
-      public Boolean call() throws Exception {
-        return streamsSuccess;
-      }
-    };
-  }
-
-  private Callable<Boolean> hasErrorWhileInsertingUpdatingDeletingStream() {
-    return new Callable<Boolean>() {
-
-      @Override
-      public Boolean call() throws Exception {
-        return streamsError;
+        return (success || error);
       }
     };
   }
@@ -458,28 +495,32 @@ public class SQLiteDBHelperTest {
     eventsCallback = new EventsCallback() {
 
       @Override
-      public void onEventsRetrievalSuccess(Map<String, Event> pEvents, Double serverTime) {
-        events = pEvents;
-        eventsRetrievalSuccess = true;
+      public void onEventsRetrievalSuccess(Map<String, Event> newEvents, Double serverTime) {
+        System.out.println("SQLiteDBHelperTest: events retrieval success with "
+                + newEvents.values().size()
+                + " events");
+        events = newEvents;
+        success = true;
       }
 
       @Override
-      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
-        Double pServerTime) {
-        testEvent = event;
-        eventsSuccess = true;
+      public void onEventsRetrievalError(String message, Double pServerTime) {
+        error = true;
       }
 
       @Override
-      public void onEventsRetrievalError(String errorMessage, Double pServerTime) {
-        eventsRetrievalError = true;
+      public void onEventsSuccess(String successMessage, Event event, Integer pStoppedId,
+                                  Double pServerTime) {
+        System.out.println("SQLiteDBHelperTest: events success msg: " + successMessage + " with Event: " + event);
+        success = true;
+        singleEvent = event;
       }
 
       @Override
       public void onEventsError(String errorMessage, Double pServerTime) {
-        eventsError = true;
+        System.out.println("SQLiteDBHelperTest: events error msg: " + errorMessage);
+        error = true;
       }
-
     };
   }
 
@@ -487,29 +528,31 @@ public class SQLiteDBHelperTest {
     streamsCallback = new StreamsCallback() {
 
       @Override
-      public void
-        onStreamsRetrievalSuccess(Map<String, Stream> receveiedStreams, Double serverTime) {
-        streams = receveiedStreams;
-        streamsRetrievalSuccess = true;
+      public void onStreamsRetrievalSuccess(Map<String, Stream> newStreams, Double serverTime) {
+        System.out.println("SQLiteDBHelperTest: streams retrieval success for "
+                + newStreams.values().size()
+                + " streams");
+        streams = newStreams;
+        success = true;
       }
 
       @Override
-      public void onStreamsRetrievalError(String errorMessage, Double serverTime) {
-        streamsRetrievalError = true;
+      public void onStreamsRetrievalError(String message, Double pServerTime) {
+        error = true;
       }
 
       @Override
-      public void onStreamsSuccess(String successMessage, Stream stream, Double serverTime) {
-        streamsSuccess = true;
-        testStream = stream;
-        System.out.println("SQLite TestStreamsCallback onStreamSuccess: " + successMessage);
+      public void onStreamsSuccess(String successMessage, Stream stream, Double pServerTime) {
+        System.out.println("SQLiteDBHelperTest: streams success msg: " + successMessage);
+        singleStream = stream;
+        success = true;
       }
 
       @Override
-      public void onStreamError(String errorMessage, Double serverTime) {
-        streamsError = true;
+      public void onStreamError(String errorMessage, Double pServerTime) {
+        System.out.println("SQLiteDBHelperTest: streams error msg: " + errorMessage);
+        error = true;
       }
-
     };
   }
 
