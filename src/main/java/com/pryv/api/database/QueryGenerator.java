@@ -42,7 +42,6 @@ public class QueryGenerator {
   public static final String EVENTS_DESCRIPTION_KEY = "DESCRIPTION";
   public static final String EVENTS_CLIENT_DATA_KEY = "CLIENT_DATA";
   public static final String EVENTS_TRASHED_KEY = "TRASHED";
-  public static final String EVENTS_TEMP_REF_ID_KEY = "TEMP_REF_ID";
   public static final String EVENTS_ATTACHMENTS_KEY = "ATTACHMENTS";
 
   /**
@@ -104,8 +103,6 @@ public class QueryGenerator {
         + ", "
         + EVENTS_TRASHED_KEY
         + ", "
-        + EVENTS_TEMP_REF_ID_KEY
-        + ", "
         + EVENTS_ATTACHMENTS_KEY
         + ")"
         + " VALUES (");
@@ -125,7 +122,6 @@ public class QueryGenerator {
     sb.append(formatTextValue(eventToCache.getDescription()) + ",");
     sb.append(formatTextValue(eventToCache.formatClientDataAsString()) + ",");
     sb.append(formatBooleanValue(eventToCache.isTrashed()) + ",");
-    sb.append(formatTextValue(eventToCache.getTempRefId()) + ",");
     sb.append(formatTextValue(JsonConverter.toJson(eventToCache.getAttachments())));
     sb.append(");");
     return sb.toString();
@@ -168,8 +164,6 @@ public class QueryGenerator {
             + EVENTS_CLIENT_DATA_KEY + "=" + formatTextValue(eventToUpdate.formatClientDataAsString())
             + ", "
             + EVENTS_TRASHED_KEY + "=" + formatBooleanValue(eventToUpdate.isTrashed())
-            + ", "
-            + EVENTS_TEMP_REF_ID_KEY + "=" + formatTextValue(eventToUpdate.getTempRefId())
             + ", "
             + EVENTS_ATTACHMENTS_KEY + "=" + formatTextValue(JsonConverter.toJson(eventToUpdate.getAttachments())));
 
@@ -443,8 +437,6 @@ public class QueryGenerator {
         + " TEXT, "
         + EVENTS_TRASHED_KEY
         + " INTEGER, "
-        + EVENTS_TEMP_REF_ID_KEY
-        + " TEXT, "
         + EVENTS_ATTACHMENTS_KEY
         + " TEXT);";
   }
@@ -463,11 +455,11 @@ public class QueryGenerator {
         + STREAMS_NAME_KEY
         + " TEXT  NOT NULL, "
         + STREAMS_CREATED_KEY
-        + " INTEGER, "
+        + " REAL, "
         + STREAMS_CREATED_BY_KEY
         + " TEXT, "
         + STREAMS_MODIFIED_KEY
-        + " INTEGER, "
+        + " REAL, "
         + STREAMS_MODIFIED_BY_KEY
         + " TEXT, "
         + STREAMS_PARENT_ID_KEY
