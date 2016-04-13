@@ -45,7 +45,7 @@ After running `mvn package`, include the `lib-java-0.1.0-jar-with-dependencies.j
 
 ### Build and tests
 
-`gradle` compiles the source files.
+`gradle compileJava` compiles the source files.
 
 `gradle test` runs the tests.
 
