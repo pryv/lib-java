@@ -34,7 +34,6 @@ public class EventsSupervisor {
 
   /**
    * EventsSupervisor constructor. Instantiates data structures to store Events.
-   *
    */
   public EventsSupervisor(StreamsSupervisor pStreamsSupervisor) {
     streamsSupervisor = pStreamsSupervisor;
@@ -97,11 +96,11 @@ public class EventsSupervisor {
    */
   public void updateOrCreateEvent(Event event, EventsCallback connectionCallback) {
     logger.log("EventsSupervisor: updateOrCreateEvent with id="
-      + event.getId()
-        + ", cid="
-        + event.getClientId()
-        + ", streamId="
-        + event.getStreamId());
+            + event.getId()
+            + ", cid="
+            + event.getClientId()
+            + ", streamId="
+            + event.getStreamId());
 
     Event oldEvent = null;
     String cid = getClientId(event.getId());
@@ -137,7 +136,7 @@ public class EventsSupervisor {
    */
   private void addEvent(Event newEvent, EventsCallback connectionCallback) {
     events.put(newEvent.getClientId(), newEvent);
-    eventIdToClientId.put(newEvent.getId(), newEvent.getClientId());
+    addIdToClientIdEntry(newEvent.getId(), newEvent.getClientId());
     logger.log("EventsSupervisor: added Event (id="
       + newEvent.getId()
         + ", cid="
@@ -183,7 +182,7 @@ public class EventsSupervisor {
         + ")");
     if (connectionCallback != null) {
       connectionCallback.onEventsSuccess("EventsSupervisor: Event updated", eventToUpdate, null,
-        null);
+              null);
     }
   }
 
@@ -218,7 +217,7 @@ public class EventsSupervisor {
       }
     } else {
       connectionCallback.onEventsError(
-        "EventsSupervisor: Event with cid=" + eventToDelete.getClientId() + " not found.", null);
+              "EventsSupervisor: Event with cid=" + eventToDelete.getClientId() + " not found.", null);
     }
   }
 
@@ -240,7 +239,23 @@ public class EventsSupervisor {
    * @return the event's clientId if it exists, else null
    */
   public String getClientId(String id) {
-    return eventIdToClientId.get(id);
+    if (id != null) {
+      return eventIdToClientId.get(id);
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Add a mapping id->clientId
+   *
+   * @param id
+   * @param clientId
+   */
+  private void addIdToClientIdEntry(String id, String clientId) {
+    if (id != null && clientId != null) {
+      eventIdToClientId.put(id, clientId);
+    }
   }
 
   /**
