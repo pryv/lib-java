@@ -33,7 +33,6 @@ public class Connection implements EventsManager, StreamsManager {
   private String accessToken;
   private String apiDomain = Pryv.DOMAIN;
   private String apiScheme = "https";
-  private String url; // generated from apiScheme, apiDomain and username
 
   private WeakReference<Connection> weakConnection;
 
@@ -65,23 +64,28 @@ public class Connection implements EventsManager, StreamsManager {
   public Connection(String pUserId, String pAccessToken, DBinitCallback pDBInitCallback) {
     userID = pUserId;
     accessToken = pAccessToken;
-    url = getApiBaseUrl();
-    String cacheFolder = null;
-    // generate caching folder
-    if (Pryv.isCacheActive()) {
-      cacheFolder = "cache/" + getIdCaching() + "/";
-      new File(cacheFolder).mkdirs();
-    }
+
     weakConnection = new WeakReference<Connection>(this);
+
     if (Pryv.isSupervisorActive()) {
       streamsSupervisor = new StreamsSupervisor();
       eventsSupervisor = new EventsSupervisor(streamsSupervisor);
       streamsSupervisor.setEventsSupervisor(eventsSupervisor);
     }
-    cacheEventsManager =
-      new CacheEventsAndStreamsManager(cacheFolder, url, accessToken, pDBInitCallback,
-        streamsSupervisor, eventsSupervisor, weakConnection);
-    cacheStreamsManager = (StreamsManager) cacheEventsManager;
+
+    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
+      String cacheFolder = null;
+
+      if (Pryv.isCacheActive()) {
+        // generate caching folder
+        cacheFolder = "cache/" + getIdCaching() + "/";
+        new File(cacheFolder).mkdirs();
+      }
+      cacheEventsManager =
+              new CacheEventsAndStreamsManager(cacheFolder, getApiBaseUrl(), accessToken, pDBInitCallback,
+                      streamsSupervisor, eventsSupervisor, weakConnection);
+      cacheStreamsManager = (StreamsManager) cacheEventsManager;
+    }
   }
 
   /**
