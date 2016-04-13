@@ -131,6 +131,60 @@ public class QueryGenerator {
     return sb.toString();
   }
 
+  public static String updateEvent(Event eventToUpdate) throws JsonProcessingException {
+    StringBuilder sb = new StringBuilder();
+    /*UPDATE table_name
+    SET column1 = value1, column2 = value2...., columnN = valueN
+    WHERE [condition];*/
+    sb.append("UPDATE " + EVENTS_TABLE_NAME + " SET "
+            + EVENTS_CLIENT_ID_KEY + "=" + formatTextValue(eventToUpdate.getClientId())
+            + ", "
+            + EVENTS_ID_KEY + "=" + formatTextValue(eventToUpdate.getId())
+            + ", "
+            + EVENTS_STREAM_ID_KEY + "=" + formatTextValue(eventToUpdate.getStreamId())
+            + ", "
+            + EVENTS_TIME_KEY + "=" + formatDoubleValue(eventToUpdate.getTime())
+            + ", "
+            + EVENTS_TYPE_KEY + "=" + formatTextValue(eventToUpdate.getType())
+            + ", "
+            + EVENTS_CREATED_KEY + "=" + formatTextValue(eventToUpdate.getCreated())
+            + ", "
+            + EVENTS_CREATED_BY_KEY + "=" + formatTextValue(eventToUpdate.getCreatedBy())
+            + ", "
+            + EVENTS_MODIFIED_KEY + "=" + formatTextValue(eventToUpdate.getModified())
+            + ", "
+            + EVENTS_MODIFIED_BY_KEY + "=" + formatTextValue(eventToUpdate.getModifiedBy())
+            + ", "
+            + EVENTS_DURATION_KEY + "=" + formatDoubleValue(eventToUpdate.getDuration())
+            + ", "
+            + EVENTS_CONTENT_KEY + "=" + formatTextValue(eventToUpdate.getContent())
+            + ", "
+            + EVENTS_TAGS_KEY + "=" + formatSetValue(eventToUpdate.getTags())
+            + ", "
+            + EVENTS_REFS_KEY + "=" + formatSetValue(eventToUpdate.getReferences())
+            + ", "
+            + EVENTS_DESCRIPTION_KEY + "=" + formatTextValue(eventToUpdate.getDescription())
+            + ", "
+            + EVENTS_CLIENT_DATA_KEY + "=" + formatTextValue(eventToUpdate.formatClientDataAsString())
+            + ", "
+            + EVENTS_TRASHED_KEY + "=" + formatBooleanValue(eventToUpdate.isTrashed())
+            + ", "
+            + EVENTS_TEMP_REF_ID_KEY + "=" + formatTextValue(eventToUpdate.getTempRefId())
+            + ", "
+            + EVENTS_ATTACHMENTS_KEY + "=" + formatTextValue(JsonConverter.toJson(eventToUpdate.getAttachments())));
+
+    sb.append(" WHERE "
+            + EVENTS_CLIENT_ID_KEY
+            + "="
+            + formatTextValue(eventToUpdate.getClientId())
+            + " AND "
+            + EVENTS_MODIFIED_KEY
+            + " < "
+            + formatDoubleValue(eventToUpdate.getModified())
+            + ";");
+    return sb.toString();
+  }
+
   /**
    * Creates the query to delete an Event. It's clientId is used in the request.
    *
@@ -362,21 +416,21 @@ public class QueryGenerator {
         + EVENTS_ID_KEY
         + " TEXT, "
         + EVENTS_STREAM_ID_KEY
-        + " TEXT, "
+        + " TEXT  NOT NULL, "
         + EVENTS_TIME_KEY
         + " INTEGER, "
         + EVENTS_TYPE_KEY
-        + " TEXT, "
+        + " TEXT  NOT NULL, "
         + EVENTS_CREATED_KEY
-        + " INTEGER, "
+        + " REAL, "
         + EVENTS_CREATED_BY_KEY
         + " TEXT, "
         + EVENTS_MODIFIED_KEY
-        + " INTEGER, "
+        + " REAL, "
         + EVENTS_MODIFIED_BY_KEY
         + " TEXT, "
         + EVENTS_DURATION_KEY
-        + " INTEGER, "
+        + " REAL, "
         + EVENTS_CONTENT_KEY
         + " BLOB, "
         + EVENTS_TAGS_KEY
@@ -407,7 +461,7 @@ public class QueryGenerator {
         + STREAMS_ID_KEY
         + " TEXT PRIMARY KEY  NOT NULL, "
         + STREAMS_NAME_KEY
-        + " TEXT, "
+        + " TEXT  NOT NULL, "
         + STREAMS_CREATED_KEY
         + " INTEGER, "
         + STREAMS_CREATED_BY_KEY
