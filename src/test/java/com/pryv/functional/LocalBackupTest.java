@@ -1,3 +1,4 @@
+/*
 package com.pryv.functional;
 
 import static org.junit.Assert.assertEquals;
@@ -25,13 +26,15 @@ import com.pryv.api.model.Stream;
 import com.pryv.backup.BackupCallback;
 import com.pryv.backup.PryvBackup;
 
+*/
 /**
  * This class contains test that are meant to direct the implementation of a
  * local backup functionality
  *
  * @author ik
  *
- */
+ *//*
+
 public class LocalBackupTest {
 
   private static ConnectionOld connection;
@@ -313,3 +316,4 @@ public class LocalBackupTest {
   }
 
 }
+*/

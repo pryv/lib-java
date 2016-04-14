@@ -1,3 +1,4 @@
+/*
 package com.pryv.functional;
 
 import static org.junit.Assert.assertEquals;
@@ -20,12 +21,14 @@ import com.pryv.api.model.Stream;
 import com.pryv.unit.DummyData;
 import com.pryv.utils.Logger;
 
+*/
 /**
  * tests for Supervisor class data manipulation
  *
  * @author ik
  *
- */
+ *//*
+
 public class SupervisorTest {
 
   private static EventsSupervisor eventsSupervisor;
@@ -174,3 +177,4 @@ public class SupervisorTest {
     };
   }
 }
+*/

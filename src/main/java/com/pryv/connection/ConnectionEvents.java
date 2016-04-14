@@ -23,97 +23,54 @@ public class ConnectionEvents implements EventsManager {
     @Override
     public void get(final Filter filter, final GetEventsCallback eventsCallback) {
         if (filter.isIncludedInScope(cacheScope)) {
+            cache.getEvents(filter, eventsCallback);
+            // to execute in separate Thread
+            // can be launched separately since write is not done until all reads are finished.
 
-            new Thread() {
-                public void run() {
-                    cache.getEvents(filter, eventsCallback);
-                    // to execute in separate Thread
-                    // can be launched separately since write is not done until all reads are finished.
-                }
-            }.start();
-
-            new Thread() {
-                public void run() {
-                    cache.update();
-                }
-            }.start();
-
-        } else {
-            new Thread() {
-                public void run() {
-                    api.getEvents(filter, eventsCallback);
-                }
-            }.start();
+            cache.update();
         }
+        api.getEvents(filter, eventsCallback);
+
     }
 
     @Override
     public void create(final Event newEvent, final EventsCallback eventsCallback) {
-        if (cacheScope.hasInScope(newEvent)) {
-            new Thread() {
-                public void run() {
-                    cache.createEvent(newEvent, eventsCallback);
-                }
-            }.start();
-
-            new Thread() {
-                public void run() {
-                    cache.update();
-                }
-            }.start();
-        } else {
-            new Thread() {
-                public void run() {
-                    api.createEvent(newEvent, eventsCallback);
-                }
-            }.start();
+        if (newEvent.getClientId() == null) {
+            newEvent.generateClientId();
         }
+        if (cacheScope.hasInScope(newEvent)) {
+            cache.createEvent(newEvent, eventsCallback);
+
+            cache.update();
+        }
+        api.createEvent(newEvent, eventsCallback);
+
     }
 
     @Override
     public void delete(final Event eventToDelete, final EventsCallback eventsCallback) {
         if (cacheScope.hasInScope(eventToDelete)) {
-            new Thread() {
-                public void run() {
-                    cache.deleteEvent(eventToDelete, eventsCallback);
-                }
-            }.start();
+            cache.deleteEvent(eventToDelete, eventsCallback);
 
-            new Thread() {
-                public void run() {
-                    cache.update();
-                }
-            }.start();
-        } else {
-            new Thread() {
-                public void run() {
-                    api.deleteEvent(eventToDelete, eventsCallback);
-                }
-            }.start();
+            cache.update();
         }
+        api.deleteEvent(eventToDelete, eventsCallback);
+
     }
 
     @Override
     public void update(final Event eventToUpdate, final EventsCallback eventsCallback) {
         if (cacheScope.hasInScope(eventToUpdate)) {
-            new Thread() {
-                public void run() {
-                    cache.updateEvent(eventToUpdate, eventsCallback);
-                }
-            }.start();
+            cache.updateEvent(eventToUpdate, eventsCallback);
 
-            new Thread() {
-                public void run() {
-                    cache.update();
-                }
-            }.start();
-        } else {
-            new Thread() {
-                public void run() {
-                    api.updateEvent(eventToUpdate, eventsCallback);
-                }
-            }.start();
+            cache.update();
         }
+        api.deleteEvent(eventToUpdate, eventsCallback);
+
+    }
+
+    public void setCacheScope(Filter scope) {
+        this.cacheScope = scope;
     }
 
 }

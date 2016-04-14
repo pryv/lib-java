@@ -12,7 +12,7 @@ import com.pryv.interfaces.StreamsManager;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ConnectionStreams implements StreamsManager{
+public class ConnectionStreams implements StreamsManager {
 
     private OnlineEventsAndStreamsManager api;
     private Filter cacheScope;
@@ -27,96 +27,52 @@ public class ConnectionStreams implements StreamsManager{
     @Override
     public void get(final Filter filter, final GetStreamsCallback getStreamsCallback) {
         if (filter.isIncludedInScope(cacheScope)) {
+            cache.getStreams(getStreamsCallback);
+            // to execute in separate Thread
+            // can be launched separately since write is not done until all reads are finished.
 
-            new Thread() {
-                public void run() {
-                    cache.getStreams(getStreamsCallback);
-                    // to execute in separate Thread
-                    // can be launched separately since write is not done until all reads are finished.
-                }
-            }.start();
-
-            new Thread() {
-                public void run() {
-                    cache.update();
-                }
-            }.start();
-
-        } else {
-            new Thread() {
-                public void run() {
-                    api.getStreams(filter, getStreamsCallback);
-                }
-            }.start();
+            cache.update();
         }
+
+        api.getStreams(filter, getStreamsCallback);
+
     }
 
     @Override
     public void create(final Stream newStream, final StreamsCallback StreamsCallback) {
         if (cacheScope.hasInScope(newStream.getId())) {
-            new Thread() {
-                public void run() {
-                    cache.updateOrCreateStream(newStream, StreamsCallback);
-                }
-            }.start();
+            cache.updateOrCreateStream(newStream, StreamsCallback);
 
-            new Thread() {
-                public void run() {
-                    cache.update();
-                }
-            }.start();
-        } else {
-            new Thread() {
-                public void run() {
-                    api.createStream(newStream, StreamsCallback);
-                }
-            }.start();
+            cache.update();
         }
+
+        api.createStream(newStream, StreamsCallback);
     }
 
     @Override
     public void delete(final Stream streamToDelete, final boolean mergeEventsWithParent, final StreamsCallback streamsCallback) {
         if (cacheScope.hasInScope(streamToDelete.getId())) {
-            new Thread() {
-                public void run() {
-                    cache.deleteStream(streamToDelete, mergeEventsWithParent, streamsCallback);
-                }
-            }.start();
+            cache.deleteStream(streamToDelete, mergeEventsWithParent, streamsCallback);
 
-            new Thread() {
-                public void run() {
-                    cache.update();
-                }
-            }.start();
-        } else {
-            new Thread() {
-                public void run() {
-                    api.deleteStream(streamToDelete, mergeEventsWithParent, streamsCallback);
-                }
-            }.start();
+            cache.update();
         }
+        api.deleteStream(streamToDelete, mergeEventsWithParent, streamsCallback);
+
     }
 
     @Override
     public void update(final Stream streamToUpdate, final StreamsCallback streamsCallback) {
         if (cacheScope.hasInScope(streamToUpdate.getId())) {
-            new Thread() {
-                public void run() {
-                    cache.updateOrCreateStream(streamToUpdate, streamsCallback);
-                }
-            }.start();
+            cache.updateOrCreateStream(streamToUpdate, streamsCallback);
 
-            new Thread() {
-                public void run() {
-                    cache.update();
-                }
-            }.start();
-        } else {
-            new Thread() {
-                public void run() {
-                    api.updateStream(streamToUpdate, streamsCallback);
-                }
-            }.start();
+            cache.update();
         }
+        api.updateStream(streamToUpdate, streamsCallback);
+
+
+    }
+
+    public void setCacheScope(Filter scope) {
+        this.cacheScope = scope;
     }
 }

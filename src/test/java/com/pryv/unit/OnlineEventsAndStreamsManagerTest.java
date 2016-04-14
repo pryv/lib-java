@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -21,9 +22,11 @@ import resources.TestCredentials;
 
 import com.jayway.awaitility.Awaitility;
 import com.pryv.Pryv;
-import com.pryv.api.EventsCallback;
+import com.pryv.interfaces.EventsCallback;
 import com.pryv.api.Filter;
 import com.pryv.api.OnlineEventsAndStreamsManager;
+import com.pryv.interfaces.GetEventsCallback;
+import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.api.model.Attachment;
 import com.pryv.api.model.Event;
@@ -39,19 +42,27 @@ public class OnlineEventsAndStreamsManagerTest {
 
   private static OnlineEventsAndStreamsManager online;
 
-  private static EventsCallback eventsCallback;
-  private static StreamsCallback streamsCallback;
+    private static EventsCallback eventsCallback;
+    private static GetEventsCallback getEventsCallback;
+    private static StreamsCallback streamsCallback;
+    private static GetStreamsCallback getStreamsCallback;
 
-  private static Map<String, Event> events;
-  private static Map<String, Stream> streams;
+    private static List<Event> events;
+    private static List<Event> partialEvents;
+    private static Map<String, Stream> streams;
+    private static Map<String, Stream> partialStreams;
 
-  private static Stream testSupportStream;
+    private static Stream testSupportStream;
 
-  private static Event createdEvent;
-  private static Stream createdStream;
+    private static String stoppedId;
 
-  private static boolean success = false;
-  private static boolean error = false;
+    private static Event singleEvent;
+    private static Stream singleStream;
+
+    private static boolean partialSuccess = false;
+    private static boolean partialError = false;
+    private static boolean success = false;
+    private static boolean error = false;
 
   @BeforeClass
   public static void setUp() throws Exception {
@@ -65,19 +76,19 @@ public class OnlineEventsAndStreamsManagerTest {
     online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
 
     testSupportStream = new Stream("onlineModuleStreamID", "javaLibTestSupportStream");
-    online.create(testSupportStream, streamsCallback);
+    online.createStream(testSupportStream, streamsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
-    testSupportStream.merge(createdStream, false);
+    testSupportStream.merge(singleStream, false);
     assertNotNull(testSupportStream.getId());
   }
 
   @AfterClass
   public static void tearDown() throws Exception {
-    online.delete(testSupportStream, false, streamsCallback);
+    online.deleteStream(testSupportStream, false, streamsCallback);
     Awaitility.await().until(hasResult());
     success = false;
-    online.delete(testSupportStream, false, streamsCallback);
+    online.deleteStream(testSupportStream, false, streamsCallback);
     Awaitility.await().until(hasResult());
   }
 
@@ -87,13 +98,13 @@ public class OnlineEventsAndStreamsManagerTest {
     events = null;
     success = false;
     error = false;
-    createdEvent = null;
-    createdStream = null;
+    singleEvent = null;
+    singleStream = null;
   }
 
   @Test
   public void testFetchStreams() {
-    online.get(null, streamsCallback);
+    online.getStreams(null, getStreamsCallback);
     Awaitility.await().until(hasResult());
     assertNotNull(streams);
     assertTrue(streams.size() > 0);
@@ -101,7 +112,7 @@ public class OnlineEventsAndStreamsManagerTest {
 
   @Test
   public void testFetchEventsWithEmptyFilter() {
-    online.get(new Filter(), eventsCallback);
+    online.getEvents(new Filter(), getEventsCallback);
     Awaitility.await().until(hasResult());
     assertNotNull(events);
     assertTrue(events.size() > 0);
@@ -114,7 +125,7 @@ public class OnlineEventsAndStreamsManagerTest {
     testEvent.setStreamId(testSupportStream.getId());
     testEvent.setType("note/txt");
     testEvent.setContent("this is a test Event. Please delete");
-    online.create(testEvent, eventsCallback);
+    online.createEvent(testEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     success = false;
@@ -123,14 +134,14 @@ public class OnlineEventsAndStreamsManagerTest {
     Set<String> streamIds = new HashSet<String>();
     streamIds.add(testSupportStream.getId());
     Filter filter = new Filter();
-    filter.setStreamIds(streamIds);
+      filter.addStream(testSupportStream);
 
     // fetch events
-    online.get(filter, eventsCallback);
+    online.getEvents(filter, getEventsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     assertTrue(events.size() > 0);
-    for (Event event : events.values()) {
+    for (Event event : events) {
       assertEquals(event.getStreamId(), testSupportStream.getId());
     }
   }
@@ -143,36 +154,36 @@ public class OnlineEventsAndStreamsManagerTest {
     testEvent.setStreamId(testSupportStream.getId());
     testEvent.setType("note/txt");
     testEvent.setContent("this is the content");
-    online.create(testEvent, eventsCallback);
+    online.createEvent(testEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     success = false;
-    assertNotNull(createdEvent);
-    assertNotNull(createdEvent.getId());
-    assertNotNull(createdEvent.getCreated());
-    assertNotNull(createdEvent.getCreatedBy());
-    assertNotNull(createdEvent.getModified());
-    assertNotNull(createdEvent.getModifiedBy());
+    assertNotNull(singleEvent);
+    assertNotNull(singleEvent.getId());
+    assertNotNull(singleEvent.getCreated());
+    assertNotNull(singleEvent.getCreatedBy());
+    assertNotNull(singleEvent.getModified());
+    assertNotNull(singleEvent.getModifiedBy());
 
     // update event
     String newContent = "updated content";
-    createdEvent.setContent(newContent);
-    online.update(createdEvent, eventsCallback);
+    singleEvent.setContent(newContent);
+    online.updateEvent(singleEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     success = false;
-    assertEquals(createdEvent.getContent(), newContent);
+    assertEquals(singleEvent.getContent(), newContent);
 
     // delete event
-    online.delete(createdEvent, eventsCallback);
+    online.deleteEvent(singleEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     success = false;
-    assertTrue(createdEvent.isTrashed());
-    online.delete(createdEvent, eventsCallback);
+    assertTrue(singleEvent.isTrashed());
+    online.deleteEvent(singleEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
-    assertNull(createdEvent);
+    assertNull(singleEvent);
   }
 
   @Test
@@ -180,39 +191,39 @@ public class OnlineEventsAndStreamsManagerTest {
     Stream testStream = new Stream(null, "onlineModuleTestStream");
 
     // create
-    online.create(testStream, streamsCallback);
+    online.createStream(testStream, streamsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     success = false;
-    assertNotNull(createdStream);
-    assertNotNull(createdStream.getId());
-    assertNotNull(createdStream.getCreated());
-    assertNotNull(createdStream.getCreatedBy());
-    assertNotNull(createdStream.getModified());
-    assertNotNull(createdStream.getModifiedBy());
+    assertNotNull(singleStream);
+    assertNotNull(singleStream.getId());
+    assertNotNull(singleStream.getCreated());
+    assertNotNull(singleStream.getCreatedBy());
+    assertNotNull(singleStream.getModified());
+    assertNotNull(singleStream.getModifiedBy());
 
     // update
     String nameUpdate = "onlineModuleTestStreamNewName";
-    createdStream.setName(nameUpdate);
-    online.update(createdStream, streamsCallback);
+    singleStream.setName(nameUpdate);
+    online.updateStream(singleStream, streamsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     success = false;
-    assertEquals(nameUpdate, createdStream.getName());
+    assertEquals(nameUpdate, singleStream.getName());
 
     // trash
-    online.delete(createdStream, false, streamsCallback);
+    online.deleteStream(singleStream, false, streamsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     success = false;
-    assertNotNull(createdStream);
-    assertTrue(createdStream.isTrashed());
+    assertNotNull(singleStream);
+    assertTrue(singleStream.isTrashed());
 
     // delete
-    online.delete(createdStream, false, streamsCallback);
+    online.deleteStream(singleStream, false, streamsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
-    assertNull(createdStream);
+    assertNull(singleStream);
   }
 
 
@@ -238,10 +249,10 @@ public class OnlineEventsAndStreamsManagerTest {
     online.createEventWithAttachment(eventWithAttachment, eventsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
-    assertNotNull(createdEvent);
-    assertNotNull(createdEvent.getAttachments());
-    assertEquals(createdEvent.getAttachments().size(), 1);
-    Attachment createdAttachment = createdEvent.getFirstAttachment();
+    assertNotNull(singleEvent);
+    assertNotNull(singleEvent.getAttachments());
+    assertEquals(singleEvent.getAttachments().size(), 1);
+    Attachment createdAttachment = singleEvent.getFirstAttachment();
     assertNotNull(createdAttachment.getId());
   }
 
@@ -255,67 +266,110 @@ public class OnlineEventsAndStreamsManagerTest {
     };
   }
 
-  private static void instanciateEventsCallback() {
-    eventsCallback = new EventsCallback() {
+    private static void instanciateGetEventsCallback() {
+        getEventsCallback = new GetEventsCallback() {
+            @Override
+            public void cacheCallback(List<Event> events, Map<String, Event> deletedEvents) {
 
-      @Override
-      public void onEventsRetrievalSuccess(Map<String, Event> newEvents, Double serverTime) {
-        System.out.println("TestEventsCallback: success with "
-          + newEvents.values().size()
-            + " events");
-        events = newEvents;
-        success = true;
-      }
+            }
 
-      @Override
-      public void onEventsRetrievalError(String message, Double pServerTime) {
-        error = true;
-      }
+            @Override
+            public void onCacheError(String errorMessage) {
 
-      @Override
-      public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
-        Double pServerTime) {
-        System.out.println("OnlineEventsManagerTest: eventsSuccess msg: " + successMessage);
-        success = true;
-        createdEvent = event;
-      }
+            }
 
-      @Override
-      public void onEventsError(String errorMessage, Double pServerTime) {
-        error = true;
-      }
-    };
-  }
+            @Override
+            public void apiCallback(List<Event> events, Double serverTime) {
 
-  private static void instanciateStreamsCallback() {
-    streamsCallback = new StreamsCallback() {
+            }
 
-      @Override
-      public void onStreamsRetrievalSuccess(Map<String, Stream> newStreams, Double serverTime) {
-        System.out.println("TestStreamsCallback: success for "
-          + newStreams.values().size()
-            + " streams");
-        streams = newStreams;
-        success = true;
-      }
+            @Override
+            public void onApiError(String errorMessage, Double serverTime) {
 
-      @Override
-      public void onStreamsRetrievalError(String message, Double pServerTime) {
-        error = true;
-      }
+            }
+        };
+    }
 
-      @Override
-      public void onStreamsSuccess(String successMessage, Stream stream, Double pServerTime) {
-        System.out.println("TestStreamsCallback: success msg: " + successMessage);
-        createdStream = stream;
-        success = true;
-      }
+    private static void instanciateEventsCallback() {
+        eventsCallback = new EventsCallback() {
 
-      @Override
-      public void onStreamError(String errorMessage, Double pServerTime) {
-        error = true;
-      }
-    };
-  }
+            @Override
+            public void onApiSuccess(String successMessage, Event event, String pStoppedId,
+                                     Double pServerTime) {
+                System.out.println("OnlineEventsManagerTest: eventsSuccess msg: " + successMessage);
+                stoppedId = pStoppedId;
+                success = true;
+                singleEvent = event;
+            }
+
+            @Override
+            public void onApiError(String errorMessage, Double pServerTime) {
+                error = true;
+            }
+
+            @Override
+            public void onCacheSuccess(String successMessage, Event event) {
+
+            }
+
+            @Override
+            public void onCacheError(String errorMessage) {
+
+            }
+        };
+    }
+
+    private static void instanciateStreamsCallback() {
+        streamsCallback = new StreamsCallback() {
+
+            @Override
+            public void onApiSuccess(String successMessage, Stream stream, Double pServerTime) {
+                System.out.println("TestStreamsCallback: success msg: " + successMessage);
+                singleStream = stream;
+                success = true;
+            }
+
+            @Override
+            public void onApiError(String errorMessage, Double pServerTime) {
+                error = true;
+            }
+
+            @Override
+            public void onCacheSuccess(String successMessage, Stream stream) {
+
+            }
+
+            @Override
+            public void onCacheError(String errorMessage) {
+
+            }
+        };
+    }
+
+    private static void instanciateGetStreamsCallback() {
+        getStreamsCallback = new GetStreamsCallback() {
+            @Override
+            public void cacheCallback(Map<String, Stream> streams, Map<String, Stream> deletedStreams) {
+                partialStreams = streams;
+                partialSuccess = true;
+            }
+
+            @Override
+            public void onCacheError(String errorMessage) {
+
+            }
+
+            @Override
+            public void apiCallback(Map<String, Stream> receivedStreams, Double serverTime) {
+                streams = receivedStreams;
+                success = true;
+            }
+
+            @Override
+            public void onApiError(String errorMessage, Double serverTime) {
+                error = true;
+            }
+        };
+    }
 
 }

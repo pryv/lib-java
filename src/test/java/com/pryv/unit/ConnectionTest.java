@@ -7,12 +7,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.pryv.ConnectionOld;
+import com.pryv.Connection;
 import com.pryv.api.database.DBinitCallback;
 
 public class ConnectionTest {
 
-  private ConnectionOld connection;
+  private Connection connection;
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
@@ -24,12 +24,12 @@ public class ConnectionTest {
 
   @Before
   public void setUp() throws Exception {
-    connection = new ConnectionOld("testUID2", "token", new DBinitCallback());
+    connection = new Connection("testUID2", "token", "pryv.io", new DBinitCallback());
   }
 
   @Test
   public void testIdCachingGeneration() {
-    String idCaching = connection.getIdCaching();
+    String idCaching = connection.generateCacheFolderName();
     System.out.println("test id caching generation: generated: " + idCaching);
     assertNotNull(idCaching);
   }

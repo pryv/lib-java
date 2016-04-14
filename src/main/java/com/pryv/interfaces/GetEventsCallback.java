@@ -13,7 +13,14 @@ public interface GetEventsCallback {
      * @param events
      * @param deletedEvents
      */
-    void partialCallback(List<Event> events, Map<String, Event> deletedEvents);
+    void cacheCallback(List<Event> events, Map<String, Event> deletedEvents);
+
+    /**
+     * Callback used to indicate an error on cache operation
+     *
+     * @param errorMessage
+     */
+    void onCacheError(String errorMessage);
 
     /**
      * used for api callback
@@ -21,7 +28,7 @@ public interface GetEventsCallback {
      * @param events
      * @param serverTime
      */
-    void doneCallback(List<Event> events, Double serverTime);
+    void apiCallback(List<Event> events, Double serverTime);
 
     /**
      * when there is an error
@@ -29,5 +36,5 @@ public interface GetEventsCallback {
      * @param errorMessage
      * @param serverTime
      */
-    void onError(String errorMessage, Double serverTime);
+    void onApiError(String errorMessage, Double serverTime);
 }

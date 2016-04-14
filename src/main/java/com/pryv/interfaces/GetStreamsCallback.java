@@ -13,7 +13,14 @@ public interface GetStreamsCallback {
      * @param streams
      * @param deletedStreams
      */
-    void partialCallback(Map<String, Stream> streams, Map<String, Stream> deletedStreams);
+    void cacheCallback(Map<String, Stream> streams, Map<String, Stream> deletedStreams);
+
+    /**
+     * Callback used to indicate an error on cache operation
+     *
+     * @param errorMessage
+     */
+    void onCacheError(String errorMessage);
 
     /**
      * used for api callback
@@ -21,7 +28,7 @@ public interface GetStreamsCallback {
      * @param streams
      * @param serverTime
      */
-    void doneCallback(Map<String, Stream> streams, Double serverTime);
+    void apiCallback(Map<String, Stream> streams, Double serverTime);
 
     /**
      * when there is an error
@@ -29,5 +36,5 @@ public interface GetStreamsCallback {
      * @param errorMessage
      * @param serverTime
      */
-    void onError(String errorMessage, Double serverTime);
+    void onApiError(String errorMessage, Double serverTime);
 }

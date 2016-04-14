@@ -271,27 +271,32 @@ public class Filter {
   }
 
   /**
-   * check if this filter is included in the scope passed in argument
+   * check if this filter is included in the scope passed in argument. If scope.streams is null,
+   * we consider that the scope is the whole Pryv data.
    *
    * @param scope a Filter object representing a scope
    * @return
    */
   public boolean isIncludedInScope(Filter scope) {
-    // test for each scope streamId if it is or its child is
-    for (Stream stream: this.streams) {
-      boolean isStreamOrParentFound = false;
-      for (Stream scopeStream: scope.streams) {
-        if (scopeStream.getId().equals(stream.getId())) {
-          isStreamOrParentFound = true;
-        } else if (scopeStream.hasChild(stream.getId())) {
-          isStreamOrParentFound = true;
+    if (this.streams == null) {
+      return true;
+    } else {
+      // test for each scope streamId if it is or its child is
+      for (Stream stream : this.streams) {
+        boolean isStreamOrParentFound = false;
+        for (Stream scopeStream : scope.streams) {
+          if (scopeStream.getId().equals(stream.getId())) {
+            isStreamOrParentFound = true;
+          } else if (scopeStream.hasChild(stream.getId())) {
+            isStreamOrParentFound = true;
+          }
+        }
+        if (!isStreamOrParentFound) {
+          return false;
         }
       }
-      if (! isStreamOrParentFound) {
-        return false;
-      }
+      return true;
     }
-    return true;
   }
 
   /**
@@ -305,20 +310,25 @@ public class Filter {
   }
 
   /**
-   * check if the streamId is included in the scope
+   * check if the streamId is included in the scope. Currently the scope is only represented by
+   * the streams. A Filter with no streams represents a total Filter.
    *
    * @param streamId
    * @return
    */
   public boolean hasInScope(String streamId) {
-    for (Stream scopeStream: streams) {
-      if (streamId.equals(scopeStream.getId())) {
-        return true;
-      } else if (scopeStream.hasChild(streamId)) {
-        return true;
+    if (streams == null) {
+      return true;
+    } else {
+      for (Stream scopeStream : streams) {
+        if (streamId.equals(scopeStream.getId())) {
+          return true;
+        } else if (scopeStream.hasChild(streamId)) {
+          return true;
+        }
       }
+      return false;
     }
-    return false;
   }
 
   public Set<String> getStreamIds() {

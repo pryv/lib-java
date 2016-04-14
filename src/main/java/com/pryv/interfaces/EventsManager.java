@@ -17,7 +17,7 @@ public interface EventsManager {
   void get(Filter filter, GetEventsCallback eventsCallback);
 
   /**
-   * Create event
+   * Create event, generates a clientId if needed
    *
    * @param newEvent
    *          the event to create

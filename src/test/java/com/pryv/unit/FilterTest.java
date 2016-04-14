@@ -1,3 +1,4 @@
+/*
 package com.pryv.unit;
 
 import static org.junit.Assert.assertEquals;
@@ -15,12 +16,14 @@ import com.pryv.api.StreamsSupervisor;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
 
+*/
 /**
  * class used to test the Filter class's methods
  *
  * @author ik
  *
- */
+ *//*
+
 public class FilterTest {
 
   @Test
@@ -132,3 +135,4 @@ public class FilterTest {
   }
 
 }
+*/

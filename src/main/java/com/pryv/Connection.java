@@ -141,10 +141,12 @@ public class Connection {
     public void setupCacheScope(Filter scope) {
         this.cacheScope = scope;
         activateCache();
+        events.setCacheScope(scope);
+        streams.setCacheScope(scope);
     };
 
     private String buildUrlEndpoint() {
-        this.urlEndpoint = "https://" + username + "." + domain;
+        this.urlEndpoint = "https://" + username + "." + domain + "/";
         return this.urlEndpoint;
     }
 

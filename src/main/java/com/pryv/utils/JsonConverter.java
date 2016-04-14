@@ -172,8 +172,7 @@ public class JsonConverter {
   }
 
   /**
-   * Retrieves the event from a JSON dictionary containing an event entry at
-   * root level
+   * Retrieves the event from a JSON dictionary containing an event entry at root level
    *
    * @param jsonSource
    *          the JSON stored in a String

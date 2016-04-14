@@ -142,14 +142,14 @@ public class DummyData {
     }
   }
 
-  public static Filter generateFullFilter() {
+  /*public static Filter generateFullFilter() {
     Set<String> dummyStringSet = new HashSet<String>();
     dummyStringSet.add("dummyValue1");
     dummyStringSet.add("dummyValue2");
     return new Filter(new Double(0), new Double(1000), dummyStringSet, dummyStringSet,
       dummyStringSet, false, true, new Integer(0), new Integer(10), Filter.State.ALL, new Double(
         500));
-  }
+  }*/
 
   public static String getId() {
     return EVENT_ID;

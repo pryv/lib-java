@@ -167,7 +167,10 @@ public class Event {
     if (event == null) {
       event = new Event();
     }
-    event.setId(result.getString(QueryGenerator.EVENTS_ID_KEY));
+    String id = result.getString(QueryGenerator.EVENTS_ID_KEY);
+    if (id != null) {
+      event.setId(id);
+    }
     event.setStreamId(result.getString(QueryGenerator.EVENTS_STREAM_ID_KEY));
     event.setTime(result.getDouble(QueryGenerator.EVENTS_TIME_KEY));
     event.setType(result.getString(QueryGenerator.EVENTS_TYPE_KEY));
@@ -219,10 +222,12 @@ public class Event {
   }
 
   /**
-   * Assign unique identifier to the Event - to execute ONCE upon creation
+   * Assign unique identifier to the Event - does nothing if Event has already a clientId field
    */
   public String generateClientId() {
-    this.clientId = UUID.randomUUID().toString();
+    if (this.clientId == null) {
+      this.clientId = UUID.randomUUID().toString();
+    }
     return this.clientId;
   }
 
@@ -450,7 +455,23 @@ public class Event {
 
   @Override
   public String toString() {
-    return "Event: id=" + id + ", streamId=" + streamId;
+    return "{\"cid\":\"" + clientId + "\","
+            + "\"id\":\"" + id + "\","
+            + "\"streamId\":\"" + streamId + "\","
+            + "\"time\":\"" + time + "\","
+            + "\"duration\":\"" + duration + "\","
+            + "\"type\":\"" + type + "\","
+            + "\"tags\":\"" + tags + "\","
+            + "\"references\":\"" + references + "\","
+            + "\"description\":\"" + description + "\","
+            + "\"attachments\":\"" + attachments + "\","
+            + "\"clientData\":\"" + clientData + "\","
+            + "\"trashed\":\"" + trashed + "\","
+            + "\"created\":\"" + created + "\","
+            + "\"createdBy\":\"" + createdBy + "\","
+            + "\"modified\":\"" + modified + "\","
+            + "\"modifiedBy\":\"" + modifiedBy + "\"}";
+
   }
 
   public String getClientId() {
@@ -533,6 +554,9 @@ public class Event {
   public void setClientId(String clientId) {
     this.clientId = clientId;
     supervisor.put(this.clientId, this);
+    if (id != null) {
+      idToClientId.put(this.id, this.clientId);
+    }
   }
 
   /**
@@ -542,7 +566,10 @@ public class Event {
    */
   public void setId(String pid) {
     this.id = pid;
-    idToClientId.put(this.id, this.clientId);
+    System.out.println("setting id, gonnna probbly crash: cid=" + clientId + ", id=" + id);
+    if (this.clientId != null) {
+      idToClientId.put(this.id, this.clientId);
+    }
   }
 
   public void setStreamId(String pstreamId) {
