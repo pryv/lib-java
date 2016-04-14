@@ -193,12 +193,49 @@ public class ConnectionStreamsTest {
         TestUtils.checkStream(newStream, apiStream);
     }
 
-    // TODO
+    @Test
     public void testCreateStreamMustReturnAnErrorIfAStreamWithTheSameNameExistsAtTheSameTreeLevel() {
+        Stream someStream = new Stream("someStreamThatWillBotherNext", "my lovely stream name");
+        someStream.setParentId(testSupportStream.getId());
+        connection.streams.create(someStream, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+        cacheSuccess = false;
+        apiSuccess = false;
 
+        Stream duplicateIdStream = new Stream("copyNameSteam", someStream.getName());
+        duplicateIdStream.setParentId(testSupportStream.getId());
+        connection.streams.create(duplicateIdStream, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        //assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiSuccess);
     }
 
-    // TODO
+    @Test
+    public void testCreateStreamMustReturnAnErrorIfAStreamWithTheSameIdAlreadyExists() {
+        Stream someStream = new Stream("someStreamWithANiceId", "Well I dont care");
+        someStream.setParentId(testSupportStream.getId());
+        connection.streams.create(someStream, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+        cacheSuccess = false;
+        apiSuccess = false;
+
+        Stream duplicateIdStream = new Stream(someStream.getId(), "I will not be created");
+        duplicateIdStream.setParentId(testSupportStream.getId());
+        connection.streams.create(duplicateIdStream, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        //assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiSuccess);
+    }
+
+    // TODO check if possible
     public void testCreateStreamMustReturnAnErrorIfTheStreamDataIsInvalid() {
 
     }
