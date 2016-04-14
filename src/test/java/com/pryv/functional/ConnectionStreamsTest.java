@@ -118,8 +118,12 @@ public class ConnectionStreamsTest {
         stoppedId = null;
     }
 
+    /**
+     * GET STREAMS
+     */
+
     @Test
-    public void testGetStreamsShouldReturnTheStreamStructure() {
+    public void testGetStreamsMustReturnATreeOfNonTrashedStreamsWithANullFilter() {
         Stream s1 = new Stream(null, "someStreamOne");
         s1.setParentId(testSupportStream.getId());
         Stream s2 = new Stream(null, "someOtherStream");
@@ -143,6 +147,103 @@ public class ConnectionStreamsTest {
         assertNotNull(streams);
 
         connection.getRootStreams();
+    }
+
+    // TODO
+    public void testGetStreamsMustReturnStreamsMatchingTheGivenFilter() {
+
+    }
+
+    // TODO
+    public void testGetStreamsMustReturnAnEmptyMapIfThereAreNoMatchingStreams() {
+
+    }
+
+    // TODO
+    public void testGetStreamsMustIncludeDeletedStreamsWhenTheFlagIncludeDeletionsIsSet() {
+
+    }
+
+    // TODO check if possible
+    public void testGetStreamsMustReturnAnErrorIfTheGivenFilterContainsInvalidParameters() {
+
+    }
+
+    /**
+     * CREATE STREAM
+     */
+
+    @Test
+    public void testCreateStreamMustAcceptAValidStream() {
+
+    }
+
+    // TODO
+    public void testCreateStreamMustReturnAnErrorIfAStreamWithTheSameNameExistsAtTheSameTreeLevel() {
+
+    }
+
+    // TODO
+    public void testCreateStreamMustReturnAnErrorIfTheStreamDataIsInvalid() {
+
+    }
+
+    /**
+     * UDPATE STREAM
+     */
+
+    // TODO
+    public void testUpdateStreamMustAcceptAValidStream() {
+
+    }
+
+    // TODO
+    public void testUpdateStreamMustUpdateTheStreamTreeWhenParentIdWasModified() {
+
+    }
+
+    // TODO
+    public void testUpdateStreamMustReturnAnErrorIfNoSuchStreamExistYet() {
+
+    }
+
+    // TODO
+    public void testUpdateStreamMustReturnAnErrorWhenIfAStreamWithTheSameNameExistsAtTheSameTreeLevel() {
+
+    }
+
+    /**
+     * DELETE STREAM
+     */
+
+    // TODO
+    public void testDeleteStreamMustAcceptAValidStream() {
+
+    }
+
+    // TODO
+    public void testDeleteStreamCalledOnceMustTrashTheStream() {
+
+    }
+
+    // TODO
+    public void testDeleteStreamCalledTwiceMustDeleteTheStreamAndReturnTheId() {
+
+    }
+
+    // TODO
+    public void testDeleteStreamMustUpdateItsEventsStreamIdsWhenDeletingWithMergeEventsWithParent() {
+
+    }
+
+    // TODO
+    public void testDeleteStreamMustDeleteItsEventsWhenDeletingWithoutMergeEventsWithParent() {
+
+    }
+
+    // TODO
+    public void testDeleteStreamMustReturnAnErrorWhenTheGivenStreamDoesntExist() {
+
     }
 
 
