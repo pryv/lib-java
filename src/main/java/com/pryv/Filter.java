@@ -278,7 +278,7 @@ public class Filter {
    * @return
    */
   public boolean isIncludedInScope(Filter scope) {
-    if (this.streams == null) {
+    if (scope.streams == null) {
       return true;
     } else {
       // test for each scope streamId if it is or its child is

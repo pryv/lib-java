@@ -111,26 +111,33 @@ public class FilterTest {
 
   @Test
   public void testAreStreamIdsContainedInScope() {
-    /*StreamsSupervisor supervisor = new StreamsSupervisor();
-    Stream parent = new Stream("parentId", "parent");
-    Stream child = new Stream("childId", "child");
+    Stream parent = new Stream("parentId", "parentName");
+    Stream child = new Stream("childId", "childName");
+    Stream grandChild = new Stream("grandChildId", "grandChildName");
     parent.addChildStream(child);
-    supervisor.updateOrCreateStream(parent, null);
+    child.addChildStream(grandChild);
+
+    Filter scope = new Filter();
+    scope.addStream(parent);
+
     Filter testFilter = new Filter();
-    testFilter.addStreamId(child.getId());
-    Set<String> scope = new HashSet<String>();
-    scope.add(parent.getId());
-    assertTrue(testFilter.areStreamIdsContainedInScope(scope, supervisor));
+    testFilter.addStream(grandChild);
+    assertTrue(testFilter.isIncludedInScope(scope));
 
-    testFilter.setStreamIds(null);
-    testFilter.addStreamId(parent.getId());
-    assertTrue(testFilter.areStreamIdsContainedInScope(scope, supervisor));
+    testFilter = new Filter();
+    testFilter.addStream((child));
+    assertTrue(testFilter.isIncludedInScope(scope));
 
-    Stream other = new Stream("otherId", "other");
-    supervisor.updateOrCreateStream(other, null);
-    scope.clear();
-    scope.add(other.getId());
-    assertFalse(testFilter.areStreamIdsContainedInScope(scope, supervisor));*/
+    testFilter = new Filter();
+    testFilter.addStream(parent);
+    assertTrue(testFilter.isIncludedInScope(scope));
+
+    testFilter = new Filter();
+    testFilter.addStream(new Stream("outSideStreamId", "outsideStreamName"));
+    assertFalse(testFilter.isIncludedInScope(scope));
+
+    scope = new Filter();
+    assertTrue(testFilter.isIncludedInScope(scope));
   }
 
 }
