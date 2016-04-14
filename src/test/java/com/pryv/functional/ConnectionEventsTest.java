@@ -136,6 +136,18 @@ public class ConnectionEventsTest {
         }
     }
 
+    @Test
+    public void testGetEventsWithANullFilterShouldReturnNonTrashedEvents() {
+        connection.events.get(null, getEventsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertTrue(cacheSuccess);
+        Awaitility.await().until(hasApiResult());
+        assertTrue(apiSuccess);
+
+        assertTrue(cacheEvents.size() > 0);
+        assertTrue(events.size() > 0);
+    }
+
     // TODO add includeDeletions in Filter
     //@Test
     public void testGetEventsMustReturnDeletedEventsWhenIncludeDeletionsIsSet() {
@@ -180,7 +192,6 @@ public class ConnectionEventsTest {
         connection.events.create(minimalEvent, eventsCallback);
         Awaitility.await().until(hasApiResult());
         assertTrue(apiSuccess);
-        System.out.println("buggin here: " + singleEvent);
         assertNotNull(singleEvent);
         assertNotNull(singleEvent.getId());
         assertNotNull(singleEvent.getTime());

@@ -23,7 +23,7 @@ public class ConnectionStreams implements StreamsManager {
 
     @Override
     public void get(final Filter filter, final GetStreamsCallback getStreamsCallback) {
-        if (filter.isIncludedInScope(cacheScope)) {
+        if (filter == null || filter.isIncludedInScope(cacheScope)) {
             cache.getStreams(getStreamsCallback);
             // to execute in separate Thread
             // can be launched separately since write is not done until all reads are finished.
@@ -32,7 +32,6 @@ public class ConnectionStreams implements StreamsManager {
         }
 
         api.getStreams(filter, getStreamsCallback);
-
     }
 
     @Override

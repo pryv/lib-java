@@ -127,13 +127,17 @@ public class OnlineEventsAndStreamsManager {
    */
 
     public void getEvents(final Filter filter, final GetEventsCallback getEventsCallback) {
-                logger.log("OnlineEventsAndStreamsManager: get: Get request at: "
-                        + eventsUrl
-                        + tokenUrlArgument
-                        + filter.toUrlParameters());
+
+        new Thread() {
+            public void run() {
+                String url = eventsUrl + tokenUrlArgument;
+                if (filter != null) {
+                    url += filter.toUrlParameters();
+                }
+                logger.log("OnlineEventsAndStreamsManager: get: Get request at: " + url);
 
                 Request request = new Request.Builder()
-                        .url(eventsUrl + tokenUrlArgument + filter.toUrlParameters())
+                        .url(url)
                         .get()
                         .build();
                 try {
@@ -145,6 +149,8 @@ public class OnlineEventsAndStreamsManager {
                     getEventsCallback.onApiError(e.getMessage(), null);
                     e.printStackTrace();
                 }
+            }
+        }.start();
     }
 
     public void createEvent(final Event newEvent, final EventsCallback cacheEventsCallback) {
@@ -285,7 +291,7 @@ public class OnlineEventsAndStreamsManager {
     }
 
     public void deleteStream(final Stream streamToDelete, final boolean mergeEventsWithParent,
-                       final StreamsCallback cacheStreamsCallback) {
+                             final StreamsCallback cacheStreamsCallback) {
         new Thread() {
             @Override
             public void run() {
@@ -351,9 +357,9 @@ public class OnlineEventsAndStreamsManager {
     private class ApiResponseHandler {
 
         private RequestType requestType;
-        private EventsCallback onlineEventsCallback;
+        private EventsCallback eventsCallback;
         private GetEventsCallback getEventsCallback;
-        private StreamsCallback onlineStreamsCallback;
+        private StreamsCallback streamsCallback;
         private GetStreamsCallback getStreamsCallback;
         private Event event;
         private Stream stream;
@@ -368,6 +374,7 @@ public class OnlineEventsAndStreamsManager {
          * @param eventsCallback
          * @param getEventsCallback
          * @param streamsCallback
+         * @param getStreamsCallback
          * @param event
          * @param stream
          */
@@ -379,9 +386,10 @@ public class OnlineEventsAndStreamsManager {
             this.event = event;
             this.stream = stream;
             this.requestType = type;
-            this.onlineEventsCallback = eventsCallback;
+            this.eventsCallback = eventsCallback;
             this.getEventsCallback = getEventsCallback;
-            this.onlineStreamsCallback = streamsCallback;
+            this.streamsCallback = streamsCallback;
+            this.getStreamsCallback = getStreamsCallback;
         }
 
         public String handleResponse(Response response) throws IOException {
@@ -423,7 +431,7 @@ public class OnlineEventsAndStreamsManager {
                                 + createdEvent.getClientId()
                                 + ", id="
                                 + createdEvent.getId());
-                        onlineEventsCallback.onApiSuccess(
+                        eventsCallback.onApiSuccess(
                                 "Online: event with clientId="
                                         + createdEvent.getClientId()
                                         + ", Id="
@@ -440,7 +448,7 @@ public class OnlineEventsAndStreamsManager {
                                 + updatedEvent.getClientId()
                                 + ", id="
                                 + updatedEvent.getId());
-                        onlineEventsCallback.onApiSuccess(
+                        eventsCallback.onApiSuccess(
                                 "Online: event with clientId="
                                         + updatedEvent.getClientId()
                                         + ", Id="
@@ -451,7 +459,7 @@ public class OnlineEventsAndStreamsManager {
                     case DELETE_EVENT:
                         if (JsonConverter.hasEventDeletionField(responseBody)) {
                             // stream was deleted, retrieve streamDeletion id field
-                            onlineEventsCallback.onApiSuccess(
+                            eventsCallback.onApiSuccess(
                                     JsonConverter.retrieveDeleteEventId(responseBody), null, null, serverTime);
                         } else {
                             // stream was trashed, forward as an update to callback
@@ -459,7 +467,7 @@ public class OnlineEventsAndStreamsManager {
                             trashedEvent.assignConnection(weakConnection);
                             trashedEvent.setClientId(event.getClientId());
                             Event.createOrReuse(trashedEvent);
-                            onlineEventsCallback.onApiSuccess(
+                            eventsCallback.onApiSuccess(
                                     "Online: event with clientId="
                                             + trashedEvent.getClientId()
                                             + ", Id="
@@ -483,7 +491,7 @@ public class OnlineEventsAndStreamsManager {
 
                         logger.log("ApiResponseHandler: stream created successfully: id="
                                 + createdStream.getId());
-                        onlineStreamsCallback.onApiSuccess(
+                        streamsCallback.onApiSuccess(
                                 "Online: stream with Id=" + createdStream.getId() + " created on API", createdStream,
                                 serverTime);
                         break;
@@ -493,7 +501,7 @@ public class OnlineEventsAndStreamsManager {
                         updatedStream.assignConnection(weakConnection);
                         logger.log("ApiResponseHandler: stream updated successfully: id="
                                 + updatedStream.getId());
-                        onlineStreamsCallback.onApiSuccess(
+                        streamsCallback.onApiSuccess(
                                 "Online: stream with Id=" + updatedStream.getId() + " updated on API", updatedStream,
                                 serverTime);
                         break;
@@ -501,13 +509,13 @@ public class OnlineEventsAndStreamsManager {
                     case DELETE_STREAM:
                         if (JsonConverter.hasStreamDeletionField(responseBody)) {
                             // stream was deleted, retrieve streamDeletion id field
-                            onlineStreamsCallback.onApiSuccess(
+                            streamsCallback.onApiSuccess(
                                     JsonConverter.retrieveDeletedStreamId(responseBody), null, serverTime);
                         } else {
                             // stream was trashed, forward as an update to callback
                             Stream trashedStream = JsonConverter.retrieveStreamFromJson(responseBody);
                             trashedStream.assignConnection(weakConnection);
-                            onlineStreamsCallback.onApiSuccess(
+                            streamsCallback.onApiSuccess(
                                     "Online: stream with Id=" + trashedStream.getId() + " trashed on API",
                                     trashedStream, serverTime);
                         }
@@ -519,10 +527,14 @@ public class OnlineEventsAndStreamsManager {
 
             } else {
                 logger.log("Online: issue in responseHandler");
-                if (stream != null) {
-                    onlineStreamsCallback.onApiError(responseBody, serverTime);
-                } else {
-                    onlineEventsCallback.onApiError(responseBody, serverTime);
+                if (streamsCallback != null) {
+                    streamsCallback.onApiError(responseBody, serverTime);
+                } else if (getStreamsCallback != null) {
+                    getStreamsCallback.onApiError(responseBody, serverTime);
+                } else if (eventsCallback != null) {
+                    eventsCallback.onApiError(responseBody, serverTime);
+                } else if (getEventsCallback != null) {
+                    getEventsCallback.onApiError(responseBody, serverTime);
                 }
             }
             return null;

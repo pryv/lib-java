@@ -10,7 +10,7 @@ public interface GetStreamsCallback {
     /**
      * Used for cache callback
      *
-     * @param streams
+     * @param streams root streams
      * @param deletedStreams
      */
     void cacheCallback(Map<String, Stream> streams, Map<String, Stream> deletedStreams);
@@ -25,7 +25,7 @@ public interface GetStreamsCallback {
     /**
      * used for api callback
      *
-     * @param streams
+     * @param streams root streams
      * @param serverTime
      */
     void apiCallback(Map<String, Stream> streams, Double serverTime);

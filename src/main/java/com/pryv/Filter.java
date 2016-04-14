@@ -331,12 +331,21 @@ public class Filter {
     }
   }
 
+  /**
+   * Returns the streamIds of this Filter, null if there are none.
+   *
+   * @return
+   */
   public Set<String> getStreamIds() {
-    Set<String> streamIds = new HashSet<String>();
-    for (Stream stream: streams) {
-      streamIds.add(stream.getId());
+    if (streams != null) {
+      Set<String> streamIds = new HashSet<String>();
+      for (Stream stream: streams) {
+        streamIds.add(stream.getId());
+      }
+      return streamIds;
+    } else {
+     return null;
     }
-    return streamIds;
   }
 
   public Double getFromTime() {

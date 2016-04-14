@@ -207,9 +207,10 @@ public class QueryGenerator {
   public static String retrieveEvents(Filter filter) {
     StringBuilder baseQuery = new StringBuilder();
     baseQuery.append("SELECT * FROM " + EVENTS_TABLE_NAME + " ");
-    StringBuilder filterParams = new StringBuilder();
 
     if (filter != null) {
+      StringBuilder filterParams = new StringBuilder();
+
       StringBuilder andSeparator = new StringBuilder("");
       // fromTime
       if (filter.getFromTime() != null) {

@@ -22,7 +22,7 @@ public class ConnectionEvents implements EventsManager {
 
     @Override
     public void get(final Filter filter, final GetEventsCallback eventsCallback) {
-        if (filter.isIncludedInScope(cacheScope)) {
+        if (filter == null || filter.isIncludedInScope(cacheScope)) {
             cache.getEvents(filter, eventsCallback);
             // to execute in separate Thread
             // can be launched separately since write is not done until all reads are finished.

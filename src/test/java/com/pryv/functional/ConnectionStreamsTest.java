@@ -26,9 +26,6 @@ import resources.TestCredentials;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
-/**
- * Created by ik on 4/14/16.
- */
 public class ConnectionStreamsTest {
 
     private static Logger logger = Logger.getInstance();
@@ -123,6 +120,19 @@ public class ConnectionStreamsTest {
 
     @Test
     public void testGetStreamsShouldReturnTheStreamStructure() {
+        Stream s1 = new Stream(null, "someStreamOne");
+        s1.setParentId(testSupportStream.getId());
+        Stream s2 = new Stream(null, "someOtherStream");
+        s2.setParentId(testSupportStream.getId());
+        connection.streams.create(s1, streamsCallback);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+        apiSuccess = false;
+        connection.streams.create(s2, streamsCallback);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+        apiSuccess = false;
+
         connection.streams.get(null, getStreamsCallback);
         Awaitility.await().until(hasCacheResult());
         assertFalse(cacheError);
@@ -131,6 +141,8 @@ public class ConnectionStreamsTest {
 
         assertNotNull(cacheStreams);
         assertNotNull(streams);
+
+        connection.getRootStreams();
     }
 
 
