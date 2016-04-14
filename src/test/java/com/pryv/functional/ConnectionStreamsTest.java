@@ -322,7 +322,7 @@ public class ConnectionStreamsTest {
     private static void instanciateGetEventsCallback() {
         getEventsCallback = new GetEventsCallback() {
             @Override
-            public void cacheCallback(List<Event> events, Map<String, Event> deletedEvents) {
+            public void cacheCallback(List<Event> events, Map<String, Double> eventDeletions) {
                 logger.log("cacheCallback with " + events.size() + " events.");
                 cacheEvents = events;
                 cacheSuccess = true;
@@ -335,7 +335,8 @@ public class ConnectionStreamsTest {
             }
 
             @Override
-            public void apiCallback(List<Event> apiEvents, Double serverTime) {
+            public void apiCallback(List<Event> apiEvents, Map<String, Double> eventDeletions,
+                                    Double serverTime) {
                 logger.log("apiCallback with " + apiEvents.size() + " events.");
                 events = apiEvents;
                 apiSuccess = true;
@@ -415,7 +416,7 @@ public class ConnectionStreamsTest {
     private static void instanciateGetStreamsCallback() {
         getStreamsCallback = new GetStreamsCallback() {
             @Override
-            public void cacheCallback(Map<String, Stream> streams, Map<String, Stream> deletedStreams) {
+            public void cacheCallback(Map<String, Stream> streams, Map<String, Double> streamDeletions) {
                 logger.log("cacheCallback with " + streams.size() + " streams.");
                 cacheStreams = streams;
                 cacheSuccess = true;
@@ -428,7 +429,8 @@ public class ConnectionStreamsTest {
             }
 
             @Override
-            public void apiCallback(Map<String, Stream> receivedStreams, Double serverTime) {
+            public void apiCallback(Map<String, Stream> receivedStreams,
+                                    Map<String, Double> streamDeletions, Double serverTime) {
                 logger.log("apiCallback with " + receivedStreams.size() + " streams.");
                 streams = receivedStreams;
                 apiSuccess = true;

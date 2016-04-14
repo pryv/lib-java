@@ -415,10 +415,11 @@ public class OnlineEventsAndStreamsManager {
                             receivedEvent.assignConnection(weakConnection);
                             Event.createOrReuse(receivedEvent);
                         }
+                        Map<String, Double> eventDeletions = null;
                         logger.log("ApiResponseHandler: received "
                                 + receivedEvents.size()
                                 + " event(s) from API.");
-                        getEventsCallback.apiCallback(receivedEvents, serverTime);
+                        getEventsCallback.apiCallback(receivedEvents, eventDeletions, serverTime);
                         break;
 
                     case CREATE_EVENT:
@@ -482,7 +483,8 @@ public class OnlineEventsAndStreamsManager {
                         for (Stream receivedStream : receivedStreams.values()) {
                             receivedStream.assignConnection(weakConnection);
                         }
-                        getStreamsCallback.apiCallback(receivedStreams, serverTime);
+                        Map<String, Double> streamDeletions = null;
+                        getStreamsCallback.apiCallback(receivedStreams, streamDeletions, serverTime);
                         break;
 
                     case CREATE_STREAM:

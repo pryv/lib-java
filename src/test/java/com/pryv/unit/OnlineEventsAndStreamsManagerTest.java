@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.HashSet;
@@ -269,17 +270,18 @@ public class OnlineEventsAndStreamsManagerTest {
     private static void instanciateGetEventsCallback() {
         getEventsCallback = new GetEventsCallback() {
             @Override
-            public void cacheCallback(List<Event> events, Map<String, Event> deletedEvents) {
-
+            public void cacheCallback(List<Event> events, Map<String, Double> eventDeletions) {
+                fail("should not be called");
             }
 
             @Override
             public void onCacheError(String errorMessage) {
-
+                fail("should not be called");
             }
 
             @Override
-            public void apiCallback(List<Event> events, Double serverTime) {
+            public void apiCallback(List<Event> events, Map<String, Double> eventDeletions,
+                                    Double serverTime) {
 
             }
 
@@ -309,12 +311,12 @@ public class OnlineEventsAndStreamsManagerTest {
 
             @Override
             public void onCacheSuccess(String successMessage, Event event) {
-
+                fail("should not be called");
             }
 
             @Override
             public void onCacheError(String errorMessage) {
-
+                fail("should not be called");
             }
         };
     }
@@ -336,12 +338,12 @@ public class OnlineEventsAndStreamsManagerTest {
 
             @Override
             public void onCacheSuccess(String successMessage, Stream stream) {
-
+                fail("should not be called");
             }
 
             @Override
             public void onCacheError(String errorMessage) {
-
+                fail("should not be called");
             }
         };
     }
@@ -349,18 +351,19 @@ public class OnlineEventsAndStreamsManagerTest {
     private static void instanciateGetStreamsCallback() {
         getStreamsCallback = new GetStreamsCallback() {
             @Override
-            public void cacheCallback(Map<String, Stream> streams, Map<String, Stream> deletedStreams) {
-                partialStreams = streams;
-                partialSuccess = true;
+            public void cacheCallback(Map<String, Stream> streams,
+                                      Map<String, Double> streamDeletions) {
+                fail("should not be called");
             }
 
             @Override
             public void onCacheError(String errorMessage) {
-
+                fail("should not be called");
             }
 
             @Override
-            public void apiCallback(Map<String, Stream> receivedStreams, Double serverTime) {
+            public void apiCallback(Map<String, Stream> receivedStreams,
+                                    Map<String, Double> streamDeletions, Double serverTime) {
                 streams = receivedStreams;
                 success = true;
             }

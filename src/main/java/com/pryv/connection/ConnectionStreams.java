@@ -87,9 +87,9 @@ public class ConnectionStreams implements StreamsManager {
         }
 
         @Override
-        public void cacheCallback(Map<String, Stream> streams, Map<String, Stream> deletedStreams) {
+        public void cacheCallback(Map<String, Stream> streams, Map<String, Double> streamDeletions) {
             weakConnection.get().updateRootStreams(streams);
-            getStreamsCallback.cacheCallback(streams, deletedStreams);
+            getStreamsCallback.cacheCallback(streams, streamDeletions);
         }
 
         @Override
@@ -98,9 +98,9 @@ public class ConnectionStreams implements StreamsManager {
         }
 
         @Override
-        public void apiCallback(Map<String, Stream> streams, Double serverTime) {
+        public void apiCallback(Map<String, Stream> streams, Map<String, Double> streamDeletions, Double serverTime) {
             weakConnection.get().updateRootStreams(streams);
-            getStreamsCallback.apiCallback(streams, serverTime);
+            getStreamsCallback.apiCallback(streams, streamDeletions, serverTime);
         }
 
         @Override
