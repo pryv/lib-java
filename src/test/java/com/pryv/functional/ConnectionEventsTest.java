@@ -40,9 +40,9 @@ public class ConnectionEventsTest {
     private static GetStreamsCallback getStreamsCallback;
 
     private static List<Event> events;
-    private static List<Event> partialEvents;
+    private static List<Event> cacheEvents;
     private static Map<String, Stream> streams;
-    private static Map<String, Stream> partialStreams;
+    private static Map<String, Stream> cacheStreams;
 
     private static Stream testSupportStream;
 
@@ -83,11 +83,16 @@ public class ConnectionEventsTest {
         assertFalse(cacheError);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
+
         testSupportStream.merge(singleStream, true);
         assertNotNull(testSupportStream.getId());
+        cacheSuccess = false;
         apiSuccess = false;
+
         connection.events.create(new Event(testSupportStream.getId(), null,
                 "note/txt", "i am a test event"), eventsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(apiError);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
     }
@@ -104,9 +109,9 @@ public class ConnectionEventsTest {
     @Before
     public void beforeEachTest() {
         events = null;
-        partialEvents = null;
+        cacheEvents = null;
         streams = null;
-        partialStreams = null;
+        cacheStreams = null;
         apiSuccess = false;
         apiError = false;
         cacheSuccess = false;
@@ -409,7 +414,7 @@ public class ConnectionEventsTest {
             @Override
             public void cacheCallback(List<Event> events, Map<String, Event> deletedEvents) {
                 logger.log("cacheCallback with " + events.size() + " events.");
-                partialEvents = events;
+                cacheEvents = events;
                 cacheSuccess = true;
             }
 
@@ -501,7 +506,7 @@ public class ConnectionEventsTest {
             @Override
             public void cacheCallback(Map<String, Stream> streams, Map<String, Stream> deletedStreams) {
                 logger.log("cacheCallback with " + streams.size() + " streams.");
-                partialStreams = streams;
+                cacheStreams = streams;
                 cacheSuccess = true;
             }
 

@@ -92,6 +92,7 @@ public class Connection {
         }
 
         if (isCacheActive) {
+            cacheScope = new Filter();
             String cacheFolder = "cache/" + generateCacheFolderName() + "/";
             new File(cacheFolder).mkdirs();
             cache = new SQLiteDBHelper(cacheFolder, weakConnection, dBinitCallback);

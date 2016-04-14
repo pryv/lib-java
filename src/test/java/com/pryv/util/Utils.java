@@ -20,70 +20,72 @@ public class Utils {
      * @param received
      */
     public void checkEvent(Event expected, Event received) {
-        if (expected.getClientId() != null) {
-            assertEquals(expected.getClientId(), received.getClientId());
-        }
-        if (expected.getId() != null) {
-            assertEquals(expected.getId(), received.getId());
-        }
-        if (expected.getStreamId() != null) {
-            assertEquals(expected.getStreamId(), received.getStreamId());
-        }
-        if (expected.getTime() != null) {
-            assertEquals(expected.getTime(), received.getTime());
-        }
-        if (expected.getType() != null) {
-            assertEquals(expected.getType(), received.getType());
-        }
-        if (expected.getCreated() != null) {
-            assertEquals(expected.getCreated(), received.getCreated());
-        }
-        if (expected.getCreatedBy() != null) {
-            assertEquals(expected.getCreatedBy(), received.getCreatedBy());
-        }
-        if (expected.getModified() != null) {
-            assertEquals(expected.getModified(), received.getModified());
-        }
-        if (expected.getModifiedBy() != null) {
-            assertEquals(expected.getModifiedBy(), received.getModifiedBy());
-        }
-        if (expected.getDuration() != null) {
-            assertEquals(expected.getDuration(), received.getDuration());
-        }
-        if (expected.getContent() != null) {
-            assertEquals(expected.getContent(), received.getContent());
-        }
-        if (expected.getDescription() != null) {
-            assertEquals(expected.getDescription(), received.getDescription());
-        }
-        if (expected.isTrashed() != null) {
-            assertEquals(expected.isTrashed(), received.isTrashed());
-        }
-        if (expected.getTags() != null) {
-            assertNotNull(received.getTags());
-            boolean found = false;
-            for (String expectedTag: expected.getTags()) {
-                found = false;
-                for (String receivedTag: received.getTags()) {
-                    assertEquals(expectedTag, receivedTag);
-                }
-                assertTrue(found);
+        if (expected != received) {
+            if (expected.getClientId() != null) {
+                assertEquals(expected.getClientId(), received.getClientId());
             }
-        }
-        if (expected.getReferences() != null) {
-            assertNotNull(received.getReferences());
-            boolean found = false;
-            for (String expectedReference: expected.getReferences()) {
-                found = false;
-                for (String receivedReference: received.getReferences()) {
-                    assertEquals(expectedReference, receivedReference);
-                }
-                assertTrue(found);
+            if (expected.getId() != null) {
+                assertEquals(expected.getId(), received.getId());
             }
-        }
+            if (expected.getStreamId() != null) {
+                assertEquals(expected.getStreamId(), received.getStreamId());
+            }
+            if (expected.getTime() != null) {
+                assertEquals(expected.getTime(), received.getTime());
+            }
+            if (expected.getType() != null) {
+                assertEquals(expected.getType(), received.getType());
+            }
+            if (expected.getCreated() != null) {
+                assertEquals(expected.getCreated(), received.getCreated());
+            }
+            if (expected.getCreatedBy() != null) {
+                assertEquals(expected.getCreatedBy(), received.getCreatedBy());
+            }
+            if (expected.getModified() != null) {
+                assertEquals(expected.getModified(), received.getModified());
+            }
+            if (expected.getModifiedBy() != null) {
+                assertEquals(expected.getModifiedBy(), received.getModifiedBy());
+            }
+            if (expected.getDuration() != null) {
+                assertEquals(expected.getDuration(), received.getDuration());
+            }
+            if (expected.getContent() != null) {
+                assertEquals(expected.getContent(), received.getContent());
+            }
+            if (expected.getDescription() != null) {
+                assertEquals(expected.getDescription(), received.getDescription());
+            }
+            if (expected.isTrashed() != null) {
+                assertEquals(expected.isTrashed(), received.isTrashed());
+            }
+            if (expected.getTags() != null) {
+                assertNotNull(received.getTags());
+                boolean found = false;
+                for (String expectedTag : expected.getTags()) {
+                    found = false;
+                    for (String receivedTag : received.getTags()) {
+                        assertEquals(expectedTag, receivedTag);
+                    }
+                    assertTrue(found);
+                }
+            }
+            if (expected.getReferences() != null) {
+                assertNotNull(received.getReferences());
+                boolean found = false;
+                for (String expectedReference : expected.getReferences()) {
+                    found = false;
+                    for (String receivedReference : received.getReferences()) {
+                        assertEquals(expectedReference, receivedReference);
+                    }
+                    assertTrue(found);
+                }
+            }
 
-        // TODO compare Attachments
-        // TODO compare clientData
+            // TODO compare Attachments
+            // TODO compare clientData
+        }
     }
 
     /**
