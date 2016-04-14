@@ -1,4 +1,4 @@
-package com.pryv.api.database;
+package com.pryv.database;
 
 import com.pryv.utils.Logger;
 

@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.pryv.Connection;
-import com.pryv.api.database.QueryGenerator;
+import com.pryv.database.QueryGenerator;
 import com.pryv.utils.JsonConverter;
 import com.rits.cloning.Cloner;
 

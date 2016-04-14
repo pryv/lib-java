@@ -26,7 +26,7 @@ import com.pryv.api.EventsCallback;
 import com.pryv.interfaces.EventsManager;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.interfaces.StreamsManager;
-import com.pryv.api.database.DBinitCallback;
+import com.pryv.database.DBinitCallback;
 import com.pryv.model.Event;
 import com.pryv.model.Permission;
 import com.pryv.model.Stream;

@@ -1,8 +1,8 @@
 package com.pryv;
 
 import com.pryv.api.OnlineEventsAndStreamsManager;
-import com.pryv.api.database.DBinitCallback;
-import com.pryv.api.database.SQLiteDBHelper;
+import com.pryv.database.DBinitCallback;
+import com.pryv.database.SQLiteDBHelper;
 import com.pryv.model.Stream;
 import com.pryv.connection.ConnectionAccesses;
 import com.pryv.connection.ConnectionAccount;

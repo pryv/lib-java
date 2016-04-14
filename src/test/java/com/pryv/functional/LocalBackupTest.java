@@ -20,7 +20,7 @@ import com.jayway.awaitility.Awaitility;
 import com.pryv.ConnectionOld;
 import com.pryv.Pryv;
 import com.pryv.interfaces.StreamsCallback;
-import com.pryv.api.database.DBinitCallback;
+import com.pryv.database.DBinitCallback;
 import Event;
 import Stream;
 import com.pryv.backup.BackupCallback;

@@ -25,7 +25,7 @@ import com.pryv.interfaces.EventsManager;
 import com.pryv.Filter;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.interfaces.StreamsManager;
-import com.pryv.api.database.DBinitCallback;
+import com.pryv.database.DBinitCallback;
 import Event;
 import Stream;
 import com.pryv.unit.DummyData;

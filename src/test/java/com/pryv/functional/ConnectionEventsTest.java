@@ -6,7 +6,7 @@ import com.pryv.interfaces.EventsCallback;
 import com.pryv.Filter;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
-import com.pryv.api.database.DBinitCallback;
+import com.pryv.database.DBinitCallback;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
 import com.pryv.interfaces.GetEventsCallback;

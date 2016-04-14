@@ -8,8 +8,8 @@ import java.util.Set;
 
 import com.pryv.ConnectionOld;
 import com.pryv.Pryv;
-import com.pryv.api.database.DBinitCallback;
-import com.pryv.api.database.SQLiteDBHelper;
+import com.pryv.database.DBinitCallback;
+import com.pryv.database.SQLiteDBHelper;
 import Event;
 import Stream;
 import com.pryv.callbacks.EventsManager;

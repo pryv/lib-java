@@ -1,4 +1,4 @@
-package com.pryv.api.database;
+package com.pryv.database;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
