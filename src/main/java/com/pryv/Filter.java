@@ -29,6 +29,8 @@ public class Filter {
   public final static String STATE_URL_KEY = "state";
   public final static String MODIFIED_SINCE_URL_KEY = "modifiedSince";
   public final static String PARENT_ID_URL_KEY = "parentId";
+  public final static String INCLUDE_DELETIONS_URL_KEY = "includeDeletions";
+  public final static String INCLUDE_DELETIONS_SINCE_URL_KEY = "includeDeletionsSince";
 
   // filter fields
   private Double fromTime;
@@ -42,6 +44,9 @@ public class Filter {
   private Integer limit;
   private State state;
   private Double modifiedSince;
+  private String parentId;
+  private Boolean includeDeletions;
+  private Boolean includeDeletionsSince;
 
   /**
    * Filter class constructor. All fields are optional: use null when unused.
@@ -71,7 +76,7 @@ public class Filter {
    */
   public Filter(Double from, Double to, Set<Stream> streams, Set<String> tags,
     Set<String> types, Boolean running, Boolean sortAscending, Integer skip, Integer limit,
-    State state, Double modifiedSince) {
+    State state, Double modifiedSince, String parentId, Boolean includeDeletions, Boolean includeDeletionsSince) {
     this.fromTime = from;
     this.toTime = to;
     this.streams = streams;
@@ -83,6 +88,9 @@ public class Filter {
     this.limit = limit;
     this.state = state;
     this.modifiedSince = modifiedSince;
+    this.parentId = parentId;
+    this.includeDeletions = includeDeletions;
+    this.includeDeletionsSince = includeDeletionsSince;
   }
 
   /**
@@ -267,6 +275,15 @@ public class Filter {
     if (modifiedSince != null) {
       sb.append("&" + MODIFIED_SINCE_URL_KEY + "=" + modifiedSince);
     }
+    if (parentId != null) {
+      sb.append("&" + PARENT_ID_URL_KEY + "=" + parentId);
+    }
+    if (includeDeletions != null) {
+      sb.append("&" + INCLUDE_DELETIONS_URL_KEY + "=" + includeDeletions);
+    }
+    if (includeDeletionsSince != null) {
+      sb.append("&" + INCLUDE_DELETIONS_SINCE_URL_KEY + "=" + includeDeletionsSince);
+    }
     return sb.toString();
   }
 
@@ -392,6 +409,18 @@ public class Filter {
     return modifiedSince;
   }
 
+  public String getParentId() {
+    return parentId;
+  }
+
+  public Boolean getIncludeDeletions() {
+    return includeDeletions;
+  }
+
+  public Boolean getIncludeDeletionsSince() {
+    return includeDeletionsSince;
+  }
+
   public void setFromTime(Double pFromTime) {
     this.fromTime = pFromTime;
   }
@@ -435,6 +464,18 @@ public class Filter {
   public void setModifiedSince(Double pModifiedSince) {
     this.modifiedSince = pModifiedSince;
   };
+
+  public void setParentId(String parentId) {
+    this.parentId = parentId;
+  }
+
+  public void setIncludeDeletions(Boolean includeDeletions) {
+    this.includeDeletions = includeDeletions;
+  }
+
+  public void setIncludeDeletionsSince(Boolean includeDeletionsSince) {
+    this.includeDeletionsSince = includeDeletionsSince;
+  }
 
   /**
    * State parameter

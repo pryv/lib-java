@@ -38,7 +38,7 @@ public class FilterTest {
     Double modifiedSince = 50.0;
     Filter filter =
       new Filter(from, to, streams, tags, types, running, sortAscending, skip, limit, state,
-        modifiedSince);
+        modifiedSince, null, null, null);
     assertEquals(from, filter.getFromTime());
     assertEquals(to, filter.getToTime());
     assertEquals(streams, filter.getStreamIds());

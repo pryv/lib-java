@@ -145,6 +145,10 @@ public class SQLiteDBHelperTest {
     cacheStreams = null;
   }
 
+  /**
+   * EVENTS
+   */
+
   @Test
   public void testInsertIncompleteEventShouldGenerateError() {
     System.out.println("test2");
@@ -314,6 +318,10 @@ public class SQLiteDBHelperTest {
       assertEquals(event.getType(), filterType);
     }
   }
+
+  /**
+   * STREAMS
+   */
 
   @Test
   public void createStreamWithMissingRequiredFieldsShouldGenerateAnError() {
@@ -491,6 +499,15 @@ public class SQLiteDBHelperTest {
     Awaitility.await().until(hasCacheResult());
     assertFalse(cacheError);
     assertNull(getEventByClientId(clientId, cacheEvents).getAttachments());
+  }
+
+  /**
+   * UPDATE
+   */
+
+  @Test
+  public void testUpdateShouldUpdateTheCache() {
+
   }
 
 
