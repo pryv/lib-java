@@ -125,7 +125,7 @@ public class CacheUpdateTest {
         updateError = false;
     }
 
-    @Test
+    //@Test
     public void testUpdateCache() {
 
         Event newEvent = new Event(testSupportStream.getId(), null,
