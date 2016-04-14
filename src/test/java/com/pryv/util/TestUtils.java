@@ -8,10 +8,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by ik on 4/14/16.
- */
-public class Utils {
+public class TestUtils {
 
     /**
      * Verifies assertions for an Event/'s parameters
@@ -19,7 +16,7 @@ public class Utils {
      * @param expected
      * @param received
      */
-    public void checkEvent(Event expected, Event received) {
+    public static void checkEvent(Event expected, Event received) {
         if (expected != received) {
             if (expected.getClientId() != null) {
                 assertEquals(expected.getClientId(), received.getClientId());
@@ -94,7 +91,7 @@ public class Utils {
      * @param expected
      * @param received
      */
-    public void checkStream(Stream expected, Stream received) {
+    public static void checkStream(Stream expected, Stream received) {
         if (expected != received) {
             if (expected.getId() != null) {
                 assertEquals(expected.getId(), received.getId());

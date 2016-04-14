@@ -10,6 +10,7 @@ import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
+import com.pryv.util.TestUtils;
 import com.pryv.utils.Logger;
 
 import org.junit.AfterClass;
@@ -25,6 +26,7 @@ import resources.TestCredentials;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ConnectionStreamsTest {
 
@@ -44,8 +46,10 @@ public class ConnectionStreamsTest {
 
     private static String stoppedId;
 
-    private static Event singleEvent;
-    private static Stream singleStream;
+    private static Event apiEvent;
+    private static Event cacheEvent;
+    private static Stream apiStream;
+    private static Stream cacheStream;
 
     private static boolean cacheSuccess = false;
     private static boolean cacheError = false;
@@ -81,7 +85,7 @@ public class ConnectionStreamsTest {
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
 
-        testSupportStream.merge(singleStream, true);
+        testSupportStream.merge(apiStream, true);
         assertNotNull(testSupportStream.getId());
         cacheSuccess = false;
         apiSuccess = false;
@@ -113,8 +117,8 @@ public class ConnectionStreamsTest {
         apiError = false;
         cacheSuccess = false;
         cacheError = false;
-        singleEvent = null;
-        singleStream = null;
+        apiEvent = null;
+        apiStream = null;
         stoppedId = null;
     }
 
@@ -175,7 +179,18 @@ public class ConnectionStreamsTest {
 
     @Test
     public void testCreateStreamMustAcceptAValidStream() {
+        Stream newStream = new Stream("myNewId", "myNewStream");
+        newStream.setParentId(testSupportStream.getId());
+        connection.streams.create(newStream, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
 
+        assertNotNull(cacheStream);
+        TestUtils.checkStream(newStream, cacheStream);
+        assertNotNull(apiStream);
+        TestUtils.checkStream(newStream, apiStream);
     }
 
     // TODO
@@ -306,7 +321,7 @@ public class ConnectionStreamsTest {
                 System.out.println("OnlineEventsManagerTest: eventsSuccess msg: " + successMessage);
                 stoppedId = pStoppedId;
                 apiSuccess = true;
-                singleEvent = event;
+                apiEvent = event;
             }
 
             @Override
@@ -335,7 +350,7 @@ public class ConnectionStreamsTest {
             @Override
             public void onApiSuccess(String successMessage, Stream stream, Double pServerTime) {
                 System.out.println("TestStreamsCallback: apiSuccess msg: " + successMessage);
-                singleStream = stream;
+                apiStream = stream;
                 apiSuccess = true;
             }
 
@@ -348,6 +363,7 @@ public class ConnectionStreamsTest {
             @Override
             public void onCacheSuccess(String successMessage, Stream stream) {
                 cacheSuccess = true;
+                cacheStream = stream;
                 logger.log(successMessage);
             }
 

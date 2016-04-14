@@ -48,8 +48,10 @@ public class ConnectionEventsTest {
 
     private static String stoppedId;
 
-    private static Event singleEvent;
-    private static Stream singleStream;
+    private static Event apiEvent;
+    private static Event cacheEvent;
+    private static Stream apiStream;
+    private static Stream cacheStream;
 
     private static boolean cacheSuccess = false;
     private static boolean cacheError = false;
@@ -84,7 +86,7 @@ public class ConnectionEventsTest {
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
 
-        testSupportStream.merge(singleStream, true);
+        testSupportStream.merge(apiStream, true);
         assertNotNull(testSupportStream.getId());
         cacheSuccess = false;
         apiSuccess = false;
@@ -116,8 +118,8 @@ public class ConnectionEventsTest {
         apiError = false;
         cacheSuccess = false;
         cacheError = false;
-        singleEvent = null;
-        singleStream = null;
+        apiEvent = null;
+        apiStream = null;
         stoppedId = null;
     }
 
@@ -192,17 +194,17 @@ public class ConnectionEventsTest {
         connection.events.create(minimalEvent, eventsCallback);
         Awaitility.await().until(hasApiResult());
         assertTrue(apiSuccess);
-        assertNotNull(singleEvent);
-        assertNotNull(singleEvent.getId());
-        assertNotNull(singleEvent.getTime());
-        assertNotNull(singleEvent.getModified());
-        assertNotNull(singleEvent.getModifiedBy());
-        assertNotNull(singleEvent.getCreated());
-        assertNotNull(singleEvent.getCreatedBy());
-        assertNotNull(singleEvent.getTags());
-        assertEquals(singleEvent.getType(), minimalEvent.getType());
-        assertEquals(singleEvent.getContent(), minimalEvent.getContent());
-        assertEquals(singleEvent.getStreamId(), minimalEvent.getStreamId());
+        assertNotNull(apiEvent);
+        assertNotNull(apiEvent.getId());
+        assertNotNull(apiEvent.getTime());
+        assertNotNull(apiEvent.getModified());
+        assertNotNull(apiEvent.getModifiedBy());
+        assertNotNull(apiEvent.getCreated());
+        assertNotNull(apiEvent.getCreatedBy());
+        assertNotNull(apiEvent.getTags());
+        assertEquals(apiEvent.getType(), minimalEvent.getType());
+        assertEquals(apiEvent.getContent(), minimalEvent.getContent());
+        assertEquals(apiEvent.getStreamId(), minimalEvent.getStreamId());
     }
 
     // TODO implement events.start in lib java
@@ -223,8 +225,8 @@ public class ConnectionEventsTest {
         Awaitility.await().until(hasApiResult());
         assertTrue(apiSuccess);
         apiSuccess = false;
-        assertNotNull(singleEvent);
-        runningEvent = singleEvent;
+        assertNotNull(apiEvent);
+        runningEvent = apiEvent;
         String myStoppedId = runningEvent.getId();
 
         // create Event that will stop running event
@@ -297,10 +299,10 @@ public class ConnectionEventsTest {
         connection.events.create(eventToUpdate, eventsCallback);
         Awaitility.await().until(hasApiResult());
         assertTrue(apiSuccess);
-        assertNotNull(singleEvent);
+        assertNotNull(apiEvent);
         apiSuccess = false;
 
-        Event initialEvent = singleEvent;
+        Event initialEvent = apiEvent;
         assertNotEquals(eventToUpdate, initialEvent);
         assertEquals(initialEvent.getContent(), eventToUpdate.getContent());
 
@@ -309,9 +311,9 @@ public class ConnectionEventsTest {
         Awaitility.await().until(hasApiResult());
         assertTrue(apiSuccess);
         apiSuccess = false;
-        assertNotNull(singleEvent);
-        assertEquals(singleEvent.getId(), initialEvent.getId());
-        assertEquals(singleEvent.getContent(), eventToUpdate.getContent());
+        assertNotNull(apiEvent);
+        assertEquals(apiEvent.getId(), initialEvent.getId());
+        assertEquals(apiEvent.getContent(), eventToUpdate.getContent());
     }
 
     public void testUpdateEventMustReturnAnErrorWhenEventDoesntExistYet() {
@@ -334,15 +336,15 @@ public class ConnectionEventsTest {
         Awaitility.await().until(hasApiResult());
         assertTrue(apiSuccess);
         apiSuccess = false;
-        eventToTrash = singleEvent;
+        eventToTrash = apiEvent;
         assertFalse(eventToTrash.isTrashed());
 
         connection.events.delete(eventToTrash, eventsCallback);
         Awaitility.await().until(hasApiResult());
         assertTrue(apiSuccess);
-        assertNotNull(singleEvent);
-        assertEquals(eventToTrash.getContent(), singleEvent.getContent());
-        assertTrue(singleEvent.isTrashed());
+        assertNotNull(apiEvent);
+        assertEquals(eventToTrash.getContent(), apiEvent.getContent());
+        assertTrue(apiEvent.isTrashed());
     }
 
     // TODO retrieve deletionId in eventsManager.onEventsSuccess
@@ -355,21 +357,21 @@ public class ConnectionEventsTest {
         Awaitility.await().until(hasApiResult());
         assertTrue(apiSuccess);
         apiSuccess = false;
-        eventToDelete = singleEvent;
+        eventToDelete = apiEvent;
 
         // trash event
         connection.events.delete(eventToDelete, eventsCallback);
         Awaitility.await().until(hasApiResult());
         assertTrue(apiSuccess);
-        assertNotNull(singleEvent);
-        assertEquals(eventToDelete.getContent(), singleEvent.getContent());
-        assertTrue(singleEvent.isTrashed());
+        assertNotNull(apiEvent);
+        assertEquals(eventToDelete.getContent(), apiEvent.getContent());
+        assertTrue(apiEvent.isTrashed());
 
         // delete event
         connection.events.delete(eventToDelete, eventsCallback);
         Awaitility.await().until(hasApiResult());
         assertTrue(apiSuccess);
-        assertNull(singleEvent);
+        assertNull(apiEvent);
     }
 
     private Stream createSingleActivityStream(Stream singleActivityStream) {
@@ -379,8 +381,8 @@ public class ConnectionEventsTest {
         connection.streams.create(singleActivityStream, streamsCallback);
         Awaitility.await().until(hasApiResult());
         assertTrue(apiSuccess);
-        assertEquals(singleStream.getName(), singleActivityStream.getName());
-        singleActivityStream = singleStream;
+        assertEquals(apiStream.getName(), singleActivityStream.getName());
+        singleActivityStream = apiStream;
         apiSuccess = false;
         return singleActivityStream;
     }
@@ -454,7 +456,7 @@ public class ConnectionEventsTest {
                 System.out.println("OnlineEventsManagerTest: eventsSuccess msg: " + successMessage);
                 stoppedId = pStoppedId;
                 apiSuccess = true;
-                singleEvent = event;
+                apiEvent = event;
             }
 
             @Override
@@ -483,7 +485,7 @@ public class ConnectionEventsTest {
             @Override
             public void onApiSuccess(String successMessage, Stream stream, Double pServerTime) {
                 System.out.println("TestStreamsCallback: apiSuccess msg: " + successMessage);
-                singleStream = stream;
+                apiStream = stream;
                 apiSuccess = true;
             }
 
@@ -496,6 +498,7 @@ public class ConnectionEventsTest {
             @Override
             public void onCacheSuccess(String successMessage, Stream stream) {
                 cacheSuccess = true;
+                cacheStream = stream;
                 logger.log(successMessage);
             }
 
