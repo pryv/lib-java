@@ -157,11 +157,6 @@ public class ConnectionEventsTest {
         }
     }
 
-    //@Test
-    public void testGetEventsMustAcceptANullFilter() {
-
-    }
-
     public void testGetEventsMustReturnAnEmptyMapWhenTheFilterMatchesNoEvents() {
         Filter filter = new Filter();
         filter.setFromTime(10.0);
