@@ -1,3 +1,4 @@
+/*
 package com.pryv.api;
 
 import java.lang.ref.WeakReference;
@@ -5,14 +6,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.pryv.Connection;
+import com.pryv.ConnectionOld;
 import com.pryv.Pryv;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.database.SQLiteDBHelper;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
+import com.pryv.callbacks.EventsManager;
 import com.pryv.utils.Logger;
 
+*/
 /**
  *
  * Cache that fetches objects from local database and forwards requests to
@@ -20,49 +23,63 @@ import com.pryv.utils.Logger;
  *
  * @author ik
  *
- */
+ *//*
+
 public class CacheEventsAndStreamsManager implements EventsManager, StreamsManager {
 
   private EventsManager onlineEventsManager;
   private StreamsManager onlineStreamsManager;
 
-  private WeakReference<Connection> weakConnection;
+  private WeakReference<ConnectionOld> weakConnection;
 
-  /**
+  */
+/**
    * defines the scope of the Events the SQLite DB contains. Concretely it
    * represents the Stream client Id's for which the Events are synchronized
    * with the SQLite database.
-   */
+   *//*
+
   private Set<String> scope;
 
-  /**
+  */
+/**
    * minimum time value
-   */
+   *//*
+
   private static final double MIN_TIME = -Double.MAX_VALUE;
 
-  /**
+  */
+/**
    * last time value received from server on online Events retrieval.
-   */
+   *//*
+
   private double lastOnlineRetrievalServerTime = MIN_TIME;
 
-  /**
+  */
+/**
    * ref to StreamsSupervisor
-   */
+   *//*
+
   private StreamsSupervisor streamsSupervisor;
 
-  /**
+  */
+/**
    * ref to EventsSupervisor
-   */
+   *//*
+
   private EventsSupervisor eventsSupervisor;
 
-  /**
+  */
+/**
    * The SQLite DB
-   */
+   *//*
+
   private SQLiteDBHelper dbHelper;
 
   private Logger logger = Logger.getInstance();
 
-  /**
+  */
+/**
    * Cache constructor. Instanciates online module to which it passes url and
    * token parameters.
    *
@@ -81,10 +98,11 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
    * @param pWeakConnection
    *          a reference to the connection object - used to assign
    *          weakreference
-   */
+   *//*
+
   public CacheEventsAndStreamsManager(String cacheFolder, String url, String token,
     DBinitCallback initCallback, StreamsSupervisor pStreams, EventsSupervisor pEventsSupervisor,
-    WeakReference<Connection> pWeakConnection) {
+    WeakReference<ConnectionOld> pWeakConnection) {
     weakConnection = pWeakConnection;
     onlineEventsManager = new OnlineEventsAndStreamsManager(url, token, pWeakConnection);
     onlineStreamsManager = (StreamsManager) onlineEventsManager;
@@ -96,12 +114,14 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
   }
 
-  /*
+  */
+/*
    * Events management
-   */
+   *//*
+
 
   @Override
-  public void getEvents(Filter filter, EventsCallback connectionEventsCallback) {
+  public void get(Filter filter, EventsCallback connectionEventsCallback) {
     // TODO when verifying if filter is included in scope, maybe clean the cache
     // when the scope is becoming smaller.
     if (Pryv.isCacheActive()) {
@@ -121,96 +141,98 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
       }
       // retrieve Events from cache
       filter.setModifiedSince(lastOnlineRetrievalServerTime);
-      dbHelper.getEvents(filter, new CacheEventsCallback(filter, connectionEventsCallback));
+      dbHelper.get(filter, new CacheEventsCallback(filter, connectionEventsCallback));
     } else if (Pryv.isOnlineActive()) {
-      onlineEventsManager.getEvents(filter, connectionEventsCallback);
+      onlineEventsManager.get(filter, connectionEventsCallback);
     }
 
   }
 
   @Override
-  public void createEvent(Event event, EventsCallback connectionEventsCallback) {
+  public void create(Event event, EventsCallback connectionEventsCallback) {
     if (Pryv.isCacheActive()) {
       // create Event in cache
-      dbHelper.createEvent(event, connectionEventsCallback);
+      dbHelper.create(event, connectionEventsCallback);
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
-      onlineEventsManager.createEvent(event, new OnlineManagerEventsCallback(null,
+      onlineEventsManager.create(event, new OnlineManagerEventsCallback(null,
         connectionEventsCallback));
     }
   }
 
   @Override
-  public void deleteEvent(Event eventToDelete, EventsCallback connectionEventsCallback) {
+  public void delete(Event eventToDelete, EventsCallback connectionEventsCallback) {
     if (Pryv.isCacheActive()) {
       // delete Event from cache
-      dbHelper.deleteEvent(eventToDelete, new CacheEventsCallback(null, connectionEventsCallback));
+      dbHelper.delete(eventToDelete, new CacheEventsCallback(null, connectionEventsCallback));
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
-      onlineEventsManager.deleteEvent(eventToDelete, new CacheEventsCallback(null,
+      onlineEventsManager.delete(eventToDelete, new CacheEventsCallback(null,
         connectionEventsCallback));
     }
   }
 
   @Override
-  public void updateEvent(Event eventToUpdate, EventsCallback connectionEventsCallback) {
+  public void update(Event eventToUpdate, EventsCallback connectionEventsCallback) {
     if (Pryv.isCacheActive()) {
       // update Event in cache
-      dbHelper.createEvent(eventToUpdate, new CacheEventsCallback(null,
+      dbHelper.create(eventToUpdate, new CacheEventsCallback(null,
         connectionEventsCallback));
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
-      onlineEventsManager.updateEvent(eventToUpdate, new CacheEventsCallback(null,
+      onlineEventsManager.update(eventToUpdate, new CacheEventsCallback(null,
         connectionEventsCallback));
     }
   }
 
-  /*
+  */
+/*
    * Streams management
-   */
+   *//*
+
 
   @Override
-  public void getStreams(Filter filter, final StreamsCallback connectionStreamsCallback) {
+  public void get(Filter filter, final StreamsCallback connectionStreamsCallback) {
     if (Pryv.isCacheActive()) {
       // retrieve Streams from cache
       logger.log("CacheEventsAndStreamsManager: retrieving Streams from cache: ");
-      dbHelper.getStreams(new CacheStreamsCallback(connectionStreamsCallback));
+      dbHelper.get(new CacheStreamsCallback(connectionStreamsCallback));
     }
   }
 
   @Override
-  public void createStream(Stream newStream, StreamsCallback connectionStreamsCallback) {
+  public void create(Stream newStream, StreamsCallback connectionStreamsCallback) {
     if (Pryv.isCacheActive()) {
       // create Stream in DB
       dbHelper.updateOrCreateStream(newStream, new CacheStreamsCallback(connectionStreamsCallback));
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
-      onlineStreamsManager.createStream(newStream, new OnlineManagerStreamsCallback(
+      onlineStreamsManager.create(newStream, new OnlineManagerStreamsCallback(
         connectionStreamsCallback));
     }
   }
 
   @Override
-  public void deleteStream(Stream streamToDelete, boolean mergeEventsWithParent,
+  public void delete(Stream streamToDelete, boolean mergeEventsWithParent,
     StreamsCallback connectionStreamsCallback) {
     if (Pryv.isCacheActive()) {
       // delete Stream from local db
-      dbHelper.deleteStream(streamToDelete, mergeEventsWithParent, new CacheStreamsCallback(
+      dbHelper.delete(streamToDelete, mergeEventsWithParent, new CacheStreamsCallback(
         connectionStreamsCallback));
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
-      onlineStreamsManager.deleteStream(streamToDelete, mergeEventsWithParent,
+      onlineStreamsManager.delete(streamToDelete, mergeEventsWithParent,
         new OnlineManagerStreamsCallback(connectionStreamsCallback));
     }
   }
 
   @Override
-  public void updateStream(Stream streamToUpdate, StreamsCallback connectionStreamsCallback) {
+  public void update(Stream streamToUpdate, StreamsCallback connectionStreamsCallback) {
     if (Pryv.isCacheActive()) {
       // update Stream in local db
       dbHelper.updateOrCreateStream(streamToUpdate, new CacheStreamsCallback(
@@ -218,17 +240,19 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
     if (Pryv.isOnlineActive()) {
       // forward call to online module
-      onlineStreamsManager.updateStream(streamToUpdate, new OnlineManagerStreamsCallback(
+      onlineStreamsManager.update(streamToUpdate, new OnlineManagerStreamsCallback(
         connectionStreamsCallback));
     }
   }
 
-  /**
+  */
+/**
    * EventsCallback for returns coming from OnlineEventsAndStreamsManager
    *
    * @author ik
    *
-   */
+   *//*
+
   private class OnlineManagerEventsCallback implements EventsCallback {
 
     private EventsCallback connectionEventsCallback;
@@ -267,7 +291,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
       Double pServerTime) {
       if (event != null && Pryv.isCacheActive()) {
-        dbHelper.createEvent(event, new CacheEventsCallback(filter,
+        dbHelper.create(event, new CacheEventsCallback(filter,
           connectionEventsCallback));
       }
       connectionEventsCallback.onEventsSuccess(successMessage, event, stoppedId, pServerTime);
@@ -280,12 +304,14 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
   }
 
-  /**
+  */
+/**
    * EventsCallback for returns coming from Cache
    *
    * @author ik
    *
-   */
+   *//*
+
   private class CacheEventsCallback implements EventsCallback {
 
     private EventsCallback connectionEventsCallback;
@@ -313,7 +339,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
         onlineFilter.setModifiedSince(lastOnlineRetrievalServerTime);
         onlineFilter.setStreamIds(scope);
         // forward call to online module
-        onlineEventsManager.getEvents(onlineFilter, new OnlineManagerEventsCallback(filter,
+        onlineEventsManager.get(onlineFilter, new OnlineManagerEventsCallback(filter,
           connectionEventsCallback));
       }
     }
@@ -335,12 +361,14 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
     }
   }
 
-  /**
+  */
+/**
    * Streams callback for local cache DB
    *
    * @author ik
    *
-   */
+   *//*
+
   private class CacheStreamsCallback implements StreamsCallback {
 
     private StreamsCallback connectionStreamsCallback;
@@ -362,7 +390,7 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
       // make the online request
       if (Pryv.isOnlineActive()) {
-        onlineStreamsManager.getStreams(null, new OnlineManagerStreamsCallback(
+        onlineStreamsManager.get(null, new OnlineManagerStreamsCallback(
           connectionStreamsCallback));
       }
     }
@@ -387,12 +415,14 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
 
   }
 
-  /**
+  */
+/**
    * Streams Callback for Online API calls
    *
    * @author ik
    *
-   */
+   *//*
+
   private class OnlineManagerStreamsCallback implements StreamsCallback {
 
     private StreamsCallback connectionStreamsCallback;
@@ -436,3 +466,4 @@ public class CacheEventsAndStreamsManager implements EventsManager, StreamsManag
   }
 
 }
+*/

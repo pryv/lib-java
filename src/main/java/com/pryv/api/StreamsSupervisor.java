@@ -1,3 +1,4 @@
+/*
 package com.pryv.api;
 
 import java.util.Map;
@@ -6,78 +7,98 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
+import com.pryv.interfaces.StreamsCallback;
 import com.pryv.utils.Logger;
 
+*/
 /**
  *
  * Contains Pryv Streams loaded in memory
  *
  * @author ik
  *
- */
+ *//*
+
 public class StreamsSupervisor {
 
-  /**
+  */
+/**
    * Streams with no parent stream. the key is the id
-   */
+   *//*
+
   private Map<String, Stream> rootStreams;
 
-  /**
+  */
+/**
    * All Streams stored in the Supervisor. the key is the id
-   */
+   *//*
+
   private Map<String, Stream> flatStreams;
 
-  private EventsSupervisor eventsSupervisor;
+//  private EventsSupervisor eventsSupervisor;
 
   private Logger logger = Logger.getInstance();
 
-  /**
+  */
+/**
    * StreamsSupervisor constructor. Instantiates data structures to store
    * Streams.
    *
-   */
+   *//*
+
   public StreamsSupervisor() {
     rootStreams = new ConcurrentHashMap<String, Stream>();
     flatStreams = new ConcurrentHashMap<String, Stream>();
   }
 
+  */
+/*
   public void setEventsSupervisor(EventsSupervisor pEventsSupervisor) {
     eventsSupervisor = pEventsSupervisor;
-  }
+  }*//*
 
-  /*
+
+  */
+/*
    * Streams Management
-   */
+   *//*
 
-  /**
+
+  */
+/**
    * Returns the root local memory streams
    *
    * @return
-   */
+   *//*
+
   public Map<String, Stream> getRootStreams() {
     recomputeRootStreamsTree();
     return rootStreams;
   }
 
-  /**
+  */
+/**
    * Returns Stream which has the provided id
    *
    * @param streamId
    *          the client id of the Stream you are looking for
    * @return the reference to the Stream
-   */
+   *//*
+
   public Stream getStreamById(String streamId) {
     return flatStreams.get(streamId);
   }
 
-  /**
+  */
+/**
    * Update or create stream in Supervisor whether it already exists or not.
    *
    * @param stream
    *          the Stream to add or update
    * @param connectionCallback
    *          the callback to notify success or failure
-   */
+   *//*
+
   public void updateOrCreateStream(Stream stream, StreamsCallback connectionCallback) {
     logger.log("StreamsSupervisor: updateOrCreateStream with id="
       + stream.getId()
@@ -87,7 +108,7 @@ public class StreamsSupervisor {
         + Thread.currentThread().getName());
 
     // stream.id shouldn't be null here. If Stream comes from API, it has an ID,
-    // if it comes from the user, Connection generates an ID for it if needed.
+    // if it comes from the user, ConnectionOld generates an ID for it if needed.
 
     Stream oldStream = getStreamById(stream.getId());
     if (oldStream != null) {
@@ -97,7 +118,8 @@ public class StreamsSupervisor {
     }
   }
 
-  /**
+  */
+/**
    * update or create multiple streams in Supervisor wether it already exists or
    * not. This method is only called by OnlineManagerStreamsCallback, and
    * CacheStreamsCallback when syncing retrieved streams.
@@ -106,7 +128,8 @@ public class StreamsSupervisor {
    *          the Streams Map to synchronize
    * @param connectionCallback
    *          the callback to notify successes or failures
-   */
+   *//*
+
   public void
     updateOrCreateStreams(Map<String, Stream> streams, StreamsCallback connectionCallback) {
     for (Stream stream : streams.values()) {
@@ -120,7 +143,8 @@ public class StreamsSupervisor {
     connectionCallback.onStreamsRetrievalSuccess(rootStreams, null);
   }
 
-  /**
+  */
+/**
    * Update Stream in Supervisor.
    *
    * @param oldStream
@@ -129,7 +153,8 @@ public class StreamsSupervisor {
    *          the instance of updated stream
    * @param connectionCallback
    *          the callback to notify success or failure
-   */
+   *//*
+
   private void updateStream(Stream oldStream, Stream streamToUpdate,
     StreamsCallback connectionCallback) {
     logger.log("StreamsSupervisor: update oldStream (id="
@@ -166,13 +191,15 @@ public class StreamsSupervisor {
         + " updated.", oldStream, null);
   }
 
-  /**
+  */
+/**
    * Add Stream in Supervisor
    *
    * @param newStream
    *          the stream to add
    * @param connectionCallback
-   */
+   *//*
+
   private void addStream(Stream newStream, StreamsCallback connectionCallback) {
     logger.log("StreamsSupervisor: add stream (id="
       + newStream.getId()
@@ -207,12 +234,14 @@ public class StreamsSupervisor {
     }
   }
 
-  /**
+  */
+/**
    * Adds the children of the parent Stream to flatStreams if it has any.
    *
    * @param parent
    *          the Stream whose children are added
-   */
+   *//*
+
   private void addChildrenStreamsToFlatStreams(Stream parent) {
     Set<Stream> children = parent.getChildren();
     if (children != null) {
@@ -223,7 +252,8 @@ public class StreamsSupervisor {
     }
   }
 
-  /**
+  */
+/**
    * Delete Stream from Supervisor, if trashed is false, sets it to true, else
    * deletes it.
    *
@@ -234,7 +264,8 @@ public class StreamsSupervisor {
    *          merged with the parent Stream
    * @param connectionSCallback
    *          callback for the Stream deletion
-   */
+   *//*
+
   public void deleteStream(String streamId, boolean mergeWithParent,
     StreamsCallback connectionSCallback) {
     Stream streamToDelete = getStreamById(streamId);
@@ -302,7 +333,8 @@ public class StreamsSupervisor {
     }
   }
 
-  /**
+  */
+/**
    * Find out if Stream with id="childId" is a child of any Stream whose id is
    * contained in parentIds
    *
@@ -310,7 +342,8 @@ public class StreamsSupervisor {
    * @param parentIds
    * @return true if stream with id "childId" is a descendant of one of the
    *         streams whose id is in the set parentIds
-   */
+   *//*
+
   public boolean verifyParency(String childId, Set<String> parentIds) {
     Stream parent = null;
     for (String parentId : parentIds) {
@@ -322,9 +355,11 @@ public class StreamsSupervisor {
     return false;
   }
 
-  /**
+  */
+/**
    * fixes Streams' children properties based on parentIds
-   */
+   *//*
+
   private void recomputeRootStreamsTree() {
     rootStreams.clear();
 
@@ -364,3 +399,4 @@ public class StreamsSupervisor {
   }
 
 }
+*/

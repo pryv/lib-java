@@ -142,16 +142,16 @@ public class Stream {
   }
 
   /**
-   * Assign a weak reference to the Connection
+   * Assign a weak reference to the ConnectionOld
    *
-   * @param connection
+   * @param weakConnection
    */
-  public void assignConnection(WeakReference<Connection> pWeakConnection) {
-    weakConnection = pWeakConnection;
+  public void assignConnection(WeakReference<Connection> weakConnection) {
+    this.weakConnection = weakConnection;
   }
 
   /**
-   * Returns the reference to the Connection to which the Event is linked if
+   * Returns the reference to the ConnectionOld to which the Event is linked if
    * any.
    *
    * @return

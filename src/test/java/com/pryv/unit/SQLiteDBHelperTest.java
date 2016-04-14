@@ -22,13 +22,12 @@ import org.junit.runners.MethodSorters;
 import com.jayway.awaitility.Awaitility;
 import com.pryv.api.EventsCallback;
 import com.pryv.api.Filter;
-import com.pryv.api.StreamsCallback;
+import com.pryv.interfaces.StreamsCallback;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.database.SQLiteDBHelper;
 import com.pryv.api.model.Attachment;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
-import com.pryv.unit.DummyData;
 
 /**
  * unit tests for SQLiteDBHelper class
@@ -80,7 +79,7 @@ public class SQLiteDBHelperTest {
   public static void cleanUpTestDB() {
     System.out.println("SQLiteDBHelperTest: clean up phase:");
     singleEvent = null;
-    db.getEvents(null, eventsCallback);
+    db.get(null, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
@@ -89,13 +88,13 @@ public class SQLiteDBHelperTest {
         + event.getClientId()
           + ", cid="
           + event.getClientId());
-      db.deleteEvent(event, eventsCallback);
+      db.delete(event, eventsCallback);
       Awaitility.await().until(hasResult());
       assertTrue(success);
       success = false;
       if (singleEvent != null) {
         System.out.println("deleting again: " + singleEvent.getClientId());
-        db.deleteEvent(event, eventsCallback);
+        db.delete(event, eventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         success = false;
@@ -143,7 +142,7 @@ public class SQLiteDBHelperTest {
     emptyEvent.setClientId("yolo");
     emptyEvent.setStreamId("testStreamId");
     emptyEvent.setContent("i am missing mandatory fields");
-    db.createEvent(emptyEvent, eventsCallback);
+    db.create(emptyEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(error);
   }
@@ -154,12 +153,12 @@ public class SQLiteDBHelperTest {
     newEvent.setClientId("newEventClientId");
     newEvent.setStreamId("myStreamId");
     newEvent.setType("activity/plain");
-    db.createEvent(newEvent, eventsCallback);
+    db.create(newEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
 
-    db.getEvents(new Filter(), eventsCallback);
+    db.get(new Filter(), eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     assertNotNull(events.get(newEvent.getClientId()));
@@ -175,19 +174,19 @@ public class SQLiteDBHelperTest {
     eventToUpdate.setContent("I will be updated youhou");
     eventToUpdate.setModified(1000.0);
 
-    db.createEvent(eventToUpdate, eventsCallback);
+    db.create(eventToUpdate, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
 
     eventToUpdate.setContent("new updated content, " +
             "shouldnt be stored in cache because of modified time");
-    db.updateEvent(eventToUpdate, eventsCallback);
+    db.update(eventToUpdate, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
 
-    db.getEvents(new Filter(), eventsCallback);
+    db.get(new Filter(), eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     assertNotEquals(events.get(eventToUpdate.getClientId()).getContent(), eventToUpdate.getContent());
@@ -202,7 +201,7 @@ public class SQLiteDBHelperTest {
     eventToUpdate.setContent("I will be updated youhou");
     eventToUpdate.setModified(1000.0);
 
-    db.createEvent(eventToUpdate, eventsCallback);
+    db.create(eventToUpdate, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
@@ -210,18 +209,18 @@ public class SQLiteDBHelperTest {
     eventToUpdate.setContent("new updated content, " +
             "should be stored because modified time is later");
     eventToUpdate.setModified(eventToUpdate.getModified() + 500.0);
-    db.updateEvent(eventToUpdate, eventsCallback);
+    db.update(eventToUpdate, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
 
     singleEvent.setModified(singleEvent.getModified() + MODIFIED_INCREMENT);
-    db.updateEvent(singleEvent, eventsCallback);
+    db.update(singleEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
 
-    db.getEvents(new Filter(), eventsCallback);
+    db.get(new Filter(), eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     assertEquals(events.get(eventToUpdate.getClientId()).getContent(), eventToUpdate.getContent());
@@ -233,17 +232,17 @@ public class SQLiteDBHelperTest {
     eventToDelete.setClientId("newEventClientId");
     eventToDelete.setStreamId("myStreamId");
     eventToDelete.setType("activity/plain");
-    db.createEvent(eventToDelete, eventsCallback);
+    db.create(eventToDelete, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
 
-    db.deleteEvent(eventToDelete, eventsCallback);
+    db.delete(eventToDelete, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
 
-    db.getEvents(null, eventsCallback);
+    db.get(null, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     assertEquals(true, events.get(eventToDelete.getClientId()).isTrashed());
@@ -255,22 +254,22 @@ public class SQLiteDBHelperTest {
     eventToDelete.setClientId("newEventClientId");
     eventToDelete.setStreamId("myStreamId");
     eventToDelete.setType("activity/plain");
-    db.createEvent(eventToDelete, eventsCallback);
+    db.create(eventToDelete, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
 
-    db.deleteEvent(eventToDelete, eventsCallback);
+    db.delete(eventToDelete, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
 
-    db.deleteEvent(eventToDelete, eventsCallback);
+    db.delete(eventToDelete, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
 
-    db.getEvents(null, eventsCallback);
+    db.get(null, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     assertNull(events.get(eventToDelete.getClientId()));
@@ -280,14 +279,14 @@ public class SQLiteDBHelperTest {
   public void testGetEventsShouldReturnEventsMatchingTheProvidedFilter() {
     Event noteEvent = new Event("myStream", null, "note/txt", "hi");
     noteEvent.setClientId("myClientId");
-    db.createEvent(noteEvent, eventsCallback);
+    db.create(noteEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
 
     Event activityEvent = new Event("myStream", null, "activity/plain", null);
     activityEvent.setClientId("otherClientId");
-    db.createEvent(activityEvent, eventsCallback);
+    db.create(activityEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
@@ -295,7 +294,7 @@ public class SQLiteDBHelperTest {
     Filter filter = new Filter();
     String filterType = "note/txt";
     filter.addType(filterType);
-    db.getEvents(filter, eventsCallback);
+    db.get(filter, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     assertTrue(events.size() > 0);
@@ -377,11 +376,11 @@ public class SQLiteDBHelperTest {
     Event testedEvent = DummyData.generateFullEvent();
     String newClientId = "myNewClientID";
     testedEvent.setClientId(newClientId);
-    db.createEvent(testedEvent, eventsCallback);
+    db.create(testedEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
-    db.getEvents(null, eventsCallback);
+    db.get(null, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
@@ -418,7 +417,7 @@ public class SQLiteDBHelperTest {
     assertEquals(testedEvent.getModifiedBy(), retrievedEvent.getModifiedBy());
     testedEvent.setTrashed(true);
     testedEvent.setModified(testedEvent.getModified() + MODIFIED_INCREMENT);
-    db.deleteEvent(testedEvent, eventsCallback);
+    db.delete(testedEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
   }
@@ -471,11 +470,11 @@ public class SQLiteDBHelperTest {
     eventWithoutAttachments.setAttachments(null);
     String clientId = "eventWithoutAttachmentsID";
     eventWithoutAttachments.setClientId(clientId);
-    db.createEvent(eventWithoutAttachments, eventsCallback);
+    db.create(eventWithoutAttachments, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     success = false;
-    db.getEvents(null, eventsCallback);
+    db.get(null, eventsCallback);
     Awaitility.await().until(hasResult());
     assertTrue(success);
     assertNull(events.get(clientId).getAttachments());

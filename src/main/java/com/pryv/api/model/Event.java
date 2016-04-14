@@ -19,8 +19,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.pryv.Connection;
 import com.pryv.api.database.QueryGenerator;
 import com.pryv.utils.JsonConverter;
@@ -229,7 +227,7 @@ public class Event {
   }
 
   /**
-   * Assign a weak reference to the Connection
+   * Assign a weak reference to the ConnectionOld
    *
    * @param weakconnection
    */
@@ -238,7 +236,7 @@ public class Event {
   }
 
   /**
-   * Returns the reference to the Connection to which the Event is linked if
+   * Returns the reference to the ConnectionOld to which the Event is linked if
    * any.
    *
    * @return

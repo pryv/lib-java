@@ -1,7 +1,9 @@
 package com.pryv.utils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -207,8 +209,7 @@ public class JsonConverter {
   }
 
   /**
-   * Deserialize a JSON containing the field "events" into a Map<String, Event>
-   * with Event id as key
+   * Deserialize a JSON containing the field "events" into a List<Event>
    *
    * @param jsonEventsArray
    * @return
@@ -216,12 +217,12 @@ public class JsonConverter {
    * @throws JsonMappingException
    * @throws IOException
    */
-  public static Map<String, Event> createEventsFromJson(String jsonEventsArray)
+  public static List<Event> createEventsFromJson(String jsonEventsArray)
     throws JsonParseException, JsonMappingException, IOException {
 
     JsonNode arrNode = toJsonNode(jsonEventsArray).get(EVENTS_KEY);
 
-    Map<String, Event> newEvents = new HashMap<String, Event>();
+    List<Event> newEvents = new ArrayList<Event>();
     if (arrNode != null) {
       if (arrNode.isArray()) {
         logger.log("JsonConverter: number of received events: " + arrNode.size());
@@ -229,7 +230,7 @@ public class JsonConverter {
           String str = objNode.toString();
           logger.log("JsonConverter: deserializing event: " + str);
           Event eventToAdd = jsonMapper.readValue(str, Event.class);
-          newEvents.put(eventToAdd.getId(), eventToAdd);
+          newEvents.add(eventToAdd);
           logger.log("JsonConverter: event created: id = " + eventToAdd.getId());
         }
       }

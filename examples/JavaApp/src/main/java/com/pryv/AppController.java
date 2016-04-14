@@ -233,7 +233,7 @@ public class AppController {
 //                .showConfirm();
 //            if (action == Dialog.Actions.OK) {
 //              // delete selected stream
-//              exampleApp.deleteStream(selectedStream, false);
+//              exampleApp.delete(selectedStream, false);
 //            }
 //          }
 //        });

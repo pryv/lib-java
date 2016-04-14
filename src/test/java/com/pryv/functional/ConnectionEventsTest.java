@@ -2,22 +2,23 @@ package com.pryv.functional;
 
 import com.jayway.awaitility.Awaitility;
 import com.pryv.Connection;
-import com.pryv.Pryv;
-import com.pryv.api.EventsCallback;
-import com.pryv.api.EventsManager;
+import com.pryv.interfaces.EventsCallback;
+import com.pryv.interfaces.EventsManager;
 import com.pryv.api.Filter;
-import com.pryv.api.OnlineEventsAndStreamsManager;
-import com.pryv.api.StreamsCallback;
-import com.pryv.api.StreamsManager;
+import com.pryv.interfaces.GetStreamsCallback;
+import com.pryv.interfaces.StreamsCallback;
+import com.pryv.interfaces.StreamsManager;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
+import com.pryv.interfaces.GetEventsCallback;
 
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -33,10 +34,14 @@ import static org.junit.Assert.assertTrue;
 public class ConnectionEventsTest {
 
     private static EventsCallback eventsCallback;
+    private static GetEventsCallback getEventsCallback;
     private static StreamsCallback streamsCallback;
+    private static GetStreamsCallback getStreamsCallback;
 
-    private static Map<String, Event> events;
+    private static List<Event> events;
+    private static List<Event> partialEvents;
     private static Map<String, Stream> streams;
+    private static Map<String, Stream> partialStreams;
 
     private static Stream testSupportStream;
 
@@ -45,23 +50,22 @@ public class ConnectionEventsTest {
     private static Event singleEvent;
     private static Stream singleStream;
 
+    private static boolean partialSuccess = false;
+    private static boolean partialError = false;
     private static boolean success = false;
     private static boolean error = false;
 
-    private static EventsManager eventsManager;
-    private static StreamsManager streamsManager;
+    private static Connection connection;
 
     @BeforeClass
     public static void setUp() throws Exception {
 
         instanciateEventsCallback();
+        instanciateGetEventsCallback();
         instanciateStreamsCallback();
-        Pryv.setDomain("pryv.li");
-        Pryv.deactivateSupervisor();
-        Pryv.deactivateCache();
 
-        Connection pryvConnection =
-                new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN,
+        connection =
+                new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, TestCredentials.DOMAIN,
                         new DBinitCallback() {
                     @Override
                     public void onError(String message) {
@@ -69,17 +73,14 @@ public class ConnectionEventsTest {
                     }
                 });
 
-        eventsManager = (EventsManager) pryvConnection;
-        streamsManager = (StreamsManager) pryvConnection;
-
         testSupportStream = new Stream("onlineModuleStreamID", "javaLibTestSupportStream");
-        streamsManager.createStream(testSupportStream, streamsCallback);
+        connection.streams.create(testSupportStream, streamsCallback);
         Awaitility.await().until(hasResult());
         assertFalse(error);
         testSupportStream.merge(singleStream, true);
         assertNotNull(testSupportStream.getId());
         success = false;
-        eventsManager.createEvent(new Event(testSupportStream.getId(), null,
+        connection.events.create(new Event(testSupportStream.getId(), null,
                 "note/txt", "i am a test event"), eventsCallback);
         Awaitility.await().until(hasResult());
         assertFalse(error);
@@ -87,19 +88,23 @@ public class ConnectionEventsTest {
 
     @AfterClass
     public static void tearDown() throws Exception {
-        streamsManager.deleteStream(testSupportStream, false, streamsCallback);
+        connection.streams.delete(testSupportStream, false, streamsCallback);
         Awaitility.await().until(hasResult());
         success = false;
-        streamsManager.deleteStream(testSupportStream, false, streamsCallback);
+        connection.streams.delete(testSupportStream, false, streamsCallback);
         Awaitility.await().until(hasResult());
     }
 
     @Before
     public void beforeEachTest() {
         events = null;
+        partialEvents = null;
         streams = null;
+        partialStreams = null;
         success = false;
         error = false;
+        partialSuccess = false;
+        partialError = false;
         singleEvent = null;
         singleStream = null;
         stoppedId = null;
@@ -111,11 +116,11 @@ public class ConnectionEventsTest {
 
     @Test
     public void testGetEventsMustReturnNonTrashedEvents() {
-        eventsManager.getEvents(new Filter(), eventsCallback);
+        connection.events.get(new Filter(), getEventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         assertTrue(events.size() > 0);
-        for (Event event: events.values()) {
+        for (Event event: events) {
             assertFalse(event.isTrashed());
         }
     }
@@ -132,11 +137,11 @@ public class ConnectionEventsTest {
         String type = "note/txt";
         filter.setLimit(numLimit);
         filter.addType(type);
-        eventsManager.getEvents(filter, eventsCallback);
+        connection.events.get(filter, getEventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         assertTrue(events.size() == 10);
-        for (Event event: events.values()) {
+        for (Event event: events) {
             assertTrue(event.getType().equals(type));
         }
     }
@@ -150,7 +155,7 @@ public class ConnectionEventsTest {
         Filter filter = new Filter();
         filter.setFromTime(10.0);
         filter.setToTime(11.0);
-        eventsManager.getEvents(filter, eventsCallback);
+        connection.events.get(filter, getEventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         assertTrue(events.size() == 0);
@@ -166,7 +171,7 @@ public class ConnectionEventsTest {
         minimalEvent.setStreamId(testSupportStream.getId());
         minimalEvent.setType("note/txt");
         minimalEvent.setContent("I am used in create event test, please delete me");
-        eventsManager.createEvent(minimalEvent, eventsCallback);
+        connection.events.create(minimalEvent, eventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         assertNotNull(singleEvent);
@@ -196,7 +201,7 @@ public class ConnectionEventsTest {
         runningEvent.setStreamId(singleAcivityStream.getId());
         runningEvent.setType("activity/plain");
         runningEvent.setDuration(null);
-        eventsManager.createEvent(runningEvent, eventsCallback);
+        connection.events.create(runningEvent, eventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         success = false;
@@ -206,7 +211,7 @@ public class ConnectionEventsTest {
 
         // create Event that will stop running event
         Event stopperEvent = new Event(singleAcivityStream.getId(), null, "activity/plain", null);
-        eventsManager.createEvent(stopperEvent, eventsCallback);
+        connection.events.create(stopperEvent, eventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         success = false;
@@ -222,7 +227,7 @@ public class ConnectionEventsTest {
         Event missingStreamIdEvent = new Event();
         missingStreamIdEvent.setType("note/txt");
         missingStreamIdEvent.setContent("i am missing a streamId, will generate error");
-        eventsManager.createEvent(missingStreamIdEvent, eventsCallback);
+        connection.events.create(missingStreamIdEvent, eventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(error);
     }
@@ -240,7 +245,7 @@ public class ConnectionEventsTest {
         runningEvent.setType("activity/plain");
         runningEvent.setTime(time);
         runningEvent.setDuration(duration);
-        eventsManager.createEvent(runningEvent, eventsCallback);
+        connection.events.create(runningEvent, eventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         success = false;
@@ -250,7 +255,7 @@ public class ConnectionEventsTest {
         invalidEvent.setType("activity/plain");
         invalidEvent.setTime(time + duration / 2);
         invalidEvent.setDuration(duration);
-        eventsManager.createEvent(invalidEvent, eventsCallback);
+        connection.events.create(invalidEvent, eventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(error);
         error = false;
@@ -271,7 +276,7 @@ public class ConnectionEventsTest {
     public void testUpdateEventMustAcceptAValidAEventAndReturnAFullEvent() {
         Event eventToUpdate = new Event(testSupportStream.getId(), null,
                 "note/txt", "i will be updated");
-        eventsManager.createEvent(eventToUpdate, eventsCallback);
+        connection.events.create(eventToUpdate, eventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         assertNotNull(singleEvent);
@@ -282,7 +287,7 @@ public class ConnectionEventsTest {
         assertEquals(initialEvent.getContent(), eventToUpdate.getContent());
 
         eventToUpdate.setContent("i have beeen updated");
-        eventsManager.updateEvent(eventToUpdate, eventsCallback);
+        connection.events.update(eventToUpdate, eventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         success = false;
@@ -294,7 +299,7 @@ public class ConnectionEventsTest {
     public void testUpdateEventMustReturnAnErrorWhenEventDoesntExistYet() {
         Event unexistingEvent = new Event(testSupportStream.getId(),
                 null, "note/txt", "I dont exist and will generate an error");
-        eventsManager.updateEvent(unexistingEvent, eventsCallback);
+        connection.events.update(unexistingEvent, eventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(error);
     }
@@ -307,14 +312,14 @@ public class ConnectionEventsTest {
     public void testDeleteEventMustReturnTheEventWithTrashedSetToTrueWhenDeletingOnce() {
         Event eventToTrash = new Event(testSupportStream.getId(),
                 null, "note/txt", "i will be trashed");
-        eventsManager.createEvent(eventToTrash, eventsCallback);
+        connection.events.create(eventToTrash, eventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         success = false;
         eventToTrash = singleEvent;
         assertFalse(eventToTrash.isTrashed());
 
-        eventsManager.deleteEvent(eventToTrash, eventsCallback);
+        connection.events.delete(eventToTrash, eventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         assertNotNull(singleEvent);
@@ -328,14 +333,14 @@ public class ConnectionEventsTest {
         // create event
         Event eventToDelete = new Event(testSupportStream.getId(),
                 null, "note/txt", "i will be deleted");
-        eventsManager.createEvent(eventToDelete, eventsCallback);
+        connection.events.create(eventToDelete, eventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         success = false;
         eventToDelete = singleEvent;
 
         // trash event
-        eventsManager.deleteEvent(eventToDelete, eventsCallback);
+        connection.events.delete(eventToDelete, eventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         assertNotNull(singleEvent);
@@ -343,7 +348,7 @@ public class ConnectionEventsTest {
         assertTrue(singleEvent.isTrashed());
 
         // delete event
-        eventsManager.deleteEvent(eventToDelete, eventsCallback);
+        connection.events.delete(eventToDelete, eventsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         assertNull(singleEvent);
@@ -353,7 +358,7 @@ public class ConnectionEventsTest {
         singleActivityStream.setId("singleActivityStream");
         singleActivityStream.setName("singleActivityStream");
         singleActivityStream.setSingleActivity(true);
-        streamsManager.createStream(singleActivityStream, streamsCallback);
+        connection.streams.create(singleActivityStream, streamsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         assertEquals(singleStream.getName(), singleActivityStream.getName());
@@ -363,11 +368,11 @@ public class ConnectionEventsTest {
     }
 
     private void deleteSingleAcitivityStream(Stream singleActivityStream) {
-        streamsManager.deleteStream(singleActivityStream, false, streamsCallback);
+        connection.streams.delete(singleActivityStream, false, streamsCallback);
         Awaitility.await().until(hasResult());
         assertTrue(success);
         success = false;
-        streamsManager.deleteStream(singleActivityStream, false, streamsCallback);
+        connection.streams.delete(singleActivityStream, false, streamsCallback);
         Awaitility.await().until(hasResult());
         success = false;
     }
@@ -382,25 +387,30 @@ public class ConnectionEventsTest {
         };
     }
 
+    private static void instanciateGetEventsCallback() {
+        getEventsCallback = new GetEventsCallback() {
+            @Override
+            public void partialCallback(List<Event> events, Map<String, Event> deletedEvents) {
+
+            }
+
+            @Override
+            public void doneCallback(List<Event> events, Double serverTime) {
+
+            }
+
+            @Override
+            public void onError(String errorMessage, Double serverTime) {
+
+            }
+        };
+    }
+
     private static void instanciateEventsCallback() {
         eventsCallback = new EventsCallback() {
 
             @Override
-            public void onEventsRetrievalSuccess(Map<String, Event> newEvents, Double serverTime) {
-                System.out.println("TestEventsCallback: success with "
-                        + newEvents.values().size()
-                        + " events");
-                events = newEvents;
-                success = true;
-            }
-
-            @Override
-            public void onEventsRetrievalError(String message, Double pServerTime) {
-                error = true;
-            }
-
-            @Override
-            public void onEventsSuccess(String successMessage, Event event, Integer pStoppedId,
+            public void onSuccess(String successMessage, Event event, Integer pStoppedId,
                                         Double pServerTime) {
                 System.out.println("OnlineEventsManagerTest: eventsSuccess msg: " + successMessage);
                 stoppedId = pStoppedId;
@@ -409,7 +419,7 @@ public class ConnectionEventsTest {
             }
 
             @Override
-            public void onEventsError(String errorMessage, Double pServerTime) {
+            public void onError(String errorMessage, Double pServerTime) {
                 error = true;
             }
         };
@@ -419,28 +429,35 @@ public class ConnectionEventsTest {
         streamsCallback = new StreamsCallback() {
 
             @Override
-            public void onStreamsRetrievalSuccess(Map<String, Stream> newStreams, Double serverTime) {
-                System.out.println("TestStreamsCallback: success for "
-                        + newStreams.values().size()
-                        + " streams");
-                streams = newStreams;
-                success = true;
-            }
-
-            @Override
-            public void onStreamsRetrievalError(String message, Double pServerTime) {
-                error = true;
-            }
-
-            @Override
-            public void onStreamsSuccess(String successMessage, Stream stream, Double pServerTime) {
+            public void onSuccess(String successMessage, Stream stream, Double pServerTime) {
                 System.out.println("TestStreamsCallback: success msg: " + successMessage);
                 singleStream = stream;
                 success = true;
             }
 
             @Override
-            public void onStreamError(String errorMessage, Double pServerTime) {
+            public void onError(String errorMessage, Double pServerTime) {
+                error = true;
+            }
+        };
+    }
+
+    private static void instanciateGetStreamsCallback() {
+        getStreamsCallback = new GetStreamsCallback() {
+            @Override
+            public void partialCallback(Map<String, Stream> streams, Map<String, Stream> deletedStreams) {
+                partialStreams = streams;
+                partialSuccess = true;
+            }
+
+            @Override
+            public void doneCallback(Map<String, Stream> receivedStreams, Double serverTime) {
+                streams = receivedStreams;
+                success = true;
+            }
+
+            @Override
+            public void onError(String errorMessage, Double serverTime) {
                 error = true;
             }
         };

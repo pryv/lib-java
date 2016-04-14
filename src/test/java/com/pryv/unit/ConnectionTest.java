@@ -7,12 +7,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.pryv.Connection;
+import com.pryv.ConnectionOld;
 import com.pryv.api.database.DBinitCallback;
 
 public class ConnectionTest {
 
-  private Connection connection;
+  private ConnectionOld connection;
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
@@ -24,7 +24,7 @@ public class ConnectionTest {
 
   @Before
   public void setUp() throws Exception {
-    connection = new Connection("testUID2", "token", new DBinitCallback());
+    connection = new ConnectionOld("testUID2", "token", new DBinitCallback());
   }
 
   @Test

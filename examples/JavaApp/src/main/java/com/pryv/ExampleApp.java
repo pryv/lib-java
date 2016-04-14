@@ -23,10 +23,10 @@ import javafx.stage.Stage;
 import org.controlsfx.dialog.Dialogs;
 
 import com.pryv.api.EventsCallback;
-import com.pryv.api.EventsManager;
+import com.pryv.interfaces.EventsManager;
 import com.pryv.api.Filter;
-import com.pryv.api.StreamsCallback;
-import com.pryv.api.StreamsManager;
+import com.pryv.interfaces.StreamsCallback;
+import com.pryv.interfaces.StreamsManager;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Permission;
@@ -136,10 +136,10 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
         showMainView();
       }
     });
-    // instanciate Connection object, through which we will interact with the
+    // instanciate ConnectionOld object, through which we will interact with the
     // API through the streamsManager and EventsManager interfaces
     // the DBinitCallback is used in case the local database fails to open
-    Connection connection = new Connection(username, token, new DBinitCallback() {
+    ConnectionOld connection = new ConnectionOld(username, token, new DBinitCallback() {
       @Override
       public void onError(String message) {
         displayError(message);
@@ -149,10 +149,10 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
     streams = new HashSet<Stream>();
     eventsManager = connection;
     streamsManager = connection;
-    streamsManager.getStreams(null, this);
+    streamsManager.get(null, this);
     Filter filter = new Filter();
     filter.setLimit(20);
-    eventsManager.getEvents(filter, this);
+    eventsManager.get(filter, this);
   }
 
   /*
@@ -302,15 +302,15 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
    */
 
   public void createStream(Stream newStream) {
-    streamsManager.createStream(newStream, this);
+    streamsManager.create(newStream, this);
   }
 
   public void updateStream(Stream streamToUpdate) {
-    streamsManager.updateStream(streamToUpdate, this);
+    streamsManager.update(streamToUpdate, this);
   }
 
   public void deleteStream(Stream streamToDelete, boolean mergeEventsWithParent) {
-    streamsManager.deleteStream(streamToDelete, mergeEventsWithParent, this);
+    streamsManager.delete(streamToDelete, mergeEventsWithParent, this);
   }
 
   /*
@@ -383,15 +383,15 @@ public class ExampleApp extends Application implements AuthView, EventsCallback,
   public void getEventsForStreamId(String streamId) {
     Filter filter = new Filter();
     filter.addStreamId(streamId);
-    eventsManager.getEvents(filter, this);
+    eventsManager.get(filter, this);
   }
 
   public void createEvent(Event newEvent) {
-    eventsManager.createEvent(newEvent, this);
+    eventsManager.create(newEvent, this);
   }
 
   public void updateEvent(Event eventToUpdate) {
-    eventsManager.updateEvent(eventToUpdate, this);
+    eventsManager.update(eventToUpdate, this);
   }
 
   /*

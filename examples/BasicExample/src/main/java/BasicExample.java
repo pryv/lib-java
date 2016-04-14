@@ -2,12 +2,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.pryv.Connection;
+import com.pryv.ConnectionOld;
 import com.pryv.api.EventsCallback;
-import com.pryv.api.EventsManager;
+import com.pryv.interfaces.EventsManager;
 import com.pryv.api.Filter;
-import com.pryv.api.StreamsCallback;
-import com.pryv.api.StreamsManager;
+import com.pryv.interfaces.StreamsCallback;
+import com.pryv.interfaces.StreamsManager;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Permission;
@@ -73,9 +73,9 @@ public class BasicExample implements AuthView, EventsCallback, StreamsCallback {
   @Override
   public void onAuthSuccess(String userID, String accessToken) {
 
-    // instanciate Connection object - used to access Streams and Events data
+    // instanciate ConnectionOld object - used to access Streams and Events data
     // (through EventsManager and StreamsManager interfaces)
-    Connection connection = new Connection(userID, accessToken, new DBinitCallback() {
+    ConnectionOld connection = new ConnectionOld(userID, accessToken, new DBinitCallback() {
       @Override
       public void onError(String message) {
         System.out.println(message);
@@ -92,12 +92,12 @@ public class BasicExample implements AuthView, EventsCallback, StreamsCallback {
     // cache database and an asynchronous callback from the online API.
 
     // Retrieve the Streams structure
-    streamsManager.getStreams(null, this);
+    streamsManager.get(null, this);
 
     // Retrieve 20 Events
     Filter eventsFilter = new Filter();
     eventsFilter.setLimit(20);
-    eventsManager.getEvents(eventsFilter, this);
+    eventsManager.get(eventsFilter, this);
   }
 
   @Override

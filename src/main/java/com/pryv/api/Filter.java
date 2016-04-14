@@ -33,7 +33,7 @@ public class Filter {
   // filter fields
   private Double fromTime;
   private Double toTime;
-  private Set<String> streamIds;
+  private Set<Stream> streams;
   private Set<String> tags;
   private Set<String> types;
   private Boolean running;
@@ -50,8 +50,8 @@ public class Filter {
    *          from time
    * @param to
    *          to time
-   * @param streamIds
-   *          stream ids
+   * @param streams
+   *          streams
    * @param tags
    *          tags
    * @param types
@@ -69,12 +69,12 @@ public class Filter {
    * @param modifiedSince
    *          since when is it modified
    */
-  public Filter(Double from, Double to, Set<String> streamIds, Set<String> tags,
+  public Filter(Double from, Double to, Set<Stream> streams, Set<String> tags,
     Set<String> types, Boolean running, Boolean sortAscending, Integer skip, Integer limit,
     State state, Double modifiedSince) {
     this.fromTime = from;
     this.toTime = to;
-    this.streamIds = streamIds;
+    this.streams = streams;
     this.tags = tags;
     this.types = types;
     this.running = running;
@@ -119,10 +119,10 @@ public class Filter {
 
     // streamIds
     Boolean streamIdMatch = true;
-    if (streamIds != null) {
+    if (streams != null) {
       streamIdMatch = false;
-      for (String streamId : streamIds) {
-        if (streamId.equals(event.getStreamId())) {
+      for (Stream stream : streams) {
+        if ((stream.getId()).equals(event.getStreamId())) {
           streamIdMatch = true;
         }
       }
@@ -186,15 +186,15 @@ public class Filter {
   }
 
   /**
-   * add a stream id to the filter
+   * add a stream to the filter
    *
-   * @param pStreamId
+   * @param stream
    */
-  public void addStreamId(String pStreamId) {
-    if (streamIds == null) {
-      streamIds = new HashSet<String>();
+  public void addStream(Stream stream) {
+    if (this.streams == null) {
+      this.streams = new HashSet<Stream>();
     }
-    streamIds.add(pStreamId);
+    this.streams.add(stream);
   }
 
   /**
@@ -234,9 +234,9 @@ public class Filter {
     if (toTime != null) {
       sb.append("&" + TO_TIME_URL_KEY + "=" + toTime);
     }
-    if (streamIds != null) {
-      for (String streamId : streamIds) {
-        sb.append("&" + STREAMS_URL_KEY + "=" + streamId);
+    if (streams != null) {
+      for (Stream stream : streams) {
+        sb.append("&" + STREAMS_URL_KEY + "=" + stream.getId());
       }
     }
     if (tags != null) {
@@ -271,31 +271,62 @@ public class Filter {
   }
 
   /**
-   * verify if the filter's Stream Ids are contained in the scope of the cache
-   * (including descendants of the scope)
+   * check if this filter is included in the scope passed in argument
    *
-   * @param scope
-   *          the Stream Ids representing the scope of the cache
-   * @param streamsSupervisor
-   *          reference to all the streams, used to resolve Streams descendency
-   *
-   * @return true if it is contained in the scope, false otherwise
+   * @param scope a Filter object representing a scope
+   * @return
    */
-  public boolean areStreamIdsContainedInScope(Set<String> scope,
-    StreamsSupervisor streamsSupervisor) {
-    for (String filterStreamId : streamIds) {
-      boolean isParentFound = false;
-      for (String scopeStreamId : scope) {
-        Stream parent = streamsSupervisor.getStreamById(scopeStreamId);
-        if (parent.hasChild(filterStreamId)) {
-          isParentFound = true;
+  public boolean isIncludedInScope(Filter scope) {
+    // test for each scope streamId if it is or its child is
+    for (Stream stream: this.streams) {
+      boolean isStreamOrParentFound = false;
+      for (Stream scopeStream: scope.streams) {
+        if (scopeStream.getId().equals(stream.getId())) {
+          isStreamOrParentFound = true;
+        } else if (scopeStream.hasChild(stream.getId())) {
+          isStreamOrParentFound = true;
         }
       }
-      if (isParentFound == false) {
+      if (! isStreamOrParentFound) {
         return false;
       }
     }
     return true;
+  }
+
+  /**
+   * check if the event is included in the scope
+   *
+   * @param event
+   * @return
+   */
+  public boolean hasInScope(Event event) {
+    return hasInScope(event.getStreamId());
+  }
+
+  /**
+   * check if the streamId is included in the scope
+   *
+   * @param streamId
+   * @return
+   */
+  public boolean hasInScope(String streamId) {
+    for (Stream scopeStream: streams) {
+      if (streamId.equals(scopeStream.getId())) {
+        return true;
+      } else if (scopeStream.hasChild(streamId)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public Set<String> getStreamIds() {
+    Set<String> streamIds = new HashSet<String>();
+    for (Stream stream: streams) {
+      streamIds.add(stream.getId());
+    }
+    return streamIds;
   }
 
   public Double getFromTime() {
@@ -306,8 +337,8 @@ public class Filter {
     return toTime;
   }
 
-  public Set<String> getStreamIds() {
-    return streamIds;
+  public Set<Stream> getStreams() {
+    return streams;
   }
 
   public Set<String> getTags() {
@@ -350,8 +381,8 @@ public class Filter {
     this.toTime = pToTime;
   }
 
-  public void setStreamIds(Set<String> pStreams) {
-    this.streamIds = pStreams;
+  public void setStreamIds(Set<Stream> streams) {
+    this.streams = streams;
   }
 
   public void setTags(Set<String> pTags) {

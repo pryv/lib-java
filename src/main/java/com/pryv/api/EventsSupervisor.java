@@ -1,3 +1,4 @@
+/*
 package com.pryv.api;
 
 import java.util.HashMap;
@@ -9,50 +10,62 @@ import com.pryv.api.model.Event;
 import com.pryv.utils.JsonConverter;
 import com.pryv.utils.Logger;
 
+*/
 /**
  *
  * Contains Events loaded in memory
  *
  * @author ik
  *
- */
+ *//*
+
 public class EventsSupervisor {
 
-  /**
+  */
+/**
    * the Events stored in volatile memory
-   */
+   *//*
+
   private Map<String, Event> events;
 
-  /**
+  */
+/**
    * Map: key=event.id, value=event.clientId
-   */
+   *//*
+
   private Map<String, String> eventIdToClientId;
 
   private StreamsSupervisor streamsSupervisor;
 
   private Logger logger = Logger.getInstance();
 
-  /**
+  */
+/**
    * EventsSupervisor constructor. Instantiates data structures to store Events.
-   */
+   *//*
+
   public EventsSupervisor(StreamsSupervisor pStreamsSupervisor) {
     streamsSupervisor = pStreamsSupervisor;
     events = new ConcurrentHashMap<String, Event>();
     eventIdToClientId = new ConcurrentHashMap<String, String>();
   }
 
-  /*
+  */
+/*
    * Events Management
-   */
+   *//*
 
-  /**
+
+  */
+/**
    * Returns the events matching the provided filter.
    *
    * @param filter
    *          the filter object used to filter the Events.
    * @param connectionCallback
-   */
-  public void getEvents(Filter filter, EventsCallback connectionCallback) {
+   *//*
+
+  public void get(Filter filter, EventsCallback connectionCallback) {
     logger.log("EventsSupervisor: fetching events");
     Map<String, Event> filteredEvents = new HashMap<String, Event>();
 
@@ -85,7 +98,8 @@ public class EventsSupervisor {
     }
   }
 
-  /**
+  */
+/**
    * Update or create Event in Supervisor whether it already exists or not.
    * generates client Id if necessary
    *
@@ -93,7 +107,8 @@ public class EventsSupervisor {
    *          the event to add or update
    * @param connectionCallback
    *          the callback to notify success or failure
-   */
+   *//*
+
   public void updateOrCreateEvent(Event event, EventsCallback connectionCallback) {
     logger.log("EventsSupervisor: updateOrCreateEvent with id="
             + event.getId()
@@ -121,19 +136,21 @@ public class EventsSupervisor {
     }
 
     if (oldEvent != null) {
-      updateEvent(oldEvent, event, connectionCallback);
+      update(oldEvent, event, connectionCallback);
     } else {
       addEvent(event, connectionCallback);
     }
   }
 
-  /**
+  */
+/**
    * Add Event in Supervisor
    *
    * @param newEvent
    *          the event to add
    * @param connectionCallback
-   */
+   *//*
+
   private void addEvent(Event newEvent, EventsCallback connectionCallback) {
     events.put(newEvent.getClientId(), newEvent);
     addIdToClientIdEntry(newEvent.getId(), newEvent.getClientId());
@@ -149,15 +166,17 @@ public class EventsSupervisor {
     }
   }
 
-  /**
+  */
+/**
    * Update event in supervisor with the fields of the event passed in
    * parameters
    *
    * @param oldEvent
    * @param eventToUpdate
    *          the event that may replace the one in place if newer.
-   */
-  private void updateEvent(Event oldEvent, Event eventToUpdate, EventsCallback connectionCallback) {
+   *//*
+
+  private void update(Event oldEvent, Event eventToUpdate, EventsCallback connectionCallback) {
     logger.log("EventsSupervisor: update oldEvent (id="
       + oldEvent.getId()
         + ", cid="
@@ -186,7 +205,8 @@ public class EventsSupervisor {
     }
   }
 
-  /**
+  */
+/**
    * Delete Event from Supervisor, if trashed is false, sets it to true, else
    * deletes it.
    *
@@ -194,8 +214,9 @@ public class EventsSupervisor {
    *          the Event to delete
    * @param connectionCallback
    *          callback used to notify success or failure
-   */
-  public void deleteEvent(Event eventToDelete, EventsCallback connectionCallback) {
+   *//*
+
+  public void delete(Event eventToDelete, EventsCallback connectionCallback) {
     logger.log("EventsSupervisor: deleting event with cid="
       + eventToDelete.getClientId()
         + ", id="
@@ -213,7 +234,7 @@ public class EventsSupervisor {
       } else {
         // update "trashed" field
         eventToDelete.setTrashed(true);
-        updateEvent(oldEvent, eventToDelete, connectionCallback);
+        update(oldEvent, eventToDelete, connectionCallback);
       }
     } else {
       connectionCallback.onEventsError(
@@ -221,23 +242,27 @@ public class EventsSupervisor {
     }
   }
 
-  /**
+  */
+/**
    * Returns the Event with clientId or null if such event does not exist.
    *
    * @param clientId
    *          the clientId of the event to be retrieved
    * @return the Event with the requested id or null
-   */
+   *//*
+
   public Event getEventByClientId(String clientId) {
     return events.get(clientId);
   }
 
-  /**
+  */
+/**
    * Returns the clientId of the Event whose id is provided.
    *
    * @param id
    * @return the event's clientId if it exists, else null
-   */
+   *//*
+
   public String getClientId(String id) {
     if (id != null) {
       return eventIdToClientId.get(id);
@@ -246,26 +271,31 @@ public class EventsSupervisor {
     }
   }
 
-  /**
+  */
+/**
    * Add a mapping id->clientId
    *
    * @param id
    * @param clientId
-   */
+   *//*
+
   private void addIdToClientIdEntry(String id, String clientId) {
     if (id != null && clientId != null) {
       eventIdToClientId.put(id, clientId);
     }
   }
 
-  /**
+  */
+/**
    * Returns the Event with id eventId or null if no such event exists.
    *
    * @param eventId
    * @return
-   */
+   *//*
+
   public Event getEventById(String eventId) {
     return events.get(getClientId(eventId));
   }
 
 }
+*/

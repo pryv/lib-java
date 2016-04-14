@@ -7,7 +7,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +24,7 @@ import com.pryv.Pryv;
 import com.pryv.api.EventsCallback;
 import com.pryv.api.Filter;
 import com.pryv.api.OnlineEventsAndStreamsManager;
-import com.pryv.api.StreamsCallback;
+import com.pryv.interfaces.StreamsCallback;
 import com.pryv.api.model.Attachment;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
@@ -66,7 +65,7 @@ public class OnlineEventsAndStreamsManagerTest {
     online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
 
     testSupportStream = new Stream("onlineModuleStreamID", "javaLibTestSupportStream");
-    online.createStream(testSupportStream, streamsCallback);
+    online.create(testSupportStream, streamsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     testSupportStream.merge(createdStream, false);
@@ -75,10 +74,10 @@ public class OnlineEventsAndStreamsManagerTest {
 
   @AfterClass
   public static void tearDown() throws Exception {
-    online.deleteStream(testSupportStream, false, streamsCallback);
+    online.delete(testSupportStream, false, streamsCallback);
     Awaitility.await().until(hasResult());
     success = false;
-    online.deleteStream(testSupportStream, false, streamsCallback);
+    online.delete(testSupportStream, false, streamsCallback);
     Awaitility.await().until(hasResult());
   }
 
@@ -94,7 +93,7 @@ public class OnlineEventsAndStreamsManagerTest {
 
   @Test
   public void testFetchStreams() {
-    online.getStreams(null, streamsCallback);
+    online.get(null, streamsCallback);
     Awaitility.await().until(hasResult());
     assertNotNull(streams);
     assertTrue(streams.size() > 0);
@@ -102,7 +101,7 @@ public class OnlineEventsAndStreamsManagerTest {
 
   @Test
   public void testFetchEventsWithEmptyFilter() {
-    online.getEvents(new Filter(), eventsCallback);
+    online.get(new Filter(), eventsCallback);
     Awaitility.await().until(hasResult());
     assertNotNull(events);
     assertTrue(events.size() > 0);
@@ -115,7 +114,7 @@ public class OnlineEventsAndStreamsManagerTest {
     testEvent.setStreamId(testSupportStream.getId());
     testEvent.setType("note/txt");
     testEvent.setContent("this is a test Event. Please delete");
-    online.createEvent(testEvent, eventsCallback);
+    online.create(testEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     success = false;
@@ -127,7 +126,7 @@ public class OnlineEventsAndStreamsManagerTest {
     filter.setStreamIds(streamIds);
 
     // fetch events
-    online.getEvents(filter, eventsCallback);
+    online.get(filter, eventsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     assertTrue(events.size() > 0);
@@ -144,7 +143,7 @@ public class OnlineEventsAndStreamsManagerTest {
     testEvent.setStreamId(testSupportStream.getId());
     testEvent.setType("note/txt");
     testEvent.setContent("this is the content");
-    online.createEvent(testEvent, eventsCallback);
+    online.create(testEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     success = false;
@@ -158,19 +157,19 @@ public class OnlineEventsAndStreamsManagerTest {
     // update event
     String newContent = "updated content";
     createdEvent.setContent(newContent);
-    online.updateEvent(createdEvent, eventsCallback);
+    online.update(createdEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     success = false;
     assertEquals(createdEvent.getContent(), newContent);
 
     // delete event
-    online.deleteEvent(createdEvent, eventsCallback);
+    online.delete(createdEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     success = false;
     assertTrue(createdEvent.isTrashed());
-    online.deleteEvent(createdEvent, eventsCallback);
+    online.delete(createdEvent, eventsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     assertNull(createdEvent);
@@ -181,7 +180,7 @@ public class OnlineEventsAndStreamsManagerTest {
     Stream testStream = new Stream(null, "onlineModuleTestStream");
 
     // create
-    online.createStream(testStream, streamsCallback);
+    online.create(testStream, streamsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     success = false;
@@ -195,14 +194,14 @@ public class OnlineEventsAndStreamsManagerTest {
     // update
     String nameUpdate = "onlineModuleTestStreamNewName";
     createdStream.setName(nameUpdate);
-    online.updateStream(createdStream, streamsCallback);
+    online.update(createdStream, streamsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     success = false;
     assertEquals(nameUpdate, createdStream.getName());
 
     // trash
-    online.deleteStream(createdStream, false, streamsCallback);
+    online.delete(createdStream, false, streamsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     success = false;
@@ -210,7 +209,7 @@ public class OnlineEventsAndStreamsManagerTest {
     assertTrue(createdStream.isTrashed());
 
     // delete
-    online.deleteStream(createdStream, false, streamsCallback);
+    online.delete(createdStream, false, streamsCallback);
     Awaitility.await().until(hasResult());
     assertFalse(error);
     assertNull(createdStream);

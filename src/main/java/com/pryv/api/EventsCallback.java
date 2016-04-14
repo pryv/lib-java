@@ -1,40 +1,48 @@
+/*
 package com.pryv.api;
 
 import java.util.Map;
 
 import com.pryv.api.model.Event;
 
+*/
 /**
  *
  * callback methods for results of Events manipulation
  *
  * @author ik
  *
- */
+ *//*
+
 public interface EventsCallback {
 
-  /**
+  */
+/**
    * callback method for successful events retrieval
    *
    * @param events
    *          the retrieved events
    * @param serverTime
    *          the time of the server in seconds
-   */
+   *//*
+
   void onEventsRetrievalSuccess(Map<String, Event> events, Double serverTime);
 
-  /**
+  */
+/**
    * callback method called when an error occured during Events retrieval.
    *
    * @param errorMessage
    *          the error message
    * @param serverTime
    *          the time of the server in seconds
-   */
+   *//*
+
   void onEventsRetrievalError(String errorMessage, Double serverTime);
 
-  /**
-   * callback method called when createEvent(), updateEvent() or deleteEvent()
+  */
+/**
+   * callback method called when create(), update() or delete()
    * execution is successful.
    *
    * @param successMessage
@@ -48,18 +56,22 @@ public interface EventsCallback {
    *          of inserting the new event.
    * @param serverTime
    *          the time of the server in seconds
-   */
+   *//*
+
   void onEventsSuccess(String successMessage, Event event, Integer stoppedId, Double serverTime);
 
-  /**
-   * callback method called when an error occurs during createEvent(),
-   * updateEvent() or deleteEvent() execution.
+  */
+/**
+   * callback method called when an error occurs during create(),
+   * update() or delete() execution.
    *
    * @param errorMessage
    *          the error message
    * @param serverTime
    *          the time of the server in seconds
-   */
+   *//*
+
   void onEventsError(String errorMessage, Double serverTime);
 
 }
+*/

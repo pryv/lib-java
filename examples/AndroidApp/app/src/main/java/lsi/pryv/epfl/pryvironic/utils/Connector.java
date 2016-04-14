@@ -2,10 +2,10 @@ package lsi.pryv.epfl.pryvironic.utils;
 
 import android.util.Log;
 
-import com.pryv.Connection;
+import com.pryv.ConnectionOld;
 import com.pryv.Pryv;
 import com.pryv.api.EventsCallback;
-import com.pryv.api.StreamsCallback;
+import com.pryv.interfaces.StreamsCallback;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
@@ -16,14 +16,14 @@ import java.util.Map;
  * Created by Thieb on 26.02.2016.
  */
 public class Connector {
-    private static Connection connection = null;
+    private static ConnectionOld connection = null;
     private static StreamsCallback streamsCallback = null;
     private static EventsCallback eventsCallback = null;
 
     public static void initiateConnection() {
         Pryv.deactivateCache();
         Pryv.deactivateSupervisor();
-        connection = new Connection(AccountManager.userName, AccountManager.token, new DBinitCallback() {
+        connection = new ConnectionOld(AccountManager.userName, AccountManager.token, new DBinitCallback() {
         });
         instanciateSCB();
         instanciateECB();

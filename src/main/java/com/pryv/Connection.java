@@ -1,428 +1,243 @@
 package com.pryv;
 
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.util.Map;
+import com.pryv.api.Filter;
+import com.pryv.api.OnlineEventsAndStreamsManager;
+import com.pryv.api.database.DBinitCallback;
+import com.pryv.api.database.SQLiteDBHelper;
+import com.pryv.api.model.Stream;
+import com.pryv.connection.ConnectionAccesses;
+import com.pryv.connection.ConnectionAccount;
+import com.pryv.connection.ConnectionEvents;
+import com.pryv.connection.ConnectionProfile;
+import com.pryv.connection.ConnectionStreams;
+import com.pryv.utils.Logger;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.joda.time.DateTime;
 
-import com.pryv.api.CacheEventsAndStreamsManager;
-import com.pryv.api.EventsCallback;
-import com.pryv.api.EventsManager;
-import com.pryv.api.EventsSupervisor;
-import com.pryv.api.Filter;
-import com.pryv.api.StreamsCallback;
-import com.pryv.api.StreamsManager;
-import com.pryv.api.StreamsSupervisor;
-import com.pryv.api.database.DBinitCallback;
-import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
-import com.pryv.utils.Logger;
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *
  * Pryv API connection - Object used to manipulate Events and Streams data.
- *
- * @author ik
- *
  */
-public class Connection implements EventsManager, StreamsManager {
+public class Connection {
 
-  private String userID;
-  private String accessToken;
-  private String apiDomain = Pryv.DOMAIN;
-  private String apiScheme = "https";
+    public ConnectionAccesses accesses;
+    public ConnectionAccount account;
+    public ConnectionEvents events;
+    public ConnectionProfile profile;
+    public ConnectionStreams streams;
 
-  private WeakReference<Connection> weakConnection;
+    private String username;
+    private String token;
+    private String domain;
+    private String urlEndpoint;
+    private String registrationUrl;
 
-  private double serverTime;
-  /**
-   * RTT between server and system: deltaTime = serverTime - systemTime
-   */
-  private double deltaTime = 0;
+    private boolean isApiActive = true;
+    private boolean isCacheActive = true;
 
-  private EventsManager cacheEventsManager;
-  private StreamsManager cacheStreamsManager;
-  private EventsSupervisor eventsSupervisor;
-  private StreamsSupervisor streamsSupervisor;
+    private OnlineEventsAndStreamsManager api;
 
-  private Logger logger = Logger.getInstance();
+    private Filter cacheScope;
+    private SQLiteDBHelper cache;
 
-  private final Double millisToSeconds = 1000.0;
-
-  /**
-   * Connection constructor. builds the Url to which the online requests are
-   * done using the provided username and API domain and Scheme from the Pryv
-   * object. Instanciates Supervisor and CacheEventsAndStreamsManager.
-   *
-   * @param pUserId
-   *          username used
-   * @param pAccessToken
-   * @param pDBInitCallback
-   */
-  public Connection(String pUserId, String pAccessToken, DBinitCallback pDBInitCallback) {
-    userID = pUserId;
-    accessToken = pAccessToken;
-
-    weakConnection = new WeakReference<Connection>(this);
-
-    if (Pryv.isSupervisorActive()) {
-      streamsSupervisor = new StreamsSupervisor();
-      eventsSupervisor = new EventsSupervisor(streamsSupervisor);
-      streamsSupervisor.setEventsSupervisor(eventsSupervisor);
-    }
-
-    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
-      String cacheFolder = null;
-
-      if (Pryv.isCacheActive()) {
-        // generate caching folder
-        cacheFolder = "cache/" + getIdCaching() + "/";
-        new File(cacheFolder).mkdirs();
-      }
-      cacheEventsManager =
-              new CacheEventsAndStreamsManager(cacheFolder, getApiBaseUrl(), accessToken, pDBInitCallback,
-                      streamsSupervisor, eventsSupervisor, weakConnection);
-      cacheStreamsManager = (StreamsManager) cacheEventsManager;
-    }
-  }
-
-  /**
-   * returns the API URL, built from the API scheme, the userID and the API
-   * domain.
-   *
-   * @return
-   */
-  private String getApiBaseUrl() {
-    return apiScheme + "://" + userID + "." + apiDomain + "/";
-  }
-
-  /**
-   * returns the API URL with the access token
-   *
-   * @return
-   */
-  private String getIdUrl() {
-    return getApiBaseUrl() + "?auth=" + accessToken;
-  }
-
-  /**
-   * returns the caching folder id
-   *
-   * @return
-   */
-  public String getIdCaching() {
-    return DigestUtils.md5Hex(getIdUrl()) + "_" + userID + apiDomain + "_" + accessToken;
-  }
-
-  /*
-   * Memory Streams management
-   */
-
-  /**
-   * Returns the Root Streams, ie. those with field parent set at null
-   *
-   * @return
-   */
-  public Map<String, Stream> getRootStreams() {
-    return streamsSupervisor.getRootStreams();
-  }
-
-  /**
-   * Returns a reference to the Stream that has the provided Id.
-   *
-   * @param streamId
-   * @return
-   */
-  public Stream getStreamById(String streamId) {
-    return streamsSupervisor.getStreamById(streamId);
-  }
-
-  /*
-   * Events management
-   */
-
-  @Override
-  public void getEvents(Filter filter, EventsCallback userEventsCallback) {
-    if (Pryv.isSupervisorActive()) {
-      // make sync request to supervisor
-      eventsSupervisor.getEvents(filter, userEventsCallback);
-    }
-    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
-      // forward getEvents() to Cache
-      cacheEventsManager.getEvents(filter, new CacheManagerEventsCallback(userEventsCallback,
-        filter));
-    }
-  }
-
-  @Override
-  public void createEvent(Event newEvent, EventsCallback userEventsCallback) {
-    newEvent.assignConnection(weakConnection);
-
-    if (Pryv.isSupervisorActive()) {
-      // make sync request to supervisor
-      eventsSupervisor.updateOrCreateEvent(newEvent, userEventsCallback);
-    }
-    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
-      // forward call to cache
-      cacheEventsManager.createEvent(newEvent, new CacheManagerEventsCallback(userEventsCallback,
-        null));
-    }
-  }
-
-  @Override
-  public void deleteEvent(Event eventToDelete, EventsCallback userEventsCallback) {
-
-    if (Pryv.isSupervisorActive()) {
-      // delete Event in Supervisor
-      eventsSupervisor.deleteEvent(eventToDelete, userEventsCallback);
-    }
-    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
-      // forward call to cache
-      cacheEventsManager.deleteEvent(eventToDelete, new CacheManagerEventsCallback(
-        userEventsCallback, null));
-    }
-  }
-
-  @Override
-  public void updateEvent(Event eventToUpdate, EventsCallback userEventsCallback) {
-
-    if (Pryv.isSupervisorActive()) {
-      // update Event in Supervisor
-      eventsSupervisor.updateOrCreateEvent(eventToUpdate, userEventsCallback);
-    }
-    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
-      // forward call to cache
-      cacheEventsManager.updateEvent(eventToUpdate, new CacheManagerEventsCallback(
-        userEventsCallback, null));
-    }
-  }
-
-  /*
-   * Streams management
-   */
-
-  @Override
-  public void getStreams(Filter filter, final StreamsCallback userStreamsCallback) {
-    if (Pryv.isSupervisorActive()) {
-      logger.log("Connection: retrieving streams from Supervisor");
-      userStreamsCallback.onStreamsRetrievalSuccess(streamsSupervisor.getRootStreams(), serverTime);
-    }
-    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
-      // forward call to cache
-      cacheStreamsManager.getStreams(filter, new CacheManagerStreamsCallback(userStreamsCallback));
-    }
-  }
-
-  @Override
-  public void createStream(Stream newStream, StreamsCallback userStreamsCallback) {
-    newStream.assignConnection(weakConnection);
-
-    // generate an id if it wasn't set during creation
-    if (newStream.getId() == null) {
-      newStream.generateId();
-      logger.log("Connection: Generated new id for stream: " + newStream.getId());
-    }
-
-    if (Pryv.isSupervisorActive()) {
-      // create Stream in Supervisor
-      streamsSupervisor.updateOrCreateStream(newStream, userStreamsCallback);
-    }
-    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
-      // forward call to cache
-      cacheStreamsManager.createStream(newStream, new CacheManagerStreamsCallback(
-        userStreamsCallback));
-    }
-  }
-
-  @Override
-  public void deleteStream(Stream streamToDelete, boolean mergeEventsWithParent,
-    StreamsCallback userStreamsCallback) {
-    // // TODO check what to do with children
-    // for (Stream childStream : streamToDelete.getChildren()) {
-    // childStream.setTrashed(true);
-    // }
-    if (Pryv.isSupervisorActive()) {
-      // delete Stream in Supervisor
-      streamsSupervisor.deleteStream(streamToDelete.getId(), mergeEventsWithParent,
-        userStreamsCallback);
-    }
-    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
-      // forward call to cache
-      cacheStreamsManager.deleteStream(streamToDelete, mergeEventsWithParent,
-        new CacheManagerStreamsCallback(userStreamsCallback));
-    }
-  }
-
-  @Override
-  public void updateStream(Stream streamToUpdate, StreamsCallback userStreamsCallback) {
-    if (Pryv.isSupervisorActive()) {
-      // update Stream in Supervisor
-      streamsSupervisor.updateOrCreateStream(streamToUpdate, userStreamsCallback);
-    }
-    if (Pryv.isCacheActive() || Pryv.isOnlineActive()) {
-      // forward call to cache
-      cacheStreamsManager.updateStream(streamToUpdate, new CacheManagerStreamsCallback(
-        userStreamsCallback));
-    }
-  }
-
-  /**
-   * Returns a DateTime object representing the time in the system reference.
-   *
-   * @param time
-   *          the time in the server reference
-   * @return
-   */
-  public DateTime serverTimeInSystemDate(double time) {
-    return new DateTime(System.currentTimeMillis() / millisToSeconds + deltaTime);
-  }
-
-  /**
-   * calculates the difference between server and system time: deltaTime =
-   * serverTime - systemTime
-   *
-   * @param pServerTime
-   */
-  private void computeDelta(Double pServerTime) {
-    if (pServerTime != null) {
-      deltaTime = pServerTime - System.currentTimeMillis() / millisToSeconds;
-    }
-  }
-
-  /**
-   * EventsCallback for returns coming from CacheEventsAndStreamsManager
-   *
-   * @author ik
-   *
-   */
-  private class CacheManagerEventsCallback implements EventsCallback {
-
-    private EventsCallback userEventsCallback;
-    private Filter filter;
-
-    public CacheManagerEventsCallback(EventsCallback pUserEventsCallback, Filter pFilter) {
-      userEventsCallback = pUserEventsCallback;
-      filter = pFilter;
-    }
-
-    @Override
-    public void onEventsRetrievalSuccess(Map<String, Event> cacheManagerEvents, Double pServerTime) {
-      computeDelta(pServerTime);
-      // return merged events from Supervisor - cacheEvents aren't used because
-      // they don't contain the merged events
-      if (Pryv.isSupervisorActive()) {
-        eventsSupervisor.getEvents(filter, userEventsCallback);
-      } else {
-        userEventsCallback.onEventsRetrievalSuccess(cacheManagerEvents, pServerTime);
-      }
-    }
-
-    @Override
-    public void onEventsRetrievalError(String message, Double pServerTime) {
-      computeDelta(pServerTime);
-      userEventsCallback.onEventsRetrievalError(message, pServerTime);
-    }
-
-    @Override
-    public void onEventsSuccess(String successMessage, Event event, Integer stoppedId,
-      Double pServerTime) {
-      computeDelta(pServerTime);
-
-      if (eventsSupervisor != null) {
-        if (event.getId() != null) {
-          eventsSupervisor.updateOrCreateEvent(event, userEventsCallback);
-        }
-
-        if (event.getClientId() != null) {
-          userEventsCallback.onEventsSuccess(successMessage,
-            eventsSupervisor.getEventByClientId(event.getClientId()), stoppedId, pServerTime);
-        } else {
-          userEventsCallback.onEventsSuccess(successMessage,
-            eventsSupervisor.getEventByClientId(eventsSupervisor.getClientId(event.getId())),
-            stoppedId, pServerTime);
-        }
-      } else {
-        userEventsCallback.onEventsSuccess(successMessage, event, stoppedId, pServerTime);
-      }
-    }
-
-    @Override
-    public void onEventsError(String errorMessage, Double pServerTime) {
-      computeDelta(pServerTime);
-      userEventsCallback.onEventsError(errorMessage, pServerTime);
-    }
-  }
-
-  /**
-   * Streams Callback for CacheManager
-   *
-   * @author ik
-   *
-   */
-  private class CacheManagerStreamsCallback implements StreamsCallback {
-
-    private StreamsCallback userStreamsCallback;
+    private WeakReference<Connection> weakConnection;
 
     /**
-     * public constructor
-     *
-     * @param pUserStreamsCallback
-     *          the class to which the results are forwarded after optional
-     *          processing.
+     * Streams with no parent stream. the key is the id
      */
-    public CacheManagerStreamsCallback(StreamsCallback pUserStreamsCallback) {
-      userStreamsCallback = pUserStreamsCallback;
+    private Map<String, Stream> rootStreams;
+
+    /**
+     * All Streams stored in the Supervisor. the key is the id
+     */
+    private Map<String, Stream> flatStreams;
+
+    private Logger logger = Logger.getInstance();
+
+    private double serverTime;
+    /**
+     * RTT between server and system: deltaTime = serverTime - systemTime
+     */
+    private double deltaTime = 0;
+    private final Double millisToSeconds = 1000.0;
+
+    /**
+     * Main object to manipulate Pryv data, instanciate it with the required parameters.
+     *
+     * @param username
+     * @param token
+     * @param domain
+     * @param dBinitCallback
+     */
+    public Connection(String username, String token, String domain, DBinitCallback dBinitCallback) {
+
+        this.username = username;
+        this.token = token;
+        this.domain = domain;
+        buildUrlEndpoint();
+        buildRegistrationUrl();
+
+        this.weakConnection = new WeakReference<Connection>(this);
+
+        rootStreams = new ConcurrentHashMap<String, Stream>();
+        flatStreams = new ConcurrentHashMap<String, Stream>();
+
+        if (isApiActive) {
+            api = new OnlineEventsAndStreamsManager(urlEndpoint, token, this.weakConnection);
+        }
+
+        if (isCacheActive) {
+            String cacheFolder = "cache/" + generateCacheFolderName() + "/";
+            new File(cacheFolder).mkdirs();
+            cache = new SQLiteDBHelper(cacheFolder, weakConnection, dBinitCallback);
+        }
+
+        this.accesses = new ConnectionAccesses();
+        this.account = new ConnectionAccount();
+        this.events = new ConnectionEvents(api, cacheScope, cache);
+        this.profile = new ConnectionProfile();
+        this.streams = new ConnectionStreams(api, cacheScope, cache);
     }
 
-    @Override
-    public void onStreamsRetrievalSuccess(Map<String, Stream> cacheManagerStreams,
-      Double pServerTime) {
-      logger.log("CacheManagerStreamsCallback: Streams retrieval success");
-
-      computeDelta(pServerTime);
-
-      if (cacheManagerStreams != null) {
-        // forward updated Streams
-        userStreamsCallback.onStreamsRetrievalSuccess(cacheManagerStreams, serverTime);
-      }
+    /**
+     * activate API calls
+     */
+    public void activateApi() {
+        this.isApiActive = true;
     }
 
-    @Override
-    public void onStreamsRetrievalError(String errorMessage, Double pServerTime) {
-      computeDelta(pServerTime);
-      userStreamsCallback.onStreamsRetrievalError(errorMessage, pServerTime);
+    /**
+     * disable usage of API calls
+     */
+    public void deactivateApi() {
+        this.isApiActive = false;
     }
 
-    @Override
-    public void onStreamsSuccess(String successMessage, Stream stream, Double pServerTime) {
-      computeDelta(pServerTime);
-      userStreamsCallback.onStreamsSuccess(successMessage, stream, pServerTime);
+    /**
+     * activate usage of local cache
+     */
+    public void activateCache() {
+        this.isCacheActive = true;
     }
 
-    @Override
-    public void onStreamError(String errorMessage, Double pServerTime) {
-      computeDelta(pServerTime);
-      userStreamsCallback.onStreamError(errorMessage, pServerTime);
+    /**
+     * deactive local cache
+     */
+    public void deactivateCache() {
+        this.isCacheActive = false;
     }
 
-  }
+    /**
+     * Assign a scope to the cache. This defines the scope of the data stored in the local cache.
+     * Activates the cache.
+     *
+     * @param scope
+     */
+    public void setupCacheScope(Filter scope) {
+        this.cacheScope = scope;
+        activateCache();
+    };
 
-  public String getUserID() {
-    return userID;
-  }
+    private String buildUrlEndpoint() {
+        this.urlEndpoint = "https://" + username + "." + domain;
+        return this.urlEndpoint;
+    }
 
-  public String getAccessToken() {
-    return accessToken;
-  }
+    private String buildRegistrationUrl() {
+        this.registrationUrl = "https://reg." + domain + "/access";
+        return this.registrationUrl;
+    }
 
-  public String getApiDomain() {
-    return apiDomain;
-  }
+    private String getUrlRegistration() {
+        return this.registrationUrl;
+    }
 
-  public String getApiScheme() {
-    return apiScheme;
-  }
+    /**
+     * Returns a DateTime object representing the time in the system reference.
+     *
+     * @param time
+     *          the time in the server reference
+     * @return
+     */
+    public DateTime serverTimeInSystemDate(double time) {
+        return new DateTime(System.currentTimeMillis() / millisToSeconds + deltaTime);
+    }
+
+    /**
+     * calculates the difference between server and system time: deltaTime =
+     * serverTime - systemTime
+     *
+     * @param pServerTime
+     */
+    private void computeDelta(Double pServerTime) {
+        if (pServerTime != null) {
+            deltaTime = pServerTime - System.currentTimeMillis() / millisToSeconds;
+        }
+    }
+
+    /**
+     * returns the a name for the cache folder
+     *
+     * @return
+     */
+    public String generateCacheFolderName() {
+        return DigestUtils.md5Hex(this.urlEndpoint + "/" + token) + "_" + username + "_"
+                +  domain + "_" + token;
+    }
+
+    /**
+     * returns the root Streams of the Pryv structure
+     *
+     * @return
+     */
+    public Map<String, Stream> getRootStreams() {
+        return rootStreams;
+    }
+
+    /**
+     * fixes Streams' children properties based on parentIds
+     */
+    private void recomputeRootStreamsTree() {
+        rootStreams.clear();
+
+        String parentId = null;
+        // set root streams
+        for (Stream potentialRootStream : flatStreams.values()) {
+            // clear children fields
+            potentialRootStream.clearChildren();
+            parentId = potentialRootStream.getParentId();
+            if (parentId == null) {
+                logger.log("StreamsSupervisor: adding rootStream: id="
+                        + potentialRootStream.getId()
+                        + ", name="
+                        + potentialRootStream.getName());
+                rootStreams.put(potentialRootStream.getId(), potentialRootStream);
+            }
+        }
+
+        // assign children
+        for (Stream childStream : flatStreams.values()) {
+            parentId = childStream.getParentId();
+            if (parentId != null) {
+                if (flatStreams.containsKey(parentId)) {
+                    logger.log("StreamsSupervisor: adding childStream: id="
+                            + childStream.getId()
+                            + ", name="
+                            + childStream.getName()
+                            + " to "
+                            + parentId);
+                    Stream parent = flatStreams.get(parentId);
+                    if (parent != null) {
+                        parent.addChildStream(childStream);
+                    }
+                }
+            }
+        }
+    }
 
 }

@@ -7,9 +7,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,11 +19,13 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.pryv.Pryv;
-import com.pryv.api.EventsCallback;
+import com.pryv.interfaces.EventsCallback;
 import com.pryv.api.Filter;
-import com.pryv.api.StreamsCallback;
+import com.pryv.interfaces.GetStreamsCallback;
+import com.pryv.interfaces.StreamsCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
+import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.utils.Logger;
 
 /**
@@ -37,10 +41,10 @@ public class SQLiteDBHelper {
 
   private final String initDBerrorMessage = "Database initialization error: ";
 
-  // the DB Connection
+  // the DB ConnectionOld
   private Connection dbConnection;
 
-  // weak reference to Pryv's Connection
+  // weak reference to Pryv's ConnectionOld
   private WeakReference<com.pryv.Connection> weakConnection;
 
   private Logger logger = Logger.getInstance();
@@ -81,17 +85,20 @@ public class SQLiteDBHelper {
     }
 
   }
+  
+  public void update() {
+    
+  }
 
   /**
    * Inserts Event into the SQLite database.
    *
    * @param eventToCache
    *          the event to insert
-   * @param cacheEventsCallback
+   * @param eventsCallback
    *          callback to notify success or failure
    */
-  public void
-    createEvent(final Event eventToCache, final EventsCallback cacheEventsCallback) {
+  public void createEvent(final Event eventToCache, final EventsCallback eventsCallback) {
     new Thread() {
       @Override
       public void run() {
@@ -101,17 +108,17 @@ public class SQLiteDBHelper {
           Statement statement = dbConnection.createStatement();
           statement.execute(cmd);
           statement.close();
-          if (cacheEventsCallback != null) {
-            cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event cached", eventToCache, null,
-              null);
+          if (eventsCallback != null) {
+            eventsCallback.onSuccess("SQLiteDBHelper: Event cached", eventToCache, null,
+                    null);
           }
         } catch (SQLException e) {
-          if (cacheEventsCallback != null) {
-            cacheEventsCallback.onEventsError(e.getMessage(), null);
+          if (eventsCallback != null) {
+            eventsCallback.onError(e.getMessage(), null);
           }
         } catch (JsonProcessingException e) {
-          if (cacheEventsCallback != null) {
-            cacheEventsCallback.onEventsError(e.getMessage(), null);
+          if (eventsCallback != null) {
+            eventsCallback.onError(e.getMessage(), null);
           }
         }
       }
@@ -134,17 +141,17 @@ public class SQLiteDBHelper {
           Statement statement = dbConnection.createStatement();
           int num = statement.executeUpdate(cmd);
             if (cacheEventsCallback != null) {
-              cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: " + num
-                              + " event(s) updated in cache", eventToUpdate, null, null);
+              cacheEventsCallback.onSuccess("SQLiteDBHelper: " + num
+                      + " event(s) updated in cache", eventToUpdate, null, null);
             }
           statement.close();
         } catch (SQLException e) {
           if (cacheEventsCallback != null) {
-            cacheEventsCallback.onEventsError(e.getMessage(), null);
+            cacheEventsCallback.onError(e.getMessage(), null);
           }
         } catch (JsonProcessingException e) {
           if (cacheEventsCallback != null) {
-            cacheEventsCallback.onEventsError(e.getMessage(), null);
+            cacheEventsCallback.onError(e.getMessage(), null);
           }
         }
       }
@@ -175,14 +182,14 @@ public class SQLiteDBHelper {
             logger.log("SQLiteDBHelper: inserted " + event.getClientId() + " into DB.");
             statement.close();
           } catch (SQLException e) {
-            cacheEventsCallback.onEventsError(e.getMessage(), null);
+            cacheEventsCallback.onError(e.getMessage(), null);
             e.printStackTrace();
           } catch (JsonProcessingException e) {
-            cacheEventsCallback.onEventsError(e.getMessage(), null);
+            cacheEventsCallback.onError(e.getMessage(), null);
             e.printStackTrace();
           }
         }
-        cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Events updated", null, null, null);
+        cacheEventsCallback.onSuccess("SQLiteDBHelper: Events updated", null, null, null);
 
       }
     }.start();
@@ -215,9 +222,9 @@ public class SQLiteDBHelper {
               // delete really
               String cmd = QueryGenerator.deleteEvent(retrievedEvent);
               statement.executeUpdate(cmd);
-              cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event with clientId="
-                + eventToDelete.getClientId()
-                  + " is deleted.", null, null, null);
+              cacheEventsCallback.onSuccess("SQLiteDBHelper: Event with clientId="
+                      + eventToDelete.getClientId()
+                      + " is deleted.", null, null, null);
             } else {
               // set to trashed
               retrievedEvent.setTrashed(true);
@@ -225,23 +232,23 @@ public class SQLiteDBHelper {
               statement.executeUpdate(cmd);
               logger.log("SQLiteDBHelper: delete - set trashed=true for clientId="
                 + retrievedEvent.getClientId());
-              cacheEventsCallback.onEventsSuccess("SQLiteDBHelper: Event with clientId="
-                + retrievedEvent.getClientId()
-                  + " is trashed.", retrievedEvent, null, null);
+              cacheEventsCallback.onSuccess("SQLiteDBHelper: Event with clientId="
+                      + retrievedEvent.getClientId()
+                      + " is trashed.", retrievedEvent, null, null);
             }
           }
           statement.close();
         } catch (SQLException e) {
-          cacheEventsCallback.onEventsError(e.getMessage(), null);
+          cacheEventsCallback.onError(e.getMessage(), null);
           e.printStackTrace();
         } catch (JsonParseException e) {
-          cacheEventsCallback.onEventsError(e.getMessage(), null);
+          cacheEventsCallback.onError(e.getMessage(), null);
           e.printStackTrace();
         } catch (JsonMappingException e) {
-          cacheEventsCallback.onEventsError(e.getMessage(), null);
+          cacheEventsCallback.onError(e.getMessage(), null);
           e.printStackTrace();
         } catch (IOException e) {
-          cacheEventsCallback.onEventsError(e.getMessage(), null);
+          cacheEventsCallback.onError(e.getMessage(), null);
           e.printStackTrace();
         }
       }
@@ -259,32 +266,34 @@ public class SQLiteDBHelper {
    * @param cacheEventsCallback
    *          callback to return retrieved events
    */
-  public void getEvents(final Filter filter, final EventsCallback cacheEventsCallback) {
+  public void getEvents(final Filter filter, final GetEventsCallback cacheEventsCallback) {
     new Thread() {
       @Override
       public void run() {
         try {
           String cmd = QueryGenerator.retrieveEvents(filter);
-          logger.log("SQLiteDBHelper: getEvents: " + cmd);
+          logger.log("SQLiteDBHelper: get: " + cmd);
           Statement statement = dbConnection.createStatement();
           ResultSet result = statement.executeQuery(cmd);
-          Map<String, Event> retrievedEvents = new HashMap<String, Event>();
+          List<Event> retrievedEvents = new ArrayList<Event>();
           while (result.next()) {
             Event retrievedEvent = Event.createOrReuse(result);
-            retrievedEvents.put(retrievedEvent.getClientId(), retrievedEvent);
+            retrievedEvents.add(retrievedEvent);
           }
-          cacheEventsCallback.onEventsRetrievalSuccess(retrievedEvents, null);
+
+          // TODO add deleted events somehow
+          cacheEventsCallback.partialCallback(retrievedEvents, null);
         } catch (SQLException e) {
-          cacheEventsCallback.onEventsRetrievalError(e.getMessage(), null);
+          cacheEventsCallback.onError(e.getMessage(), null);
           e.printStackTrace();
         } catch (JsonParseException e) {
-          cacheEventsCallback.onEventsRetrievalError(e.getMessage(), null);
+          cacheEventsCallback.onError(e.getMessage(), null);
           e.printStackTrace();
         } catch (JsonMappingException e) {
-          cacheEventsCallback.onEventsRetrievalError(e.getMessage(), null);
+          cacheEventsCallback.onError(e.getMessage(), null);
           e.printStackTrace();
         } catch (IOException e) {
-          cacheEventsCallback.onEventsRetrievalError(e.getMessage(), null);
+          cacheEventsCallback.onError(e.getMessage(), null);
           e.printStackTrace();
         }
       }
@@ -320,10 +329,10 @@ public class SQLiteDBHelper {
             }
           }
           statement.close();
-          cacheStreamsCallback.onStreamsSuccess("SQLiteDBHelper: Stream updated or created",
-            streamToCache, null);
+          cacheStreamsCallback.onSuccess("SQLiteDBHelper: Stream updated or created",
+                  streamToCache, null);
         } catch (SQLException e) {
-          cacheStreamsCallback.onStreamError(e.getMessage(), null);
+          cacheStreamsCallback.onError(e.getMessage(), null);
         }
       }
     }.start();
@@ -354,8 +363,8 @@ public class SQLiteDBHelper {
                 + stream.getName());
             logger.log("SQLiteDBHelper: update or create Stream: " + cmd);
             statement.executeUpdate(cmd);
-            cacheStreamsCallback.onStreamsSuccess(
-              "SQLiteDBHelper: child stream updated or created", stream, null);
+            cacheStreamsCallback.onSuccess(
+                    "SQLiteDBHelper: child stream updated or created", stream, null);
             if (stream.getChildren() != null) {
               Set<Stream> children = new HashSet<Stream>();
               retrieveAllChildren(children, stream);
@@ -364,13 +373,13 @@ public class SQLiteDBHelper {
                 logger.log("SQLiteDBHelper: add child Stream: " + cmd);
 
                 statement.execute(cmd);
-                cacheStreamsCallback.onStreamsSuccess(
-                  "SQLiteDBHelper: child stream updated or created", childStream, null);
+                cacheStreamsCallback.onSuccess(
+                        "SQLiteDBHelper: child stream updated or created", childStream, null);
               }
             }
             statement.close();
           } catch (SQLException e) {
-            cacheStreamsCallback.onStreamError(e.getMessage(), null);
+            cacheStreamsCallback.onError(e.getMessage(), null);
             e.printStackTrace();
           }
         }
@@ -434,7 +443,7 @@ public class SQLiteDBHelper {
                 // fetch all these events, modify their parent stream id
                 // and save them
                 Filter deleteFilter = new Filter();
-                deleteFilter.addStreamId(retrievedStreamToDelete.getId());
+                deleteFilter.addStream(retrievedStreamToDelete);
                 cmd = QueryGenerator.retrieveEvents(deleteFilter);
                 result = statement.executeQuery(cmd);
                 Event updateEvent = null;
@@ -445,13 +454,13 @@ public class SQLiteDBHelper {
                     updateEvent(updateEvent, null);
                   } catch (JsonParseException e) {
                     e.printStackTrace();
-                    cacheStreamsCallback.onStreamError(e.getMessage(), null);
+                    cacheStreamsCallback.onError(e.getMessage(), null);
                   } catch (JsonMappingException e) {
                     e.printStackTrace();
-                    cacheStreamsCallback.onStreamError(e.getMessage(), null);
+                    cacheStreamsCallback.onError(e.getMessage(), null);
                   } catch (IOException e) {
                     e.printStackTrace();
-                    cacheStreamsCallback.onStreamError(e.getMessage(), null);
+                    cacheStreamsCallback.onError(e.getMessage(), null);
                   }
                 }
 
@@ -465,17 +474,17 @@ public class SQLiteDBHelper {
                   statement.executeUpdate(cmd);
                 }
               }
-              cacheStreamsCallback.onStreamsSuccess("SQLiteDBHelper: Stream with id="
-                + retrievedStreamToDelete.getId()
-                  + " deleted.", null, null);
+              cacheStreamsCallback.onSuccess("SQLiteDBHelper: Stream with id="
+                      + retrievedStreamToDelete.getId()
+                      + " deleted.", null, null);
             } else {
               // set its trashed field to true and save it
               logger.log("SQLiteDBHelper: trash Stream with id=" + streamToDelete.getId());
               retrievedStreamToDelete.setTrashed(true);
               updateOrCreateStream(retrievedStreamToDelete, cacheStreamsCallback);
-              cacheStreamsCallback.onStreamsSuccess("SQLiteDBHelper: Stream with id="
-                + retrievedStreamToDelete.getId()
-                  + " trashed.", retrievedStreamToDelete, null);
+              cacheStreamsCallback.onSuccess("SQLiteDBHelper: Stream with id="
+                      + retrievedStreamToDelete.getId()
+                      + " trashed.", retrievedStreamToDelete, null);
               // set child streams' trashed field to true
 
             }
@@ -486,7 +495,7 @@ public class SQLiteDBHelper {
           // these streams' events)
           // if (streamToDelete.getChildren() != null) {
           // for (Stream childStream : streamToDelete.getChildren()) {
-          // cmd = QueryGenerator.deleteStream(childStream);
+          // cmd = QueryGenerator.delete(childStream);
           // int done = statement.executeUpdate(cmd);
           // logger.log("SQLiteDBHelper: delete child Stream with name "
           // + childStream.getName()
@@ -500,8 +509,8 @@ public class SQLiteDBHelper {
           // }
           // }
           // }
-          // cmd = QueryGenerator.deleteStream(streamToDelete);
-          // logger.log("SQLiteDBHelper: deleteStream: " + cmd);
+          // cmd = QueryGenerator.delete(streamToDelete);
+          // logger.log("SQLiteDBHelper: delete: " + cmd);
           // int done = statement.executeUpdate(cmd);
           // // set trashed to true
           // if (done == 0) {
@@ -509,7 +518,7 @@ public class SQLiteDBHelper {
           // }
           statement.close();
         } catch (SQLException e) {
-          cacheStreamsCallback.onStreamError(e.getMessage(), null);
+          cacheStreamsCallback.onError(e.getMessage(), null);
           e.printStackTrace();
         }
       }
@@ -523,13 +532,13 @@ public class SQLiteDBHelper {
    * @param cacheStreamsCallback
    *          callback to which the streams are returned.
    */
-  public void getStreams(final StreamsCallback cacheStreamsCallback) {
+  public void getStreams(final GetStreamsCallback cacheStreamsCallback) {
     new Thread() {
       @Override
       public void run() {
         try {
           String cmd = QueryGenerator.retrieveStreams();
-          logger.log("SQLiteDBHelper: getStreams: "
+          logger.log("SQLiteDBHelper: get: "
             + cmd
               + " - "
               + Thread.currentThread().getName());
@@ -572,9 +581,9 @@ public class SQLiteDBHelper {
             }
           }
 
-          cacheStreamsCallback.onStreamsRetrievalSuccess(rootStreams, null);
+          cacheStreamsCallback.partialCallback(rootStreams, null);
         } catch (SQLException e) {
-          cacheStreamsCallback.onStreamError(e.getMessage(), null);
+          cacheStreamsCallback.onError(e.getMessage(), null);
           e.printStackTrace();
         }
       }

@@ -1,9 +1,10 @@
-package com.pryv.api;
+package com.pryv.interfaces;
 
+import com.pryv.api.Filter;
 import com.pryv.api.model.Stream;
 
 /**
- * interface used by Connection, OnlineEventsAndStreamManager and
+ * interface used by ConnectionOld, OnlineEventsAndStreamManager and
  * CacheEventsAndStreamManager to manipulate Streams
  *
  * @author ik
@@ -16,10 +17,10 @@ public interface StreamsManager {
    *
    * @param filter
    *          optional filter parameters
-   * @param streamsCallback
+   * @param getStreamsCallback
    *          the callback for streams retrieval
    */
-  void getStreams(Filter filter, StreamsCallback streamsCallback);
+  void get(Filter filter, GetStreamsCallback getStreamsCallback);
 
   /**
    * Create stream
@@ -29,7 +30,7 @@ public interface StreamsManager {
    * @param streamsCallback
    *          the callback for streams creation, notifies success or failure
    */
-  void createStream(Stream newStream, StreamsCallback streamsCallback);
+  void create(Stream newStream, StreamsCallback streamsCallback);
 
   /**
    * Trash or delete the specified stream, depending on its current state
@@ -44,8 +45,8 @@ public interface StreamsManager {
    * @param streamsCallback
    *          the callback for streams deletion, notifies success or failure.
    */
-  void deleteStream(Stream streamToDelete, boolean mergeEventsWithParent,
-    StreamsCallback streamsCallback);
+  void delete(Stream streamToDelete, boolean mergeEventsWithParent,
+              StreamsCallback streamsCallback);
 
   /**
    * Update Stream
@@ -55,6 +56,6 @@ public interface StreamsManager {
    * @param streamsCallback
    *          the callback for streams update, notifies success or failure.
    */
-  void updateStream(Stream streamToUpdate, StreamsCallback streamsCallback);
+  void update(Stream streamToUpdate, StreamsCallback streamsCallback);
 
 }

@@ -16,9 +16,9 @@ import org.junit.Test;
 import resources.TestCredentials;
 
 import com.jayway.awaitility.Awaitility;
-import com.pryv.Connection;
+import com.pryv.ConnectionOld;
 import com.pryv.Pryv;
-import com.pryv.api.StreamsCallback;
+import com.pryv.interfaces.StreamsCallback;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
@@ -34,7 +34,7 @@ import com.pryv.backup.PryvBackup;
  */
 public class LocalBackupTest {
 
-  private static Connection connection;
+  private static ConnectionOld connection;
   private static StreamsCallback streamsCallback;
   private static boolean streamsOperationDone = false;
   private static boolean streamsSuccess = false;
@@ -52,7 +52,7 @@ public class LocalBackupTest {
   @BeforeClass
   public static void setUpBeforeAllTests() throws Exception {
     connection =
-      new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, new DBinitCallback());
+      new ConnectionOld(TestCredentials.USERNAME, TestCredentials.TOKEN, new DBinitCallback());
     // to simplify things
     Pryv.deactivateCache();
     Pryv.deactivateOnline();

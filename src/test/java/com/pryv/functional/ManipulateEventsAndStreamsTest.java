@@ -17,13 +17,13 @@ import org.junit.Test;
 import resources.TestCredentials;
 
 import com.jayway.awaitility.Awaitility;
-import com.pryv.Connection;
+import com.pryv.ConnectionOld;
 import com.pryv.Pryv;
 import com.pryv.api.EventsCallback;
-import com.pryv.api.EventsManager;
+import com.pryv.interfaces.EventsManager;
 import com.pryv.api.Filter;
-import com.pryv.api.StreamsCallback;
-import com.pryv.api.StreamsManager;
+import com.pryv.interfaces.StreamsCallback;
+import com.pryv.interfaces.StreamsManager;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.model.Event;
 import com.pryv.api.model.Stream;
@@ -64,7 +64,7 @@ public class ManipulateEventsAndStreamsTest {
     Pryv.setDomain("pryv.li");
 
     eventsManager =
-      new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, new DBinitCallback() {
+      new ConnectionOld(TestCredentials.USERNAME, TestCredentials.TOKEN, new DBinitCallback() {
         @Override
         public void onError(String message) {
           System.out.println("DB init Error: " + message);
@@ -87,7 +87,7 @@ public class ManipulateEventsAndStreamsTest {
 
   @Test
   public void testFetchEvents() {
-    eventsManager.getEvents(new Filter(), eventsCallback);
+    eventsManager.get(new Filter(), eventsCallback);
     Awaitility.await().until(hasEventsSuccess());
     Awaitility.await().until(hasEvents());
   }
@@ -96,7 +96,7 @@ public class ManipulateEventsAndStreamsTest {
   // @Test
   public void testManipulateEventTest() {
     System.out.println("testManipulateEventTest begins");
-    streamsManager.getStreams(null, streamsCallback);
+    streamsManager.get(null, streamsCallback);
     Awaitility.await().until(hasReceivedStreams());
     System.out.println("RECEIVED STREAMS ONE - LALALA");
     streamsReceived = false;
@@ -122,7 +122,7 @@ public class ManipulateEventsAndStreamsTest {
     testEvent.setClientData(DummyData.getClientdata());
 
     // create
-    eventsManager.createEvent(testEvent, eventsCallback);
+    eventsManager.create(testEvent, eventsCallback);
     Awaitility.await().until(hasEventsSuccess());
     eventsSuccess = false;
     System.out.println("RetrieveEventsTest: TEST EVENT CREATED ONE - LALALA");
@@ -134,7 +134,7 @@ public class ManipulateEventsAndStreamsTest {
     System.out.println("RetrieveEventsTest: TEST EVENT CREATED THREE - LALALA");
 
     // delete
-    eventsManager.deleteEvent(createdEvent, eventsCallback);
+    eventsManager.delete(createdEvent, eventsCallback);
     Awaitility.await().until(hasEventsSuccess());
     System.out.println("RetrieveEventsTest: TEST EVENT DELETED ONE - LALALA");
     eventsSuccess = false;
@@ -157,7 +157,7 @@ public class ManipulateEventsAndStreamsTest {
     System.out.println("### --- Create Stream phase --- ###");
 
     // create
-    streamsManager.createStream(testStream, streamsCallback);
+    streamsManager.create(testStream, streamsCallback);
     Awaitility.await().until(hasStreamsSuccess());
     System.out.println("first create success before, streamsSuccess set to: " + streamsSuccess);
     streamsSuccess = false;
@@ -177,7 +177,7 @@ public class ManipulateEventsAndStreamsTest {
     System.out.println("### --- Update Stream phase --- ###");
     String nameUpdate = "testStream name" + num + " updated - wooohooohoo";
     testStream.setName(nameUpdate);
-    streamsManager.updateStream(testStream, streamsCallback);
+    streamsManager.update(testStream, streamsCallback);
     Awaitility.await().until(hasStreamsSuccess());
     streamsSuccess = false;
     Awaitility.await().until(hasStreamsSuccess());
@@ -186,7 +186,7 @@ public class ManipulateEventsAndStreamsTest {
 
     // trash
     System.out.println("### --- Trash Stream phase --- ###");
-    streamsManager.deleteStream(testStream, false, streamsCallback);
+    streamsManager.delete(testStream, false, streamsCallback);
     Awaitility.await().until(hasStreamsSuccess());
     streamsSuccess = false;
     assertNotNull(testStream);
@@ -194,7 +194,7 @@ public class ManipulateEventsAndStreamsTest {
 
     // delete
     System.out.println("### --- Delete Stream phase --- ###");
-    streamsManager.deleteStream(testStream, false, streamsCallback);
+    streamsManager.delete(testStream, false, streamsCallback);
     Awaitility.await().until(hasStreamsSuccess());
     streamsSuccess = false;
     Awaitility.await().until(hasStreamsSuccess());
@@ -207,7 +207,7 @@ public class ManipulateEventsAndStreamsTest {
     Filter filter = new Filter();
     final int limit = 20;
     filter.setLimit(limit);
-    eventsManager.getEvents(filter, eventsCallback);
+    eventsManager.get(filter, eventsCallback);
     Awaitility.await().until(hasEvents());
 
     // get a streamId
@@ -220,7 +220,7 @@ public class ManipulateEventsAndStreamsTest {
     filter = new Filter();
     filter.addStreamId(streamId);
     System.out.println("Test: going for dem right EVENTZZZZZ");
-    eventsManager.getEvents(filter, eventsCallback);
+    eventsManager.get(filter, eventsCallback);
     Awaitility.await().until(hasFetchedRightEvents(streamId));
     eventsSuccess = false;
     assertFalse(eventsError);

@@ -11,4 +11,5 @@ package resources;
 public class TestCredentials {
   public final static String USERNAME = "javalib";
   public final static String TOKEN = "cimonutvu000b8257mwu801va";
+  public final static String DOMAIN = "pryv.li";
 }

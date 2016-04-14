@@ -1,15 +1,9 @@
-package com.pryv.api;
+package com.pryv.interfaces;
 
+import com.pryv.api.Filter;
 import com.pryv.api.model.Event;
 
-/**
- *
- * interface used by Connection, OnlineEventsAndStreamsManager and
- * CacheEventsAndStreamsManager to manipulate Events
- *
- * @author ik
- *
- */
+
 public interface EventsManager {
 
   /**
@@ -20,7 +14,7 @@ public interface EventsManager {
    * @param eventsCallback
    *          the callback for events retrieval
    */
-  void getEvents(Filter filter, EventsCallback eventsCallback);
+  void get(Filter filter, GetEventsCallback eventsCallback);
 
   /**
    * Create event
@@ -31,7 +25,7 @@ public interface EventsManager {
    *          the callback for events creation, notifies success or failure
    *
    */
-  void createEvent(Event newEvent, EventsCallback eventsCallback);
+  void create(Event newEvent, EventsCallback eventsCallback);
 
   /**
    * Delete Event
@@ -42,7 +36,7 @@ public interface EventsManager {
    *          the callback for events deletion, notifies success or failure
    *
    */
-  void deleteEvent(Event eventToDelete, EventsCallback eventsCallback);
+  void delete(Event eventToDelete, EventsCallback eventsCallback);
 
   /**
    * Update Event.
@@ -54,6 +48,6 @@ public interface EventsManager {
    *          the callback for events update, notifies success or failure
    *
    */
-  void updateEvent(Event eventToUpdate, EventsCallback eventsCallback);
+  void update(Event eventToUpdate, EventsCallback eventsCallback);
 
 }

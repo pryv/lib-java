@@ -35,7 +35,7 @@ public class PryvBackup {
    */
   public PryvBackup(Connection connection) {
     this.connection = connection;
-    backupFolderName = "backup/" + connection.getIdCaching() + "/";
+    backupFolderName = "backup/" + connection.generateCacheFolderName() + "/";
     new File(backupFolderName).mkdirs();
   }
 
