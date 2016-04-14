@@ -93,6 +93,37 @@ public class Utils {
      * @param received
      */
     public void checkStream(Stream expected, Stream received) {
+        if (expected != received) {
+            if (expected.getId() != null) {
+                assertEquals(expected.getId(), received.getId());
+            }
+            if (expected.getName() != null) {
+                assertEquals(expected.getName(), received.getName());
+            }
+            if (expected.getParentId() != null) {
+                assertEquals(expected.getParentId(), received.getParentId());
+            }
+            if (expected.getCreated() != null) {
+                assertEquals(expected.getCreated(), received.getCreated());
+            }
+            if (expected.getCreatedBy() != null) {
+                assertEquals(expected.getCreatedBy(), received.getCreatedBy());
+            }
+            if (expected.getModified() != null) {
+                assertEquals(expected.getModified(), received.getModified());
+            }
+            if (expected.getModifiedBy() != null) {
+                assertEquals(expected.getModifiedBy(), received.getModifiedBy());
+            }
+            if (expected.isTrashed() != null) {
+                assertEquals(expected.isTrashed(), received.isTrashed());
+            }
+            if (expected.isSingleActivity() != null) {
+                assertEquals(expected.isSingleActivity(), received.isSingleActivity());
+            }
+
+            // TODO add children and clientData comparison
+        }
 
     }
 }

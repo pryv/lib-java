@@ -461,7 +461,7 @@ public class SQLiteDBHelperTest {
     Stream retrievedStream = streams.get(newId);
     assertEquals(testedStream.getName(), retrievedStream.getName());
     assertEquals(testedStream.getParentId(), retrievedStream.getParentId());
-    assertEquals(testedStream.getSingleActivity(), retrievedStream.getSingleActivity());
+    assertEquals(testedStream.isSingleActivity(), retrievedStream.isSingleActivity());
     assertEquals(testedStream.formatClientDataAsString(),
       retrievedStream.formatClientDataAsString());
     boolean childrenMatch = false;

@@ -357,7 +357,7 @@ public class QueryGenerator {
     sb.append(formatTextValue(streamToCache.getId()) + ",");
     sb.append(formatTextValue(streamToCache.getName()) + ",");
     sb.append(formatTextValue(streamToCache.getParentId()) + ",");
-    sb.append(formatBooleanValue(streamToCache.getSingleActivity()) + ",");
+    sb.append(formatBooleanValue(streamToCache.isSingleActivity()) + ",");
     sb.append(formatTextValue(streamToCache.formatClientDataAsString()) + ",");
     sb.append(formatBooleanValue(streamToCache.isTrashed()) + ",");
     sb.append(formatDoubleValue(streamToCache.getCreated()) + ",");

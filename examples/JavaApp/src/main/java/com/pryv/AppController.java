@@ -348,7 +348,7 @@ public class AppController {
     }
     String childrenIDs = sb.toString();
     childrenLabel.setText(childrenIDs);
-    singleActivityLabel.setText(String.valueOf(stream.getSingleActivity()));
+    singleActivityLabel.setText(String.valueOf(stream.isSingleActivity()));
     clientDataLabel.setText(stream.formatClientDataAsString());
     createdLabel.setText(String.valueOf(stream.getCreated()));
     createdByLabel.setText(stream.getCreatedBy());

@@ -330,7 +330,7 @@ public class Stream {
     return parentId;
   }
 
-  public Boolean getSingleActivity() {
+  public Boolean isSingleActivity() {
     return singleActivity;
   }
 

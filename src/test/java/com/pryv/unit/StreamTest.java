@@ -49,7 +49,7 @@ public class StreamTest {
       assertTrue(baseStreamRef == streamToUpdate);
       assertTrue(streamToUpdate.getId().equals(testStream.getId()));
       assertTrue(streamToUpdate.getName().equals(testStream.getName()));
-      assertTrue(streamToUpdate.getSingleActivity() == testStream.getSingleActivity());
+      assertTrue(streamToUpdate.isSingleActivity() == testStream.isSingleActivity());
       assertFalse(streamToUpdate.getClientData() == testStream.getClientData());
       for (String key : testStream.getClientData().keySet()) {
         for (String key2 : streamToUpdate.getClientData().keySet()) {
@@ -114,7 +114,7 @@ public class StreamTest {
     assertEquals(DummyData.getStreamId(), pStream.getId());
     assertEquals(DummyData.getStreamName(), pStream.getName());
     assertEquals(null, pStream.getParentId());
-    assertEquals(DummyData.getStreamSingleActivity(), pStream.getSingleActivity());
+    assertEquals(DummyData.getStreamSingleActivity(), pStream.isSingleActivity());
     assertEquals(DummyData.getStreamClientData(), pStream.getClientData());
     for (Stream child : pStream.getChildren()) {
       assertEquals(DummyData.getStreamChildId(), child.getId());
