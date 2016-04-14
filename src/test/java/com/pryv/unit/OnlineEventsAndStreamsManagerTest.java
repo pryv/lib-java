@@ -37,11 +37,10 @@ import com.pryv.model.Stream;
  * Test of Online module methods
  *
  * @author ik
- *
  */
 public class OnlineEventsAndStreamsManagerTest {
 
-  private static OnlineEventsAndStreamsManager online;
+    private static OnlineEventsAndStreamsManager online;
 
     private static EventsCallback eventsCallback;
     private static GetEventsCallback getEventsCallback;
@@ -65,207 +64,206 @@ public class OnlineEventsAndStreamsManagerTest {
     private static boolean success = false;
     private static boolean error = false;
 
-  @BeforeClass
-  public static void setUp() throws Exception {
+    @BeforeClass
+    public static void setUp() throws Exception {
 
-    instanciateEventsCallback();
-    instanciateStreamsCallback();
+        instanciateEventsCallback();
+        instanciateStreamsCallback();
 
-    Pryv.setDomain("pryv.li");
-    String url = "https://" + TestCredentials.USERNAME + "." + Pryv.DOMAIN + "/";
+        String url = "https://" + TestCredentials.USERNAME + "." + Pryv.DOMAIN + "/";
 
-    online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
+        online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
 
-    testSupportStream = new Stream("onlineModuleStreamID", "javaLibTestSupportStream");
-    online.createStream(testSupportStream, streamsCallback);
-    Awaitility.await().until(hasResult());
-    assertFalse(error);
-    testSupportStream.merge(singleStream, false);
-    assertNotNull(testSupportStream.getId());
-  }
-
-  @AfterClass
-  public static void tearDown() throws Exception {
-    online.deleteStream(testSupportStream, false, streamsCallback);
-    Awaitility.await().until(hasResult());
-    success = false;
-    online.deleteStream(testSupportStream, false, streamsCallback);
-    Awaitility.await().until(hasResult());
-  }
-
-  @Before
-  public void beforeEachTest() throws Exception {
-    streams = null;
-    events = null;
-    success = false;
-    error = false;
-    singleEvent = null;
-    singleStream = null;
-  }
-
-  @Test
-  public void testFetchStreams() {
-    online.getStreams(null, getStreamsCallback);
-    Awaitility.await().until(hasResult());
-    assertNotNull(streams);
-    assertTrue(streams.size() > 0);
-  }
-
-  @Test
-  public void testFetchEventsWithEmptyFilter() {
-    online.getEvents(new Filter(), getEventsCallback);
-    Awaitility.await().until(hasResult());
-    assertNotNull(events);
-    assertTrue(events.size() > 0);
-  }
-
-  @Test
-  public void testFetchEventsForAStream() {
-    // create event
-    Event testEvent = new Event();
-    testEvent.setStreamId(testSupportStream.getId());
-    testEvent.setType("note/txt");
-    testEvent.setContent("this is a test Event. Please delete");
-    online.createEvent(testEvent, eventsCallback);
-    Awaitility.await().until(hasResult());
-    assertFalse(error);
-    success = false;
-
-    // create filter
-    Set<String> streamIds = new HashSet<String>();
-    streamIds.add(testSupportStream.getId());
-    Filter filter = new Filter();
-      filter.addStream(testSupportStream);
-
-    // fetch events
-    online.getEvents(filter, getEventsCallback);
-    Awaitility.await().until(hasResult());
-    assertFalse(error);
-    assertTrue(events.size() > 0);
-    for (Event event : events) {
-      assertEquals(event.getStreamId(), testSupportStream.getId());
+        testSupportStream = new Stream("onlineModuleStreamID", "javaLibTestSupportStream");
+        online.createStream(testSupportStream, streamsCallback);
+        Awaitility.await().until(hasResult());
+        assertFalse(error);
+        testSupportStream.merge(singleStream, false);
+        assertNotNull(testSupportStream.getId());
     }
-  }
 
-  @Test
-  public void testCreateUpdateAndDeleteEvent() {
+    @AfterClass
+    public static void tearDown() throws Exception {
+        online.deleteStream(testSupportStream, false, streamsCallback);
+        Awaitility.await().until(hasResult());
+        success = false;
+        online.deleteStream(testSupportStream, false, streamsCallback);
+        Awaitility.await().until(hasResult());
+    }
 
-    // create event
-    Event testEvent = new Event();
-    testEvent.setStreamId(testSupportStream.getId());
-    testEvent.setType("note/txt");
-    testEvent.setContent("this is the content");
-    online.createEvent(testEvent, eventsCallback);
-    Awaitility.await().until(hasResult());
-    assertFalse(error);
-    success = false;
-    assertNotNull(singleEvent);
-    assertNotNull(singleEvent.getId());
-    assertNotNull(singleEvent.getCreated());
-    assertNotNull(singleEvent.getCreatedBy());
-    assertNotNull(singleEvent.getModified());
-    assertNotNull(singleEvent.getModifiedBy());
+    @Before
+    public void beforeEachTest() throws Exception {
+        streams = null;
+        events = null;
+        success = false;
+        error = false;
+        singleEvent = null;
+        singleStream = null;
+    }
 
-    // update event
-    String newContent = "updated content";
-    singleEvent.setContent(newContent);
-    online.updateEvent(singleEvent, eventsCallback);
-    Awaitility.await().until(hasResult());
-    assertFalse(error);
-    success = false;
-    assertEquals(singleEvent.getContent(), newContent);
+    @Test
+    public void testFetchStreams() {
+        online.getStreams(null, getStreamsCallback);
+        Awaitility.await().until(hasResult());
+        assertNotNull(streams);
+        assertTrue(streams.size() > 0);
+    }
 
-    // delete event
-    online.deleteEvent(singleEvent, eventsCallback);
-    Awaitility.await().until(hasResult());
-    assertFalse(error);
-    success = false;
-    assertTrue(singleEvent.isTrashed());
-    online.deleteEvent(singleEvent, eventsCallback);
-    Awaitility.await().until(hasResult());
-    assertFalse(error);
-    assertNull(singleEvent);
-  }
+    @Test
+    public void testFetchEventsWithEmptyFilter() {
+        online.getEvents(new Filter(), getEventsCallback);
+        Awaitility.await().until(hasResult());
+        assertNotNull(events);
+        assertTrue(events.size() > 0);
+    }
 
-  @Test
-  public void testCreateUpdateAndDeleteStream() {
-    Stream testStream = new Stream(null, "onlineModuleTestStream");
+    @Test
+    public void testFetchEventsForAStream() {
+        // create event
+        Event testEvent = new Event();
+        testEvent.setStreamId(testSupportStream.getId());
+        testEvent.setType("note/txt");
+        testEvent.setContent("this is a test Event. Please delete");
+        online.createEvent(testEvent, eventsCallback);
+        Awaitility.await().until(hasResult());
+        assertFalse(error);
+        success = false;
 
-    // create
-    online.createStream(testStream, streamsCallback);
-    Awaitility.await().until(hasResult());
-    assertFalse(error);
-    success = false;
-    assertNotNull(singleStream);
-    assertNotNull(singleStream.getId());
-    assertNotNull(singleStream.getCreated());
-    assertNotNull(singleStream.getCreatedBy());
-    assertNotNull(singleStream.getModified());
-    assertNotNull(singleStream.getModifiedBy());
+        // create filter
+        Set<String> streamIds = new HashSet<String>();
+        streamIds.add(testSupportStream.getId());
+        Filter filter = new Filter();
+        filter.addStream(testSupportStream);
 
-    // update
-    String nameUpdate = "onlineModuleTestStreamNewName";
-    singleStream.setName(nameUpdate);
-    online.updateStream(singleStream, streamsCallback);
-    Awaitility.await().until(hasResult());
-    assertFalse(error);
-    success = false;
-    assertEquals(nameUpdate, singleStream.getName());
+        // fetch events
+        online.getEvents(filter, getEventsCallback);
+        Awaitility.await().until(hasResult());
+        assertFalse(error);
+        assertTrue(events.size() > 0);
+        for (Event event : events) {
+            assertEquals(event.getStreamId(), testSupportStream.getId());
+        }
+    }
 
-    // trash
-    online.deleteStream(singleStream, false, streamsCallback);
-    Awaitility.await().until(hasResult());
-    assertFalse(error);
-    success = false;
-    assertNotNull(singleStream);
-    assertTrue(singleStream.isTrashed());
+    @Test
+    public void testCreateUpdateAndDeleteEvent() {
 
-    // delete
-    online.deleteStream(singleStream, false, streamsCallback);
-    Awaitility.await().until(hasResult());
-    assertFalse(error);
-    assertNull(singleStream);
-  }
+        // create event
+        Event testEvent = new Event();
+        testEvent.setStreamId(testSupportStream.getId());
+        testEvent.setType("note/txt");
+        testEvent.setContent("this is the content");
+        online.createEvent(testEvent, eventsCallback);
+        Awaitility.await().until(hasResult());
+        assertFalse(error);
+        success = false;
+        assertNotNull(singleEvent);
+        assertNotNull(singleEvent.getId());
+        assertNotNull(singleEvent.getCreated());
+        assertNotNull(singleEvent.getCreatedBy());
+        assertNotNull(singleEvent.getModified());
+        assertNotNull(singleEvent.getModifiedBy());
+
+        // update event
+        String newContent = "updated content";
+        singleEvent.setContent(newContent);
+        online.updateEvent(singleEvent, eventsCallback);
+        Awaitility.await().until(hasResult());
+        assertFalse(error);
+        success = false;
+        assertEquals(singleEvent.getContent(), newContent);
+
+        // delete event
+        online.deleteEvent(singleEvent, eventsCallback);
+        Awaitility.await().until(hasResult());
+        assertFalse(error);
+        success = false;
+        assertTrue(singleEvent.isTrashed());
+        online.deleteEvent(singleEvent, eventsCallback);
+        Awaitility.await().until(hasResult());
+        assertFalse(error);
+        assertNull(singleEvent);
+    }
+
+    @Test
+    public void testCreateUpdateAndDeleteStream() {
+        Stream testStream = new Stream(null, "onlineModuleTestStream");
+
+        // create
+        online.createStream(testStream, streamsCallback);
+        Awaitility.await().until(hasResult());
+        assertFalse(error);
+        success = false;
+        assertNotNull(singleStream);
+        assertNotNull(singleStream.getId());
+        assertNotNull(singleStream.getCreated());
+        assertNotNull(singleStream.getCreatedBy());
+        assertNotNull(singleStream.getModified());
+        assertNotNull(singleStream.getModifiedBy());
+
+        // update
+        String nameUpdate = "onlineModuleTestStreamNewName";
+        singleStream.setName(nameUpdate);
+        online.updateStream(singleStream, streamsCallback);
+        Awaitility.await().until(hasResult());
+        assertFalse(error);
+        success = false;
+        assertEquals(nameUpdate, singleStream.getName());
+
+        // trash
+        online.deleteStream(singleStream, false, streamsCallback);
+        Awaitility.await().until(hasResult());
+        assertFalse(error);
+        success = false;
+        assertNotNull(singleStream);
+        assertTrue(singleStream.isTrashed());
+
+        // delete
+        online.deleteStream(singleStream, false, streamsCallback);
+        Awaitility.await().until(hasResult());
+        assertFalse(error);
+        assertNull(singleStream);
+    }
 
 
-  @Test
-  public void testCreateEventWithAttachment() {
-    // create attachment instance
-    Attachment attachment = new Attachment();
-    File attachmentFile = new File(getClass().getClassLoader().getResource("photo.PNG").getPath());
-    attachment.setFile(attachmentFile);
-    assertTrue(attachment.getFile().length() > 0);
-    attachment.setType("image/png");
-    attachment.setFileName(attachmentFile.getName());
+    @Test
+    public void testCreateEventWithAttachment() {
+        // create attachment instance
+        Attachment attachment = new Attachment();
+        File attachmentFile = new File(getClass().getClassLoader().getResource("photo.PNG").getPath());
+        attachment.setFile(attachmentFile);
+        assertTrue(attachment.getFile().length() > 0);
+        attachment.setType("image/png");
+        attachment.setFileName(attachmentFile.getName());
 
-    // create encapsulating event
-    Event eventWithAttachment = new Event();
-      eventWithAttachment.setStreamId(testSupportStream.getId());
-    eventWithAttachment.addAttachment(attachment);
-    eventWithAttachment.setStreamId(testSupportStream.getId());
-    eventWithAttachment.setType("picture/attached");
-    eventWithAttachment.setDescription("This is a test event with an image.");
+        // create encapsulating event
+        Event eventWithAttachment = new Event();
+        eventWithAttachment.setStreamId(testSupportStream.getId());
+        eventWithAttachment.addAttachment(attachment);
+        eventWithAttachment.setStreamId(testSupportStream.getId());
+        eventWithAttachment.setType("picture/attached");
+        eventWithAttachment.setDescription("This is a test event with an image.");
 
-    // create event with attachment
-    online.createEventWithAttachment(eventWithAttachment, eventsCallback);
-    Awaitility.await().until(hasResult());
-    assertFalse(error);
-    assertNotNull(singleEvent);
-    assertNotNull(singleEvent.getAttachments());
-    assertEquals(singleEvent.getAttachments().size(), 1);
-    Attachment createdAttachment = singleEvent.getFirstAttachment();
-    assertNotNull(createdAttachment.getId());
-  }
+        // create event with attachment
+        online.createEventWithAttachment(eventWithAttachment, eventsCallback);
+        Awaitility.await().until(hasResult());
+        assertFalse(error);
+        assertNotNull(singleEvent);
+        assertNotNull(singleEvent.getAttachments());
+        assertEquals(singleEvent.getAttachments().size(), 1);
+        Attachment createdAttachment = singleEvent.getFirstAttachment();
+        assertNotNull(createdAttachment.getId());
+    }
 
-  private static Callable<Boolean> hasResult() {
-    return new Callable<Boolean>() {
+    private static Callable<Boolean> hasResult() {
+        return new Callable<Boolean>() {
 
-      @Override
-      public Boolean call() throws Exception {
-        return (success || error);
-      }
-    };
-  }
+            @Override
+            public Boolean call() throws Exception {
+                return (success || error);
+            }
+        };
+    }
 
     private static void instanciateGetEventsCallback() {
         getEventsCallback = new GetEventsCallback() {
