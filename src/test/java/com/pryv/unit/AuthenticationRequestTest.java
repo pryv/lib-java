@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.pryv.Pryv;
-import com.pryv.api.model.Permission;
+import com.pryv.model.Permission;
 import com.pryv.auth.AuthenticationRequest;
 
 /**

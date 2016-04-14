@@ -13,8 +13,8 @@ import org.junit.Test;
 import com.pryv.api.Filter;
 import com.pryv.api.Filter.State;
 import com.pryv.api.StreamsSupervisor;
-import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
+import Event;
+import Stream;
 
 */
 /**

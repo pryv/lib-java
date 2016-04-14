@@ -1,4 +1,4 @@
-package com.pryv.api.model;
+package com.pryv.model;
 
 import java.lang.ref.WeakReference;
 import java.sql.ResultSet;

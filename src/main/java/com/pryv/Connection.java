@@ -4,7 +4,7 @@ import com.pryv.api.Filter;
 import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.database.SQLiteDBHelper;
-import com.pryv.api.model.Stream;
+import com.pryv.model.Stream;
 import com.pryv.connection.ConnectionAccesses;
 import com.pryv.connection.ConnectionAccount;
 import com.pryv.connection.ConnectionEvents;

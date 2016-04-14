@@ -8,7 +8,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
-import com.pryv.api.model.Stream;
+import com.pryv.model.Stream;
 import com.pryv.utils.Logger;
 
 /**

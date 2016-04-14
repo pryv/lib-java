@@ -9,12 +9,11 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.pryv.api.model.Attachment;
+import com.pryv.model.Attachment;
 import com.pryv.utils.JsonConverter;
 
 /**

@@ -16,8 +16,8 @@ import com.pryv.callbacks.StreamsCallback;
 import com.pryv.callbacks.StreamsManager;
 import com.pryv.api.StreamsSupervisor;
 import com.pryv.api.database.DBinitCallback;
-import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
+import Event;
+import Stream;
 import com.pryv.utils.Logger;
 
 */

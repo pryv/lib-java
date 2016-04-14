@@ -11,7 +11,7 @@ import android.view.View;
 import android.webkit.WebView;
 
 import com.pryv.Pryv;
-import com.pryv.api.model.Permission;
+import com.pryv.model.Permission;
 import com.pryv.auth.AuthController;
 import com.pryv.auth.AuthControllerImpl;
 import com.pryv.auth.AuthView;

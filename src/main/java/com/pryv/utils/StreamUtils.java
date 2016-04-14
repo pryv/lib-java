@@ -3,7 +3,7 @@ package com.pryv.utils;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.pryv.api.model.Stream;
+import com.pryv.model.Stream;
 
 /**
  * utilitary functions for Streams manipulation

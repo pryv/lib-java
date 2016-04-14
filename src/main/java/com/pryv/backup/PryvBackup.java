@@ -10,8 +10,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.pryv.Connection;
-import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
+import com.pryv.model.Event;
+import com.pryv.model.Stream;
 
 /**
  * Class used to save and extract Pryv data on local file system

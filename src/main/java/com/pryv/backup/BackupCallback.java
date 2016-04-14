@@ -2,8 +2,8 @@ package com.pryv.backup;
 
 import java.util.Map;
 
-import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
+import com.pryv.model.Event;
+import com.pryv.model.Stream;
 
 /**
  * callback methods for results of backup operations using PryvBackup.

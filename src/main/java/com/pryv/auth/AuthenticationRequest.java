@@ -3,7 +3,7 @@ package com.pryv.auth;
 import java.util.List;
 
 import com.pryv.Pryv;
-import com.pryv.api.model.Permission;
+import com.pryv.model.Permission;
 
 /**
  *

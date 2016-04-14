@@ -10,8 +10,8 @@ import com.pryv.ConnectionOld;
 import com.pryv.Pryv;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.database.SQLiteDBHelper;
-import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
+import Event;
+import Stream;
 import com.pryv.callbacks.EventsManager;
 import com.pryv.utils.Logger;
 

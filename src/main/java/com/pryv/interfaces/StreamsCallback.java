@@ -1,6 +1,6 @@
 package com.pryv.interfaces;
 
-import com.pryv.api.model.Stream;
+import com.pryv.model.Stream;
 
 /**
  *

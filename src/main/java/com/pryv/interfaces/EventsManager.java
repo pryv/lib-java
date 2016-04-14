@@ -1,7 +1,7 @@
 package com.pryv.interfaces;
 
 import com.pryv.api.Filter;
-import com.pryv.api.model.Event;
+import com.pryv.model.Event;
 
 
 public interface EventsManager {

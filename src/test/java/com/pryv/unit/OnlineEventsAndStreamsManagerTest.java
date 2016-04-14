@@ -28,9 +28,9 @@ import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
-import com.pryv.api.model.Attachment;
-import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
+import com.pryv.model.Attachment;
+import com.pryv.model.Event;
+import com.pryv.model.Stream;
 
 /**
  * Test of Online module methods

@@ -3,8 +3,8 @@ package com.pryv.api;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
+import com.pryv.model.Event;
+import com.pryv.model.Stream;
 
 /**
  * Filter used in Events fetching. All its fields are optional. Either

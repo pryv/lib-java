@@ -1,4 +1,4 @@
-package com.pryv.api.model;
+package com.pryv.model;
 
 import java.io.File;
 

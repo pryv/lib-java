@@ -13,9 +13,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pryv.api.model.Attachment;
-import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
+import com.pryv.model.Attachment;
+import com.pryv.model.Event;
+import com.pryv.model.Stream;
 import com.rits.cloning.Cloner;
 
 /**

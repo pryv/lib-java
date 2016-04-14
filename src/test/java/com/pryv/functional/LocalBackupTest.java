@@ -21,8 +21,8 @@ import com.pryv.ConnectionOld;
 import com.pryv.Pryv;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.api.database.DBinitCallback;
-import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
+import Event;
+import Stream;
 import com.pryv.backup.BackupCallback;
 import com.pryv.backup.PryvBackup;
 

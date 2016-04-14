@@ -4,13 +4,10 @@ package com.pryv.connection;
 import com.pryv.api.Filter;
 import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.api.database.SQLiteDBHelper;
-import com.pryv.api.model.Stream;
+import com.pryv.model.Stream;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsManager;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionStreams implements StreamsManager {
 

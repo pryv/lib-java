@@ -16,8 +16,8 @@ import com.pryv.api.EventsCallback;
 import com.pryv.api.EventsSupervisor;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.api.StreamsSupervisor;
-import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
+import Event;
+import Stream;
 import com.pryv.unit.DummyData;
 import com.pryv.utils.Logger;
 

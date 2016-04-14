@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pryv.api.model.Permission;
+import com.pryv.model.Permission;
 import com.pryv.utils.JsonConverter;
 
 /**

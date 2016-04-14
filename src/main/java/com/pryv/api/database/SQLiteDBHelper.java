@@ -23,8 +23,8 @@ import com.pryv.interfaces.EventsCallback;
 import com.pryv.api.Filter;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
-import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
+import com.pryv.model.Event;
+import com.pryv.model.Stream;
 import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.utils.Logger;
 

@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
+import Event;
+import Stream;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.utils.Logger;
 

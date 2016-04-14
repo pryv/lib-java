@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.pryv.api.model.Event;
+import Event;
 import com.pryv.utils.JsonConverter;
 import com.pryv.utils.Logger;
 

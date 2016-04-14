@@ -1,4 +1,4 @@
-package com.pryv.api.model;
+package com.pryv.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize.Inclusion;

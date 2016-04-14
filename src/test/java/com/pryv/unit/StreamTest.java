@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.pryv.api.model.Stream;
+import com.pryv.model.Stream;
 import com.pryv.utils.JsonConverter;
 
 /**

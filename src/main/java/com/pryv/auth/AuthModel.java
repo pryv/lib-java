@@ -7,7 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.pryv.Pryv;
-import com.pryv.api.model.Permission;
+import com.pryv.model.Permission;
 import com.pryv.utils.JsonConverter;
 import com.pryv.utils.Logger;
 import okhttp3.MediaType;

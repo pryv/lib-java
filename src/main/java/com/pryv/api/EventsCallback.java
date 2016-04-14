@@ -3,7 +3,7 @@ package com.pryv.api;
 
 import java.util.Map;
 
-import com.pryv.api.model.Event;
+import Event;
 
 */
 /**

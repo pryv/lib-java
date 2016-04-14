@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.pryv.Connection;
-import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
+import com.pryv.model.Event;
+import com.pryv.model.Stream;
 import com.pryv.interfaces.EventsCallback;
 import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.interfaces.GetStreamsCallback;

@@ -7,10 +7,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.pryv.api.Filter;
-import com.pryv.api.model.Attachment;
-import com.pryv.api.model.Event;
-import com.pryv.api.model.Stream;
+import com.pryv.model.Attachment;
+import com.pryv.model.Event;
+import com.pryv.model.Stream;
 import com.pryv.utils.JsonConverter;
 
 /**
