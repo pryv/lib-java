@@ -97,14 +97,15 @@ public class FilterTest {
     testFilter.setRunning(false);
     testFilter.setSkip(0);
     testFilter.setSortAscending(false);
-    testFilter.addStream(new Stream("sid", "myTestStreamName"));
+    testFilter.addStream(new Stream("testStreamId", "myTestStreamName"));
     testFilter.addTag("tag");
     testFilter.setToTime(200.0);
     testFilter.addType("unit");
     testFilter.setState(State.ALL);
     String urlFormat =
       "&fromTime=100.0&toTime=200.0&streams[]=testStreamId&tags[]=tag&types[]=unit&running=false&sortAscending=false&skip=0&limit=100&state=ALL&modifiedSince=150.0";
-    System.out.println("expecting");
+    System.out.println("expecting:\t\t" + urlFormat);
+    System.out.println("received:\t\t" + testFilter.toUrlParameters());
     assertEquals(urlFormat, testFilter.toUrlParameters());
   }
 
