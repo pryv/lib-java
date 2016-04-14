@@ -11,7 +11,7 @@ import com.pryv.api.CacheEventsAndStreamsManager;
 import com.pryv.api.EventsCallback;
 import com.pryv.callbacks.EventsManager;
 import com.pryv.api.EventsSupervisor;
-import com.pryv.api.Filter;
+import com.pryv.Filter;
 import com.pryv.callbacks.StreamsCallback;
 import com.pryv.callbacks.StreamsManager;
 import com.pryv.api.StreamsSupervisor;

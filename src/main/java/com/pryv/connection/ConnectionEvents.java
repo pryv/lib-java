@@ -2,7 +2,7 @@ package com.pryv.connection;
 
 import com.pryv.api.database.SQLiteDBHelper;
 import com.pryv.interfaces.EventsManager;
-import com.pryv.api.Filter;
+import com.pryv.Filter;
 import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.model.Event;
 import com.pryv.interfaces.GetEventsCallback;

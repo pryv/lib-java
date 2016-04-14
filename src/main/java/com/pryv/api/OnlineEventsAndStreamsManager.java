@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.pryv.Connection;
+import com.pryv.Filter;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
 import com.pryv.interfaces.EventsCallback;
@@ -415,7 +416,6 @@ public class OnlineEventsAndStreamsManager {
                     case CREATE_EVENT:
                         String stoppedId = JsonConverter.retrieveStoppedIdFromJson(responseBody);
                         Event createdEvent = JsonConverter.retrieveEventFromJson(responseBody);
-                        System.out.println("just before: assigning dis clientId: " + event.getClientId());
                         createdEvent.setClientId(event.getClientId());
                         createdEvent.assignConnection(weakConnection);
                         Event.createOrReuse(createdEvent);
@@ -505,7 +505,6 @@ public class OnlineEventsAndStreamsManager {
                                     JsonConverter.retrieveDeletedStreamId(responseBody), null, serverTime);
                         } else {
                             // stream was trashed, forward as an update to callback
-                            System.out.println("responseBody: " + responseBody);
                             Stream trashedStream = JsonConverter.retrieveStreamFromJson(responseBody);
                             trashedStream.assignConnection(weakConnection);
                             onlineStreamsCallback.onApiSuccess(
@@ -519,7 +518,7 @@ public class OnlineEventsAndStreamsManager {
                 }
 
             } else {
-                System.out.println("Online: issue in responseHandler");
+                logger.log("Online: issue in responseHandler");
                 if (stream != null) {
                     onlineStreamsCallback.onApiError(responseBody, serverTime);
                 } else {

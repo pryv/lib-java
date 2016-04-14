@@ -23,7 +23,7 @@ import resources.TestCredentials;
 import com.jayway.awaitility.Awaitility;
 import com.pryv.Pryv;
 import com.pryv.interfaces.EventsCallback;
-import com.pryv.api.Filter;
+import com.pryv.Filter;
 import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.interfaces.GetStreamsCallback;

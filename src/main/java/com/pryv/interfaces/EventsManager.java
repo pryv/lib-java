@@ -1,6 +1,6 @@
 package com.pryv.interfaces;
 
-import com.pryv.api.Filter;
+import com.pryv.Filter;
 import com.pryv.model.Event;
 
 

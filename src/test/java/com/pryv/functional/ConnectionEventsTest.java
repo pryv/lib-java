@@ -3,7 +3,7 @@ package com.pryv.functional;
 import com.jayway.awaitility.Awaitility;
 import com.pryv.Connection;
 import com.pryv.interfaces.EventsCallback;
-import com.pryv.api.Filter;
+import com.pryv.Filter;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.api.database.DBinitCallback;

@@ -22,7 +22,7 @@ import com.pryv.ConnectionOld;
 import com.pryv.Pryv;
 import com.pryv.api.EventsCallback;
 import com.pryv.interfaces.EventsManager;
-import com.pryv.api.Filter;
+import com.pryv.Filter;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.interfaces.StreamsManager;
 import com.pryv.api.database.DBinitCallback;

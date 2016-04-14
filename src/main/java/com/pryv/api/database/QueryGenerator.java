@@ -3,7 +3,7 @@ package com.pryv.api.database;
 import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.pryv.api.Filter;
+import com.pryv.Filter;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
 import com.pryv.utils.JsonConverter;

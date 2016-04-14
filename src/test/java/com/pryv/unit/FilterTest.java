@@ -1,4 +1,3 @@
-/*
 package com.pryv.unit;
 
 import static org.junit.Assert.assertEquals;
@@ -10,19 +9,17 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import com.pryv.api.Filter;
-import com.pryv.api.Filter.State;
-import com.pryv.api.StreamsSupervisor;
-import Event;
-import Stream;
+import com.pryv.Filter;
+import com.pryv.Filter.State;
+import com.pryv.model.Event;
+import com.pryv.model.Stream;
 
-*/
 /**
  * class used to test the Filter class's methods
  *
  * @author ik
- *
- *//*
+ */
+
 
 public class FilterTest {
 
@@ -30,7 +27,7 @@ public class FilterTest {
   public void testContructor() {
     Double from = 0.0;
     Double to = 100.0;
-    Set<String> streamIds = new HashSet<String>();
+    Set<Stream> streams = new HashSet<Stream>();
     Set<String> tags = new HashSet<String>();
     Set<String> types = new HashSet<String>();
     Boolean running = false;
@@ -40,11 +37,11 @@ public class FilterTest {
     State state = State.DEFAULT;
     Double modifiedSince = 50.0;
     Filter filter =
-      new Filter(from, to, streamIds, tags, types, running, sortAscending, skip, limit, state,
+      new Filter(from, to, streams, tags, types, running, sortAscending, skip, limit, state,
         modifiedSince);
     assertEquals(from, filter.getFromTime());
     assertEquals(to, filter.getToTime());
-    assertEquals(streamIds, filter.getStreamIds());
+    assertEquals(streams, filter.getStreamIds());
     assertEquals(tags, filter.getTags());
     assertEquals(types, filter.getTypes());
     assertEquals(running, filter.getRunning());
@@ -64,23 +61,23 @@ public class FilterTest {
     unmatchingFilter.setRunning(false);
     unmatchingFilter.setSkip(0);
     unmatchingFilter.setSortAscending(false);
-    unmatchingFilter.addStreamId("wrongStreamId");
+    unmatchingFilter.addStream(new Stream("wrongStreamId", "wrongStreamName"));
     unmatchingFilter.addTag("wrongTag");
     unmatchingFilter.setToTime(200.0);
     unmatchingFilter.addType("wrongType");
     unmatchingFilter.setState(State.TRASHED);
 
     Filter matchingFilter = new Filter();
-    matchingFilter.addStreamId("testStreamId");
-    String rightStreamId = "testStreamId";
+    matchingFilter.addStream(new Stream("testStreamId", "someStreamName"));
+    Stream rightStream = new Stream("testStreamId","rightStreamName");
     String rightTag = "tag";
     String rightType = "type";
-    matchingFilter.addStreamId(rightStreamId);
+    matchingFilter.addStream(rightStream);
     matchingFilter.addTag(rightTag);
     matchingFilter.addType(rightType);
 
     Event testEvent = new Event();
-    testEvent.setStreamId(rightStreamId);
+    testEvent.setStreamId(rightStream.getId());
     testEvent.setType(rightType);
     testEvent.setContent("testContent");
     testEvent.setTime(125.0);
@@ -100,19 +97,20 @@ public class FilterTest {
     testFilter.setRunning(false);
     testFilter.setSkip(0);
     testFilter.setSortAscending(false);
-    testFilter.addStreamId("testStreamId");
+    testFilter.addStream(new Stream("sid", "myTestStreamName"));
     testFilter.addTag("tag");
     testFilter.setToTime(200.0);
     testFilter.addType("unit");
     testFilter.setState(State.ALL);
     String urlFormat =
       "&fromTime=100.0&toTime=200.0&streams[]=testStreamId&tags[]=tag&types[]=unit&running=false&sortAscending=false&skip=0&limit=100&state=ALL&modifiedSince=150.0";
+    System.out.println("expecting");
     assertEquals(urlFormat, testFilter.toUrlParameters());
   }
 
   @Test
   public void testAreStreamIdsContainedInScope() {
-    StreamsSupervisor supervisor = new StreamsSupervisor();
+    /*StreamsSupervisor supervisor = new StreamsSupervisor();
     Stream parent = new Stream("parentId", "parent");
     Stream child = new Stream("childId", "child");
     parent.addChildStream(child);
@@ -131,8 +129,7 @@ public class FilterTest {
     supervisor.updateOrCreateStream(other, null);
     scope.clear();
     scope.add(other.getId());
-    assertFalse(testFilter.areStreamIdsContainedInScope(scope, supervisor));
+    assertFalse(testFilter.areStreamIdsContainedInScope(scope, supervisor));*/
   }
 
 }
-*/

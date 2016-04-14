@@ -1,6 +1,5 @@
 package com.pryv;
 
-import com.pryv.api.Filter;
 import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.api.database.DBinitCallback;
 import com.pryv.api.database.SQLiteDBHelper;

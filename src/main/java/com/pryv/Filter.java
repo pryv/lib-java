@@ -1,4 +1,4 @@
-package com.pryv.api;
+package com.pryv;
 
 import java.util.HashSet;
 import java.util.Set;
