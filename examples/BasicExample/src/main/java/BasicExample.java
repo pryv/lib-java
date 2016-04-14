@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.pryv.ConnectionOld;
+import com.pryv.Connection;
 import com.pryv.api.EventsCallback;
 import com.pryv.interfaces.EventsManager;
 import com.pryv.Filter;
@@ -27,9 +27,7 @@ import com.pryv.utils.Logger;
  */
 public class BasicExample implements AuthView, EventsCallback, StreamsCallback {
 
-  private EventsManager eventsManager;
-  private StreamsManager streamsManager;
-  private Map<String, Event> events;
+  private List<Event> events;
   private Map<String, Stream> streams;
 
   public static void main(String[] args) {
@@ -75,7 +73,7 @@ public class BasicExample implements AuthView, EventsCallback, StreamsCallback {
 
     // instanciate ConnectionOld object - used to access Streams and Events data
     // (through EventsManager and StreamsManager interfaces)
-    ConnectionOld connection = new ConnectionOld(userID, accessToken, new DBinitCallback() {
+    Connection connection = new Connection(userID, accessToken, new DBinitCallback() {
       @Override
       public void onError(String message) {
         System.out.println(message);
