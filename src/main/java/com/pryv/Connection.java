@@ -94,7 +94,7 @@ public class Connection {
             cacheScope = new Filter();
             String cacheFolder = "cache/" + generateCacheFolderName() + "/";
             new File(cacheFolder).mkdirs();
-            cache = new SQLiteDBHelper(cacheFolder, weakConnection, dBinitCallback);
+            cache = new SQLiteDBHelper(cacheScope, cacheFolder, api, weakConnection, dBinitCallback);
         }
 
         this.accesses = new ConnectionAccesses();

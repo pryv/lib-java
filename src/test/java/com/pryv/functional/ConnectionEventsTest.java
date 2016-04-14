@@ -70,12 +70,7 @@ public class ConnectionEventsTest {
 
         connection =
                 new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, TestCredentials.DOMAIN,
-                        new DBinitCallback() {
-                    @Override
-                    public void onError(String message) {
-                        System.out.println("DB init Error: " + message);
-                    }
-                });
+                        new DBinitCallback());
 
         connection.setupCacheScope(new Filter());
 

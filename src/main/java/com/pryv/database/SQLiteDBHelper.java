@@ -19,10 +19,12 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.pryv.Pryv;
+import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.interfaces.EventsCallback;
 import com.pryv.Filter;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
+import com.pryv.interfaces.UpdateCacheCallback;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
 import com.pryv.interfaces.GetEventsCallback;
@@ -41,11 +43,15 @@ public class SQLiteDBHelper {
 
   private final String initDBerrorMessage = "Database initialization error: ";
 
-  // the DB ConnectionOld
+  // the DB Connection
   private Connection dbConnection;
 
-  // weak reference to Pryv's ConnectionOld
+  // weak reference to Pryv's Connection
   private WeakReference<com.pryv.Connection> weakConnection;
+
+  private Filter scope;
+  private OnlineEventsAndStreamsManager api;
+  private Double lastUpdate;
 
   private Logger logger = Logger.getInstance();
 
@@ -53,16 +59,20 @@ public class SQLiteDBHelper {
    * SQLiteDBHelper constructor. Creates and Connects to the SQLite database
    * located in ./sqlite-db/name. Creates the tables if required.
    *
-   * @param cacheFolder
+   * @param cacheFolderPath
    *          the path to the caching folder
+   * @param weakConnection
    * @param initCallback
    *          callback to notify failure
    */
-  public SQLiteDBHelper(String cacheFolder, WeakReference<com.pryv.Connection> weakConnection,
-    DBinitCallback initCallback) {
+  public SQLiteDBHelper(Filter scope, String cacheFolderPath, OnlineEventsAndStreamsManager api,
+                        WeakReference<com.pryv.Connection> weakConnection,
+                        DBinitCallback initCallback) {
+    this.scope = scope;
+    this.api = api;
     this.weakConnection = weakConnection;
-    logger.log("SQLiteDBHelper: init DB in: " + cacheFolder + Pryv.DATABASE_NAME);
-    initDB(cacheFolder + Pryv.DATABASE_NAME, initCallback);
+    logger.log("SQLiteDBHelper: init DB in: " + cacheFolderPath + Pryv.DATABASE_NAME);
+    initDB(cacheFolderPath + Pryv.DATABASE_NAME, initCallback);
   }
 
   /**
@@ -85,9 +95,49 @@ public class SQLiteDBHelper {
     }
 
   }
-  
-  public void update() {
-    
+
+  /**
+   * method used to update the cache with data obtained from the Pryv online API
+   *
+   * @param updateCacheCallback
+   */
+  public void update(final UpdateCacheCallback updateCacheCallback) {
+    Filter filter = new Filter();
+    filter.setIncludeDeletions(true);
+    filter.setModifiedSince(lastUpdate);
+    if (scope != null && scope.getStreams() != null) {
+      for (Stream scopeStream : scope.getStreams()) {
+        filter.addStream(scopeStream);
+      }
+    }
+    api.getEvents(filter, new GetEventsCallback() {
+
+      @Override
+      public void cacheCallback(List<Event> events, Map<String, Double> eventDeletions) {}
+
+      @Override
+      public void onCacheError(String errorMessage) {}
+
+      @Override
+      public void apiCallback(List<Event> events, Map<String, Double> eventDeletions, Double serverTime) {
+        /*for (Event event: events) {
+
+        }
+
+        for (String deletionId: eventDeletions.keySet()) {
+
+        }*/
+
+        updateCacheCallback.apiCallback(null, null, null, null, serverTime);
+
+
+      }
+
+      @Override
+      public void onApiError(String errorMessage, Double serverTime) {
+        updateCacheCallback.onError(errorMessage, serverTime);
+      }
+    });
   }
 
   /**

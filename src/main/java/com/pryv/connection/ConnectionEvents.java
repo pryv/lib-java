@@ -7,9 +7,13 @@ import com.pryv.database.SQLiteDBHelper;
 import com.pryv.interfaces.EventsCallback;
 import com.pryv.interfaces.EventsManager;
 import com.pryv.interfaces.GetEventsCallback;
+import com.pryv.interfaces.UpdateCacheCallback;
 import com.pryv.model.Event;
+import com.pryv.model.Stream;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
+import java.util.Map;
 
 public class ConnectionEvents implements EventsManager {
 
@@ -32,7 +36,7 @@ public class ConnectionEvents implements EventsManager {
             // to execute in separate Thread
             // can be launched separately since write is not done until all reads are finished.
 
-            cache.update();
+            cache.update(updateCacheCallback);
         }
         api.getEvents(filter, eventsCallback);
 
@@ -46,7 +50,7 @@ public class ConnectionEvents implements EventsManager {
         if (cacheScope == null || cacheScope.hasInScope(newEvent)) {
             cache.createEvent(newEvent, eventsCallback);
 
-            cache.update();
+            cache.update(updateCacheCallback);
         }
         api.createEvent(newEvent, eventsCallback);
 
@@ -57,7 +61,7 @@ public class ConnectionEvents implements EventsManager {
         if (cacheScope.hasInScope(eventToDelete)) {
             cache.deleteEvent(eventToDelete, eventsCallback);
 
-            cache.update();
+            cache.update(updateCacheCallback);
         }
         api.deleteEvent(eventToDelete, eventsCallback);
 
@@ -68,7 +72,7 @@ public class ConnectionEvents implements EventsManager {
         if (cacheScope == null || cacheScope.hasInScope(eventToUpdate)) {
             cache.updateEvent(eventToUpdate, eventsCallback);
 
-            cache.update();
+            cache.update(updateCacheCallback);
         }
         api.deleteEvent(eventToUpdate, eventsCallback);
 
@@ -77,5 +81,19 @@ public class ConnectionEvents implements EventsManager {
     public void setCacheScope(Filter scope) {
         this.cacheScope = scope;
     }
+
+    private UpdateCacheCallback updateCacheCallback = new UpdateCacheCallback() {
+        @Override
+        public void apiCallback(List<Event> events, Map<String, Double> eventDeletions,
+                                Map<String, Stream> streams, Map<String, Double> streamDeletions,
+                                Double serverTime) {
+
+        }
+
+        @Override
+        public void onError(String errorMessage, Double serverTime) {
+
+        }
+    };
 
 }

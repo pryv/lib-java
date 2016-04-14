@@ -7,7 +7,7 @@ import com.pryv.utils.Logger;
 
 /**
  *
- * High-level used to Authenticate the user. Upon success, provides a ConnectionOld
+ * High-level used to Authenticate the user. Upon success, provides a Connection
  * with the appropriate username and token.
  *
  * @author ik
@@ -59,7 +59,7 @@ public class AuthController {
 
 	public void onSuccess(String username, String token) {
 		view.onAuthSuccess(username, token);
-		// acquire ref to new ConnectionOld, instanciated
+		// acquire ref to new Connection, instanciated
 	}
 
 	public void onError(String message) {

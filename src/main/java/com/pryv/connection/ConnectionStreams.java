@@ -5,12 +5,15 @@ import com.pryv.Connection;
 import com.pryv.Filter;
 import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.database.SQLiteDBHelper;
+import com.pryv.interfaces.UpdateCacheCallback;
+import com.pryv.model.Event;
 import com.pryv.model.Stream;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsManager;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.Map;
 
 public class ConnectionStreams implements StreamsManager {
@@ -34,7 +37,7 @@ public class ConnectionStreams implements StreamsManager {
             // to execute in separate Thread
             // can be launched separately since write is not done until all reads are finished.
 
-            cache.update();
+            cache.update(updateCacheCallback);
         }
 
         api.getStreams(filter, new RootStreamsUpdater(getStreamsCallback));
@@ -45,7 +48,7 @@ public class ConnectionStreams implements StreamsManager {
         if (cacheScope == null || cacheScope.hasInScope(newStream.getId())) {
             cache.updateOrCreateStream(newStream, StreamsCallback);
 
-            cache.update();
+            cache.update(updateCacheCallback);
         }
 
         api.createStream(newStream, StreamsCallback);
@@ -56,7 +59,7 @@ public class ConnectionStreams implements StreamsManager {
         if (cacheScope == null || cacheScope.hasInScope(streamToDelete.getId())) {
             cache.deleteStream(streamToDelete, mergeEventsWithParent, streamsCallback);
 
-            cache.update();
+            cache.update(updateCacheCallback);
         }
         api.deleteStream(streamToDelete, mergeEventsWithParent, streamsCallback);
 
@@ -67,7 +70,7 @@ public class ConnectionStreams implements StreamsManager {
         if (cacheScope == null || cacheScope.hasInScope(streamToUpdate.getId())) {
             cache.updateOrCreateStream(streamToUpdate, streamsCallback);
 
-            cache.update();
+            cache.update(updateCacheCallback);
         }
         api.updateStream(streamToUpdate, streamsCallback);
 
@@ -108,4 +111,18 @@ public class ConnectionStreams implements StreamsManager {
             getStreamsCallback.onApiError(errorMessage, serverTime);
         }
     }
+
+    private UpdateCacheCallback updateCacheCallback = new UpdateCacheCallback() {
+        @Override
+        public void apiCallback(List<Event> events, Map<String, Double> eventDeletions,
+                                Map<String, Stream> streams, Map<String, Double> streamDeletions,
+                                Double serverTime) {
+
+        }
+
+        @Override
+        public void onError(String errorMessage, Double serverTime) {
+
+        }
+    };
 }
