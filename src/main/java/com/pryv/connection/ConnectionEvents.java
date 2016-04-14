@@ -1,5 +1,6 @@
 package com.pryv.connection;
 
+import com.pryv.Connection;
 import com.pryv.Filter;
 import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.database.SQLiteDBHelper;
@@ -8,13 +9,17 @@ import com.pryv.interfaces.EventsManager;
 import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.model.Event;
 
+import java.lang.ref.WeakReference;
+
 public class ConnectionEvents implements EventsManager {
 
+    private WeakReference<Connection> connection;
     private OnlineEventsAndStreamsManager api;
     private Filter cacheScope;
     private SQLiteDBHelper cache;
 
-    public ConnectionEvents(OnlineEventsAndStreamsManager api, Filter cacheScope, SQLiteDBHelper cache) {
+    public ConnectionEvents(WeakReference<Connection> connection, OnlineEventsAndStreamsManager api, Filter cacheScope, SQLiteDBHelper cache) {
+        this.connection = connection;
         this.api = api;
         this.cacheScope = cacheScope;
         this.cache = cache;
@@ -38,7 +43,7 @@ public class ConnectionEvents implements EventsManager {
         if (newEvent.getClientId() == null) {
             newEvent.generateClientId();
         }
-        if (cacheScope.hasInScope(newEvent)) {
+        if (cacheScope == null || cacheScope.hasInScope(newEvent)) {
             cache.createEvent(newEvent, eventsCallback);
 
             cache.update();
@@ -60,7 +65,7 @@ public class ConnectionEvents implements EventsManager {
 
     @Override
     public void update(final Event eventToUpdate, final EventsCallback eventsCallback) {
-        if (cacheScope.hasInScope(eventToUpdate)) {
+        if (cacheScope == null || cacheScope.hasInScope(eventToUpdate)) {
             cache.updateEvent(eventToUpdate, eventsCallback);
 
             cache.update();

@@ -58,11 +58,11 @@ public class Connection {
 
     private Logger logger = Logger.getInstance();
 
-    private double serverTime;
+    private double serverTime = 0.0;
     /**
      * RTT between server and system: deltaTime = serverTime - systemTime
      */
-    private double deltaTime = 0;
+    private double deltaTime = 0.0;
     private final Double millisToSeconds = 1000.0;
 
     /**
@@ -99,9 +99,9 @@ public class Connection {
 
         this.accesses = new ConnectionAccesses();
         this.account = new ConnectionAccount();
-        this.events = new ConnectionEvents(api, cacheScope, cache);
+        this.events = new ConnectionEvents(weakConnection, api, cacheScope, cache);
         this.profile = new ConnectionProfile();
-        this.streams = new ConnectionStreams(api, cacheScope, cache);
+        this.streams = new ConnectionStreams(weakConnection, api, cacheScope, cache);
     }
 
     /**
@@ -199,6 +199,15 @@ public class Connection {
      */
     public Map<String, Stream> getRootStreams() {
         return rootStreams;
+    }
+
+    /**
+     * update the rootsStreams values
+     *
+     * @param rootStreams
+     */
+    public void updateRootStreams(Map<String, Stream> rootStreams) {
+        this.rootStreams = rootStreams;
     }
 
     /**
