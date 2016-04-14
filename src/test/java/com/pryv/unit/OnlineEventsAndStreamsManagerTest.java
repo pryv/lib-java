@@ -48,9 +48,7 @@ public class OnlineEventsAndStreamsManagerTest {
     private static GetStreamsCallback getStreamsCallback;
 
     private static List<Event> events;
-    private static List<Event> partialEvents;
     private static Map<String, Stream> streams;
-    private static Map<String, Stream> partialStreams;
 
     private static Stream testSupportStream;
 
@@ -59,8 +57,6 @@ public class OnlineEventsAndStreamsManagerTest {
     private static Event singleEvent;
     private static Stream singleStream;
 
-    private static boolean partialSuccess = false;
-    private static boolean partialError = false;
     private static boolean success = false;
     private static boolean error = false;
 
@@ -69,8 +65,10 @@ public class OnlineEventsAndStreamsManagerTest {
 
         instanciateEventsCallback();
         instanciateStreamsCallback();
+        instanciateGetStreamsCallback();
+        instanciateGetEventsCallback();
 
-        String url = "https://" + TestCredentials.USERNAME + "." + Pryv.DOMAIN + "/";
+        String url = "https://" + TestCredentials.USERNAME + "." + TestCredentials.DOMAIN + "/";
 
         online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
 
@@ -130,11 +128,10 @@ public class OnlineEventsAndStreamsManagerTest {
         success = false;
 
         // create filter
-        Set<String> streamIds = new HashSet<String>();
-        streamIds.add(testSupportStream.getId());
         Filter filter = new Filter();
         filter.addStream(testSupportStream);
 
+        System.out.println("AM I DOOOIN DA FETCHING");
         // fetch events
         online.getEvents(filter, getEventsCallback);
         Awaitility.await().until(hasResult());
@@ -278,9 +275,10 @@ public class OnlineEventsAndStreamsManagerTest {
             }
 
             @Override
-            public void apiCallback(List<Event> events, Map<String, Double> eventDeletions,
+            public void apiCallback(List<Event> receivedEvents, Map<String, Double> eventDeletions,
                                     Double serverTime) {
-
+                events = receivedEvents;
+                success = true;
             }
 
             @Override
