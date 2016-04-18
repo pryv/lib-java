@@ -1,8 +1,9 @@
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'jacoco'
 
 group = 'com.pryv'
-version = '0.1.0'
+version = '1.0.0'
 
 description = """com.pryv:lib"""
 
