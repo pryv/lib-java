@@ -1,21 +1,22 @@
 apply plugin: 'java'
-apply plugin: 'maven'
 
 group = 'com.pryv'
 version = '0.0.1-SNAPSHOT'
 
 description = """BasicExample"""
 
-sourceCompatibility = 1.5
-targetCompatibility = 1.5
-
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 
 repositories {
-        
-     maven { url "http://repo.maven.apache.org/maven2" }
+    maven {
+        url "https://jitpack.io"
+    }
+    jcenter()
 }
+
 dependencies {
-    compile group: 'com.pryv', name: 'lib', version:'0.1.0'
-    testCompile group: 'junit', name: 'junit', version:'3.8.1'
+    //compile 'com.github.Pryv:lib-java:v1.0'
+    compile 'com.github.Pryv:lib-java:master-SNAPSHOT'
 }
