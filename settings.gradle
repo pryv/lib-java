@@ -1,0 +1,2 @@
+include ':ex', ':basicexample'
+project(':ex').projectDir = new File('examples/BasicExample/ex')

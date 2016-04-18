@@ -1,21 +1,19 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.pryv.Connection;
-import com.pryv.api.EventsCallback;
-import com.pryv.interfaces.EventsManager;
 import com.pryv.Filter;
-import com.pryv.interfaces.StreamsCallback;
-import com.pryv.interfaces.StreamsManager;
-import com.pryv.database.DBinitCallback;
-import com.pryv.model.Event;
-import com.pryv.model.Permission;
-import com.pryv.model.Stream;
+import com.pryv.api.EventsCallback;
 import com.pryv.auth.AuthBrowserView;
 import com.pryv.auth.AuthController;
 import com.pryv.auth.AuthView;
+import com.pryv.database.DBinitCallback;
+import com.pryv.interfaces.StreamsCallback;
+import com.pryv.model.Event;
+import com.pryv.model.Permission;
+import com.pryv.model.Stream;
 import com.pryv.utils.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This example lets the user sign in, then retrieves the access information
