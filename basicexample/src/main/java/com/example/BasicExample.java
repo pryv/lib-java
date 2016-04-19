@@ -1,6 +1,5 @@
 package com.example;
 
-import com.pryv.Connection;
 import com.pryv.auth.AuthView;
 import com.pryv.interfaces.EventsCallback;
 import com.pryv.interfaces.StreamsCallback;
