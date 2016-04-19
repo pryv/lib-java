@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-	compile 'com.github.Pryv:lib-java:v1.0'
+	compile 'com.github.Pryv:lib-java:master-SNAPSHOT'
 }
 ```
 
