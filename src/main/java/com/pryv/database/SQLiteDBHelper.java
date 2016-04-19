@@ -97,6 +97,15 @@ public class SQLiteDBHelper {
   }
 
   /**
+   * Set a scope of data stored in the cache.
+   *
+   * @param scope
+   */
+  public void setScope(Filter scope) {
+    this.scope = scope;
+  }
+
+  /**
    * method used to update the cache with data obtained from the Pryv online API
    *
    * @param updateCacheCallback

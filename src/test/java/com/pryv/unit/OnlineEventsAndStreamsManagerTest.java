@@ -131,7 +131,6 @@ public class OnlineEventsAndStreamsManagerTest {
         Filter filter = new Filter();
         filter.addStream(testSupportStream);
 
-        System.out.println("AM I DOOOIN DA FETCHING");
         // fetch events
         online.getEvents(filter, getEventsCallback);
         Awaitility.await().until(hasResult());

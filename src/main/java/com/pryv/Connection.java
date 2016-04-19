@@ -91,7 +91,6 @@ public class Connection {
         }
 
         if (isCacheActive) {
-            cacheScope = new Filter();
             String cacheFolder = "cache/" + generateCacheFolderName() + "/";
             new File(cacheFolder).mkdirs();
             cache = new SQLiteDBHelper(cacheScope, cacheFolder, api, weakConnection, dBinitCallback);
@@ -141,6 +140,7 @@ public class Connection {
     public void setupCacheScope(Filter scope) {
         this.cacheScope = scope;
         activateCache();
+        cache.setScope(scope);
         events.setCacheScope(scope);
         streams.setCacheScope(scope);
     };
