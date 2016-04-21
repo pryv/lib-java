@@ -17,13 +17,13 @@ import java.util.Map;
 
 public class ConnectionEvents implements EventsManager {
 
-    private WeakReference<Connection> connection;
+    private WeakReference<Connection> weakConnection;
     private OnlineEventsAndStreamsManager api;
     private Filter cacheScope;
     private SQLiteDBHelper cache;
 
-    public ConnectionEvents(WeakReference<Connection> connection, OnlineEventsAndStreamsManager api, Filter cacheScope, SQLiteDBHelper cache) {
-        this.connection = connection;
+    public ConnectionEvents(WeakReference<Connection> weakConnection, OnlineEventsAndStreamsManager api, Filter cacheScope, SQLiteDBHelper cache) {
+        this.weakConnection = weakConnection;
         this.api = api;
         this.cacheScope = cacheScope;
         this.cache = cache;
@@ -31,7 +31,7 @@ public class ConnectionEvents implements EventsManager {
 
     @Override
     public void get(final Filter filter, final GetEventsCallback eventsCallback) {
-        if (filter == null || filter.isIncludedInScope(cacheScope)) {
+        if (weakConnection.get().isCacheActive() && (filter == null || filter.isIncludedInScope(cacheScope))) {
             cache.getEvents(filter, eventsCallback);
             // to execute in separate Thread
             // can be launched separately since write is not done until all reads are finished.
@@ -47,7 +47,7 @@ public class ConnectionEvents implements EventsManager {
         if (newEvent.getClientId() == null) {
             newEvent.generateClientId();
         }
-        if (cacheScope == null || cacheScope.hasInScope(newEvent)) {
+        if (weakConnection.get().isCacheActive() && (cacheScope == null || cacheScope.hasInScope(newEvent))) {
             cache.createEvent(newEvent, eventsCallback);
 
             cache.update(updateCacheCallback);
@@ -58,7 +58,7 @@ public class ConnectionEvents implements EventsManager {
 
     @Override
     public void delete(final Event eventToDelete, final EventsCallback eventsCallback) {
-        if (cacheScope.hasInScope(eventToDelete)) {
+        if (weakConnection.get().isCacheActive() && (cacheScope.hasInScope(eventToDelete))) {
             cache.deleteEvent(eventToDelete, eventsCallback);
 
             cache.update(updateCacheCallback);
@@ -69,7 +69,7 @@ public class ConnectionEvents implements EventsManager {
 
     @Override
     public void update(final Event eventToUpdate, final EventsCallback eventsCallback) {
-        if (cacheScope == null || cacheScope.hasInScope(eventToUpdate)) {
+        if (weakConnection.get().isCacheActive() && (cacheScope == null || cacheScope.hasInScope(eventToUpdate))) {
             cache.updateEvent(eventToUpdate, eventsCallback);
 
             cache.update(updateCacheCallback);

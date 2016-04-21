@@ -23,8 +23,8 @@ public class ConnectionStreams implements StreamsManager {
     private Filter cacheScope;
     private SQLiteDBHelper cache;
 
-    public ConnectionStreams(WeakReference<Connection> connection, OnlineEventsAndStreamsManager api, Filter cacheScope, SQLiteDBHelper cache) {
-        this.weakConnection = connection;
+    public ConnectionStreams(WeakReference<Connection> weakConnection, OnlineEventsAndStreamsManager api, Filter cacheScope, SQLiteDBHelper cache) {
+        this.weakConnection = weakConnection;
         this.api = api;
         this.cacheScope = cacheScope;
         this.cache = cache;
@@ -32,7 +32,7 @@ public class ConnectionStreams implements StreamsManager {
 
     @Override
     public void get(final Filter filter, final GetStreamsCallback getStreamsCallback) {
-        if (filter == null || filter.isIncludedInScope(cacheScope)) {
+        if (weakConnection.get().isCacheActive() && (filter == null || filter.isIncludedInScope(cacheScope))) {
             cache.getStreams(new RootStreamsUpdater(getStreamsCallback));
             // to execute in separate Thread
             // can be launched separately since write is not done until all reads are finished.
@@ -45,7 +45,7 @@ public class ConnectionStreams implements StreamsManager {
 
     @Override
     public void create(final Stream newStream, final StreamsCallback StreamsCallback) {
-        if (cacheScope == null || cacheScope.hasInScope(newStream.getId())) {
+        if (weakConnection.get().isCacheActive() && (cacheScope == null || cacheScope.hasInScope(newStream.getId()))) {
             cache.updateOrCreateStream(newStream, StreamsCallback);
 
             cache.update(updateCacheCallback);
@@ -56,7 +56,7 @@ public class ConnectionStreams implements StreamsManager {
 
     @Override
     public void delete(final Stream streamToDelete, final boolean mergeEventsWithParent, final StreamsCallback streamsCallback) {
-        if (cacheScope == null || cacheScope.hasInScope(streamToDelete.getId())) {
+        if (weakConnection.get().isCacheActive() && (cacheScope == null || cacheScope.hasInScope(streamToDelete.getId()))) {
             cache.deleteStream(streamToDelete, mergeEventsWithParent, streamsCallback);
 
             cache.update(updateCacheCallback);
@@ -67,7 +67,7 @@ public class ConnectionStreams implements StreamsManager {
 
     @Override
     public void update(final Stream streamToUpdate, final StreamsCallback streamsCallback) {
-        if (cacheScope == null || cacheScope.hasInScope(streamToUpdate.getId())) {
+        if (weakConnection.get().isCacheActive() && (cacheScope == null || cacheScope.hasInScope(streamToUpdate.getId()))) {
             cache.updateOrCreateStream(streamToUpdate, streamsCallback);
 
             cache.update(updateCacheCallback);

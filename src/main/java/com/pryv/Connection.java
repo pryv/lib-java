@@ -103,6 +103,14 @@ public class Connection {
         this.streams = new ConnectionStreams(weakConnection, api, cacheScope, cache);
     }
 
+    public boolean isApiActive() {
+        return this.isApiActive;
+    }
+
+    public boolean isCacheActive() {
+        return this.isCacheActive;
+    }
+
     /**
      * activate API calls
      */
