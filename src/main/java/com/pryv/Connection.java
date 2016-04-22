@@ -71,15 +71,18 @@ public class Connection {
      * @param username
      * @param token
      * @param domain
+     * @param isCacheUsed;
      * @param dBinitCallback
      */
-    public Connection(String username, String token, String domain, DBinitCallback dBinitCallback) {
+    public Connection(String username, String token, String domain, boolean isCacheUsed, DBinitCallback dBinitCallback) {
 
         this.username = username;
         this.token = token;
         this.domain = domain;
         buildUrlEndpoint();
         buildRegistrationUrl();
+
+        this.isCacheActive = isCacheUsed;
 
         this.weakConnection = new WeakReference<Connection>(this);
 
