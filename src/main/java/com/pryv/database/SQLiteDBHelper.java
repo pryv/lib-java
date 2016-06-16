@@ -51,6 +51,7 @@ public class SQLiteDBHelper {
 
   private Filter scope;
   private OnlineEventsAndStreamsManager api;
+  private Double lastUpdate;
 
   private Logger logger = Logger.getInstance();
 
