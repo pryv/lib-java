@@ -108,7 +108,7 @@ public class Event {
   public Event(String pClientId, String pId, String pStreamId, Double pTime, Double pDuration,
     String pType, String pContent, Set<String> pTags, Set<String> pReferences, String pDescription,
     Set<Attachment> pAttachments, Map<String, Object> pClientData, Boolean pTrashed,
-    Double pCreated, String pCreatedBy, Double pModified, String pModifiedBy, String pTempRefId) {
+    Double pCreated, String pCreatedBy, Double pModified, String pModifiedBy) {
     clientId = pClientId;
     id = pId;
     streamId = pStreamId;
