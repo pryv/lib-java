@@ -167,10 +167,7 @@ public class Event {
     if (event == null) {
       event = new Event();
     }
-    String id = result.getString(QueryGenerator.EVENTS_ID_KEY);
-    if (id != null) {
-      event.setId(id);
-    }
+    event.setId(result.getString(QueryGenerator.EVENTS_ID_KEY));
     event.setStreamId(result.getString(QueryGenerator.EVENTS_STREAM_ID_KEY));
     event.setTime(result.getDouble(QueryGenerator.EVENTS_TIME_KEY));
     event.setType(result.getString(QueryGenerator.EVENTS_TYPE_KEY));
@@ -181,13 +178,9 @@ public class Event {
     event.setDuration(result.getDouble(QueryGenerator.EVENTS_DURATION_KEY));
     event.setContent(result.getObject(QueryGenerator.EVENTS_CONTENT_KEY));
     String tagsString = result.getString(QueryGenerator.EVENTS_TAGS_KEY);
-    if (tagsString != null) {
-      event.setTags(new HashSet<String>(Arrays.asList(tagsString.split(","))));
-    }
+    event.setTags(new HashSet<String>(Arrays.asList(tagsString.split(","))));
     String referencesString = result.getString(QueryGenerator.EVENTS_REFS_KEY);
-    if (referencesString != null) {
-      event.setReferences(new HashSet<String>(Arrays.asList(referencesString.split(","))));
-    }
+    event.setReferences(new HashSet<String>(Arrays.asList(referencesString.split(","))));
 
     event.setDescription(result.getString(QueryGenerator.EVENTS_DESCRIPTION_KEY));
     // TODO fetch Attachments elsewhere
@@ -552,10 +545,12 @@ public class Event {
    * @param clientId
    */
   public void setClientId(String clientId) {
-    this.clientId = clientId;
-    supervisor.put(this.clientId, this);
-    if (id != null) {
-      idToClientId.put(this.id, this.clientId);
+    if(clientId != null) {
+      this.clientId = clientId;
+      supervisor.put(this.clientId, this);
+      if (id != null) {
+        idToClientId.put(this.id, this.clientId);
+      }
     }
   }
 
@@ -565,71 +560,102 @@ public class Event {
    * @param pid
    */
   public void setId(String pid) {
-    this.id = pid;
-    System.out.println("setting id, gonnna probbly crash: cid=" + clientId + ", id=" + id);
-    if (this.clientId != null) {
-      idToClientId.put(this.id, this.clientId);
+    if(pid != null) {
+      this.id = pid;
+      if (this.clientId != null) {
+        idToClientId.put(this.id, this.clientId);
+      }
     }
   }
 
   public void setStreamId(String pstreamId) {
-    this.streamId = pstreamId;
+    if(pstreamId != null) {
+      this.streamId = pstreamId;
+    }
   }
 
   public void setTime(Double ptime) {
-    this.time = ptime;
+    if(ptime != null) {
+      this.time = ptime;
+    }
   }
 
   public void setType(String ptype) {
-    this.type = ptype;
+    if(ptype != null) {
+      this.type = ptype;
+    }
   }
 
   public void setCreated(Double pcreated) {
-    this.created = pcreated;
+    if(pcreated != null) {
+      this.created = pcreated;
+    }
   }
 
   public void setCreatedBy(String pcreatedBy) {
-    this.createdBy = pcreatedBy;
+    if(pcreatedBy != null) {
+      this.createdBy = pcreatedBy;
+    }
   }
 
   public void setModified(Double pmodified) {
-    this.modified = pmodified;
+    if(pmodified != null) {
+      this.modified = pmodified;
+    }
   }
 
   public void setModifiedBy(String pmodifiedBy) {
-    this.modifiedBy = pmodifiedBy;
+    if(pmodifiedBy != null) {
+      this.modifiedBy = pmodifiedBy;
+    }
   }
 
   public void setDuration(Double pduration) {
-    this.duration = pduration;
+    if(pduration != null) {
+      this.duration = pduration;
+    }
   }
 
   public void setContent(Object pcontent) {
-    this.content = pcontent;
+    if(pcontent != null) {
+      this.content = pcontent;
+    }
   }
 
   public void setTags(Set<String> ptags) {
-    this.tags = ptags;
+    if(ptags != null) {
+      this.tags = ptags;
+    }
   }
 
   public void setReferences(Set<String> preferences) {
-    this.references = preferences;
+    if(preferences != null) {
+      this.references = preferences;
+    }
   }
 
   public void setDescription(String pdescription) {
-    this.description = pdescription;
+    if(pdescription != null) {
+      this.description = pdescription;
+    }
   }
 
   public void setAttachments(Set<Attachment> pattachments) {
-    this.attachments = pattachments;
+    if(pattachments != null) {
+      this.attachments = pattachments;
+    }
   }
 
   public void setClientData(Map<String, Object> pclientData) {
-    this.clientData = pclientData;
+    if(clientData != null) {
+      this.clientData = pclientData;
+    }
   }
 
   public void setTrashed(Boolean ptrashed) {
-    this.trashed = ptrashed;
+    if(ptrashed != null) {
+      this.trashed = ptrashed;
+    }
   }
 
 

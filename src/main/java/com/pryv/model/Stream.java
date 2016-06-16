@@ -370,23 +370,33 @@ public class Stream {
   }
 
   public void setId(String pId) {
-    this.id = pId;
+    if(pId != null) {
+      this.id = pId;
+    }
   }
 
   public void setName(String pName) {
-    this.name = pName;
+    if(pName != null) {
+      this.name = pName;
+    }
   }
 
   public void setParentId(String pParentId) {
-    this.parentId = pParentId;
+    if(pParentId !=null) {
+      this.parentId = pParentId;
+    }
   }
 
   public void setSingleActivity(Boolean pSingleActivity) {
-    this.singleActivity = pSingleActivity;
+    if(pSingleActivity != null) {
+      this.singleActivity = pSingleActivity;
+    }
   }
 
   public void setClientData(Map<String, Object> pClientData) {
-    this.clientData = pClientData;
+    if(pClientData != null) {
+      this.clientData = pClientData;
+    }
   }
 
   public void setChildren(Set<Stream> pChildren) {
@@ -402,23 +412,33 @@ public class Stream {
   }
 
   public void setTrashed(Boolean pTrashed) {
-    this.trashed = pTrashed;
+    if(pTrashed !=null) {
+      this.trashed = pTrashed;
+    }
   }
 
   public void setCreated(Double pCreated) {
-    this.created = pCreated;
+    if(created != null) {
+      this.created = pCreated;
+    }
   }
 
   public void setCreatedBy(String pCreatedBy) {
-    this.createdBy = pCreatedBy;
+    if(pCreatedBy != null) {
+      this.createdBy = pCreatedBy;
+    }
   }
 
   public void setModified(Double pModified) {
-    this.modified = pModified;
+    if(pModified != null) {
+      this.modified = pModified;
+    }
   }
 
   public void setModifiedBy(String pModifiedBy) {
-    this.modifiedBy = pModifiedBy;
+    if(pModifiedBy != null) {
+      this.modifiedBy = pModifiedBy;
+    }
   }
 
 }
