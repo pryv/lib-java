@@ -2,9 +2,7 @@ package com.pryv.functional;
 
 
 import com.jayway.awaitility.Awaitility;
-import com.pryv.Connection;
 import com.pryv.Filter;
-import com.pryv.Pryv;
 import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.database.DBinitCallback;
 import com.pryv.database.SQLiteDBHelper;
@@ -20,7 +18,6 @@ import com.pryv.utils.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
 import java.util.List;

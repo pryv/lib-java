@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.pryv.Connection;
 import com.pryv.database.DBinitCallback;
 
 public class ConnectionTest {

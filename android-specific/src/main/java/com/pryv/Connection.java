@@ -1,8 +1,10 @@
 package com.pryv;
 
+import android.content.Context;
+
 import com.pryv.api.OnlineEventsAndStreamsManager;
+import com.pryv.database.DBHelper;
 import com.pryv.database.DBinitCallback;
-import com.pryv.database.SQLiteDBHelper;
 import com.pryv.model.Stream;
 import com.pryv.connection.ConnectionAccesses;
 import com.pryv.connection.ConnectionAccount;
@@ -22,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Pryv API connection - Object used to manipulate Events and Streams data.
  */
-public class Connection {
+public class Connection extends AbstractConnection {
 
     public ConnectionAccesses accesses;
     public ConnectionAccount account;
@@ -42,9 +44,11 @@ public class Connection {
     private OnlineEventsAndStreamsManager api;
 
     private Filter cacheScope;
-    private SQLiteDBHelper cache;
+    private DBHelper cache;
 
-    private WeakReference<Connection> weakConnection;
+    private WeakReference<AbstractConnection> weakConnection;
+
+    private Context context;
 
     /**
      * Streams with no parent stream. the key is the id
@@ -74,8 +78,7 @@ public class Connection {
      * @param isCacheUsed;
      * @param dBinitCallback
      */
-    public Connection(String username, String token, String domain, boolean isCacheUsed, DBinitCallback dBinitCallback) {
-
+    public Connection(Context context, String username, String token, String domain, boolean isCacheUsed, DBinitCallback dBinitCallback) {
         this.username = username;
         this.token = token;
         this.domain = domain;
@@ -84,7 +87,9 @@ public class Connection {
 
         this.isCacheActive = isCacheUsed;
 
-        this.weakConnection = new WeakReference<Connection>(this);
+        this.weakConnection = new WeakReference<AbstractConnection>(this);
+
+        this.context = context;
 
         rootStreams = new ConcurrentHashMap<String, Stream>();
         flatStreams = new ConcurrentHashMap<String, Stream>();
@@ -96,7 +101,8 @@ public class Connection {
         if (isCacheActive) {
             String cacheFolder = "cache/" + generateCacheFolderName() + "/";
             new File(cacheFolder).mkdirs();
-            cache = new SQLiteDBHelper(cacheScope, cacheFolder, api, weakConnection, dBinitCallback);
+            
+            cache = new SQLiteDBHelper(context, cacheScope, cacheFolder, api, weakConnection, dBinitCallback);
         }
 
         this.accesses = new ConnectionAccesses();

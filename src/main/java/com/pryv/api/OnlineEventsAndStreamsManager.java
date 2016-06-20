@@ -7,7 +7,6 @@ import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Map;
 
-import com.pryv.Connection;
 import com.pryv.Filter;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;

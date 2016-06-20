@@ -1,9 +1,8 @@
 package com.pryv.connection;
 
-import com.pryv.Connection;
 import com.pryv.Filter;
 import com.pryv.api.OnlineEventsAndStreamsManager;
-import com.pryv.database.SQLiteDBHelper;
+import com.pryv.database.DBHelper;
 import com.pryv.interfaces.EventsCallback;
 import com.pryv.interfaces.EventsManager;
 import com.pryv.interfaces.GetEventsCallback;
@@ -20,9 +19,9 @@ public class ConnectionEvents implements EventsManager {
     private WeakReference<Connection> weakConnection;
     private OnlineEventsAndStreamsManager api;
     private Filter cacheScope;
-    private SQLiteDBHelper cache;
+    private DBHelper cache;
 
-    public ConnectionEvents(WeakReference<Connection> weakConnection, OnlineEventsAndStreamsManager api, Filter cacheScope, SQLiteDBHelper cache) {
+    public ConnectionEvents(WeakReference<Connection> weakConnection, OnlineEventsAndStreamsManager api, Filter cacheScope, DBHelper cache) {
         this.weakConnection = weakConnection;
         this.api = api;
         this.cacheScope = cacheScope;

@@ -1,4 +1,3 @@
-import com.pryv.Connection;
 import com.pryv.Filter;
 import com.pryv.api.EventsCallback;
 import com.pryv.auth.AuthBrowserView;

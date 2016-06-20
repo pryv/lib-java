@@ -1,7 +1,6 @@
 package com.pryv.functional;
 
 import com.jayway.awaitility.Awaitility;
-import com.pryv.Connection;
 import com.pryv.Filter;
 import com.pryv.database.DBinitCallback;
 import com.pryv.interfaces.EventsCallback;
