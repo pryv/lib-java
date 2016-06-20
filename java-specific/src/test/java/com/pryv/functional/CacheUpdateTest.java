@@ -2,11 +2,15 @@ package com.pryv.functional;
 
 
 import com.jayway.awaitility.Awaitility;
+import com.pryv.Filter;
+import com.pryv.SQLiteDBHelper;
+import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.database.DBinitCallback;
 import com.pryv.interfaces.EventsCallback;
 import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
+import com.pryv.interfaces.UpdateCacheCallback;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
 import com.pryv.utils.Logger;
@@ -14,8 +18,8 @@ import com.pryv.utils.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -23,10 +27,9 @@ import java.util.concurrent.Callable;
 import resources.TestCredentials;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class ConnectionTest {
+public class CacheUpdateTest {
 
     private static Logger logger = Logger.getInstance();
 
@@ -35,12 +38,16 @@ public class ConnectionTest {
     private static StreamsCallback streamsCallback;
     private static GetStreamsCallback getStreamsCallback;
 
+    private static UpdateCacheCallback updateCacheCallback;
+
     private static List<Event> events;
     private static List<Event> cacheEvents;
     private static Map<String, Stream> streams;
     private static Map<String, Stream> cacheStreams;
 
     private static Stream testSupportStream;
+
+    private static String stoppedId;
 
     private static Event apiEvent;
     private static Event cacheEvent;
@@ -51,40 +58,49 @@ public class ConnectionTest {
     private static boolean cacheError = false;
     private static boolean apiSuccess = false;
     private static boolean apiError = false;
+    private static boolean updateSuccess = false;
+    private static boolean updateError = false;
 
-    private static Connection connection;
+    private static OnlineEventsAndStreamsManager api;
+    private static SQLiteDBHelper db;
+
+    private static Filter scope;
 
     @BeforeClass
-    public static void setup() {
+    public static void setUp() throws Exception {
 
         instanciateEventsCallback();
         instanciateGetEventsCallback();
         instanciateStreamsCallback();
         instanciateGetStreamsCallback();
 
-        connection = new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN,
-                TestCredentials.DOMAIN, new DBinitCallback());
+        String url = "https://" + TestCredentials.USERNAME + "." + TestCredentials.DOMAIN + "/";
 
-        connection.setupCacheScope(null);
+        api = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
+
+        String cacheFolder = "cache/test/";
+        new File(cacheFolder).mkdirs();
+        scope = new Filter();
+        db = new SQLiteDBHelper(scope, cacheFolder, api, null, new DBinitCallback() {
+
+            @Override
+            public void onError(String message) {
+                System.out.println(message);
+            }
+        });
 
         testSupportStream = new Stream("onlineModuleStreamID", "javaLibTestSupportStream");
-        connection.streams.create(testSupportStream, streamsCallback);
-        Awaitility.await().until(hasCacheResult());
-        assertFalse(cacheError);
-        Awaitility.await().until(hasApiResult());
-        assertFalse(apiError);
-
-        connection.streams.get(null, getStreamsCallback);
+        api.createStream(testSupportStream, streamsCallback);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
     }
 
     @AfterClass
     public static void tearDown() throws Exception {
-        connection.streams.delete(testSupportStream, false, streamsCallback);
+        api.deleteStream(testSupportStream, false, streamsCallback);
         Awaitility.await().until(hasApiResult());
         apiSuccess = false;
-        connection.streams.delete(testSupportStream, false, streamsCallback);
+        api.deleteStream(testSupportStream, false, streamsCallback);
         Awaitility.await().until(hasApiResult());
     }
 
@@ -100,12 +116,60 @@ public class ConnectionTest {
         cacheError = false;
         apiEvent = null;
         apiStream = null;
+        stoppedId = null;
+        updateSuccess = false;
+        updateError = false;
     }
 
-    @Test
-    public void testGetRootStreams() {
-        Map<String, Stream> rootStreams = connection.getRootStreams();
-        assertTrue(rootStreams.size() > 0);
+    //@Test
+    public void testUpdateCache() {
+
+        Event newEvent = new Event(testSupportStream.getId(), null,
+                "note/txt", "i am a test event");
+        newEvent.generateClientId();
+        api.createEvent(newEvent, eventsCallback);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+        apiSuccess = false;
+        newEvent = new Event(testSupportStream.getId(), null,
+                "note/txt", "i am another test event");
+        newEvent.generateClientId();
+        api.createEvent(newEvent, eventsCallback);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+        apiSuccess = false;
+
+        api.getEvents(null, getEventsCallback);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+        apiSuccess = false;
+
+        db.update(updateCacheCallback);
+        Awaitility.await().until(hasUpdateResult());
+        assertFalse(updateError);
+
+        db.getEvents(null, getEventsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        for (Event cacheEvent: cacheEvents) {
+            boolean found = false;
+            for (Event apiEvent: events) {
+                if (apiEvent.getId().equals(cacheEvent.getId())) {
+                    found = true;
+                }
+            }
+            assertTrue(found);
+        }
+    }
+
+    private static Callable<Boolean> hasUpdateResult() {
+        return new Callable<Boolean>() {
+
+            @Override
+            public Boolean call() throws Exception {
+                return (updateSuccess || updateError);
+            }
+        };
     }
 
     private static Callable<Boolean> hasCacheResult() {
@@ -124,6 +188,22 @@ public class ConnectionTest {
             @Override
             public Boolean call() throws Exception {
                 return (apiSuccess || apiError);
+            }
+        };
+    }
+
+    private static void instanciateUpdateCacheCallback() {
+        updateCacheCallback = new UpdateCacheCallback() {
+            @Override
+            public void apiCallback(List<Event> events, Map<String, Double> eventDeletions,
+                                    Map<String, Stream> streams,
+                                    Map<String, Double> streamDeletions, Double serverTime) {
+                updateSuccess = true;
+            }
+
+            @Override
+            public void onError(String errorMessage, Double serverTime) {
+                updateError = true;
             }
         };
     }
@@ -166,6 +246,7 @@ public class ConnectionTest {
             public void onApiSuccess(String successMessage, Event event, String pStoppedId,
                                      Double pServerTime) {
                 System.out.println("OnlineEventsManagerTest: eventsSuccess msg: " + successMessage);
+                stoppedId = pStoppedId;
                 apiSuccess = true;
                 apiEvent = event;
             }
@@ -251,4 +332,5 @@ public class ConnectionTest {
             }
         };
     }
+
 }

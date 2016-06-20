@@ -1,25 +1,23 @@
 package com.pryv.functional;
 
-
 import com.jayway.awaitility.Awaitility;
+import com.pryv.Connection;
 import com.pryv.Filter;
-import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.database.DBinitCallback;
-import com.pryv.database.SQLiteDBHelper;
 import com.pryv.interfaces.EventsCallback;
 import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
-import com.pryv.interfaces.UpdateCacheCallback;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
+import com.pryv.util.TestUtils;
 import com.pryv.utils.Logger;
 
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -28,9 +26,8 @@ import resources.TestCredentials;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
-public class CacheUpdateTest {
+public class ConnectionStreamsTest {
 
     private static Logger logger = Logger.getInstance();
 
@@ -38,8 +35,6 @@ public class CacheUpdateTest {
     private static GetEventsCallback getEventsCallback;
     private static StreamsCallback streamsCallback;
     private static GetStreamsCallback getStreamsCallback;
-
-    private static UpdateCacheCallback updateCacheCallback;
 
     private static List<Event> events;
     private static List<Event> cacheEvents;
@@ -59,13 +54,9 @@ public class CacheUpdateTest {
     private static boolean cacheError = false;
     private static boolean apiSuccess = false;
     private static boolean apiError = false;
-    private static boolean updateSuccess = false;
-    private static boolean updateError = false;
 
-    private static OnlineEventsAndStreamsManager api;
-    private static SQLiteDBHelper db;
+    private static Connection connection;
 
-    private static Filter scope;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -75,33 +66,43 @@ public class CacheUpdateTest {
         instanciateStreamsCallback();
         instanciateGetStreamsCallback();
 
-        String url = "https://" + TestCredentials.USERNAME + "." + TestCredentials.DOMAIN + "/";
+        connection =
+                new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, TestCredentials.DOMAIN, true,
+                        new DBinitCallback() {
+                            @Override
+                            public void onError(String message) {
+                                System.out.println("DB init Error: " + message);
+                            }
+                        });
 
-        api = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
-
-        String cacheFolder = "cache/test/";
-        new File(cacheFolder).mkdirs();
-        scope = new Filter();
-        db = new SQLiteDBHelper(scope, cacheFolder, api, null, new DBinitCallback() {
-
-            @Override
-            public void onError(String message) {
-                System.out.println(message);
-            }
-        });
+        connection.setupCacheScope(new Filter());
 
         testSupportStream = new Stream("onlineModuleStreamID", "javaLibTestSupportStream");
-        api.createStream(testSupportStream, streamsCallback);
+        connection.streams.create(testSupportStream, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+
+        testSupportStream.merge(apiStream, true);
+        assertNotNull(testSupportStream.getId());
+        cacheSuccess = false;
+        apiSuccess = false;
+
+        connection.events.create(new Event(testSupportStream.getId(), null,
+                "note/txt", "i am a test event"), eventsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(apiError);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
     }
 
     @AfterClass
     public static void tearDown() throws Exception {
-        api.deleteStream(testSupportStream, false, streamsCallback);
+        connection.streams.delete(testSupportStream, false, streamsCallback);
         Awaitility.await().until(hasApiResult());
         apiSuccess = false;
-        api.deleteStream(testSupportStream, false, streamsCallback);
+        connection.streams.delete(testSupportStream, false, streamsCallback);
         Awaitility.await().until(hasApiResult());
     }
 
@@ -118,60 +119,184 @@ public class CacheUpdateTest {
         apiEvent = null;
         apiStream = null;
         stoppedId = null;
-        updateSuccess = false;
-        updateError = false;
     }
 
-    //@Test
-    public void testUpdateCache() {
+    /**
+     * GET STREAMS
+     */
 
-        Event newEvent = new Event(testSupportStream.getId(), null,
-                "note/txt", "i am a test event");
-        newEvent.generateClientId();
-        api.createEvent(newEvent, eventsCallback);
+    @Test
+    public void testGetStreamsMustReturnATreeOfNonTrashedStreamsWithANullFilter() {
+        Stream s1 = new Stream(null, "someStreamOne");
+        s1.setParentId(testSupportStream.getId());
+        Stream s2 = new Stream(null, "someOtherStream");
+        s2.setParentId(testSupportStream.getId());
+        connection.streams.create(s1, streamsCallback);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
         apiSuccess = false;
-        newEvent = new Event(testSupportStream.getId(), null,
-                "note/txt", "i am another test event");
-        newEvent.generateClientId();
-        api.createEvent(newEvent, eventsCallback);
-        Awaitility.await().until(hasApiResult());
-        assertFalse(apiError);
-        apiSuccess = false;
-
-        api.getEvents(null, getEventsCallback);
+        connection.streams.create(s2, streamsCallback);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
         apiSuccess = false;
 
-        db.update(updateCacheCallback);
-        Awaitility.await().until(hasUpdateResult());
-        assertFalse(updateError);
-
-        db.getEvents(null, getEventsCallback);
+        connection.streams.get(null, getStreamsCallback);
         Awaitility.await().until(hasCacheResult());
         assertFalse(cacheError);
-        for (Event cacheEvent: cacheEvents) {
-            boolean found = false;
-            for (Event apiEvent: events) {
-                if (apiEvent.getId().equals(cacheEvent.getId())) {
-                    found = true;
-                }
-            }
-            assertTrue(found);
-        }
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+
+        assertNotNull(cacheStreams);
+        assertNotNull(streams);
+
+        connection.getRootStreams();
     }
 
-    private static Callable<Boolean> hasUpdateResult() {
-        return new Callable<Boolean>() {
+    // TODO
+    public void testGetStreamsMustReturnStreamsMatchingTheGivenFilter() {
 
-            @Override
-            public Boolean call() throws Exception {
-                return (updateSuccess || updateError);
-            }
-        };
     }
+
+    // TODO
+    public void testGetStreamsMustReturnAnEmptyMapIfThereAreNoMatchingStreams() {
+
+    }
+
+    // TODO
+    public void testGetStreamsMustIncludeDeletedStreamsWhenTheFlagIncludeDeletionsIsSet() {
+
+    }
+
+    // TODO check if possible
+    public void testGetStreamsMustReturnAnErrorIfTheGivenFilterContainsInvalidParameters() {
+
+    }
+
+    /**
+     * CREATE STREAM
+     */
+
+    @Test
+    public void testCreateStreamMustAcceptAValidStream() {
+        Stream newStream = new Stream("myNewId", "myNewStream");
+        newStream.setParentId(testSupportStream.getId());
+        connection.streams.create(newStream, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+
+        assertNotNull(cacheStream);
+        TestUtils.checkStream(newStream, cacheStream);
+        assertNotNull(apiStream);
+        TestUtils.checkStream(newStream, apiStream);
+    }
+
+    @Test
+    public void testCreateStreamMustReturnAnErrorIfAStreamWithTheSameNameExistsAtTheSameTreeLevel() {
+        Stream someStream = new Stream("someStreamThatWillBotherNext", "my lovely stream name");
+        someStream.setParentId(testSupportStream.getId());
+        connection.streams.create(someStream, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+        cacheSuccess = false;
+        apiSuccess = false;
+
+        Stream duplicateIdStream = new Stream("copyNameSteam", someStream.getName());
+        duplicateIdStream.setParentId(testSupportStream.getId());
+        connection.streams.create(duplicateIdStream, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        //assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiSuccess);
+    }
+
+    @Test
+    public void testCreateStreamMustReturnAnErrorIfAStreamWithTheSameIdAlreadyExists() {
+        Stream someStream = new Stream("someStreamWithANiceId", "Well I dont care");
+        someStream.setParentId(testSupportStream.getId());
+        connection.streams.create(someStream, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+        cacheSuccess = false;
+        apiSuccess = false;
+
+        Stream duplicateIdStream = new Stream(someStream.getId(), "I will not be created");
+        duplicateIdStream.setParentId(testSupportStream.getId());
+        connection.streams.create(duplicateIdStream, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        //assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiSuccess);
+    }
+
+    // TODO check if possible
+    public void testCreateStreamMustReturnAnErrorIfTheStreamDataIsInvalid() {
+
+    }
+
+    /**
+     * UDPATE STREAM
+     */
+
+    // TODO
+    public void testUpdateStreamMustAcceptAValidStream() {
+
+    }
+
+    // TODO
+    public void testUpdateStreamMustUpdateTheStreamTreeWhenParentIdWasModified() {
+
+    }
+
+    // TODO
+    public void testUpdateStreamMustReturnAnErrorIfNoSuchStreamExistYet() {
+
+    }
+
+    // TODO
+    public void testUpdateStreamMustReturnAnErrorWhenIfAStreamWithTheSameNameExistsAtTheSameTreeLevel() {
+
+    }
+
+    /**
+     * DELETE STREAM
+     */
+
+    // TODO
+    public void testDeleteStreamMustAcceptAValidStream() {
+
+    }
+
+    // TODO
+    public void testDeleteStreamCalledOnceMustTrashTheStream() {
+
+    }
+
+    // TODO
+    public void testDeleteStreamCalledTwiceMustDeleteTheStreamAndReturnTheId() {
+
+    }
+
+    // TODO
+    public void testDeleteStreamMustUpdateItsEventsStreamIdsWhenDeletingWithMergeEventsWithParent() {
+
+    }
+
+    // TODO
+    public void testDeleteStreamMustDeleteItsEventsWhenDeletingWithoutMergeEventsWithParent() {
+
+    }
+
+    // TODO
+    public void testDeleteStreamMustReturnAnErrorWhenTheGivenStreamDoesntExist() {
+
+    }
+
 
     private static Callable<Boolean> hasCacheResult() {
         return new Callable<Boolean>() {
@@ -189,22 +314,6 @@ public class CacheUpdateTest {
             @Override
             public Boolean call() throws Exception {
                 return (apiSuccess || apiError);
-            }
-        };
-    }
-
-    private static void instanciateUpdateCacheCallback() {
-        updateCacheCallback = new UpdateCacheCallback() {
-            @Override
-            public void apiCallback(List<Event> events, Map<String, Double> eventDeletions,
-                                    Map<String, Stream> streams,
-                                    Map<String, Double> streamDeletions, Double serverTime) {
-                updateSuccess = true;
-            }
-
-            @Override
-            public void onError(String errorMessage, Double serverTime) {
-                updateError = true;
             }
         };
     }
@@ -333,5 +442,4 @@ public class CacheUpdateTest {
             }
         };
     }
-
 }

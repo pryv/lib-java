@@ -1,7 +1,8 @@
 package com.pryv.functional;
 
+
 import com.jayway.awaitility.Awaitility;
-import com.pryv.Filter;
+import com.pryv.Connection;
 import com.pryv.database.DBinitCallback;
 import com.pryv.interfaces.EventsCallback;
 import com.pryv.interfaces.GetEventsCallback;
@@ -9,7 +10,6 @@ import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
-import com.pryv.util.TestUtils;
 import com.pryv.utils.Logger;
 
 import org.junit.AfterClass;
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class ConnectionStreamsTest {
+public class ConnectionTest {
 
     private static Logger logger = Logger.getInstance();
 
@@ -43,8 +43,6 @@ public class ConnectionStreamsTest {
 
     private static Stream testSupportStream;
 
-    private static String stoppedId;
-
     private static Event apiEvent;
     private static Event cacheEvent;
     private static Stream apiStream;
@@ -57,25 +55,18 @@ public class ConnectionStreamsTest {
 
     private static Connection connection;
 
-
     @BeforeClass
-    public static void setUp() throws Exception {
+    public static void setup() {
 
         instanciateEventsCallback();
         instanciateGetEventsCallback();
         instanciateStreamsCallback();
         instanciateGetStreamsCallback();
 
-        connection =
-                new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, TestCredentials.DOMAIN,
-                        new DBinitCallback() {
-                            @Override
-                            public void onError(String message) {
-                                System.out.println("DB init Error: " + message);
-                            }
-                        });
+        connection = new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN,
+                TestCredentials.DOMAIN, true, new DBinitCallback());
 
-        connection.setupCacheScope(new Filter());
+        connection.setupCacheScope(null);
 
         testSupportStream = new Stream("onlineModuleStreamID", "javaLibTestSupportStream");
         connection.streams.create(testSupportStream, streamsCallback);
@@ -84,15 +75,7 @@ public class ConnectionStreamsTest {
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
 
-        testSupportStream.merge(apiStream, true);
-        assertNotNull(testSupportStream.getId());
-        cacheSuccess = false;
-        apiSuccess = false;
-
-        connection.events.create(new Event(testSupportStream.getId(), null,
-                "note/txt", "i am a test event"), eventsCallback);
-        Awaitility.await().until(hasCacheResult());
-        assertFalse(apiError);
+        connection.streams.get(null, getStreamsCallback);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
     }
@@ -118,185 +101,13 @@ public class ConnectionStreamsTest {
         cacheError = false;
         apiEvent = null;
         apiStream = null;
-        stoppedId = null;
-    }
-
-    /**
-     * GET STREAMS
-     */
-
-    @Test
-    public void testGetStreamsMustReturnATreeOfNonTrashedStreamsWithANullFilter() {
-        Stream s1 = new Stream(null, "someStreamOne");
-        s1.setParentId(testSupportStream.getId());
-        Stream s2 = new Stream(null, "someOtherStream");
-        s2.setParentId(testSupportStream.getId());
-        connection.streams.create(s1, streamsCallback);
-        Awaitility.await().until(hasApiResult());
-        assertFalse(apiError);
-        apiSuccess = false;
-        connection.streams.create(s2, streamsCallback);
-        Awaitility.await().until(hasApiResult());
-        assertFalse(apiError);
-        apiSuccess = false;
-
-        connection.streams.get(null, getStreamsCallback);
-        Awaitility.await().until(hasCacheResult());
-        assertFalse(cacheError);
-        Awaitility.await().until(hasApiResult());
-        assertFalse(apiError);
-
-        assertNotNull(cacheStreams);
-        assertNotNull(streams);
-
-        connection.getRootStreams();
-    }
-
-    // TODO
-    public void testGetStreamsMustReturnStreamsMatchingTheGivenFilter() {
-
-    }
-
-    // TODO
-    public void testGetStreamsMustReturnAnEmptyMapIfThereAreNoMatchingStreams() {
-
-    }
-
-    // TODO
-    public void testGetStreamsMustIncludeDeletedStreamsWhenTheFlagIncludeDeletionsIsSet() {
-
-    }
-
-    // TODO check if possible
-    public void testGetStreamsMustReturnAnErrorIfTheGivenFilterContainsInvalidParameters() {
-
-    }
-
-    /**
-     * CREATE STREAM
-     */
-
-    @Test
-    public void testCreateStreamMustAcceptAValidStream() {
-        Stream newStream = new Stream("myNewId", "myNewStream");
-        newStream.setParentId(testSupportStream.getId());
-        connection.streams.create(newStream, streamsCallback);
-        Awaitility.await().until(hasCacheResult());
-        assertFalse(cacheError);
-        Awaitility.await().until(hasApiResult());
-        assertFalse(apiError);
-
-        assertNotNull(cacheStream);
-        TestUtils.checkStream(newStream, cacheStream);
-        assertNotNull(apiStream);
-        TestUtils.checkStream(newStream, apiStream);
     }
 
     @Test
-    public void testCreateStreamMustReturnAnErrorIfAStreamWithTheSameNameExistsAtTheSameTreeLevel() {
-        Stream someStream = new Stream("someStreamThatWillBotherNext", "my lovely stream name");
-        someStream.setParentId(testSupportStream.getId());
-        connection.streams.create(someStream, streamsCallback);
-        Awaitility.await().until(hasCacheResult());
-        assertFalse(cacheError);
-        Awaitility.await().until(hasApiResult());
-        assertFalse(apiError);
-        cacheSuccess = false;
-        apiSuccess = false;
-
-        Stream duplicateIdStream = new Stream("copyNameSteam", someStream.getName());
-        duplicateIdStream.setParentId(testSupportStream.getId());
-        connection.streams.create(duplicateIdStream, streamsCallback);
-        Awaitility.await().until(hasCacheResult());
-        //assertFalse(cacheError);
-        Awaitility.await().until(hasApiResult());
-        assertFalse(apiSuccess);
+    public void testGetRootStreams() {
+        Map<String, Stream> rootStreams = connection.getRootStreams();
+        assertTrue(rootStreams.size() > 0);
     }
-
-    @Test
-    public void testCreateStreamMustReturnAnErrorIfAStreamWithTheSameIdAlreadyExists() {
-        Stream someStream = new Stream("someStreamWithANiceId", "Well I dont care");
-        someStream.setParentId(testSupportStream.getId());
-        connection.streams.create(someStream, streamsCallback);
-        Awaitility.await().until(hasCacheResult());
-        assertFalse(cacheError);
-        Awaitility.await().until(hasApiResult());
-        assertFalse(apiError);
-        cacheSuccess = false;
-        apiSuccess = false;
-
-        Stream duplicateIdStream = new Stream(someStream.getId(), "I will not be created");
-        duplicateIdStream.setParentId(testSupportStream.getId());
-        connection.streams.create(duplicateIdStream, streamsCallback);
-        Awaitility.await().until(hasCacheResult());
-        //assertFalse(cacheError);
-        Awaitility.await().until(hasApiResult());
-        assertFalse(apiSuccess);
-    }
-
-    // TODO check if possible
-    public void testCreateStreamMustReturnAnErrorIfTheStreamDataIsInvalid() {
-
-    }
-
-    /**
-     * UDPATE STREAM
-     */
-
-    // TODO
-    public void testUpdateStreamMustAcceptAValidStream() {
-
-    }
-
-    // TODO
-    public void testUpdateStreamMustUpdateTheStreamTreeWhenParentIdWasModified() {
-
-    }
-
-    // TODO
-    public void testUpdateStreamMustReturnAnErrorIfNoSuchStreamExistYet() {
-
-    }
-
-    // TODO
-    public void testUpdateStreamMustReturnAnErrorWhenIfAStreamWithTheSameNameExistsAtTheSameTreeLevel() {
-
-    }
-
-    /**
-     * DELETE STREAM
-     */
-
-    // TODO
-    public void testDeleteStreamMustAcceptAValidStream() {
-
-    }
-
-    // TODO
-    public void testDeleteStreamCalledOnceMustTrashTheStream() {
-
-    }
-
-    // TODO
-    public void testDeleteStreamCalledTwiceMustDeleteTheStreamAndReturnTheId() {
-
-    }
-
-    // TODO
-    public void testDeleteStreamMustUpdateItsEventsStreamIdsWhenDeletingWithMergeEventsWithParent() {
-
-    }
-
-    // TODO
-    public void testDeleteStreamMustDeleteItsEventsWhenDeletingWithoutMergeEventsWithParent() {
-
-    }
-
-    // TODO
-    public void testDeleteStreamMustReturnAnErrorWhenTheGivenStreamDoesntExist() {
-
-    }
-
 
     private static Callable<Boolean> hasCacheResult() {
         return new Callable<Boolean>() {
@@ -356,7 +167,6 @@ public class ConnectionStreamsTest {
             public void onApiSuccess(String successMessage, Event event, String pStoppedId,
                                      Double pServerTime) {
                 System.out.println("OnlineEventsManagerTest: eventsSuccess msg: " + successMessage);
-                stoppedId = pStoppedId;
                 apiSuccess = true;
                 apiEvent = event;
             }

@@ -133,8 +133,7 @@ public class EventTest {
     String eventType = "myType";
     testEvent =
       new Event(clientId, eventId, streamId, time, duration, eventType, content, tags, refs,
-        description, attachments, clientData, trashed, created, createdBy, modified, modifiedBy,
-        null);
+        description, attachments, clientData, trashed, created, createdBy, modified, modifiedBy);
     Event mergeDestination = new Event();
     mergeDestination.merge(testEvent, JsonConverter.getCloner());
     assertEquals(eventId, mergeDestination.getId());

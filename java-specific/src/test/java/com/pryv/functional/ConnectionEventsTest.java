@@ -1,6 +1,7 @@
 package com.pryv.functional;
 
 import com.jayway.awaitility.Awaitility;
+import com.pryv.Connection;
 import com.pryv.interfaces.EventsCallback;
 import com.pryv.Filter;
 import com.pryv.interfaces.GetStreamsCallback;
@@ -68,8 +69,7 @@ public class ConnectionEventsTest {
         instanciateGetStreamsCallback();
 
         connection =
-                new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, TestCredentials.DOMAIN,
-                        new DBinitCallback());
+                new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, TestCredentials.DOMAIN, true, new DBinitCallback());
 
         connection.setupCacheScope(new Filter());
 
