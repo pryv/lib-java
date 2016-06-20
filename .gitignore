@@ -78,3 +78,5 @@ build
 # android studio
 .idea
 
+# Allow wrapper jar for jitpack
+!gradle/wrapper/gradle-wrapper.jar
