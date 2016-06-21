@@ -6,14 +6,14 @@ import org.joda.time.DateTime;
 
 import java.util.Map;
 
-public abstract class AbstractConnection {
-    public abstract DateTime serverTimeInSystemDate(double time);
+public interface AbstractConnection {
+    DateTime serverTimeInSystemDate(double time);
 
-    public abstract String generateCacheFolderName();
+    String generateCacheFolderName();
 
-    public abstract Map<String, Stream> getRootStreams();
+    Map<String, Stream> getRootStreams();
 
-    public abstract boolean isCacheActive();
+    boolean isCacheActive();
 
-    public abstract void updateRootStreams(Map<String, Stream> streams);
+    void updateRootStreams(Map<String, Stream> streams);
 }

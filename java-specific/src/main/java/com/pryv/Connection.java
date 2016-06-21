@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Pryv API connection - Object used to manipulate Events and Streams data.
  */
-public class Connection extends AbstractConnection {
+public class Connection implements AbstractConnection {
 
     public ConnectionAccesses accesses;
     public ConnectionAccount account;

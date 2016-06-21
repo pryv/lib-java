@@ -42,7 +42,7 @@ import com.pryv.utils.Logger;
  * @author ik
  *
  */
-public class SQLiteDBHelper extends DBHelper {
+public class SQLiteDBHelper implements DBHelper {
 
   private final String initDBerrorMessage = "Database initialization error: ";
 
