@@ -1,1 +1,1 @@
-include ':basicexample', ':java-specific', ':android-specific', ':commons'
+include ':basicexample', ':java-specific', ':commons'
