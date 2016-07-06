@@ -1,6 +1,11 @@
 apply plugin: 'java'
-apply plugin: 'maven'
 apply plugin: 'jacoco'
+
+ext {
+    libraryName = 'Commons library'
+    artifact = 'commons'
+    libraryDescription = 'Common package shared among Java and Android specific libraries.'
+}
 
 group = 'com.pryv'
 version = '1.0.0'
@@ -26,3 +31,6 @@ dependencies {
     testCompile group: 'org.jacoco', name: 'jacoco-maven-plugin', version:'0.7.1.201405082137'
     compile 'commons-codec:commons-codec:1.2'
 }
+
+apply from: '../jcenter.gradle'
+apply from: '../bintray.gradle'

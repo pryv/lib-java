@@ -6,7 +6,8 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.0'
-
+		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -20,4 +21,19 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'pryv-java-android-lib'
+    publishedGroupId = 'com.pryv'
+    libraryVersion = '0.2.0'
+    siteUrl = 'http://api.pryv.com'
+    gitUrl = 'https://github.com/pryv/lib-java.git'
+    developerName = 'Thiébaud Modoux'
+    developerEmail = 'tmodoux@pryv.com'
+    organizationName = 'Pryv'
+    licenseName = 'BSD'
+    licenseUrl = 'https://github.com/pryv/documents/blob/master/license-bsd-revised.md'
+    allLicenses = ['BSD']
 }

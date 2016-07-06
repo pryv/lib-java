@@ -1,6 +1,15 @@
 apply plugin: 'java'
 
+ext {
+    libraryName = 'Pryv Java library'
+    artifact = 'java-specific'
+    libraryDescription = 'Pryv library for Java apps.'
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':commons')
 }
+
+apply from: '../jcenter.gradle'
+apply from: '../bintray.gradle'
