@@ -25,9 +25,14 @@ install {
                 }
                 developers {
                     developer {
-                        name developerName
-                        email developerEmail
-                        organization organizationName
+                        name 'Ilia Kebets'
+                        email 'ilia@pryv.com'
+                        organization 'Pryv'
+                    }
+                    developer {
+                        name 'Thiébaud Modoux'
+                        email 'tmodoux@pryv.com'
+                        organization 'Pryv'
                     }
                 }
                 scm {

@@ -127,6 +127,7 @@ public class Event {
     attachments = pAttachments;
     clientData = pClientData;
     trashed = pTrashed;
+    // TODO: check for non null?
     supervisor.put(this.clientId, this);
     idToClientId.put(this.id, this.clientId);
   }
@@ -206,6 +207,8 @@ public class Event {
     if (clientId == null) {
       clientId = event.generateClientId();
     }
+
+    // TODO: Check if already existing?
     supervisor.put(clientId, event);
 
     if (id != null) {

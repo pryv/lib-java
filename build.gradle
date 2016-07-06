@@ -30,9 +30,6 @@ ext {
     libraryVersion = '0.2.0'
     siteUrl = 'http://api.pryv.com'
     gitUrl = 'https://github.com/pryv/lib-java.git'
-    developerName = 'Thiébaud Modoux'
-    developerEmail = 'tmodoux@pryv.com'
-    organizationName = 'Pryv'
     licenseName = 'BSD'
     licenseUrl = 'https://github.com/pryv/documents/blob/master/license-bsd-revised.md'
     allLicenses = ['BSD']
