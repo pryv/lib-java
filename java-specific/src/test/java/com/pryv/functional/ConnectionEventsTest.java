@@ -145,7 +145,7 @@ public class ConnectionEventsTest {
     }
 
     // TODO add includeDeletions in Filter
-    //@Test
+    @Test
     public void testGetEventsMustReturnDeletedEventsWhenIncludeDeletionsIsSet() {
         Filter deletionsFilter = new Filter();
     }
@@ -203,7 +203,7 @@ public class ConnectionEventsTest {
 
     // TODO implement events.start in lib java
     // TODO move all the singleActivity related tests in a separate test class
-    //@Test
+    @Test
     public void
     testCreateEventsMustReturnAStoppedIdWhenCalledInASingleActivityStreamWithARunningEvent() {
         // create singleActivity Stream
@@ -278,7 +278,7 @@ public class ConnectionEventsTest {
     }
 
     // TODO add eventsManager.createEventWithAttachment()
-    // @Test
+    @Test
     public void testCreateEventsWithAttachmentWithValidDataMustWork() {
 
     }

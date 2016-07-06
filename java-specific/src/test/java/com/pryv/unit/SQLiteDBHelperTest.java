@@ -345,7 +345,7 @@ public class SQLiteDBHelperTest {
     assertNotNull(cacheStreams.get(validStream.getId()));
   }
 
-  //@Test
+  @Test
   public void testUpdateStreamShouldNotModifyEventIfItsField() {
     System.out.println("test update full stream START");
     String newStreamName = "myNewStreamName - dadadaa";
@@ -361,7 +361,7 @@ public class SQLiteDBHelperTest {
     assertEquals(newStreamName, cacheStreams.get(cacheStream.getId()).getName());
   }
 
-  //@Test
+  @Test
   public void test10retrieveStreams() {
     db.getStreams(getStreamsCallback);
     Awaitility.await().until(hasCacheResult());
@@ -370,7 +370,7 @@ public class SQLiteDBHelperTest {
     assertTrue(cacheStreams.get(cacheStream.getId()).getChildren().size() != 0);
   }
 
-  //@Test
+  @Test
   public void test11RemoveFullStream() {
     System.out.println("SQLiteDBHelperTest: test11RemoveFullStream");
     db.deleteStream(cacheStream, false, streamsCallback);
@@ -392,7 +392,7 @@ public class SQLiteDBHelperTest {
     }
   }
 
-  //@Test
+  @Test
   public void test14RetrieveCorrectEvent() {
     Event testedEvent = DummyData.generateFullEvent();
     String newClientId = "myNewClientID";
@@ -443,7 +443,7 @@ public class SQLiteDBHelperTest {
     assertFalse(cacheError);
   }
 
-  //@Test
+  @Test
   public void test13RetrieveStreamCorrectly() {
     Stream testedStream = DummyData.generateFullStream();
     String newId = "myNewStreamId";
@@ -485,7 +485,7 @@ public class SQLiteDBHelperTest {
     assertEquals(testedStream.getModifiedBy(), retrievedStream.getModifiedBy());
   }
 
-  //@Test
+  @Test
   public void testInsertAndRetrieveEventWithNullAttachments() {
     Event eventWithoutAttachments = DummyData.generateFullEvent();
     eventWithoutAttachments.setAttachments(null);

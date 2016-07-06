@@ -18,6 +18,7 @@ import com.pryv.utils.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.File;
 import java.util.List;
@@ -121,7 +122,7 @@ public class CacheUpdateTest {
         updateError = false;
     }
 
-    //@Test
+    @Test
     public void testUpdateCache() {
 
         Event newEvent = new Event(testSupportStream.getId(), null,
