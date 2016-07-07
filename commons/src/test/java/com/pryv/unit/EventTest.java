@@ -76,30 +76,30 @@ public class EventTest {
 
   @Test
   public void testCreateEventWithFields() {
-    checkEventParams(testEvent);
+    checkEventParams(testEvent, testEvent);
   }
 
-  private void checkEventParams(Event pEvent) {
-    assertEquals(testEvent.getId(), pEvent.getId());
-    assertEquals(testEvent.getStreamId(), pEvent.getStreamId());
-    assertEquals(testEvent.getTime(), pEvent.getTime());
-    assertEquals(testEvent.getType(), pEvent.getType());
-    for (String tag : pEvent.getTags()) {
-      assertTrue(testEvent.getTags().contains(tag));
+  private void checkEventParams(Event expected, Event actual) {
+    assertEquals(expected.getId(), actual.getId());
+    assertEquals(expected.getStreamId(), actual.getStreamId());
+    assertEquals(expected.getTime(), actual.getTime());
+    assertEquals(expected.getType(), actual.getType());
+    for (String tag : actual.getTags()) {
+      assertTrue(expected.getTags().contains(tag));
     }
-    assertEquals(testEvent.getDuration(), pEvent.getDuration());
-    assertEquals(testEvent.getContent(), pEvent.getContent());
-    for (String ref : pEvent.getReferences()) {
-      assertTrue(testEvent.getReferences().contains(ref));
+    assertEquals(expected.getDuration(), actual.getDuration());
+    assertEquals(expected.getContent(), actual.getContent());
+    for (String ref : actual.getReferences()) {
+      assertTrue(expected.getReferences().contains(ref));
     }
-    assertEquals(testEvent.getDescription(), pEvent.getDescription());
+    assertEquals(expected.getDescription(), actual.getDescription());
     Set<String> attachIds = new HashSet<String>();
-    for (Attachment attach : testEvent.getAttachments()) {
+    for (Attachment attach : expected.getAttachments()) {
       attachIds.add(attach.getId());
     }
-    for (Attachment testedAttachment : pEvent.getAttachments()) {
+    for (Attachment testedAttachment : actual.getAttachments()) {
       boolean attachmentsMatch = false;
-      for (Attachment trueAttachment : testEvent.getAttachments()) {
+      for (Attachment trueAttachment : expected.getAttachments()) {
         if (testedAttachment.getId().equals(trueAttachment.getId())) {
           attachmentsMatch = true;
           assertEquals(trueAttachment.getFileName(), testedAttachment.getFileName());
@@ -110,12 +110,12 @@ public class EventTest {
       }
       assertTrue(attachmentsMatch);
     }
-    assertEquals(testEvent.formatClientDataAsString(), pEvent.formatClientDataAsString());
-    assertEquals(testEvent.isTrashed(), pEvent.isTrashed());
-    assertEquals(testEvent.getCreated(), pEvent.getCreated());
-    assertEquals(testEvent.getCreatedBy(), pEvent.getCreatedBy());
-    assertEquals(testEvent.getModified(), pEvent.getModified());
-    assertEquals(testEvent.getModifiedBy(), pEvent.getModifiedBy());
+    assertEquals(expected.formatClientDataAsString(), actual.formatClientDataAsString());
+    assertEquals(expected.isTrashed(), actual.isTrashed());
+    assertEquals(expected.getCreated(), actual.getCreated());
+    assertEquals(expected.getCreatedBy(), actual.getCreatedBy());
+    assertEquals(expected.getModified(), actual.getModified());
+    assertEquals(expected.getModifiedBy(), actual.getModifiedBy());
   }
 
   @Test
@@ -130,7 +130,7 @@ public class EventTest {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    checkEventParams(eventFromJson);
+    checkEventParams(testEvent, eventFromJson);
   }
 
   @Test
