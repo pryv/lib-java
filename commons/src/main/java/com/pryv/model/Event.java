@@ -76,6 +76,27 @@ public class Event {
   private static Map<String, String> idToClientId = new ConcurrentHashMap<String, String>();
 
   /**
+   * empty Event constructor
+   */
+  public Event() {
+    this.generateId();
+  }
+
+  /**
+   * Constructor for Event object with mandatory fields
+   *
+   * @param streamId
+   * @param type
+   * @param content
+   */
+  public Event(String streamId, String type, String content) {
+    this.generateClientId();
+    this.streamId = streamId;
+    this.type = type;
+    this.content = content;
+  };
+
+  /**
    * Construct Event object from parameters
    *
    * @param pClientId
@@ -130,27 +151,6 @@ public class Event {
     // TODO: check for non null?
     supervisor.put(this.clientId, this);
     idToClientId.put(this.id, this.clientId);
-  }
-
-  /**
-   * empty Event constructor
-   */
-  public Event() {
-  }
-
-  /**
-   * minimal constructor
-   *
-   * @param streamId
-   * @param time
-   * @param type
-   * @param content
-   */
-  public Event(String streamId, Double time, String type, Object content) {
-    this.streamId = streamId;
-    this.time = time;
-    this.type = type;
-    this.content = content;
   }
 
   /**
@@ -215,6 +215,16 @@ public class Event {
       idToClientId.put(id, clientId);
     }
     return event;
+  }
+
+  /**
+   * Assign unique identifier to the Event - does nothing if Event has already a id field
+   */
+  public String generateId() {
+    if (this.id == null) {
+      this.id = UUID.randomUUID().toString();
+    }
+    return this.id;
   }
 
   /**
