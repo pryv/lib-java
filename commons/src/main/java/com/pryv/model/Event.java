@@ -226,7 +226,7 @@ public class Event {
   public String generateId() {
     if (this.id == null) {
       // TODO find better way to generate CUID
-      this.id = "c" + UUID.randomUUID().toString().substring(0,23);
+      this.id = "c" + UUID.randomUUID().toString().substring(0,24);
     }
     return this.id;
   }
