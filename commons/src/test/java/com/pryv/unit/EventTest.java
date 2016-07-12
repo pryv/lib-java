@@ -20,6 +20,10 @@ import com.pryv.model.Attachment;
 import com.pryv.model.Event;
 import com.pryv.utils.JsonConverter;
 
+import com.pryv.util.TestUtils;
+
+
+
 /**
  * unit test for Event class methods
  *
@@ -64,74 +68,17 @@ public class EventTest {
     assertEquals(content, event.getContent());
   }
 
+  @Test
   public void testFullConstructor() {
-    // TODO
+    TestUtils.checkEvent(testEvent, testEvent);
   }
+
 
   public void testCreateOrReuse() {
 
   }
 
   // TODO test remaining methods
-
-  @Test
-  public void testCreateEventWithFields() {
-    checkEventParams(testEvent, testEvent);
-  }
-
-  private void checkEventParams(Event expected, Event actual) {
-    assertEquals(expected.getId(), actual.getId());
-    assertEquals(expected.getStreamId(), actual.getStreamId());
-    assertEquals(expected.getTime(), actual.getTime());
-    assertEquals(expected.getType(), actual.getType());
-    for (String tag : actual.getTags()) {
-      assertTrue(expected.getTags().contains(tag));
-    }
-    assertEquals(expected.getDuration(), actual.getDuration());
-    assertEquals(expected.getContent(), actual.getContent());
-    for (String ref : actual.getReferences()) {
-      assertTrue(expected.getReferences().contains(ref));
-    }
-    assertEquals(expected.getDescription(), actual.getDescription());
-    Set<String> attachIds = new HashSet<String>();
-    for (Attachment attach : expected.getAttachments()) {
-      attachIds.add(attach.getId());
-    }
-    for (Attachment testedAttachment : actual.getAttachments()) {
-      boolean attachmentsMatch = false;
-      for (Attachment trueAttachment : expected.getAttachments()) {
-        if (testedAttachment.getId().equals(trueAttachment.getId())) {
-          attachmentsMatch = true;
-          assertEquals(trueAttachment.getFileName(), testedAttachment.getFileName());
-          assertEquals(trueAttachment.getReadToken(), testedAttachment.getReadToken());
-          assertEquals(trueAttachment.getType(), testedAttachment.getType());
-          assertTrue(trueAttachment.getSize() == testedAttachment.getSize());
-        }
-      }
-      assertTrue(attachmentsMatch);
-    }
-    assertEquals(expected.formatClientDataAsString(), actual.formatClientDataAsString());
-    assertEquals(expected.isTrashed(), actual.isTrashed());
-    assertEquals(expected.getCreated(), actual.getCreated());
-    assertEquals(expected.getCreatedBy(), actual.getCreatedBy());
-    assertEquals(expected.getModified(), actual.getModified());
-    assertEquals(expected.getModifiedBy(), actual.getModifiedBy());
-  }
-
-  @Test
-  public void testCreateEventFromJson() {
-    Event eventFromJson = new Event();
-    try {
-      JsonConverter.resetEventFromJson(jsonEvent, eventFromJson);
-    } catch (JsonParseException e) {
-      e.printStackTrace();
-    } catch (JsonMappingException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    checkEventParams(testEvent, eventFromJson);
-  }
 
   @Test
   public void testMerge() {
