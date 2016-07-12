@@ -53,7 +53,6 @@ public class EventTest {
     event.setStreamId(streamId);
     event.setType(type);
     event.setContent(content);
-    assertNotNull(event.getId());
     assertTrue(event.getId().matches("^c[a-z0-9-]{24}$"));
     assertEquals(streamId, event.getStreamId());
     assertEquals(type, event.getType());
@@ -63,7 +62,7 @@ public class EventTest {
   @Test
   public void testMinimalConstructor() {
     Event event = new Event(streamId, type, content);
-    // TODO verify that id field exists and that it fits the id regex
+    assertTrue(event.getId().matches("^c[a-z0-9-]{24}$"));
     assertEquals(streamId, event.getStreamId());
     assertEquals(type, event.getType());
     assertEquals(content, event.getContent());
