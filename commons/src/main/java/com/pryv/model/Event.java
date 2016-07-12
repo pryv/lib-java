@@ -15,9 +15,12 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -222,7 +225,8 @@ public class Event {
    */
   public String generateId() {
     if (this.id == null) {
-      this.id = UUID.randomUUID().toString();
+      // TODO find better way to generate CUID
+      this.id = "c" + UUID.randomUUID().toString().substring(0,23);
     }
     return this.id;
   }
@@ -377,7 +381,7 @@ public class Event {
     StringBuilder sb = new StringBuilder();
     if (clientData != null) {
       String separator = "";
-      for (String key : clientData.keySet()) {
+      for (String key : sortSet(clientData.keySet())) {
         sb.append(separator);
         separator = ",";
         sb.append(key + ":" + clientData.get(key));
@@ -386,6 +390,12 @@ public class Event {
     } else {
       return null;
     }
+  }
+
+  private List<String> sortSet (Collection<String> c) {
+    List<String> list = new ArrayList<String>(c);
+    java.util.Collections.sort(list);
+    return list;
   }
 
   /**
