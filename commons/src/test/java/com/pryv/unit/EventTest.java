@@ -1,26 +1,21 @@
 package com.pryv.unit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import com.pryv.model.Attachment;
+import com.pryv.model.Event;
+import com.pryv.util.TestUtils;
+import com.pryv.utils.JsonConverter;
 
-import java.io.IOException;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.pryv.model.Attachment;
-import com.pryv.model.Event;
-import com.pryv.utils.JsonConverter;
-
-import com.pryv.util.TestUtils;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 
 
@@ -80,7 +75,7 @@ public class EventTest {
 
   // TODO test remaining methods
 
-  @Test
+  //@Test
   public void testMerge() {
     String eventId = "eventId";
     String streamId = "parentId";
