@@ -93,7 +93,7 @@ public class Event {
    * @param content
    */
   public Event(String streamId, String type, String content) {
-    this.generateClientId();
+    this.generateId();
     this.streamId = streamId;
     this.type = type;
     this.content = content;
