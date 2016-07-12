@@ -71,23 +71,27 @@ public class TestUtils {
                 }
             }
 
-            for (Attachment testedAttachment : actual.getAttachments()) {
-                boolean attachmentsMatch = false;
-                for (Attachment trueAttachment : expected.getAttachments()) {
-                    if (testedAttachment.getId().equals(trueAttachment.getId())) {
-                        attachmentsMatch = true;
-                        assertEquals(trueAttachment.getFileName(), testedAttachment.getFileName());
-                        assertEquals(trueAttachment.getReadToken(), testedAttachment.getReadToken());
-                        assertEquals(trueAttachment.getType(), testedAttachment.getType());
-                        assertTrue(trueAttachment.getSize() == testedAttachment.getSize());
+            if (expected.getAttachments() != null) {
+                assertNotNull(actual.getAttachments());
+                assertEquals(expected.getAttachments().size(), actual.getAttachments().size());
+                for (Attachment testedAttachment : actual.getAttachments()) {
+                    boolean attachmentsMatch = false;
+                    for (Attachment trueAttachment : expected.getAttachments()) {
+                        if (testedAttachment.getId().equals(trueAttachment.getId())) {
+                            attachmentsMatch = true;
+                            assertEquals(trueAttachment.getFileName(), testedAttachment.getFileName());
+                            assertEquals(trueAttachment.getReadToken(), testedAttachment.getReadToken());
+                            assertEquals(trueAttachment.getType(), testedAttachment.getType());
+                            assertTrue(trueAttachment.getSize() == testedAttachment.getSize());
+                        }
                     }
+                    assertTrue(attachmentsMatch);
                 }
-                assertTrue(attachmentsMatch);
             }
 
-
-            assertEquals(expected.formatClientDataAsString(), actual.formatClientDataAsString());
-            // TODO compare clientData
+            if (expected.getClientData() != null) {
+                assertEquals(expected.formatClientDataAsString(), actual.formatClientDataAsString());
+            }
         }
     }
 
