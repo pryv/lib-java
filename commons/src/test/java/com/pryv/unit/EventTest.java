@@ -35,10 +35,12 @@ public class EventTest {
   private Event testEvent;
   private String jsonEvent;
 
-  private String id = "test-id";
-  private String streamId = "test-stream-id";
-  private String type = "note/txt";
-  private String content = "yolo";
+  private static final String ID = "test-id";
+  private static final String STREAM_ID = "test-stream-id";
+  private static final String TYPE = "note/txt";
+  private static final String CONTENT = "yolo";
+
+  private static final String CUID_REGEX = "^c[a-z0-9-]{24}$";
 
   @Before
   public void setUp() throws Exception {
@@ -50,22 +52,22 @@ public class EventTest {
   public void testEmptyConstructor() {
     Event event = new Event();
 
-    event.setStreamId(streamId);
-    event.setType(type);
-    event.setContent(content);
-    assertTrue(event.getId().matches("^c[a-z0-9-]{24}$"));
-    assertEquals(streamId, event.getStreamId());
-    assertEquals(type, event.getType());
-    assertEquals(content, event.getContent());
+    event.setStreamId(STREAM_ID);
+    event.setType(TYPE);
+    event.setContent(CONTENT);
+    assertTrue(event.getId().matches(CUID_REGEX));
+    assertEquals(STREAM_ID, event.getStreamId());
+    assertEquals(TYPE, event.getType());
+    assertEquals(CONTENT, event.getContent());
   }
 
   @Test
   public void testMinimalConstructor() {
-    Event event = new Event(streamId, type, content);
-    assertTrue(event.getId().matches("^c[a-z0-9-]{24}$"));
-    assertEquals(streamId, event.getStreamId());
-    assertEquals(type, event.getType());
-    assertEquals(content, event.getContent());
+    Event event = new Event(STREAM_ID, TYPE, CONTENT);
+    assertTrue(event.getId().matches(CUID_REGEX));
+    assertEquals(STREAM_ID, event.getStreamId());
+    assertEquals(TYPE, event.getType());
+    assertEquals(CONTENT, event.getContent());
   }
 
   @Test
