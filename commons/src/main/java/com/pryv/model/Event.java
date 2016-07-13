@@ -219,6 +219,10 @@ public class Event {
   public String generateId() {
     if (this.id == null) {
       // TODO find better way to generate CUID
+      // https://github.com/graphcool/cuid-java/blob/master/src/main/java/cool/graph/cuid/Cuid.java#L2
+      // Issue: ManagementFactory for Fingerprint part should be redesigned for Android
+      // http://stackoverflow.com/questions/12462215/managementfactory-from-java-lang-management-in-android
+
       this.id = "c" + UUID.randomUUID().toString().substring(0,24);
     }
     return this.id;
@@ -673,6 +677,4 @@ public class Event {
       this.trashed = ptrashed;
     }
   }
-
-
 }
