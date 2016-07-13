@@ -83,6 +83,7 @@ public class Event {
    */
   public Event() {
     this.generateId();
+    this.updateSupervisor();
   }
 
   /**
@@ -94,6 +95,7 @@ public class Event {
    */
   public Event(String streamId, String type, String content) {
     this.generateId();
+    this.updateSupervisor();
     this.streamId = streamId;
     this.type = type;
     this.content = content;
@@ -151,8 +153,7 @@ public class Event {
     attachments = pAttachments;
     clientData = pClientData;
     trashed = pTrashed;
-    // TODO: check for non null?
-    supervisor.put(this.id, this);
+    this.updateSupervisor();
   }
 
   /**
@@ -226,6 +227,15 @@ public class Event {
       this.id = "c" + UUID.randomUUID().toString().substring(0,24);
     }
     return this.id;
+  }
+
+  private void updateSupervisor() {
+    String id = this.getId();
+    if(supervisor.containsKey(id)) {
+      supervisor.get(id).merge(this, JsonConverter.getCloner());
+    } else {
+      supervisor.put(id,this);
+    }
   }
 
   /**

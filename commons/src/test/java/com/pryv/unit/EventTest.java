@@ -52,7 +52,6 @@ public class EventTest {
   @Test
   public void testEmptyConstructor() {
     Event event = new Event();
-
     event.setStreamId(STREAM_ID);
     event.setType(TYPE);
     event.setContent(CONTENT);
@@ -75,15 +74,6 @@ public class EventTest {
   public void testFullConstructor() {
     TestUtils.checkEvent(testEvent, testEvent);
   }
-
-  public void testCreateOrReuse() {
-    // TODO: Do it with non nulls?
-    Event fullEvent = new Event(null, ID, STREAM_ID, null, null, TYPE, CONTENT, null, null, null, null, null, false, null, null, null, null);
-    Event.createOrReuse(fullEvent);
-    // TODO: Mock ResultSet?
-  }
-
-  // TODO test remaining methods
 
   @Test
   public void testMerge() {
