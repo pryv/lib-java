@@ -152,8 +152,7 @@ public class Event {
     clientData = pClientData;
     trashed = pTrashed;
     // TODO: check for non null?
-    supervisor.put(this.clientId, this);
-    idToClientId.put(this.id, this.clientId);
+    supervisor.put(this.id, this);
   }
 
   /**
@@ -166,8 +165,8 @@ public class Event {
    * @throws IOException
    */
   public static Event createOrReuse(ResultSet result) throws SQLException, IOException {
-    String clientId = result.getString(QueryGenerator.EVENTS_CLIENT_ID_KEY);
-    Event event = supervisor.get(clientId);
+    String id = result.getString(QueryGenerator.EVENTS_ID_KEY);
+    Event event = supervisor.get(id);
     if (event == null) {
       event = new Event();
     }
@@ -202,21 +201,15 @@ public class Event {
    */
   public static Event createOrReuse(Event event) {
     String id = event.getId();
-    String clientId = event.getClientId();
-    if (id != null && clientId == null) {
-      clientId = idToClientId.get(id);
-    }
 
-    if (clientId == null) {
-      clientId = event.generateClientId();
+    // TODO: I think this check is not needed
+    if (id == null) {
+      id = event.generateId();
     }
 
     // TODO: Check if already existing?
-    supervisor.put(clientId, event);
+    supervisor.put(id, event);
 
-    if (id != null) {
-      idToClientId.put(id, clientId);
-    }
     return event;
   }
 
