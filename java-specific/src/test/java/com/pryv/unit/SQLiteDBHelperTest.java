@@ -94,16 +94,14 @@ public class SQLiteDBHelperTest {
     assertFalse(cacheError);
     cacheSuccess = false;
     for (Event event : cacheEvents) {
-      System.out.println("trashing event with clientId="
-        + event.getClientId()
-          + ", cid="
-          + event.getClientId());
+      System.out.println("trashing event with id="
+        + event.getId());
       db.deleteEvent(event, eventsCallback);
       Awaitility.await().until(hasCacheResult());
       assertFalse(cacheError);
       cacheSuccess = false;
       if (cacheEvent != null) {
-        System.out.println("deleting again: " + cacheEvent.getClientId());
+        System.out.println("deleting again: " + cacheEvent.getId());
         db.deleteEvent(event, eventsCallback);
         Awaitility.await().until(hasCacheResult());
         assertFalse(cacheError);
@@ -153,7 +151,7 @@ public class SQLiteDBHelperTest {
   public void testInsertIncompleteEventShouldGenerateError() {
     System.out.println("test2");
     Event emptyEvent = new Event();
-    emptyEvent.setClientId("yolo");
+    emptyEvent.setId("yolo");
     emptyEvent.setStreamId("testStreamId");
     emptyEvent.setContent("i am missing mandatory fields");
     db.createEvent(emptyEvent, eventsCallback);
@@ -164,7 +162,7 @@ public class SQLiteDBHelperTest {
   @Test
   public void testInsertValidEvent() {
     Event newEvent = new Event();
-    newEvent.setClientId("newEventClientId");
+    newEvent.setId("newEventId");
     newEvent.setStreamId("myStreamId");
     newEvent.setType("activity/plain");
     db.createEvent(newEvent, eventsCallback);
@@ -175,14 +173,14 @@ public class SQLiteDBHelperTest {
     db.getEvents(new Filter(), getEventsCallback);
     Awaitility.await().until(hasCacheResult());
     assertFalse(cacheError);
-    assertNotNull(getEventByClientId(newEvent.getClientId(), cacheEvents));
+    assertNotNull(getEventById(newEvent.getId(), cacheEvents));
   }
 
   // TODO implement modified_time comparison for this to work
   @Test
   public void testUpdateEventShouldDoNothingBecauseOfModifiedFields() {
     Event eventToUpdate = new Event();
-    eventToUpdate.setClientId("myUpdatedEventCid");
+    eventToUpdate.setId("myUpdatedEventId");
     eventToUpdate.setStreamId("someStreamId");
     eventToUpdate.setType("note/txt");
     eventToUpdate.setContent("I will be updated youhou");
@@ -193,8 +191,8 @@ public class SQLiteDBHelperTest {
     assertFalse(cacheError);
     cacheSuccess = false;
 
-    Event updatedEvent = new Event(eventToUpdate.getStreamId(), null, eventToUpdate.getType(), null);
-    updatedEvent.setClientId(eventToUpdate.getClientId());
+    Event updatedEvent = new Event(eventToUpdate.getStreamId(), eventToUpdate.getType(), null);
+    updatedEvent.setId(eventToUpdate.getId());
     updatedEvent.setContent("new updated content, " +
             "shouldnt be stored in cache because of modified time");
     db.updateEvent(updatedEvent, eventsCallback);
@@ -205,14 +203,14 @@ public class SQLiteDBHelperTest {
     db.getEvents(new Filter(), getEventsCallback);
     Awaitility.await().until(hasCacheResult());
     assertFalse(cacheError);
-    Event notModifiedEvent = getEventByClientId(eventToUpdate.getClientId(), cacheEvents);
+    Event notModifiedEvent = getEventById(eventToUpdate.getId(), cacheEvents);
     assertEquals(notModifiedEvent.getContent(), eventToUpdate.getContent());
   }
 
   @Test
   public void testUpdateEventShouldModify() {
     Event eventToUpdate = new Event();
-    eventToUpdate.setClientId("myUpdatedEventCid");
+    eventToUpdate.setId("myUpdatedEventId");
     eventToUpdate.setStreamId("someStreamId");
     eventToUpdate.setType("note/txt");
     eventToUpdate.setContent("I will be updated youhou");
@@ -223,8 +221,8 @@ public class SQLiteDBHelperTest {
     assertFalse(cacheError);
     cacheSuccess = false;
 
-    Event updatedEvent = new Event(eventToUpdate.getStreamId(), null, eventToUpdate.getType(), null);
-    updatedEvent.setClientId(eventToUpdate.getClientId());
+    Event updatedEvent = new Event(eventToUpdate.getStreamId(), eventToUpdate.getType(), null);
+    updatedEvent.setId(eventToUpdate.getId());
     updatedEvent.setContent("new updated content, " +
             "should be stored because modified time is later");
     updatedEvent.setModified(eventToUpdate.getModified() + MODIFIED_INCREMENT);
@@ -236,14 +234,14 @@ public class SQLiteDBHelperTest {
     db.getEvents(new Filter(), getEventsCallback);
     Awaitility.await().until(hasCacheResult());
     assertFalse(cacheError);
-    Event modifiedEvent = getEventByClientId(eventToUpdate.getClientId(), cacheEvents);
+    Event modifiedEvent = getEventById(eventToUpdate.getId(), cacheEvents);
     assertNotEquals(modifiedEvent.getContent(), eventToUpdate.getContent());
   }
 
   @Test
   public void testDeleteEventCalledOnceShouldUpdateItAsTrashed() {
     Event eventToTrash = new Event();
-    eventToTrash.setClientId("newEventClientId");
+    eventToTrash.setId("newEventId");
     eventToTrash.setStreamId("myStreamId");
     eventToTrash.setType("activity/plain");
     db.createEvent(eventToTrash, eventsCallback);
@@ -260,14 +258,14 @@ public class SQLiteDBHelperTest {
     Awaitility.await().until(hasCacheResult());
     assertFalse(cacheError);
     assertNotNull(cacheEvents);
-    Event trashedEvent = getEventByClientId(eventToTrash.getClientId(), cacheEvents);
+    Event trashedEvent = getEventById(eventToTrash.getId(), cacheEvents);
     assertEquals(true, trashedEvent.isTrashed());
   }
 
   @Test
   public void testDeleteEventCalledTwiceShouldDeleteIt() {
     Event eventToDelete = new Event();
-    eventToDelete.setClientId("newEventClientId");
+    eventToDelete.setId("newEventId");
     eventToDelete.setStreamId("myStreamId");
     eventToDelete.setType("activity/plain");
     db.createEvent(eventToDelete, eventsCallback);
@@ -288,20 +286,20 @@ public class SQLiteDBHelperTest {
     db.getEvents(null, getEventsCallback);
     Awaitility.await().until(hasCacheResult());
     assertFalse(cacheError);
-    assertNull(getEventByClientId(eventToDelete.getClientId(), cacheEvents));
+    assertNull(getEventById(eventToDelete.getId(), cacheEvents));
   }
 
   @Test
   public void testGetEventsShouldReturnEventsMatchingTheProvidedFilter() {
-    Event noteEvent = new Event("myStream", null, "note/txt", "hi");
-    noteEvent.setClientId("myClientId");
+    Event noteEvent = new Event("myStream", "note/txt", "hi");
+    noteEvent.setId("myId");
     db.createEvent(noteEvent, eventsCallback);
     Awaitility.await().until(hasCacheResult());
     assertFalse(cacheError);
     cacheSuccess = false;
 
-    Event activityEvent = new Event("myStream", null, "activity/plain", null);
-    activityEvent.setClientId("otherClientId");
+    Event activityEvent = new Event("myStream", "activity/plain", null);
+    activityEvent.setId("otherId");
     db.createEvent(activityEvent, eventsCallback);
     Awaitility.await().until(hasCacheResult());
     assertFalse(cacheError);
@@ -395,8 +393,8 @@ public class SQLiteDBHelperTest {
   @Test
   public void test14RetrieveCorrectEvent() {
     Event testedEvent = DummyData.generateFullEvent();
-    String newClientId = "myNewClientID";
-    testedEvent.setClientId(newClientId);
+    String newId = "myNewID";
+    testedEvent.setId(newId);
     db.createEvent(testedEvent, eventsCallback);
     Awaitility.await().until(hasCacheResult());
     assertFalse(cacheError);
@@ -405,8 +403,8 @@ public class SQLiteDBHelperTest {
     Awaitility.await().until(hasCacheResult());
     assertFalse(cacheError);
     cacheSuccess = false;
-    Event retrievedEvent = getEventByClientId(newClientId, cacheEvents);
-    assertEquals(testedEvent.getClientId(), retrievedEvent.getClientId());
+    Event retrievedEvent = getEventById(newId, cacheEvents);
+    assertEquals(testedEvent.getId(), retrievedEvent.getId());
     assertEquals(testedEvent.getStreamId(), retrievedEvent.getStreamId());
     assertEquals(testedEvent.getTime(), retrievedEvent.getTime());
     assertEquals(testedEvent.getDuration(), retrievedEvent.getDuration());
@@ -489,8 +487,8 @@ public class SQLiteDBHelperTest {
   public void testInsertAndRetrieveEventWithNullAttachments() {
     Event eventWithoutAttachments = DummyData.generateFullEvent();
     eventWithoutAttachments.setAttachments(null);
-    String clientId = "eventWithoutAttachmentsID";
-    eventWithoutAttachments.setClientId(clientId);
+    String id = "eventWithoutAttachmentsID";
+    eventWithoutAttachments.setId(id);
     db.createEvent(eventWithoutAttachments, eventsCallback);
     Awaitility.await().until(hasCacheResult());
     assertFalse(cacheError);
@@ -498,7 +496,7 @@ public class SQLiteDBHelperTest {
     db.getEvents(null, getEventsCallback);
     Awaitility.await().until(hasCacheResult());
     assertFalse(cacheError);
-    assertNull(getEventByClientId(clientId, cacheEvents).getAttachments());
+    assertNull(getEventById(id, cacheEvents).getAttachments());
   }
 
   /**
@@ -511,9 +509,9 @@ public class SQLiteDBHelperTest {
   }
 
 
-  private Event getEventByClientId(String clientId, List<Event> events) {
+  private Event getEventById(String id, List<Event> events) {
     for(Event event: events) {
-      if (clientId.equals(event.getClientId())) {
+      if (id.equals(event.getId())) {
         return event;
       }
     }

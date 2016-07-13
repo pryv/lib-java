@@ -91,7 +91,6 @@ public class EventTest {
     String key = "key";
     String val = "value";
     clientData.put(key, val);
-    String clientId = "clientId";
     String content = "blablabla";
     Double created = 123.0;
     String createdBy = "bob";
@@ -111,12 +110,11 @@ public class EventTest {
     Boolean trashed = false;
     String eventType = "myType";
     testEvent =
-      new Event(clientId, eventId, streamId, time, duration, eventType, content, tags, refs,
+      new Event(eventId, streamId, time, duration, eventType, content, tags, refs,
         description, attachments, clientData, trashed, created, createdBy, modified, modifiedBy);
     Event mergeDestination = new Event();
     mergeDestination.merge(testEvent, JsonConverter.getCloner());
     assertEquals(eventId, mergeDestination.getId());
-    assertEquals(clientId, mergeDestination.getClientId());
     assertEquals(streamId, mergeDestination.getStreamId());
     assertEquals(time, mergeDestination.getTime());
     assertEquals(duration, mergeDestination.getDuration());

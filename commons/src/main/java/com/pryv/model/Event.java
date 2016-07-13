@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Event data structure from Pryv
@@ -41,7 +40,6 @@ public class Event {
    * id used to access files locally
    */
   @JsonIgnore
-  private String clientId;
 
   private String id;
   private String streamId;
@@ -74,11 +72,6 @@ public class Event {
   private static Map<String, Event> supervisor = new WeakHashMap<String, Event>();
 
   /**
-   * Used to map ids to clientIds
-   */
-  private static Map<String, String> idToClientId = new ConcurrentHashMap<String, String>();
-
-  /**
    * empty Event constructor
    */
   public Event() {
@@ -104,7 +97,6 @@ public class Event {
   /**
    * Construct Event object from parameters
    *
-   * @param pClientId
    * @param pId
    * @param pStreamId
    * @param pTime
@@ -131,11 +123,10 @@ public class Event {
    * @param pTrashed
    *          optional
    */
-  public Event(String pClientId, String pId, String pStreamId, Double pTime, Double pDuration,
+  public Event(String pId, String pStreamId, Double pTime, Double pDuration,
     String pType, String pContent, Set<String> pTags, Set<String> pReferences, String pDescription,
     Set<Attachment> pAttachments, Map<String, Object> pClientData, Boolean pTrashed,
     Double pCreated, String pCreatedBy, Double pModified, String pModifiedBy) {
-    clientId = pClientId;
     id = pId;
     streamId = pStreamId;
     time = pTime;
@@ -202,15 +193,7 @@ public class Event {
    */
   public static Event createOrReuse(Event event) {
     String id = event.getId();
-
-    // TODO: I think this check is not needed
-    if (id == null) {
-      id = event.generateId();
-    }
-
-    // TODO: Check if already existing?
     supervisor.put(id, event);
-
     return event;
   }
 
@@ -236,16 +219,6 @@ public class Event {
     } else {
       supervisor.put(id,this);
     }
-  }
-
-  /**
-   * Assign unique identifier to the Event - does nothing if Event has already a clientId field
-   */
-  public String generateClientId() {
-    if (this.clientId == null) {
-      this.clientId = UUID.randomUUID().toString();
-    }
-    return this.clientId;
   }
 
   /**
@@ -276,7 +249,6 @@ public class Event {
    *          com.rits.cloning.Cloner instance from JsonConverter util class
    */
   public void merge(Event temp, Cloner cloner) {
-    clientId = temp.clientId;
     weakConnection = temp.weakConnection;
     id = temp.id;
     streamId = temp.streamId;
@@ -478,8 +450,7 @@ public class Event {
 
   @Override
   public String toString() {
-    return "{\"cid\":\"" + clientId + "\","
-            + "\"id\":\"" + id + "\","
+    return "{\"id\":\"" + id + "\","
             + "\"streamId\":\"" + streamId + "\","
             + "\"time\":\"" + time + "\","
             + "\"duration\":\"" + duration + "\","
@@ -495,10 +466,6 @@ public class Event {
             + "\"modified\":\"" + modified + "\","
             + "\"modifiedBy\":\"" + modifiedBy + "\"}";
 
-  }
-
-  public String getClientId() {
-    return clientId;
   }
 
   public String getId() {
@@ -570,31 +537,13 @@ public class Event {
   }
 
   /**
-   * Assigns a clientId and saves it in the supervisor
-   *
-   * @param clientId
-   */
-  public void setClientId(String clientId) {
-    if(clientId != null) {
-      this.clientId = clientId;
-      supervisor.put(this.clientId, this);
-      if (id != null) {
-        idToClientId.put(this.id, this.clientId);
-      }
-    }
-  }
-
-  /**
-   * Assigns an id and puts an entry in the idToClientId table
+   * Assigns an id
    *
    * @param pid
    */
   public void setId(String pid) {
     if(pid != null) {
       this.id = pid;
-      if (this.clientId != null) {
-        idToClientId.put(this.id, this.clientId);
-      }
     }
   }
 

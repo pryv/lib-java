@@ -240,7 +240,7 @@ public class SQLiteDBHelper implements DBHelper {
             String cmd = QueryGenerator.insertOrReplaceEvent(event);
             logger.log("SQLiteDBHelper: update or create event : " + cmd);
             statement.execute(cmd);
-            logger.log("SQLiteDBHelper: inserted " + event.getClientId() + " into DB.");
+            logger.log("SQLiteDBHelper: inserted " + event.getId() + " into DB.");
             statement.close();
           } catch (SQLException e) {
             cacheEventsCallback.onCacheError(e.getMessage());
@@ -271,9 +271,9 @@ public class SQLiteDBHelper implements DBHelper {
       @Override
       public void run() {
         try {
-          System.out.println("SQLiteDBHelper: deleting event with cid="
-            + eventToDelete.getClientId());
-          String fetchCmd = QueryGenerator.retrieveEvent(eventToDelete.getClientId());
+          System.out.println("SQLiteDBHelper: deleting event with Id="
+            + eventToDelete.getId());
+          String fetchCmd = QueryGenerator.retrieveEvent(eventToDelete.getId());
           System.out.println("SQLiteDBHelper: fetching request: " + fetchCmd);
           Statement statement = dbConnection.createStatement();
           ResultSet result = statement.executeQuery(fetchCmd);
@@ -283,18 +283,18 @@ public class SQLiteDBHelper implements DBHelper {
               // delete really
               String cmd = QueryGenerator.deleteEvent(retrievedEvent);
               statement.executeUpdate(cmd);
-              cacheEventsCallback.onCacheSuccess("SQLiteDBHelper: Event with clientId="
-                      + eventToDelete.getClientId()
+              cacheEventsCallback.onCacheSuccess("SQLiteDBHelper: Event with Id="
+                      + eventToDelete.getId()
                       + " is deleted.", null);
             } else {
               // set to trashed
               retrievedEvent.setTrashed(true);
               String cmd = QueryGenerator.insertOrReplaceEvent(retrievedEvent);
               statement.executeUpdate(cmd);
-              logger.log("SQLiteDBHelper: delete - set trashed=true for clientId="
-                + retrievedEvent.getClientId());
-              cacheEventsCallback.onCacheSuccess("SQLiteDBHelper: Event with clientId="
-                      + retrievedEvent.getClientId()
+              logger.log("SQLiteDBHelper: delete - set trashed=true for Id="
+                + retrievedEvent.getId());
+              cacheEventsCallback.onCacheSuccess("SQLiteDBHelper: Event with Id="
+                      + retrievedEvent.getId()
                       + " is trashed.", retrievedEvent);
             }
           }

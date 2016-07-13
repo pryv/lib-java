@@ -125,16 +125,16 @@ public class CacheUpdateTest {
     @Test
     public void testUpdateCache() {
 
-        Event newEvent = new Event(testSupportStream.getId(), null,
+        Event newEvent = new Event(testSupportStream.getId(),
                 "note/txt", "i am a test event");
-        newEvent.generateClientId();
+        newEvent.generateId();
         api.createEvent(newEvent, eventsCallback);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
         apiSuccess = false;
-        newEvent = new Event(testSupportStream.getId(), null,
+        newEvent = new Event(testSupportStream.getId(),
                 "note/txt", "i am another test event");
-        newEvent.generateClientId();
+        newEvent.generateId();
         api.createEvent(newEvent, eventsCallback);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);

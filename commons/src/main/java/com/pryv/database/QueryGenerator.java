@@ -25,7 +25,6 @@ public class QueryGenerator {
   /**
    * Events Table keys
    */
-  public static final String EVENTS_CLIENT_ID_KEY = "CLIENT_ID";
   public static final String EVENTS_ID_KEY = "ID";
   public static final String EVENTS_STREAM_ID_KEY = "STREAM_ID";
   public static final String EVENTS_TIME_KEY = "TIME";
@@ -71,8 +70,6 @@ public class QueryGenerator {
     sb.append("INSERT OR REPLACE INTO "
       + EVENTS_TABLE_NAME
         + " ("
-        + EVENTS_CLIENT_ID_KEY
-        + ", "
         + EVENTS_ID_KEY
         + ", "
         + EVENTS_STREAM_ID_KEY
@@ -106,7 +103,6 @@ public class QueryGenerator {
         + EVENTS_ATTACHMENTS_KEY
         + ")"
         + " VALUES (");
-    sb.append(formatTextValue(eventToCache.getClientId()) + ",");
     sb.append(formatTextValue(eventToCache.getId()) + ",");
     sb.append(formatTextValue(eventToCache.getStreamId()) + ",");
     sb.append(formatDoubleValue(eventToCache.getTime()) + ",");
@@ -133,8 +129,6 @@ public class QueryGenerator {
     SET column1 = value1, column2 = value2...., columnN = valueN
     WHERE [condition];*/
     sb.append("UPDATE " + EVENTS_TABLE_NAME + " SET "
-            + EVENTS_CLIENT_ID_KEY + "=" + formatTextValue(eventToUpdate.getClientId())
-            + ", "
             + EVENTS_ID_KEY + "=" + formatTextValue(eventToUpdate.getId())
             + ", "
             + EVENTS_STREAM_ID_KEY + "=" + formatTextValue(eventToUpdate.getStreamId())
@@ -168,9 +162,9 @@ public class QueryGenerator {
             + EVENTS_ATTACHMENTS_KEY + "=" + formatTextValue(JsonConverter.toJson(eventToUpdate.getAttachments())));
 
     sb.append(" WHERE "
-            + EVENTS_CLIENT_ID_KEY
+            + EVENTS_ID_KEY
             + "="
-            + formatTextValue(eventToUpdate.getClientId())
+            + formatTextValue(eventToUpdate.getId())
             + " AND "
             + EVENTS_MODIFIED_KEY
             + " < "
@@ -180,7 +174,7 @@ public class QueryGenerator {
   }
 
   /**
-   * Creates the query to delete an Event. It's clientId is used in the request.
+   * Creates the query to delete an Event. It's id is used in the request.
    *
    * @param eventToDelete
    * @return the SQLite query
@@ -189,9 +183,9 @@ public class QueryGenerator {
     return "DELETE FROM "
       + EVENTS_TABLE_NAME
         + " WHERE "
-        + EVENTS_CLIENT_ID_KEY
+        + EVENTS_ID_KEY
         + "="
-        + formatTextValue(eventToDelete.getClientId())
+        + formatTextValue(eventToDelete.getId())
         + " AND "
         + EVENTS_TRASHED_KEY
         + "=1;";
@@ -275,17 +269,17 @@ public class QueryGenerator {
   /**
    * retrieve an Event from the SQLite database.
    *
-   * @param clientId
-   *          the client ID of the event
+   * @param id
+   *          the ID of the event
    * @return
    */
-  public static String retrieveEvent(String clientId) {
+  public static String retrieveEvent(String id) {
     return "SELECT * FROM "
       + EVENTS_TABLE_NAME
         + " WHERE "
-        + EVENTS_CLIENT_ID_KEY
+        + EVENTS_ID_KEY
         + "="
-        + formatTextValue(clientId)
+        + formatTextValue(id)
         + ";";
   }
 
@@ -406,10 +400,8 @@ public class QueryGenerator {
     return "CREATE TABLE IF NOT EXISTS "
       + EVENTS_TABLE_NAME
         + "("
-        + EVENTS_CLIENT_ID_KEY
-        + " TEXT PRIMARY KEY NOT NULL, "
         + EVENTS_ID_KEY
-        + " TEXT, "
+        + " TEXT PRIMARY KEY NOT NULL, "
         + EVENTS_STREAM_ID_KEY
         + " TEXT  NOT NULL, "
         + EVENTS_TIME_KEY
