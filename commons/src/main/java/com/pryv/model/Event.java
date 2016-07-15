@@ -74,6 +74,7 @@ public class Event {
   /**
    * empty Event constructor
    */
+  // TODO: Time?
   public Event() {
     this.generateId();
     this.updateSupervisor();
@@ -191,6 +192,7 @@ public class Event {
    * @param event
    * @return
    */
+  // TODO: Is it useful or new Event is already adding to supervisor?
   public static Event createOrReuse(Event event) {
     String id = event.getId();
     supervisor.put(id, event);
