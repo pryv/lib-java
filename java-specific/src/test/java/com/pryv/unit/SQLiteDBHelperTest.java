@@ -347,7 +347,7 @@ public class SQLiteDBHelperTest {
   public void testUpdateStreamShouldNotModifyEventIfItsField() {
     System.out.println("test update full stream START");
     String newStreamName = "myNewStreamName - dadadaa";
-    assertFalse(cacheStream==null);
+    assertNotNull(cacheStream);
     cacheStream.setName(newStreamName);
     db.updateOrCreateStream(cacheStream, streamsCallback);
     Awaitility.await().until(hasCacheResult());
@@ -364,7 +364,7 @@ public class SQLiteDBHelperTest {
     db.getStreams(getStreamsCallback);
     Awaitility.await().until(hasCacheResult());
     assertFalse(cacheError);
-    assertFalse(cacheStream==null);
+    assertNotNull(cacheStream);
     assertTrue(cacheStreams.get(cacheStream.getId()) != null);
     assertTrue(cacheStreams.get(cacheStream.getId()).getChildren().size() != 0);
   }
@@ -372,6 +372,7 @@ public class SQLiteDBHelperTest {
   @Test
   public void test11RemoveFullStream() {
     System.out.println("SQLiteDBHelperTest: test11RemoveFullStream");
+    assertNotNull(cacheStream);
     db.deleteStream(cacheStream, false, streamsCallback);
     Awaitility.await().until(hasCacheResult());
     assertFalse(cacheError);
