@@ -85,7 +85,7 @@ public class ConnectionEventsTest {
         cacheSuccess = false;
         apiSuccess = false;
 
-        connection.events.create(new Event(testSupportStream.getId(), null,
+        connection.events.create(new Event(testSupportStream.getId(),
                 "note/txt", "i am a test event"), eventsCallback);
         Awaitility.await().until(hasCacheResult());
         assertFalse(apiError);
@@ -224,7 +224,7 @@ public class ConnectionEventsTest {
         String myStoppedId = runningEvent.getId();
 
         // create Event that will stop running event
-        Event stopperEvent = new Event(singleAcivityStream.getId(), null, "activity/plain", null);
+        Event stopperEvent = new Event(singleAcivityStream.getId(), "activity/plain", null);
         connection.events.create(stopperEvent, eventsCallback);
         Awaitility.await().until(hasApiResult());
         assertTrue(apiSuccess);
@@ -288,7 +288,7 @@ public class ConnectionEventsTest {
      */
 
     public void testUpdateEventMustAcceptAValidAEventAndReturnAFullEvent() {
-        Event eventToUpdate = new Event(testSupportStream.getId(), null,
+        Event eventToUpdate = new Event(testSupportStream.getId(),
                 "note/txt", "i will be updated");
         connection.events.create(eventToUpdate, eventsCallback);
         Awaitility.await().until(hasApiResult());
@@ -311,8 +311,7 @@ public class ConnectionEventsTest {
     }
 
     public void testUpdateEventMustReturnAnErrorWhenEventDoesntExistYet() {
-        Event unexistingEvent = new Event(testSupportStream.getId(),
-                null, "note/txt", "I dont exist and will generate an apiError");
+        Event unexistingEvent = new Event(testSupportStream.getId(), "note/txt", "I dont exist and will generate an apiError");
         connection.events.update(unexistingEvent, eventsCallback);
         Awaitility.await().until(hasApiResult());
         assertTrue(apiError);
@@ -324,8 +323,7 @@ public class ConnectionEventsTest {
 
     @Test
     public void testDeleteEventMustReturnTheEventWithTrashedSetToTrueWhenDeletingOnce() {
-        Event eventToTrash = new Event(testSupportStream.getId(),
-                null, "note/txt", "i will be trashed");
+        Event eventToTrash = new Event(testSupportStream.getId(), "note/txt", "i will be trashed");
         connection.events.create(eventToTrash, eventsCallback);
         Awaitility.await().until(hasApiResult());
         assertTrue(apiSuccess);
@@ -345,8 +343,7 @@ public class ConnectionEventsTest {
     @Test
     public void testDeleteEventMustReturnADeletionIdWhenDeletingTwice() {
         // create event
-        Event eventToDelete = new Event(testSupportStream.getId(),
-                null, "note/txt", "i will be deleted");
+        Event eventToDelete = new Event(testSupportStream.getId(), "note/txt", "i will be deleted");
         connection.events.create(eventToDelete, eventsCallback);
         Awaitility.await().until(hasApiResult());
         assertTrue(apiSuccess);

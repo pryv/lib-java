@@ -368,7 +368,7 @@ public class OnlineEventsAndStreamsManager {
          * Constructor for ApiResponseHandler. Depending on wether the requests
          * concerns Streams or Events, a pStreamsCallback or a pEventsCallback needs
          * to be provided. pEvent or pStream is used when updating or creating an
-         * item to retrieve the clientId on the server response.
+         * item to retrieve the id on the server response.
          *
          * @param type
          * @param eventsCallback
@@ -425,19 +425,15 @@ public class OnlineEventsAndStreamsManager {
                     case CREATE_EVENT:
                         String stoppedId = JsonConverter.retrieveStoppedIdFromJson(responseBody);
                         Event createdEvent = JsonConverter.retrieveEventFromJson(responseBody);
-                        if (event.getClientId() != null) {
-                            createdEvent.setClientId(event.getClientId());
+                        if (event.getId() != null) {
+                            createdEvent.setId(event.getId());
                         }
                         createdEvent.assignConnection(weakConnection);
                         Event.createOrReuse(createdEvent);
-                        logger.log("ApiResponseHandler: event created successfully: cid="
-                                + createdEvent.getClientId()
-                                + ", id="
+                        logger.log("ApiResponseHandler: event created successfully: Id="
                                 + createdEvent.getId());
                         eventsCallback.onApiSuccess(
-                                "Online: event with clientId="
-                                        + createdEvent.getClientId()
-                                        + ", Id="
+                                "Online: event with Id="
                                         + createdEvent.getId()
                                         + " created on API", createdEvent, stoppedId, serverTime);
                         break;
@@ -445,16 +441,12 @@ public class OnlineEventsAndStreamsManager {
                     case UPDATE_EVENT:
                         Event updatedEvent = JsonConverter.retrieveEventFromJson(responseBody);
                         updatedEvent.assignConnection(weakConnection);
-                        updatedEvent.setClientId(event.getClientId());
+                        updatedEvent.setId(event.getId());
                         Event.createOrReuse(updatedEvent);
-                        logger.log("ApiResponseHandler: event updated successfully: cid="
-                                + updatedEvent.getClientId()
-                                + ", id="
+                        logger.log("ApiResponseHandler: event updated successfully: Id="
                                 + updatedEvent.getId());
                         eventsCallback.onApiSuccess(
-                                "Online: event with clientId="
-                                        + updatedEvent.getClientId()
-                                        + ", Id="
+                                "Online: event with Id="
                                         + updatedEvent.getId()
                                         + " updated on API", updatedEvent, null, serverTime);
                         break;
@@ -468,12 +460,10 @@ public class OnlineEventsAndStreamsManager {
                             // stream was trashed, forward as an update to callback
                             Event trashedEvent = JsonConverter.retrieveEventFromJson(responseBody);
                             trashedEvent.assignConnection(weakConnection);
-                            trashedEvent.setClientId(event.getClientId());
+                            trashedEvent.setId(event.getId());
                             Event.createOrReuse(trashedEvent);
                             eventsCallback.onApiSuccess(
-                                    "Online: event with clientId="
-                                            + trashedEvent.getClientId()
-                                            + ", Id="
+                                    "Online: event with Id="
                                             + trashedEvent.getId()
                                             + " trashed on API", trashedEvent, null, serverTime);
                         }

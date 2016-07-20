@@ -254,8 +254,7 @@ public class Stream {
 
   /**
    * Add a stream as child to caller. If children list & map are null,
-   * instantiates them. The child's parentId and parentClientId fields are
-   * updated.
+   * instantiates them. The child's parentId field is updated.
    *
    * @param childStream
    */
@@ -275,8 +274,7 @@ public class Stream {
 
   /**
    * Removes a child Stream from the Stream. If no more children are left, the
-   * children and childrenMap fields are set to null. The child's parentId and
-   * parentClientId are set to null.
+   * children and childrenMap fields are set to null. The child's parentId is set to null.
    *
    * @param childStream
    *          the child Stream to remove

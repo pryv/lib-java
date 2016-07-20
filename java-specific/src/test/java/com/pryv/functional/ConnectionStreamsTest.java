@@ -89,7 +89,7 @@ public class ConnectionStreamsTest {
         cacheSuccess = false;
         apiSuccess = false;
 
-        connection.events.create(new Event(testSupportStream.getId(), null,
+        connection.events.create(new Event(testSupportStream.getId(),
                 "note/txt", "i am a test event"), eventsCallback);
         Awaitility.await().until(hasCacheResult());
         assertFalse(apiError);

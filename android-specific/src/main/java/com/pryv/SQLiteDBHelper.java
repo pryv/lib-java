@@ -252,7 +252,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper implements DBHelper{
                         String cmd = QueryGenerator.insertOrReplaceEvent(event);
                         logger.log("SQLiteDBHelper: update or create event : " + cmd);
                         db.execSQL(cmd);
-                        logger.log("SQLiteDBHelper: inserted " + event.getClientId() + " into DB.");
+                        logger.log("SQLiteDBHelper: inserted " + event.getId() + " into DB.");
                     } catch (SQLException e) {
                         cacheEventsCallback.onCacheError(e.getMessage());
                         e.printStackTrace();
@@ -283,7 +283,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper implements DBHelper{
             public void run() {
                 try {
                     SQLiteDatabase db = getWritableDatabase();
-                    String fetchCmd = QueryGenerator.retrieveEvent(eventToDelete.getClientId());
+                    String fetchCmd = QueryGenerator.retrieveEvent(eventToDelete.getId());
                     Cursor result = db.rawQuery(fetchCmd,null);
                     if (result.moveToFirst()) {
                         do {
@@ -292,18 +292,18 @@ public class SQLiteDBHelper extends SQLiteOpenHelper implements DBHelper{
                                 // delete really
                                 String cmd = QueryGenerator.deleteEvent(retrievedEvent);
                                 db.execSQL(cmd);
-                                cacheEventsCallback.onCacheSuccess("SQLiteDBHelper: Event with clientId="
-                                        + eventToDelete.getClientId()
+                                cacheEventsCallback.onCacheSuccess("SQLiteDBHelper: Event with Id="
+                                        + eventToDelete.getId()
                                         + " is deleted.", null);
                             } else {
                                 // set to trashed
                                 retrievedEvent.setTrashed(true);
                                 String cmd = QueryGenerator.insertOrReplaceEvent(retrievedEvent);
                                 db.execSQL(cmd);
-                                logger.log("SQLiteDBHelper: delete - set trashed=true for clientId="
-                                        + retrievedEvent.getClientId());
-                                cacheEventsCallback.onCacheSuccess("SQLiteDBHelper: Event with clientId="
-                                        + retrievedEvent.getClientId()
+                                logger.log("SQLiteDBHelper: delete - set trashed=true for Id="
+                                        + retrievedEvent.getId());
+                                cacheEventsCallback.onCacheSuccess("SQLiteDBHelper: Event with Id="
+                                        + retrievedEvent.getId()
                                         + " is trashed.", retrievedEvent);
                             }
                         } while (result.moveToNext());
@@ -681,7 +681,6 @@ public class SQLiteDBHelper extends SQLiteOpenHelper implements DBHelper{
 
     // TODO: Check supervisor !!! see Event.createOrReuse(result);
     private Event getEventFromCursor(Cursor c) throws IOException {
-        String clientId = c.getString(c.getColumnIndex(QueryGenerator.EVENTS_CLIENT_ID_KEY));
         String id = c.getString(c.getColumnIndex(QueryGenerator.EVENTS_ID_KEY));
         String streamId = c.getString(c.getColumnIndex(QueryGenerator.EVENTS_STREAM_ID_KEY));
         Double time = c.getDouble(c.getColumnIndex(QueryGenerator.EVENTS_TIME_KEY));
@@ -698,9 +697,9 @@ public class SQLiteDBHelper extends SQLiteOpenHelper implements DBHelper{
         String clientData = c.getString(c.getColumnIndex(QueryGenerator.EVENTS_CLIENT_DATA_KEY));
         Boolean trashed = c.getInt(c.getColumnIndex(QueryGenerator.EVENTS_TRASHED_KEY)) > 0 ;
         String attachment = c.getString(c.getColumnIndex(QueryGenerator.EVENTS_ATTACHMENTS_KEY));
-        Event event = new Event(clientId, id, streamId, time, duration, type, content, null, null, description, null, null, trashed, created, createdBy, modified, modifiedBy);
-        event.setTags(new HashSet<String>(Arrays.asList(tagsString.split(","))));
-        event.setReferences(new HashSet<String>(Arrays.asList(referencesString.split(","))));
+        Event event = new Event(id, streamId, time, duration, type, content, null, null, description, null, null, trashed, created, createdBy, modified, modifiedBy);
+        event.setTags(tagsString);
+        event.setReferences(referencesString);
         event.setAttachments(JsonConverter.deserializeAttachments(attachment));
         event.setClientDataFromAstring(clientData);
         return event;

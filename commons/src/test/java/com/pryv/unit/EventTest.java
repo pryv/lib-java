@@ -8,6 +8,8 @@ import com.pryv.utils.JsonConverter;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,10 +32,12 @@ public class EventTest {
   private Event testEvent;
   private String jsonEvent;
 
-  private String id = "test-id";
-  private String streamId = "test-stream-id";
-  private String type = "note/txt";
-  private String content = "yolo";
+  private static final String ID = "test-id";
+  private static final String STREAM_ID = "test-stream-id";
+  private static final String TYPE = "note/txt";
+  private static final String CONTENT = "yolo";
+
+  private static final String CUID_REGEX = "^c[a-z0-9-]{24}$";
 
   @Before
   public void setUp() throws Exception {
@@ -44,23 +48,22 @@ public class EventTest {
   @Test
   public void testEmptyConstructor() {
     Event event = new Event();
-
-    event.setStreamId(streamId);
-    event.setType(type);
-    event.setContent(content);
-    assertTrue(event.getId().matches("^c[a-z0-9-]{24}$"));
-    assertEquals(streamId, event.getStreamId());
-    assertEquals(type, event.getType());
-    assertEquals(content, event.getContent());
+    event.setStreamId(STREAM_ID);
+    event.setType(TYPE);
+    event.setContent(CONTENT);
+    assertTrue(event.getId().matches(CUID_REGEX));
+    assertEquals(STREAM_ID, event.getStreamId());
+    assertEquals(TYPE, event.getType());
+    assertEquals(CONTENT, event.getContent());
   }
 
   @Test
   public void testMinimalConstructor() {
-    Event event = new Event(streamId, type, content);
-    assertTrue(event.getId().matches("^c[a-z0-9-]{24}$"));
-    assertEquals(streamId, event.getStreamId());
-    assertEquals(type, event.getType());
-    assertEquals(content, event.getContent());
+    Event event = new Event(STREAM_ID, TYPE, CONTENT);
+    assertTrue(event.getId().matches(CUID_REGEX));
+    assertEquals(STREAM_ID, event.getStreamId());
+    assertEquals(TYPE, event.getType());
+    assertEquals(CONTENT, event.getContent());
   }
 
   @Test
@@ -68,14 +71,7 @@ public class EventTest {
     TestUtils.checkEvent(testEvent, testEvent);
   }
 
-
-  public void testCreateOrReuse() {
-
-  }
-
-  // TODO test remaining methods
-
-  //@Test
+  @Test
   public void testMerge() {
     String eventId = "eventId";
     String streamId = "parentId";
@@ -91,7 +87,6 @@ public class EventTest {
     String key = "key";
     String val = "value";
     clientData.put(key, val);
-    String clientId = "clientId";
     String content = "blablabla";
     Double created = 123.0;
     String createdBy = "bob";
@@ -111,12 +106,11 @@ public class EventTest {
     Boolean trashed = false;
     String eventType = "myType";
     testEvent =
-      new Event(clientId, eventId, streamId, time, duration, eventType, content, tags, refs,
+      new Event(eventId, streamId, time, duration, eventType, content, tags, refs,
         description, attachments, clientData, trashed, created, createdBy, modified, modifiedBy);
     Event mergeDestination = new Event();
     mergeDestination.merge(testEvent, JsonConverter.getCloner());
     assertEquals(eventId, mergeDestination.getId());
-    assertEquals(clientId, mergeDestination.getClientId());
     assertEquals(streamId, mergeDestination.getStreamId());
     assertEquals(time, mergeDestination.getTime());
     assertEquals(duration, mergeDestination.getDuration());

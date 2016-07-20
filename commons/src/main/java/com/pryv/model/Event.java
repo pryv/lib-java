@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Event data structure from Pryv
@@ -41,7 +40,6 @@ public class Event {
    * id used to access files locally
    */
   @JsonIgnore
-  private String clientId;
 
   private String id;
   private String streamId;
@@ -74,15 +72,12 @@ public class Event {
   private static Map<String, Event> supervisor = new WeakHashMap<String, Event>();
 
   /**
-   * Used to map ids to clientIds
-   */
-  private static Map<String, String> idToClientId = new ConcurrentHashMap<String, String>();
-
-  /**
    * empty Event constructor
    */
+  // TODO: Time?
   public Event() {
     this.generateId();
+    this.updateSupervisor();
   }
 
   /**
@@ -94,6 +89,7 @@ public class Event {
    */
   public Event(String streamId, String type, String content) {
     this.generateId();
+    this.updateSupervisor();
     this.streamId = streamId;
     this.type = type;
     this.content = content;
@@ -102,7 +98,6 @@ public class Event {
   /**
    * Construct Event object from parameters
    *
-   * @param pClientId
    * @param pId
    * @param pStreamId
    * @param pTime
@@ -129,11 +124,10 @@ public class Event {
    * @param pTrashed
    *          optional
    */
-  public Event(String pClientId, String pId, String pStreamId, Double pTime, Double pDuration,
+  public Event(String pId, String pStreamId, Double pTime, Double pDuration,
     String pType, String pContent, Set<String> pTags, Set<String> pReferences, String pDescription,
     Set<Attachment> pAttachments, Map<String, Object> pClientData, Boolean pTrashed,
     Double pCreated, String pCreatedBy, Double pModified, String pModifiedBy) {
-    clientId = pClientId;
     id = pId;
     streamId = pStreamId;
     time = pTime;
@@ -151,9 +145,7 @@ public class Event {
     attachments = pAttachments;
     clientData = pClientData;
     trashed = pTrashed;
-    // TODO: check for non null?
-    supervisor.put(this.clientId, this);
-    idToClientId.put(this.id, this.clientId);
+    this.updateSupervisor();
   }
 
   /**
@@ -166,8 +158,8 @@ public class Event {
    * @throws IOException
    */
   public static Event createOrReuse(ResultSet result) throws SQLException, IOException {
-    String clientId = result.getString(QueryGenerator.EVENTS_CLIENT_ID_KEY);
-    Event event = supervisor.get(clientId);
+    String id = result.getString(QueryGenerator.EVENTS_ID_KEY);
+    Event event = supervisor.get(id);
     if (event == null) {
       event = new Event();
     }
@@ -182,10 +174,9 @@ public class Event {
     event.setDuration(result.getDouble(QueryGenerator.EVENTS_DURATION_KEY));
     event.setContent(result.getObject(QueryGenerator.EVENTS_CONTENT_KEY));
     String tagsString = result.getString(QueryGenerator.EVENTS_TAGS_KEY);
-    event.setTags(new HashSet<String>(Arrays.asList(tagsString.split(","))));
+    event.setTags(tagsString);
     String referencesString = result.getString(QueryGenerator.EVENTS_REFS_KEY);
-    event.setReferences(new HashSet<String>(Arrays.asList(referencesString.split(","))));
-
+    event.setReferences(referencesString);
     event.setDescription(result.getString(QueryGenerator.EVENTS_DESCRIPTION_KEY));
     // TODO fetch Attachments elsewhere
     event.setClientDataFromAstring(result.getString(QueryGenerator.EVENTS_CLIENT_DATA_KEY));
@@ -200,23 +191,10 @@ public class Event {
    * @param event
    * @return
    */
+  // TODO: Is it useful or new Event is already adding to supervisor?
   public static Event createOrReuse(Event event) {
     String id = event.getId();
-    String clientId = event.getClientId();
-    if (id != null && clientId == null) {
-      clientId = idToClientId.get(id);
-    }
-
-    if (clientId == null) {
-      clientId = event.generateClientId();
-    }
-
-    // TODO: Check if already existing?
-    supervisor.put(clientId, event);
-
-    if (id != null) {
-      idToClientId.put(id, clientId);
-    }
+    supervisor.put(id, event);
     return event;
   }
 
@@ -226,19 +204,22 @@ public class Event {
   public String generateId() {
     if (this.id == null) {
       // TODO find better way to generate CUID
+      // https://github.com/graphcool/cuid-java/blob/master/src/main/java/cool/graph/cuid/Cuid.java#L2
+      // Issue: ManagementFactory for Fingerprint part should be redesigned for Android
+      // http://stackoverflow.com/questions/12462215/managementfactory-from-java-lang-management-in-android
+
       this.id = "c" + UUID.randomUUID().toString().substring(0,24);
     }
     return this.id;
   }
 
-  /**
-   * Assign unique identifier to the Event - does nothing if Event has already a clientId field
-   */
-  public String generateClientId() {
-    if (this.clientId == null) {
-      this.clientId = UUID.randomUUID().toString();
+  private void updateSupervisor() {
+    String id = this.getId();
+    if(supervisor.containsKey(id)) {
+      supervisor.get(id).merge(this, JsonConverter.getCloner());
+    } else {
+      supervisor.put(id,this);
     }
-    return this.clientId;
   }
 
   /**
@@ -269,7 +250,6 @@ public class Event {
    *          com.rits.cloning.Cloner instance from JsonConverter util class
    */
   public void merge(Event temp, Cloner cloner) {
-    clientId = temp.clientId;
     weakConnection = temp.weakConnection;
     id = temp.id;
     streamId = temp.streamId;
@@ -471,8 +451,7 @@ public class Event {
 
   @Override
   public String toString() {
-    return "{\"cid\":\"" + clientId + "\","
-            + "\"id\":\"" + id + "\","
+    return "{\"id\":\"" + id + "\","
             + "\"streamId\":\"" + streamId + "\","
             + "\"time\":\"" + time + "\","
             + "\"duration\":\"" + duration + "\","
@@ -488,10 +467,6 @@ public class Event {
             + "\"modified\":\"" + modified + "\","
             + "\"modifiedBy\":\"" + modifiedBy + "\"}";
 
-  }
-
-  public String getClientId() {
-    return clientId;
   }
 
   public String getId() {
@@ -563,31 +538,13 @@ public class Event {
   }
 
   /**
-   * Assigns a clientId and saves it in the supervisor
-   *
-   * @param clientId
-   */
-  public void setClientId(String clientId) {
-    if(clientId != null) {
-      this.clientId = clientId;
-      supervisor.put(this.clientId, this);
-      if (id != null) {
-        idToClientId.put(this.id, this.clientId);
-      }
-    }
-  }
-
-  /**
-   * Assigns an id and puts an entry in the idToClientId table
+   * Assigns an id
    *
    * @param pid
    */
   public void setId(String pid) {
     if(pid != null) {
       this.id = pid;
-      if (this.clientId != null) {
-        idToClientId.put(this.id, this.clientId);
-      }
     }
   }
 
@@ -645,15 +602,15 @@ public class Event {
     }
   }
 
-  public void setTags(Set<String> ptags) {
+  public void setTags(String ptags) {
     if(ptags != null) {
-      this.tags = ptags;
+      this.tags = new HashSet<String>(Arrays.asList(ptags.split(",")));
     }
   }
 
-  public void setReferences(Set<String> preferences) {
+  public void setReferences(String preferences) {
     if(preferences != null) {
-      this.references = preferences;
+      this.references = new HashSet<String>(Arrays.asList(preferences.split(",")));
     }
   }
 
@@ -680,6 +637,4 @@ public class Event {
       this.trashed = ptrashed;
     }
   }
-
-
 }

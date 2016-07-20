@@ -44,8 +44,8 @@ public class ConnectionEvents implements EventsManager {
 
     @Override
     public void create(final Event newEvent, final EventsCallback eventsCallback) {
-        if (newEvent.getClientId() == null) {
-            newEvent.generateClientId();
+        if (newEvent.getId() == null) {
+            newEvent.generateId();
         }
         if (weakConnection.get().isCacheActive() && (cacheScope == null || cacheScope.hasInScope(newEvent))) {
             cache.createEvent(newEvent, eventsCallback);
