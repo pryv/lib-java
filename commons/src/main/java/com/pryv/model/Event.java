@@ -174,10 +174,9 @@ public class Event {
     event.setDuration(result.getDouble(QueryGenerator.EVENTS_DURATION_KEY));
     event.setContent(result.getObject(QueryGenerator.EVENTS_CONTENT_KEY));
     String tagsString = result.getString(QueryGenerator.EVENTS_TAGS_KEY);
-    event.setTags(new HashSet<String>(Arrays.asList(tagsString.split(","))));
+    event.setTags(tagsString);
     String referencesString = result.getString(QueryGenerator.EVENTS_REFS_KEY);
-    event.setReferences(new HashSet<String>(Arrays.asList(referencesString.split(","))));
-
+    event.setReferences(referencesString);
     event.setDescription(result.getString(QueryGenerator.EVENTS_DESCRIPTION_KEY));
     // TODO fetch Attachments elsewhere
     event.setClientDataFromAstring(result.getString(QueryGenerator.EVENTS_CLIENT_DATA_KEY));
@@ -603,15 +602,15 @@ public class Event {
     }
   }
 
-  public void setTags(Set<String> ptags) {
+  public void setTags(String ptags) {
     if(ptags != null) {
-      this.tags = ptags;
+      this.tags = new HashSet<String>(Arrays.asList(ptags.split(",")));
     }
   }
 
-  public void setReferences(Set<String> preferences) {
+  public void setReferences(String preferences) {
     if(preferences != null) {
-      this.references = preferences;
+      this.references = new HashSet<String>(Arrays.asList(preferences.split(",")));
     }
   }
 

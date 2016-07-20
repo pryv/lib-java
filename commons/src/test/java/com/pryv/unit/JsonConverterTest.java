@@ -144,15 +144,9 @@ public class JsonConverterTest {
     testEvent.setDuration(duration);
     testEvent.setModified(modified);
     testEvent.setModifiedBy(testerId);
-    Set<String> refs = new HashSet<String>();
-    refs.add("ref1");
-    refs.add("ref2");
-    testEvent.setReferences(refs);
+    testEvent.setReferences("ref1,ref2");
     testEvent.setStreamId(streamId);
-    Set<String> tags = new HashSet<String>();
-    tags.add("tag1");
-    tags.add("tag2");
-    testEvent.setTags(tags);
+    testEvent.setTags("tag1,tag2");
     testEvent.setTime(time);
     testEvent.setTrashed(false);
     testEvent.setType(type);

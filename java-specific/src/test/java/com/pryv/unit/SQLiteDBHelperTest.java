@@ -364,6 +364,9 @@ public class SQLiteDBHelperTest {
     db.getStreams(getStreamsCallback);
     Awaitility.await().until(hasCacheResult());
     assertFalse(cacheError);
+
+    assertFalse(cacheStream.getId()==null);
+
     assertTrue(cacheStreams.get(cacheStream.getId()) != null);
     assertTrue(cacheStreams.get(cacheStream.getId()).getChildren().size() != 0);
   }
