@@ -88,7 +88,7 @@ public class ConnectionEventsTest {
         connection.events.create(new Event(testSupportStream.getId(),
                 "note/txt", "i am a test event"), eventsCallback);
         Awaitility.await().until(hasCacheResult());
-        assertFalse(apiError);
+        assertFalse(cacheError);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
     }
