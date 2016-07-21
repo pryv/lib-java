@@ -183,7 +183,7 @@ public class OnlineEventsAndStreamsManagerTest {
 
     @Test
     public void testCreateUpdateAndDeleteStream() {
-        Stream testStream = new Stream(null, "onlineModuleTestStream");
+        Stream testStream = new Stream("onlineModuleTestStreamId", "onlineModuleTestStream");
 
         // create
         online.createStream(testStream, streamsCallback);
@@ -226,7 +226,7 @@ public class OnlineEventsAndStreamsManagerTest {
     public void testCreateEventWithAttachment() {
         // create attachment instance
         Attachment attachment = new Attachment();
-        File attachmentFile = new File(getClass().getClassLoader().getResource("photo.PNG").getPath());
+        File attachmentFile = new File(getClass().getClassLoader().getResource("resources/photo.PNG").getPath());
         attachment.setFile(attachmentFile);
         assertTrue(attachment.getFile().length() > 0);
         attachment.setType("image/png");
