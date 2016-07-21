@@ -697,7 +697,10 @@ public class SQLiteDBHelper extends SQLiteOpenHelper implements DBHelper{
         Boolean trashed = c.getInt(c.getColumnIndex(QueryGenerator.EVENTS_TRASHED_KEY)) > 0 ;
         String attachment = c.getString(c.getColumnIndex(QueryGenerator.EVENTS_ATTACHMENTS_KEY));
         Event event = new Event(id, streamId, time, duration, type, content, null, description, null, null, trashed, created, createdBy, modified, modifiedBy);
-        event.setTags(tagsString);
+        if (tagsString != null) {
+            Set <String> tags = new HashSet<String>(Arrays.asList(tagsString.split(",")));
+            event.setTags(tags);
+        }
         event.setAttachments(JsonConverter.deserializeAttachments(attachment));
         event.setClientDataFromAstring(clientData);
         return event;
