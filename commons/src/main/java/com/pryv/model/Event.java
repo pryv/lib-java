@@ -37,11 +37,6 @@ import java.util.WeakHashMap;
 @JsonInclude(Include.NON_NULL)
 public class Event {
 
-  /**
-   * id used to access files locally
-   */
-  @JsonIgnore
-
   private String id;
   private String streamId;
   private Double time;
@@ -171,7 +166,10 @@ public class Event {
     event.setDuration(result.getDouble(QueryGenerator.EVENTS_DURATION_KEY));
     event.setContent(result.getObject(QueryGenerator.EVENTS_CONTENT_KEY));
     String tagsString = result.getString(QueryGenerator.EVENTS_TAGS_KEY);
-    event.setTags(tagsString);
+    if (tagsString != null) {
+      Set <String> tags = new HashSet<String>(Arrays.asList(tagsString.split(",")));
+      event.setTags(tags);
+    }
     event.setDescription(result.getString(QueryGenerator.EVENTS_DESCRIPTION_KEY));
     // TODO fetch Attachments elsewhere
     event.setClientDataFromAstring(result.getString(QueryGenerator.EVENTS_CLIENT_DATA_KEY));
@@ -189,6 +187,7 @@ public class Event {
   // TODO: Is it useful or new Event is already adding to supervisor?
   public static Event createOrReuse(Event event) {
     String id = event.getId();
+    // TODO: merge - not replace
     supervisor.put(id, event);
     return event;
   }
@@ -544,8 +543,8 @@ public class Event {
     this.content = content;
   }
 
-  public void setTags(String ptags) {
-    this.tags = (ptags == null) ? null : new HashSet<String>(Arrays.asList(ptags.split(",")));
+  public void setTags(Set<String> tags) {
+    this.tags = tags;
   }
 
   public void setDescription(String description) {
