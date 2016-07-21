@@ -13,7 +13,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -174,7 +176,10 @@ public class JsonConverterTest {
         testEvent.setModified(modified);
         testEvent.setModifiedBy(testerId);
         testEvent.setStreamId(streamId);
-        testEvent.setTags("tag1,tag2");
+        Set<String> tags = new HashSet<String>();
+        tags.add("tag1");
+        tags.add("tag2");
+        testEvent.setTags(tags);
         testEvent.setTime(time);
         testEvent.setTrashed(false);
         testEvent.setType(type);
