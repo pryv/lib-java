@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.pryv.AbstractConnection;
 import com.pryv.database.QueryGenerator;
+import com.pryv.utils.Cuid;
 import com.pryv.utils.JsonConverter;
 import com.rits.cloning.Cloner;
 
@@ -203,12 +204,7 @@ public class Event {
    */
   public String generateId() {
     if (this.id == null) {
-      // TODO find better way to generate CUID
-      // https://github.com/graphcool/cuid-java/blob/master/src/main/java/cool/graph/cuid/Cuid.java#L2
-      // Issue: ManagementFactory for Fingerprint part should be redesigned for Android
-      // http://stackoverflow.com/questions/12462215/managementfactory-from-java-lang-management-in-android
-
-      this.id = "c" + UUID.randomUUID().toString().substring(0,24);
+      this.id = Cuid.createCuid();
     }
     return this.id;
   }
