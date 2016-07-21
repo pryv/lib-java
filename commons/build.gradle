@@ -32,6 +32,7 @@ task copyTestResources(type: Copy, dependsOn: processTestResources) {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv', version:'2.5.3'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.3.3'
     compile group: 'uk.com.robust-it', name: 'cloning', version:'1.9.0'
     compile group: 'org.xerial', name: 'sqlite-jdbc', version:'3.7.2'
     compile group: 'com.jayway.awaitility', name: 'awaitility', version:'1.6.1'
