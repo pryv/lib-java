@@ -55,7 +55,6 @@ public class Event {
   private Double duration;
   private Object content;
   private Set<String> tags;
-  private Set<String> references;
   private String description;
   private Set<Attachment> attachments;
   private Map<String, Object> clientData;
@@ -114,8 +113,6 @@ public class Event {
    *          optional
    * @param pTags
    *          optional
-   * @param pReferences
-   *          optional
    * @param pDescription
    *          optional
    * @param pAttachments
@@ -126,7 +123,7 @@ public class Event {
    *          optional
    */
   public Event(String pId, String pStreamId, Double pTime, Double pDuration,
-    String pType, String pContent, Set<String> pTags, Set<String> pReferences, String pDescription,
+    String pType, String pContent, Set<String> pTags, String pDescription,
     Set<Attachment> pAttachments, Map<String, Object> pClientData, Boolean pTrashed,
     Double pCreated, String pCreatedBy, Double pModified, String pModifiedBy) {
     id = pId;
@@ -141,7 +138,6 @@ public class Event {
     duration = pDuration;
     content = pContent;
     tags = pTags;
-    references = pReferences;
     description = pDescription;
     attachments = pAttachments;
     clientData = pClientData;
@@ -176,8 +172,6 @@ public class Event {
     event.setContent(result.getObject(QueryGenerator.EVENTS_CONTENT_KEY));
     String tagsString = result.getString(QueryGenerator.EVENTS_TAGS_KEY);
     event.setTags(tagsString);
-    String referencesString = result.getString(QueryGenerator.EVENTS_REFS_KEY);
-    event.setReferences(referencesString);
     event.setDescription(result.getString(QueryGenerator.EVENTS_DESCRIPTION_KEY));
     // TODO fetch Attachments elsewhere
     event.setClientDataFromAstring(result.getString(QueryGenerator.EVENTS_CLIENT_DATA_KEY));
@@ -260,12 +254,6 @@ public class Event {
       }
     }
 
-    if (temp.references != null) {
-      references = new HashSet<String>();
-      for (String ref : temp.references) {
-        references.add(ref);
-      }
-    }
     description = temp.description;
     if (temp.attachments != null) {
       attachments = new HashSet<Attachment>();
@@ -404,18 +392,6 @@ public class Event {
   }
 
   /**
-   * add a reference to the event
-   *
-   * @param reference
-   */
-  public void addReference(String reference) {
-    if (references == null) {
-      references = new HashSet<String>();
-    }
-    references.add(reference);
-  }
-
-  /**
    * add an attachment to the event.
    *
    * @param attachment
@@ -453,7 +429,6 @@ public class Event {
             + "\"duration\":\"" + duration + "\","
             + "\"type\":\"" + type + "\","
             + "\"tags\":\"" + tags + "\","
-            + "\"references\":\"" + references + "\","
             + "\"description\":\"" + description + "\","
             + "\"attachments\":\"" + attachments + "\","
             + "\"clientData\":\"" + clientData + "\","
@@ -507,10 +482,6 @@ public class Event {
 
   public Set<String> getTags() {
     return tags;
-  }
-
-  public Set<String> getReferences() {
-    return references;
   }
 
   public String getDescription() {
@@ -573,16 +544,8 @@ public class Event {
     this.content = content;
   }
 
-  public void setTags(String tags) {
-    if(tags != null) {
-      this.tags = new HashSet<String>(Arrays.asList(tags.split(",")));
-    }
-  }
-
-  public void setReferences(String references) {
-    if(references != null) {
-      this.references = new HashSet<String>(Arrays.asList(references.split(",")));
-    }
+  public void setTags(String ptags) {
+    this.tags = (ptags == null) ? null : new HashSet<String>(Arrays.asList(ptags.split(",")));
   }
 
   public void setDescription(String description) {

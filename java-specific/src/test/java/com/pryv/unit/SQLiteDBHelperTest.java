@@ -415,7 +415,6 @@ public class SQLiteDBHelperTest {
     for (String tag : testedEvent.getTags()) {
       assertTrue(retrievedEvent.getTags().contains(tag));
     }
-    assertTrue(retrievedEvent.getReferences().containsAll(testedEvent.getReferences()));
     // test attachments
     for (Attachment testedAttachment : testedEvent.getAttachments()) {
       boolean attachmentsMatch = false;
