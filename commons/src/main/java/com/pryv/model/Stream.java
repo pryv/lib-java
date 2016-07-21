@@ -367,30 +367,30 @@ public class Stream {
     return modifiedBy;
   }
 
-  public void setId(String pId) {
-    this.id = pId;
+  public void setId(String id) {
+    this.id = id;
   }
 
-  public void setName(String pName) {
-    this.name = pName;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public void setParentId(String pParentId) {
-    this.parentId = pParentId;
+  public void setParentId(String parentId) {
+    this.parentId = parentId;
   }
 
-  public void setSingleActivity(Boolean pSingleActivity) {
-    this.singleActivity = pSingleActivity;
+  public void setSingleActivity(Boolean singleActivity) {
+    this.singleActivity = singleActivity;
   }
 
-  public void setClientData(Map<String, Object> pClientData) {
-    this.clientData = pClientData;
+  public void setClientData(Map<String, Object> clientData) {
+    this.clientData = clientData;
   }
 
-  public void setChildren(Set<Stream> pChildren) {
-    this.children = pChildren;
-    if (pChildren != null) {
-      for (Stream stream : pChildren) {
+  public void setChildren(Set<Stream> children) {
+    this.children = children;
+    if (children != null) {
+      for (Stream stream : children) {
         if (childrenMap == null) {
           childrenMap = new HashMap<String, Stream>();
         }
@@ -399,24 +399,24 @@ public class Stream {
     }
   }
 
-  public void setTrashed(Boolean pTrashed) {
-    this.trashed = pTrashed;
+  public void setTrashed(Boolean trashed) {
+    this.trashed = trashed;
   }
 
-  public void setCreated(Double pCreated) {
-    this.created = pCreated;
+  public void setCreated(Double created) {
+    this.created = created;
   }
 
-  public void setCreatedBy(String pCreatedBy) {
-    this.createdBy = pCreatedBy;
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
   }
 
-  public void setModified(Double pModified) {
-    this.modified = pModified;
+  public void setModified(Double modified) {
+    this.modified = modified;
   }
 
-  public void setModifiedBy(String pModifiedBy) {
-    this.modifiedBy = pModifiedBy;
+  public void setModifiedBy(String modifiedBy) {
+    this.modifiedBy = modifiedBy;
   }
 
 }
