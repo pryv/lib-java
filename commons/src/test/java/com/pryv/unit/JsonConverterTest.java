@@ -68,23 +68,24 @@ public class JsonConverterTest {
             assertEquals(streams.size(), 24);
             Stream activityStream = streams.get("activity");
             assertNotNull(activityStream);
-            System.out.println("XXXstream: " + activityStream);
-            System.out.println("XXXstream: " + activityStream.getName());
-            System.out.println("XXXstream: " + activityStream.getParentId());
-            System.out.println("XXXstream: " + activityStream.getCreated());
             assertEquals(new Double(1409328827.942), activityStream.getCreated());
             assertEquals("chxoqauy71d5uc4zqvdekucij", activityStream.getCreatedBy());
             assertEquals(new Double(1433332913.88), activityStream.getModified());
             assertEquals("chxoppo8v1d3uc4zqhqdthudf", activityStream.getModifiedBy());
-            assertEquals(2, activityStream.getChildren().size());
-            assertNotNull(activityStream.getChildrenMap().get("child1"));
-            assertNotNull(activityStream.getChildrenMap().get("child2"));
-            assertNotNull(streams.get("parent2"));
-            assertEquals(streams.get("parent2").getCreated(), new Double(1369009268.827185));
-            assertEquals(streams.get("parent2").getCreatedBy(), "ci9wp5fxf0000tcjx5wndexgb");
-            assertEquals(streams.get("parent2").getModified(), new Double(1369009333.1197622));
-            assertEquals(streams.get("parent2").getModifiedBy(), "ci9wp5fxf0000tcjx5wndexgb");
-            assertNull(streams.get("parent2").getChildren());
+            assertEquals(6, activityStream.getChildren().size());
+            assertNotNull(activityStream.getChildrenMap().get("moves-8371604354526466-cycling"));
+            assertNotNull(activityStream.getChildrenMap().get("moves-8371604354526466-places"));
+            assertNotNull(activityStream.getChildrenMap().get("moves-8371604354526466-running"));
+            assertNotNull(activityStream.getChildrenMap().get("moves-8371604354526466-transport"));
+            assertNotNull(activityStream.getChildrenMap().get("moves-8371604354526466-walking"));
+            assertNotNull(activityStream.getChildrenMap().get("cij4ga8us0qd51fyqzv317cms"));
+            Stream diaryStream = streams.get("diary");
+            assertNotNull(diaryStream);
+            assertEquals(diaryStream.getCreated(), new Double(1453454806.33));
+            assertEquals(diaryStream.getCreatedBy(), "chxoqauy71d5uc4zqvdekucij");
+            assertEquals(diaryStream.getModified(), new Double(1454432686.39));
+            assertEquals(diaryStream.getModifiedBy(), "chxoqauy71d5uc4zqvdekucij");
+            assertEquals(0, diaryStream.getChildren().size());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -105,7 +106,7 @@ public class JsonConverterTest {
         }
     }
 
-    //@Test
+    @Test
     public void testUnmarshallStream() {
         try {
             Stream parsedStream = JsonConverter.retrieveStreamFromJson(jsonStream);
