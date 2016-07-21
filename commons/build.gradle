@@ -24,6 +24,11 @@ configurations {
     testOutput
 }
 
+task copyTestResources(type: Copy, dependsOn: processTestResources) {
+    from "${projectDir}/src/test/resources"
+    into "${buildDir}/classes/test/resources"
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv', version:'2.5.3'
