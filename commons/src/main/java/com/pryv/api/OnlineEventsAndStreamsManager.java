@@ -425,9 +425,6 @@ public class OnlineEventsAndStreamsManager {
                     case CREATE_EVENT:
                         String stoppedId = JsonConverter.retrieveStoppedIdFromJson(responseBody);
                         Event createdEvent = JsonConverter.retrieveEventFromJson(responseBody);
-                        if (event.getId() != null) {
-                            createdEvent.setId(event.getId());
-                        }
                         createdEvent.assignConnection(weakConnection);
                         Event.createOrReuse(createdEvent);
                         logger.log("ApiResponseHandler: event created successfully: Id="
