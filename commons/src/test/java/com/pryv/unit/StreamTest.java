@@ -21,7 +21,6 @@ import com.pryv.utils.JsonConverter;
  * Unit tests for Stream class params and functions
  *
  * @author ik
- *
  */
 public class StreamTest {
 

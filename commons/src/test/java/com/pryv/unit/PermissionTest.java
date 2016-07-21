@@ -13,7 +13,6 @@ import com.pryv.model.Permission;
 import com.pryv.utils.JsonConverter;
 
 /**
- *
  * unit test for Permission object
  *
  * @author ik

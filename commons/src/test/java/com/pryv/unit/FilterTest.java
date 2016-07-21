@@ -19,8 +19,6 @@ import com.pryv.model.Stream;
  *
  * @author ik
  */
-
-
 public class FilterTest {
 
   @Test
