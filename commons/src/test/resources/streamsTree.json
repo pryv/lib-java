@@ -1,0 +1,1201 @@
+{
+  "streams": [
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#34495e"
+      },
+      "created": 1,
+      "createdBy": "chxoqauy71d5uc4zqvdekucij",
+      "modified": 1433332913.88,
+      "modifiedBy": "chxoppo8v1d3uc4zqhqdthudf",
+      "name": "Activity",
+      "parentId": null,
+      "id": "activity",
+      "children": [
+        {
+          "name": "Cycling",
+          "parentId": "moves-8371604354526466",
+          "clientData": {},
+          "created": 1433332922.125,
+          "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "modified": 1433332922.125,
+          "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "id": "moves-8371604354526466-cycling",
+          "children": [
+            {
+              "name": "Cycling Activity",
+              "parentId": "moves-8371604354526466-cycling",
+              "clientData": {},
+              "created": 1433332922.5,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.5,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-cycling-activity",
+              "children": [
+                {
+                  "name": "Weight",
+                  "parentId": "moves-8371604354526466-cycling-activity",
+                  "created": 1452183108.091,
+                  "createdBy": "ci9k0wddq9x7fh5zqa0avr4wv",
+                  "modified": 1452183108.091,
+                  "modifiedBy": "ci9k0wddq9x7fh5zqa0avr4wv",
+                  "id": "cij4gbtha0qhp1fyqmz8xd75l",
+                  "children": []
+                },
+                {
+                  "name": "streamId",
+                  "parentId": "moves-8371604354526466-cycling-activity",
+                  "created": 1452183108.086,
+                  "createdBy": "ci9k0wddq9x7fh5zqa0avr4wv",
+                  "modified": 1452183108.086,
+                  "modifiedBy": "ci9k0wddq9x7fh5zqa0avr4wv",
+                  "id": "cij4gbth40qho1fyqb2pesq7s",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Cycling Calories",
+              "parentId": "moves-8371604354526466-cycling",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "energy/cal": {
+                    "settings": {
+                      "color": "#f1c40f",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.552,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.552,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-cycling-calories",
+              "children": []
+            },
+            {
+              "name": "Cycling Distance",
+              "parentId": "moves-8371604354526466-cycling",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "length/m": {
+                    "settings": {
+                      "color": "#2c3e50",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.519,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.519,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-cycling-distance",
+              "children": []
+            },
+            {
+              "name": "Cycling Steps",
+              "parentId": "moves-8371604354526466-cycling",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "count/steps": {
+                    "settings": {
+                      "color": "#27ae60",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.566,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.566,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-cycling-steps",
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Places",
+          "parentId": "moves-8371604354526466",
+          "clientData": {},
+          "created": 1433332922.148,
+          "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "modified": 1433332922.148,
+          "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "id": "moves-8371604354526466-places",
+          "children": []
+        },
+        {
+          "name": "Running",
+          "parentId": "moves-8371604354526466",
+          "clientData": {},
+          "created": 1433332922.136,
+          "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "modified": 1433332922.136,
+          "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "id": "moves-8371604354526466-running",
+          "children": [
+            {
+              "name": "Running Activity",
+              "parentId": "moves-8371604354526466-running",
+              "clientData": {},
+              "created": 1433332922.579,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.579,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-running-activity",
+              "children": []
+            },
+            {
+              "name": "Running Calories",
+              "parentId": "moves-8371604354526466-running",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "energy/cal": {
+                    "settings": {
+                      "color": "#f1c40f",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.587,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.587,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-running-calories",
+              "children": []
+            },
+            {
+              "name": "Running Distance",
+              "parentId": "moves-8371604354526466-running",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "length/m": {
+                    "settings": {
+                      "color": "#2c3e50",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.572,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.572,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-running-distance",
+              "children": []
+            },
+            {
+              "name": "Running Steps",
+              "parentId": "moves-8371604354526466-running",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "count/steps": {
+                    "settings": {
+                      "color": "#27ae60",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.595,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.595,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-running-steps",
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Transport",
+          "parentId": "moves-8371604354526466",
+          "clientData": {},
+          "created": 1433332922.142,
+          "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "modified": 1433332922.142,
+          "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "id": "moves-8371604354526466-transport",
+          "children": [
+            {
+              "name": "Transport Activity",
+              "parentId": "moves-8371604354526466-transport",
+              "clientData": {},
+              "created": 1433332922.609,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.609,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-transport-activity",
+              "children": []
+            },
+            {
+              "name": "Transport Calories",
+              "parentId": "moves-8371604354526466-transport",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "energy/cal": {
+                    "settings": {
+                      "color": "#f1c40f",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.628,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.628,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-transport-calories",
+              "children": []
+            },
+            {
+              "name": "Transport Distance",
+              "parentId": "moves-8371604354526466-transport",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "length/m": {
+                    "settings": {
+                      "color": "#2c3e50",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.603,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.603,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-transport-distance",
+              "children": []
+            },
+            {
+              "name": "Transport Steps",
+              "parentId": "moves-8371604354526466-transport",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "count/steps": {
+                    "settings": {
+                      "color": "#27ae60",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.612,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.612,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-transport-steps",
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Walking",
+          "parentId": "moves-8371604354526466",
+          "clientData": {},
+          "created": 1433332922.147,
+          "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "modified": 1433332922.147,
+          "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "id": "moves-8371604354526466-walking",
+          "children": [
+            {
+              "name": "Walking Activity",
+              "parentId": "moves-8371604354526466-walking",
+              "clientData": {},
+              "created": 1433332922.629,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.629,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-walking-activity",
+              "children": []
+            },
+            {
+              "name": "Walking Calories",
+              "parentId": "moves-8371604354526466-walking",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "energy/cal": {
+                    "settings": {
+                      "color": "#f1c40f",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.636,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.636,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-walking-calories",
+              "children": []
+            },
+            {
+              "name": "Walking Distance",
+              "parentId": "moves-8371604354526466-walking",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "length/m": {
+                    "settings": {
+                      "color": "#2c3e50",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.632,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.632,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-walking-distance",
+              "children": []
+            },
+            {
+              "name": "Walking Steps",
+              "parentId": "moves-8371604354526466-walking",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "count/steps": {
+                    "settings": {
+                      "color": "#27ae60",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.638,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.638,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-walking-steps",
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "streamId",
+          "parentId": "moves-8371604354526466",
+          "created": 1452183034.707,
+          "createdBy": "ci9k0wddq9x7fh5zqa0avr4wv",
+          "modified": 1452183034.707,
+          "modifiedBy": "ci9k0wddq9x7fh5zqa0avr4wv",
+          "id": "cij4ga8us0qd51fyqzv317cms",
+          "children": []
+        }
+      ]
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#1abc9c"
+      },
+      "created": 1462789331.848,
+      "createdBy": "cinztwxh037zfutyq2yahiacz",
+      "modified": 1464015308.67,
+      "modifiedBy": "chxoppo8v1d3uc4zqhqdthudf",
+      "name": "BP5_batteryLevel",
+      "parentId": null,
+      "id": "BP5_batteryLevel",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#2ecc71"
+      },
+      "created": 1462789332.135,
+      "createdBy": "cinztwxh037zfutyq2yahiacz",
+      "modified": 1464015308.67,
+      "modifiedBy": "chxoppo8v1d3uc4zqhqdthudf",
+      "name": "BP5_onlineResults",
+      "parentId": null,
+      "id": "BP5_onlineResults",
+      "children": [
+        {
+          "name": "BP5_highPressure",
+          "parentId": "BP5_onlineResults",
+          "created": 1462789332.443,
+          "createdBy": "cinztwxh037zfutyq2yahiacz",
+          "modified": 1462789332.443,
+          "modifiedBy": "cinztwxh037zfutyq2yahiacz",
+          "id": "BP5_highPressure",
+          "children": []
+        },
+        {
+          "name": "BP5_lowPressure",
+          "parentId": "BP5_onlineResults",
+          "created": 1464015228.079,
+          "createdBy": "cinztwxh037zfutyq2yahiacz",
+          "modified": 1464015228.079,
+          "modifiedBy": "cinztwxh037zfutyq2yahiacz",
+          "id": "BP5_lowPressure",
+          "children": []
+        },
+        {
+          "name": "BP5_pulse",
+          "parentId": "BP5_onlineResults",
+          "created": 1462789332.443,
+          "createdBy": "cinztwxh037zfutyq2yahiacz",
+          "modified": 1462789332.443,
+          "modifiedBy": "cinztwxh037zfutyq2yahiacz",
+          "id": "BP5_pulse",
+          "children": []
+        }
+      ]
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#1abc9c"
+      },
+      "created": 1467384403.252,
+      "createdBy": "chxoppo8v1d3uc4zqhqdthudf",
+      "modified": 1468338961.898,
+      "modifiedBy": "chxoppo8v1d3uc4zqhqdthudf",
+      "name": "Emfit",
+      "parentId": null,
+      "id": "emfit",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#1abc9c"
+      },
+      "created": 1455013059.692,
+      "createdBy": "chxoqauy71d5uc4zqvdekucij",
+      "modified": 1455013830.481,
+      "modifiedBy": "chxoqauy71d5uc4zqvdekucij",
+      "name": "Facebook",
+      "parentId": null,
+      "id": "FB",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#f1c40f"
+      },
+      "created": 1409328827.944,
+      "createdBy": "chxoqauy71d5uc4zqvdekucij",
+      "modified": 1433332913.907,
+      "modifiedBy": "chxoppo8v1d3uc4zqhqdthudf",
+      "name": "Health",
+      "parentId": null,
+      "id": "health",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#3498db"
+      },
+      "created": 1454669219.498,
+      "createdBy": "chxoqauy71d5uc4zqvdekucij",
+      "modified": 1454670854.21,
+      "modifiedBy": "chxoqauy71d5uc4zqvdekucij",
+      "name": "IFTTT",
+      "parentId": null,
+      "id": "ifttt",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#95a5a6"
+      },
+      "created": 1453454806.33,
+      "createdBy": "chxoqauy71d5uc4zqvdekucij",
+      "modified": 1454432686.39,
+      "modifiedBy": "chxoqauy71d5uc4zqvdekucij",
+      "name": "Journal",
+      "parentId": null,
+      "id": "diary",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#e67e22"
+      },
+      "created": 1433332921.75,
+      "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+      "modified": 1433346143.864,
+      "modifiedBy": "chxoppo8v1d3uc4zqhqdthudf",
+      "name": "Moves",
+      "parentId": null,
+      "id": "moves-8371604354526466",
+      "children": [
+        {
+          "name": "Cycling",
+          "parentId": "moves-8371604354526466",
+          "clientData": {},
+          "created": 1433332922.125,
+          "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "modified": 1433332922.125,
+          "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "id": "moves-8371604354526466-cycling",
+          "children": [
+            {
+              "name": "Cycling Activity",
+              "parentId": "moves-8371604354526466-cycling",
+              "clientData": {},
+              "created": 1433332922.5,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.5,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-cycling-activity",
+              "children": [
+                {
+                  "name": "Weight",
+                  "parentId": "moves-8371604354526466-cycling-activity",
+                  "created": 1452183108.091,
+                  "createdBy": "ci9k0wddq9x7fh5zqa0avr4wv",
+                  "modified": 1452183108.091,
+                  "modifiedBy": "ci9k0wddq9x7fh5zqa0avr4wv",
+                  "id": "cij4gbtha0qhp1fyqmz8xd75l",
+                  "children": []
+                },
+                {
+                  "name": "streamId",
+                  "parentId": "moves-8371604354526466-cycling-activity",
+                  "created": 1452183108.086,
+                  "createdBy": "ci9k0wddq9x7fh5zqa0avr4wv",
+                  "modified": 1452183108.086,
+                  "modifiedBy": "ci9k0wddq9x7fh5zqa0avr4wv",
+                  "id": "cij4gbth40qho1fyqb2pesq7s",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Cycling Calories",
+              "parentId": "moves-8371604354526466-cycling",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "energy/cal": {
+                    "settings": {
+                      "color": "#f1c40f",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.552,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.552,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-cycling-calories",
+              "children": []
+            },
+            {
+              "name": "Cycling Distance",
+              "parentId": "moves-8371604354526466-cycling",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "length/m": {
+                    "settings": {
+                      "color": "#2c3e50",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.519,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.519,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-cycling-distance",
+              "children": []
+            },
+            {
+              "name": "Cycling Steps",
+              "parentId": "moves-8371604354526466-cycling",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "count/steps": {
+                    "settings": {
+                      "color": "#27ae60",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.566,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.566,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-cycling-steps",
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Places",
+          "parentId": "moves-8371604354526466",
+          "clientData": {},
+          "created": 1433332922.148,
+          "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "modified": 1433332922.148,
+          "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "id": "moves-8371604354526466-places",
+          "children": []
+        },
+        {
+          "name": "Running",
+          "parentId": "moves-8371604354526466",
+          "clientData": {},
+          "created": 1433332922.136,
+          "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "modified": 1433332922.136,
+          "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "id": "moves-8371604354526466-running",
+          "children": [
+            {
+              "name": "Running Activity",
+              "parentId": "moves-8371604354526466-running",
+              "clientData": {},
+              "created": 1433332922.579,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.579,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-running-activity",
+              "children": []
+            },
+            {
+              "name": "Running Calories",
+              "parentId": "moves-8371604354526466-running",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "energy/cal": {
+                    "settings": {
+                      "color": "#f1c40f",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.587,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.587,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-running-calories",
+              "children": []
+            },
+            {
+              "name": "Running Distance",
+              "parentId": "moves-8371604354526466-running",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "length/m": {
+                    "settings": {
+                      "color": "#2c3e50",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.572,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.572,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-running-distance",
+              "children": []
+            },
+            {
+              "name": "Running Steps",
+              "parentId": "moves-8371604354526466-running",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "count/steps": {
+                    "settings": {
+                      "color": "#27ae60",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.595,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.595,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-running-steps",
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Transport",
+          "parentId": "moves-8371604354526466",
+          "clientData": {},
+          "created": 1433332922.142,
+          "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "modified": 1433332922.142,
+          "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "id": "moves-8371604354526466-transport",
+          "children": [
+            {
+              "name": "Transport Activity",
+              "parentId": "moves-8371604354526466-transport",
+              "clientData": {},
+              "created": 1433332922.609,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.609,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-transport-activity",
+              "children": []
+            },
+            {
+              "name": "Transport Calories",
+              "parentId": "moves-8371604354526466-transport",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "energy/cal": {
+                    "settings": {
+                      "color": "#f1c40f",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.628,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.628,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-transport-calories",
+              "children": []
+            },
+            {
+              "name": "Transport Distance",
+              "parentId": "moves-8371604354526466-transport",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "length/m": {
+                    "settings": {
+                      "color": "#2c3e50",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.603,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.603,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-transport-distance",
+              "children": []
+            },
+            {
+              "name": "Transport Steps",
+              "parentId": "moves-8371604354526466-transport",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "count/steps": {
+                    "settings": {
+                      "color": "#27ae60",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.612,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.612,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-transport-steps",
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Walking",
+          "parentId": "moves-8371604354526466",
+          "clientData": {},
+          "created": 1433332922.147,
+          "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "modified": 1433332922.147,
+          "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+          "id": "moves-8371604354526466-walking",
+          "children": [
+            {
+              "name": "Walking Activity",
+              "parentId": "moves-8371604354526466-walking",
+              "clientData": {},
+              "created": 1433332922.629,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.629,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-walking-activity",
+              "children": []
+            },
+            {
+              "name": "Walking Calories",
+              "parentId": "moves-8371604354526466-walking",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "energy/cal": {
+                    "settings": {
+                      "color": "#f1c40f",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.636,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.636,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-walking-calories",
+              "children": []
+            },
+            {
+              "name": "Walking Distance",
+              "parentId": "moves-8371604354526466-walking",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "length/m": {
+                    "settings": {
+                      "color": "#2c3e50",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.632,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.632,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-walking-distance",
+              "children": []
+            },
+            {
+              "name": "Walking Steps",
+              "parentId": "moves-8371604354526466-walking",
+              "clientData": {
+                "pryv-browser:charts": {
+                  "count/steps": {
+                    "settings": {
+                      "color": "#27ae60",
+                      "style": "bar",
+                      "transform": "sum",
+                      "interval": "daily",
+                      "fitting": false
+                    }
+                  }
+                }
+              },
+              "created": 1433332922.638,
+              "createdBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "modified": 1433332922.638,
+              "modifiedBy": "ciagpdn05b4r9h5zqn37z81cf",
+              "id": "moves-8371604354526466-walking-steps",
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "streamId",
+          "parentId": "moves-8371604354526466",
+          "created": 1452183034.707,
+          "createdBy": "ci9k0wddq9x7fh5zqa0avr4wv",
+          "modified": 1452183034.707,
+          "modifiedBy": "ci9k0wddq9x7fh5zqa0avr4wv",
+          "id": "cij4ga8us0qd51fyqzv317cms",
+          "children": []
+        }
+      ]
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#1abc9c"
+      },
+      "created": 1461310615.577,
+      "createdBy": "cinbelyqk07a2utyq0sno2ui3",
+      "modified": 1461335367.371,
+      "modifiedBy": "chxoppo8v1d3uc4zqhqdthudf",
+      "name": "Notes",
+      "parentId": null,
+      "id": "sampleNotes",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#1abc9c"
+      },
+      "created": 1454680647.479,
+      "createdBy": "chxoqauy71d5uc4zqvdekucij",
+      "modified": 1454681396.383,
+      "modifiedBy": "chxoqauy71d5uc4zqvdekucij",
+      "name": "Phone",
+      "parentId": null,
+      "id": "cik9rar7b0lczwryq1g38oc28",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#1abc9c"
+      },
+      "created": 1454682652.48,
+      "createdBy": "chxoqauy71d5uc4zqvdekucij",
+      "modified": 1454688784.235,
+      "modifiedBy": "chxoqauy71d5uc4zqvdekucij",
+      "name": "Photos",
+      "parentId": null,
+      "id": "cik9shq9s0ldswryq8l17uujb",
+      "children": [
+        {
+          "name": "subphoto",
+          "parentId": "cik9shq9s0ldswryq8l17uujb",
+          "created": 1460983062.483,
+          "createdBy": "chxoppo8v1d3uc4zqhqdthudf",
+          "modified": 1460983062.483,
+          "modifiedBy": "chxoppo8v1d3uc4zqhqdthudf",
+          "id": "cin5zldr78975wvyqwq6dohcc",
+          "children": []
+        }
+      ]
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#e74c3c"
+      },
+      "created": 1409328827.945,
+      "createdBy": "chxoqauy71d5uc4zqvdekucij",
+      "modified": 1433332913.915,
+      "modifiedBy": "chxoppo8v1d3uc4zqhqdthudf",
+      "name": "Places",
+      "parentId": null,
+      "id": "places",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#95a5a6"
+      },
+      "created": 1453454806.341,
+      "createdBy": "chxoqauy71d5uc4zqvdekucij",
+      "modified": 1454432686.392,
+      "modifiedBy": "chxoqauy71d5uc4zqvdekucij",
+      "name": "Position",
+      "parentId": null,
+      "id": "position",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#1abc9c"
+      },
+      "created": 1459758133.891,
+      "createdBy": "chxoqauy71d5uc4zqvdekucij",
+      "modified": 1459758213.53,
+      "modifiedBy": "chxoqauy71d5uc4zqvdekucij",
+      "name": "Smart Health Catalyst",
+      "parentId": null,
+      "id": "SmartHealthCatalyst2016",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#1abc9c"
+      },
+      "created": 1454604662.099,
+      "createdBy": "chxoqauy71d5uc4zqvdekucij",
+      "modified": 1454668948.921,
+      "modifiedBy": "chxoqauy71d5uc4zqvdekucij",
+      "name": "StreamTypeTest",
+      "parentId": null,
+      "id": "StreamTypeTest",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#1abc9c"
+      },
+      "created": 1461336002.88,
+      "createdBy": "chxoqauy71d5uc4zqvdekucij",
+      "modified": 1461533699.525,
+      "modifiedBy": "chxoqauy71d5uc4zqvdekucij",
+      "name": "Test",
+      "parentId": null,
+      "id": "test",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#9b59b6"
+      },
+      "created": 1454670905.463,
+      "createdBy": "chxoqauy71d5uc4zqvdekucij",
+      "modified": 1454673372.356,
+      "modifiedBy": "chxoqauy71d5uc4zqvdekucij",
+      "name": "Weather",
+      "parentId": null,
+      "id": "cik9lhy7s0l9lwryq4f3lwrw2",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#1abc9c"
+      },
+      "created": 1468930393.456,
+      "createdBy": "chxoqauy71d5uc4zqvdekucij",
+      "modified": 1468931070.258,
+      "modifiedBy": "chxoqauy71d5uc4zqvdekucij",
+      "name": "Withings",
+      "parentId": null,
+      "id": "health-withings",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#3498db"
+      },
+      "created": 1454670062.647,
+      "createdBy": "chxoqauy71d5uc4zqvdekucij",
+      "modified": 1454670854.205,
+      "modifiedBy": "chxoqauy71d5uc4zqvdekucij",
+      "name": "Work",
+      "parentId": null,
+      "id": "cik9kzvw80l9fwryqsfxnhhd1",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#95a5a6",
+        "pryv-browser:charts": {
+          "absorbed-dose/gy": {
+            "settings": {
+              "color": "#1abc9c",
+              "style": "line",
+              "transform": "sum"
+            }
+          }
+        }
+      },
+      "created": 1454348122.803,
+      "createdBy": "ci9k0wddq9x7fh5zqa0avr4wv",
+      "modified": 1456486327.271,
+      "modifiedBy": "chxoppo8v1d3uc4zqhqdthudf",
+      "name": "csv",
+      "parentId": null,
+      "id": "cik49blir0h1kwryqhsbcvfng",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#1abc9c"
+      },
+      "created": 1405519048.343,
+      "createdBy": "chxoppo8v1d3uc4zqhqdthudf",
+      "modified": 1405520054.147,
+      "modifiedBy": "chxoppo8v1d3uc4zqhqdthudf",
+      "name": "random",
+      "parentId": null,
+      "id": "chxopr2jb1d3vc4zqd4ygh0o4",
+      "children": [
+        {
+          "name": "test",
+          "singleActivity": false,
+          "modified": 1405521897.733,
+          "parentId": "chxopr2jb1d3vc4zqd4ygh0o4",
+          "created": 1405521897.733,
+          "createdBy": "chxoqvd2j1dbgc4zqq2rn71nn",
+          "modifiedBy": "chxoqvd2j1dbgc4zqq2rn71nn",
+          "id": "chxorg5521ddrc4zq2trzq6y1",
+          "children": []
+        }
+      ]
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#1abc9c"
+      },
+      "created": 1458633792.984,
+      "createdBy": "chxoqauy71d5uc4zqvdekucij",
+      "modified": 1458633804.71,
+      "modifiedBy": "chxoqauy71d5uc4zqvdekucij",
+      "name": "startStop",
+      "parentId": null,
+      "id": "startStop",
+      "children": []
+    },
+    {
+      "clientData": {
+        "pryv-browser:bgColor": "#2ecc71"
+      },
+      "created": 1405519540.547,
+      "createdBy": "chxoppo8v1d3uc4zqhqdthudf",
+      "modified": 1405520054.162,
+      "modifiedBy": "chxoppo8v1d3uc4zqhqdthudf",
+      "name": "testing map",
+      "parentId": null,
+      "id": "chxoq1mbn1d5cc4zqpn9e13s8",
+      "children": []
+    }
+  ]
+}
