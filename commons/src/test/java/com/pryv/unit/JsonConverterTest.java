@@ -27,7 +27,7 @@ import com.pryv.model.Stream;
 import com.pryv.utils.JsonConverter;
 
 /**
- * Class used to test JsoncConverter methods
+ * Class used to test JsonConverter methods
  *
  * @author ik
  */
