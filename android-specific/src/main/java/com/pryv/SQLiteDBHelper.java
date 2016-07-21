@@ -692,14 +692,12 @@ public class SQLiteDBHelper extends SQLiteOpenHelper implements DBHelper{
         Double duration = c.getDouble(c.getColumnIndex(QueryGenerator.EVENTS_DURATION_KEY));
         String content = c.getString(c.getColumnIndex(QueryGenerator.EVENTS_CONTENT_KEY));
         String tagsString = c.getString(c.getColumnIndex(QueryGenerator.EVENTS_TAGS_KEY));
-        String referencesString = c.getString(c.getColumnIndex(QueryGenerator.EVENTS_REFS_KEY));
         String description = c.getString(c.getColumnIndex(QueryGenerator.EVENTS_DESCRIPTION_KEY));
         String clientData = c.getString(c.getColumnIndex(QueryGenerator.EVENTS_CLIENT_DATA_KEY));
         Boolean trashed = c.getInt(c.getColumnIndex(QueryGenerator.EVENTS_TRASHED_KEY)) > 0 ;
         String attachment = c.getString(c.getColumnIndex(QueryGenerator.EVENTS_ATTACHMENTS_KEY));
-        Event event = new Event(id, streamId, time, duration, type, content, null, null, description, null, null, trashed, created, createdBy, modified, modifiedBy);
+        Event event = new Event(id, streamId, time, duration, type, content, null, description, null, null, trashed, created, createdBy, modified, modifiedBy);
         event.setTags(tagsString);
-        event.setReferences(referencesString);
         event.setAttachments(JsonConverter.deserializeAttachments(attachment));
         event.setClientDataFromAstring(clientData);
         return event;

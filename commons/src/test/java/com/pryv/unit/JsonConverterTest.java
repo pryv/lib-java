@@ -172,7 +172,6 @@ public class JsonConverterTest {
         testEvent.setDuration(duration);
         testEvent.setModified(modified);
         testEvent.setModifiedBy(testerId);
-        testEvent.setReferences("ref1,ref2");
         testEvent.setStreamId(streamId);
         testEvent.setTags("tag1,tag2");
         testEvent.setTime(time);

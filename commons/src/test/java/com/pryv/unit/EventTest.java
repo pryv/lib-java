@@ -95,8 +95,6 @@ public class EventTest {
     Double modified = 155.0;
     String modifiedBy = "bill";
     String ref1 = "ref1";
-    Set<String> refs = new HashSet<String>();
-    refs.add(ref1);
     String tag1 = "tag1";
     String tag2 = "tag2";
     Set<String> tags = new HashSet<String>();
@@ -106,7 +104,7 @@ public class EventTest {
     Boolean trashed = false;
     String eventType = "myType";
     testEvent =
-      new Event(eventId, streamId, time, duration, eventType, content, tags, refs,
+      new Event(eventId, streamId, time, duration, eventType, content, tags,
         description, attachments, clientData, trashed, created, createdBy, modified, modifiedBy);
     Event mergeDestination = new Event();
     mergeDestination.merge(testEvent, JsonConverter.getCloner());
@@ -117,7 +115,6 @@ public class EventTest {
     assertEquals(eventType, mergeDestination.getType());
     assertEquals(content, mergeDestination.getContent());
     assertTrue(areStringSetsEqualInContent(tags, mergeDestination.getTags()));
-    assertTrue(areStringSetsEqualInContent(refs, mergeDestination.getReferences()));
     assertEquals(description, mergeDestination.getDescription());
     assertNotEquals(attachments, mergeDestination.getAttachments());
     int attachmentsCount = attachments.size();

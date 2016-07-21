@@ -36,8 +36,6 @@ public class QueryGenerator {
   public static final String EVENTS_DURATION_KEY = "DURATION";
   public static final String EVENTS_CONTENT_KEY = "CONTENT";
   public static final String EVENTS_TAGS_KEY = "TAGS";
-  public static final String EVENTS_REFS_KEY = "REFS";
-  // "REFERENCES" is a reserved command in SQLite
   public static final String EVENTS_DESCRIPTION_KEY = "DESCRIPTION";
   public static final String EVENTS_CLIENT_DATA_KEY = "CLIENT_DATA";
   public static final String EVENTS_TRASHED_KEY = "TRASHED";
@@ -92,8 +90,6 @@ public class QueryGenerator {
         + ", "
         + EVENTS_TAGS_KEY
         + ", "
-        + EVENTS_REFS_KEY
-        + ", "
         + EVENTS_DESCRIPTION_KEY
         + ", "
         + EVENTS_CLIENT_DATA_KEY
@@ -114,7 +110,6 @@ public class QueryGenerator {
     sb.append(formatDoubleValue(eventToCache.getDuration()) + ",");
     sb.append(formatTextValue(eventToCache.getContent()) + ",");
     sb.append(formatSetValue(eventToCache.getTags()) + ",");
-    sb.append(formatSetValue(eventToCache.getReferences()) + ",");
     sb.append(formatTextValue(eventToCache.getDescription()) + ",");
     sb.append(formatTextValue(eventToCache.formatClientDataAsString()) + ",");
     sb.append(formatBooleanValue(eventToCache.isTrashed()) + ",");
@@ -150,8 +145,6 @@ public class QueryGenerator {
             + EVENTS_CONTENT_KEY + "=" + formatTextValue(eventToUpdate.getContent())
             + ", "
             + EVENTS_TAGS_KEY + "=" + formatSetValue(eventToUpdate.getTags())
-            + ", "
-            + EVENTS_REFS_KEY + "=" + formatSetValue(eventToUpdate.getReferences())
             + ", "
             + EVENTS_DESCRIPTION_KEY + "=" + formatTextValue(eventToUpdate.getDescription())
             + ", "
@@ -421,8 +414,6 @@ public class QueryGenerator {
         + EVENTS_CONTENT_KEY
         + " BLOB, "
         + EVENTS_TAGS_KEY
-        + " TEXT, "
-        + EVENTS_REFS_KEY
         + " TEXT, "
         + EVENTS_DESCRIPTION_KEY
         + " TEXT, "
