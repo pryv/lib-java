@@ -52,7 +52,7 @@ public class JsonConverterTest {
             File eventFile =
                     new File(getClass().getClassLoader().getResource("resources/testEvent.json").getPath());
             byte[] encodedEvent = Files.readAllBytes(Paths.get(eventFile.getAbsolutePath()));
-            String jsonEvent = new String(encodedEvent, Charset.forName("UTF-8"));
+            jsonEvent = new String(encodedEvent, Charset.forName("UTF-8"));
         } catch (NullPointerException e) {
             System.err.println("Test file not found. Root folder for loading test file: " + getClass().getClassLoader().getResource("."));
             e.printStackTrace();
@@ -185,7 +185,7 @@ public class JsonConverterTest {
         }
     }
 
-    //@Test
+    @Test
     public void testUnmarshallEvent() {
         try {
             Event parsedEvent = JsonConverter.retrieveEventFromJson(jsonEvent);
