@@ -533,104 +533,71 @@ public class Event {
     }
   }
 
-  /**
-   * Assigns an id
-   *
-   * @param pid
-   */
-  public void setId(String pid) {
-    if(pid != null) {
-      this.id = pid;
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public void setStreamId(String streamId) {
+    this.streamId = streamId;
+  }
+
+  public void setTime(Double time) {
+    this.time = time;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public void setCreated(Double created) {
+    this.created = created;
+  }
+
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+  }
+
+  public void setModified(Double modified) {
+    this.modified = modified;
+  }
+
+  public void setModifiedBy(String modifiedBy) {
+    this.modifiedBy = modifiedBy;
+  }
+
+  public void setDuration(Double duration) {
+    this.duration = duration;
+  }
+
+  public void setContent(Object content) {
+    this.content = content;
+  }
+
+  public void setTags(String tags) {
+    if(tags != null) {
+      this.tags = new HashSet<String>(Arrays.asList(tags.split(",")));
     }
   }
 
-  public void setStreamId(String pstreamId) {
-    if(pstreamId != null) {
-      this.streamId = pstreamId;
+  public void setReferences(String references) {
+    if(references != null) {
+      this.references = new HashSet<String>(Arrays.asList(references.split(",")));
     }
   }
 
-  public void setTime(Double ptime) {
-    if(ptime != null) {
-      this.time = ptime;
-    }
+  public void setDescription(String description) {
+    this.description = description;
   }
 
-  public void setType(String ptype) {
-    if(ptype != null) {
-      this.type = ptype;
-    }
+  public void setAttachments(Set<Attachment> attachments) {
+    this.attachments = attachments;
   }
 
-  public void setCreated(Double pcreated) {
-    if(pcreated != null) {
-      this.created = pcreated;
-    }
+  public void setClientData(Map<String, Object> clientData) {
+    this.clientData = clientData;
   }
 
-  public void setCreatedBy(String pcreatedBy) {
-    if(pcreatedBy != null) {
-      this.createdBy = pcreatedBy;
-    }
-  }
-
-  public void setModified(Double pmodified) {
-    if(pmodified != null) {
-      this.modified = pmodified;
-    }
-  }
-
-  public void setModifiedBy(String pmodifiedBy) {
-    if(pmodifiedBy != null) {
-      this.modifiedBy = pmodifiedBy;
-    }
-  }
-
-  public void setDuration(Double pduration) {
-    if(pduration != null) {
-      this.duration = pduration;
-    }
-  }
-
-  public void setContent(Object pcontent) {
-    if(pcontent != null) {
-      this.content = pcontent;
-    }
-  }
-
-  public void setTags(String ptags) {
-    if(ptags != null) {
-      this.tags = new HashSet<String>(Arrays.asList(ptags.split(",")));
-    }
-  }
-
-  public void setReferences(String preferences) {
-    if(preferences != null) {
-      this.references = new HashSet<String>(Arrays.asList(preferences.split(",")));
-    }
-  }
-
-  public void setDescription(String pdescription) {
-    if(pdescription != null) {
-      this.description = pdescription;
-    }
-  }
-
-  public void setAttachments(Set<Attachment> pattachments) {
-    if(pattachments != null) {
-      this.attachments = pattachments;
-    }
-  }
-
-  public void setClientData(Map<String, Object> pclientData) {
-    if(clientData != null) {
-      this.clientData = pclientData;
-    }
-  }
-
-  public void setTrashed(Boolean ptrashed) {
-    if(ptrashed != null) {
-      this.trashed = ptrashed;
-    }
+  public void setTrashed(Boolean trashed) {
+    this.trashed = trashed;
   }
 }
