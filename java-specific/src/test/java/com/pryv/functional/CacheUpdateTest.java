@@ -41,7 +41,7 @@ public class CacheUpdateTest {
 
     private static UpdateCacheCallback updateCacheCallback;
 
-    private static List<Event> events;
+    private static List<Event> apiEvents;
     private static List<Event> cacheEvents;
     private static Map<String, Stream> streams;
     private static Map<String, Stream> cacheStreams;
@@ -74,14 +74,23 @@ public class CacheUpdateTest {
         instanciateGetEventsCallback();
         instanciateStreamsCallback();
         instanciateGetStreamsCallback();
+        instanciateUpdateCacheCallback();
 
         String url = "https://" + TestCredentials.USERNAME + "." + TestCredentials.DOMAIN + "/";
 
         api = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
 
+        String streamId = "onlineModuleStreamID";
+        testSupportStream = new Stream(streamId, "javaLibTestSupportStream");
+        api.createStream(testSupportStream, streamsCallback);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+
         String cacheFolder = "cache/test/";
         new File(cacheFolder).mkdirs();
         scope = new Filter();
+        scope.addStream(testSupportStream);
+
         db = new SQLiteDBHelper(scope, cacheFolder, api, null, new DBinitCallback() {
 
             @Override
@@ -89,11 +98,6 @@ public class CacheUpdateTest {
                 System.out.println(message);
             }
         });
-
-        testSupportStream = new Stream("onlineModuleStreamID", "javaLibTestSupportStream");
-        api.createStream(testSupportStream, streamsCallback);
-        Awaitility.await().until(hasApiResult());
-        assertFalse(apiError);
     }
 
     @AfterClass
@@ -107,7 +111,7 @@ public class CacheUpdateTest {
 
     @Before
     public void beforeEachTest() {
-        events = null;
+        apiEvents = null;
         cacheEvents = null;
         streams = null;
         cacheStreams = null;
@@ -127,14 +131,12 @@ public class CacheUpdateTest {
 
         Event newEvent = new Event(testSupportStream.getId(),
                 "note/txt", "i am a test event");
-        newEvent.generateId();
         api.createEvent(newEvent, eventsCallback);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
         apiSuccess = false;
         newEvent = new Event(testSupportStream.getId(),
                 "note/txt", "i am another test event");
-        newEvent.generateId();
         api.createEvent(newEvent, eventsCallback);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
@@ -154,7 +156,7 @@ public class CacheUpdateTest {
         assertFalse(cacheError);
         for (Event cacheEvent: cacheEvents) {
             boolean found = false;
-            for (Event apiEvent: events) {
+            for (Event apiEvent: apiEvents) {
                 if (apiEvent.getId().equals(cacheEvent.getId())) {
                     found = true;
                 }
@@ -200,6 +202,7 @@ public class CacheUpdateTest {
                                     Map<String, Stream> streams,
                                     Map<String, Double> streamDeletions, Double serverTime) {
                 updateSuccess = true;
+
             }
 
             @Override
@@ -225,10 +228,10 @@ public class CacheUpdateTest {
             }
 
             @Override
-            public void apiCallback(List<Event> apiEvents, Map<String, Double> eventDeletions,
+            public void apiCallback(List<Event> events, Map<String, Double> eventDeletions,
                                     Double serverTime) {
-                logger.log("apiCallback with " + apiEvents.size() + " events.");
-                events = apiEvents;
+                logger.log("apiCallback with " + events.size() + " events.");
+                apiEvents = events;
                 apiSuccess = true;
             }
 
@@ -246,7 +249,6 @@ public class CacheUpdateTest {
             @Override
             public void onApiSuccess(String successMessage, Event event, String pStoppedId,
                                      Double pServerTime) {
-                System.out.println("OnlineEventsManagerTest: eventsSuccess msg: " + successMessage);
                 stoppedId = pStoppedId;
                 apiSuccess = true;
                 apiEvent = event;
@@ -277,7 +279,6 @@ public class CacheUpdateTest {
 
             @Override
             public void onApiSuccess(String successMessage, Stream stream, Double pServerTime) {
-                System.out.println("TestStreamsCallback: apiSuccess msg: " + successMessage);
                 apiStream = stream;
                 apiSuccess = true;
             }
