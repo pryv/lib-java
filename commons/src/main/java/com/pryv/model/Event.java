@@ -195,7 +195,7 @@ public class Event {
   /**
    * Assign unique identifier to the Event - does nothing if Event has already a id field
    */
-  public String generateId() {
+  private String generateId() {
     if (this.id == null) {
       this.id = Cuid.createCuid();
     }
