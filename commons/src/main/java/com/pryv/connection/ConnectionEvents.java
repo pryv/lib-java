@@ -44,9 +44,6 @@ public class ConnectionEvents implements EventsManager {
 
     @Override
     public void create(final Event newEvent, final EventsCallback eventsCallback) {
-        if (newEvent.getId() == null) {
-            newEvent.generateId();
-        }
         if (weakConnection.get().isCacheActive() && (cacheScope == null || cacheScope.hasInScope(newEvent))) {
             cache.createEvent(newEvent, eventsCallback);
 
@@ -74,7 +71,7 @@ public class ConnectionEvents implements EventsManager {
 
             cache.update(updateCacheCallback);
         }
-        api.deleteEvent(eventToUpdate, eventsCallback);
+        api.updateEvent(eventToUpdate, eventsCallback);
 
     }
 
@@ -82,6 +79,7 @@ public class ConnectionEvents implements EventsManager {
         this.cacheScope = scope;
     }
 
+    // TODO
     private UpdateCacheCallback updateCacheCallback = new UpdateCacheCallback() {
         @Override
         public void apiCallback(List<Event> events, Map<String, Double> eventDeletions,
