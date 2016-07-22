@@ -140,7 +140,7 @@ public class SQLiteDBHelper implements DBHelper {
 
         }*/
 
-        updateCacheCallback.apiCallback(null, null, null, null, serverTime);
+        updateCacheCallback.apiCallback(events, eventDeletions, null, null, serverTime);
 
 
       }
