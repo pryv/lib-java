@@ -1,4 +1,4 @@
-package com.pryv.functional;
+package com.pryv.acceptance;
 
 import com.jayway.awaitility.Awaitility;
 import com.pryv.Connection;

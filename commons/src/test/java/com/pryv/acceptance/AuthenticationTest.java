@@ -1,4 +1,4 @@
-package com.pryv.functional;
+package com.pryv.acceptance;
 
 import static org.junit.Assert.assertTrue;
 
