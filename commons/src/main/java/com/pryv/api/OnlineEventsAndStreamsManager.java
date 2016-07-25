@@ -40,14 +40,11 @@ public class OnlineEventsAndStreamsManager {
     private String tokenUrlArgument;
 
     /**
-     * represents the type of reply that is being handled by the
-     * ApiResponseHandler
-     *
-     * @author ik
+     * represents the API method called, used by the ApiResponseHandler
      */
-    private enum RequestType {
-        GET_EVENTS, CREATE_EVENT, UPDATE_EVENT, DELETE_EVENT, GET_STREAMS, CREATE_STREAM,
-        UPDATE_STREAM, DELETE_STREAM, ADD_ATTACHMENT, GET_ATTACHMENT, DELETE_ATTACHMENT
+    private enum ApiMethod {
+        EVENTS_GET, EVENTS_CREATE, EVENTS_UPDATE, EVENTS_DELETE, STREAMS_GET, STREAMS_CREATE,
+        STREAMS_UPDATE, STREAMS_DELETE, ADD_ATTACHMENT, GET_ATTACHMENT, DELETE_ATTACHMENT
     }
 
     private WeakReference<AbstractConnection> weakConnection;
@@ -111,7 +108,7 @@ public class OnlineEventsAndStreamsManager {
                             .build();
 
                     Response response = client.newCall(request).execute();
-                    new ApiResponseHandler(RequestType.CREATE_EVENT, cacheEventsCallback, null, null, null,
+                    new ApiResponseHandler(ApiMethod.EVENTS_CREATE, cacheEventsCallback, null, null, null,
                             eventWithAttachment, null).handleResponse(response);
 
                 } catch (IOException e) {
@@ -142,7 +139,7 @@ public class OnlineEventsAndStreamsManager {
                         .build();
                 try {
                     Response response = client.newCall(request).execute();
-                    new ApiResponseHandler(RequestType.GET_EVENTS, null, getEventsCallback, null,
+                    new ApiResponseHandler(ApiMethod.EVENTS_GET, null, getEventsCallback, null,
                             null, null, null).handleResponse(response);
 
                 } catch (IOException e) {
@@ -171,7 +168,7 @@ public class OnlineEventsAndStreamsManager {
                             .post(bodyString)
                             .build();
                     Response response = client.newCall(request).execute();
-                    new ApiResponseHandler(RequestType.CREATE_EVENT, cacheEventsCallback, null,
+                    new ApiResponseHandler(ApiMethod.EVENTS_CREATE, cacheEventsCallback, null,
                             null, null, newEvent, null).handleResponse(response);
 
                 } catch (IOException e) {
@@ -196,7 +193,7 @@ public class OnlineEventsAndStreamsManager {
                         .build();
                 try {
                     Response response = client.newCall(request).execute();
-                    new ApiResponseHandler(RequestType.DELETE_EVENT, cacheEventsCallback, null,
+                    new ApiResponseHandler(ApiMethod.EVENTS_DELETE, cacheEventsCallback, null,
                             null, null, eventToDelete, null).handleResponse(response);
 
                 } catch (IOException e) {
@@ -221,7 +218,7 @@ public class OnlineEventsAndStreamsManager {
                             .put(bodyString)
                             .build();
                     Response response = client.newCall(request).execute();
-                    new ApiResponseHandler(RequestType.UPDATE_EVENT, cacheEventsCallback, null,
+                    new ApiResponseHandler(ApiMethod.EVENTS_UPDATE, cacheEventsCallback, null,
                             null, null, eventToUpdate, null).handleResponse(response);
 
                 } catch (IOException e) {
@@ -250,7 +247,7 @@ public class OnlineEventsAndStreamsManager {
                         .build();
                 try {
                     Response response = client.newCall(request).execute();
-                    new ApiResponseHandler(RequestType.GET_STREAMS, null, null, null,
+                    new ApiResponseHandler(ApiMethod.STREAMS_GET, null, null, null,
                             onlineManagerStreamsCallback, null, null).handleResponse(response);
 
                 } catch (IOException e) {
@@ -279,7 +276,7 @@ public class OnlineEventsAndStreamsManager {
                             .post(bodyString)
                             .build();
                     Response response = client.newCall(request).execute();
-                    new ApiResponseHandler(RequestType.CREATE_STREAM, null, null, cacheStreamsCallback, null, null,
+                    new ApiResponseHandler(ApiMethod.STREAMS_CREATE, null, null, cacheStreamsCallback, null, null,
                             newStream).handleResponse(response);
 
                 } catch (IOException e) {
@@ -312,7 +309,7 @@ public class OnlineEventsAndStreamsManager {
                         .build();
                 try {
                     Response response = client.newCall(request).execute();
-                    new ApiResponseHandler(RequestType.DELETE_STREAM, null, null, cacheStreamsCallback, null, null,
+                    new ApiResponseHandler(ApiMethod.STREAMS_DELETE, null, null, cacheStreamsCallback, null, null,
                             streamToDelete).handleResponse(response);
 
                 } catch (IOException e) {
@@ -338,7 +335,7 @@ public class OnlineEventsAndStreamsManager {
                             .put(bodyString)
                             .build();
                     Response response = client.newCall(request).execute();
-                    new ApiResponseHandler(RequestType.UPDATE_STREAM, null, null, cacheStreamsCallback, null, null,
+                    new ApiResponseHandler(ApiMethod.STREAMS_UPDATE, null, null, cacheStreamsCallback, null, null,
                             streamToUpdate).handleResponse(response);
 
                 } catch (IOException e) {
@@ -356,7 +353,7 @@ public class OnlineEventsAndStreamsManager {
      */
     private class ApiResponseHandler {
 
-        private RequestType requestType;
+        private ApiMethod apiMethod;
         private EventsCallback eventsCallback;
         private GetEventsCallback getEventsCallback;
         private StreamsCallback streamsCallback;
@@ -370,7 +367,7 @@ public class OnlineEventsAndStreamsManager {
          * to be provided. pEvent or pStream is used when updating or creating an
          * item to retrieve the id on the server response.
          *
-         * @param type
+         * @param apiMethod
          * @param eventsCallback
          * @param getEventsCallback
          * @param streamsCallback
@@ -378,14 +375,14 @@ public class OnlineEventsAndStreamsManager {
          * @param event
          * @param stream
          */
-        public ApiResponseHandler(RequestType type, final EventsCallback eventsCallback,
+        public ApiResponseHandler(ApiMethod apiMethod, final EventsCallback eventsCallback,
                                   final GetEventsCallback getEventsCallback,
                                   final StreamsCallback streamsCallback,
                                   final GetStreamsCallback getStreamsCallback,
                                   final Event event, final Stream stream) {
             this.event = event;
             this.stream = stream;
-            this.requestType = type;
+            this.apiMethod = apiMethod;
             this.eventsCallback = eventsCallback;
             this.getEventsCallback = getEventsCallback;
             this.streamsCallback = streamsCallback;
@@ -407,9 +404,9 @@ public class OnlineEventsAndStreamsManager {
 
             if (statusCode == HttpURLConnection.HTTP_CREATED || statusCode == HttpURLConnection.HTTP_OK) {
                 // saul good
-                switch (requestType) {
+                switch (apiMethod) {
 
-                    case GET_EVENTS:
+                    case EVENTS_GET:
                         List<Event> receivedEvents = JsonConverter.createEventsFromJson(responseBody);
                         for (Event receivedEvent : receivedEvents) {
                             receivedEvent.assignConnection(weakConnection);
@@ -422,7 +419,7 @@ public class OnlineEventsAndStreamsManager {
                         getEventsCallback.apiCallback(receivedEvents, eventDeletions, serverTime);
                         break;
 
-                    case CREATE_EVENT:
+                    case EVENTS_CREATE:
                         String stoppedId = JsonConverter.retrieveStoppedIdFromJson(responseBody);
                         Event createdEvent = JsonConverter.retrieveEventFromJson(responseBody);
                         createdEvent.assignConnection(weakConnection);
@@ -435,7 +432,7 @@ public class OnlineEventsAndStreamsManager {
                                         + " created on API", createdEvent, stoppedId, serverTime);
                         break;
 
-                    case UPDATE_EVENT:
+                    case EVENTS_UPDATE:
                         Event updatedEvent = JsonConverter.retrieveEventFromJson(responseBody);
                         updatedEvent.assignConnection(weakConnection);
                         updatedEvent.setId(event.getId());
@@ -448,7 +445,7 @@ public class OnlineEventsAndStreamsManager {
                                         + " updated on API", updatedEvent, null, serverTime);
                         break;
 
-                    case DELETE_EVENT:
+                    case EVENTS_DELETE:
                         if (JsonConverter.hasEventDeletionField(responseBody)) {
                             // stream was deleted, retrieve streamDeletion id field
                             eventsCallback.onApiSuccess(
@@ -466,7 +463,7 @@ public class OnlineEventsAndStreamsManager {
                         }
                         break;
 
-                    case GET_STREAMS:
+                    case STREAMS_GET:
                         Map<String, Stream> receivedStreams =
                                 JsonConverter.createStreamsTreeFromJson(responseBody);
                         for (Stream receivedStream : receivedStreams.values()) {
@@ -476,7 +473,7 @@ public class OnlineEventsAndStreamsManager {
                         getStreamsCallback.apiCallback(receivedStreams, streamDeletions, serverTime);
                         break;
 
-                    case CREATE_STREAM:
+                    case STREAMS_CREATE:
                         Stream createdStream = JsonConverter.retrieveStreamFromJson(responseBody);
                         createdStream.assignConnection(weakConnection);
 
@@ -487,7 +484,7 @@ public class OnlineEventsAndStreamsManager {
                                 serverTime);
                         break;
 
-                    case UPDATE_STREAM:
+                    case STREAMS_UPDATE:
                         Stream updatedStream = JsonConverter.retrieveStreamFromJson(responseBody);
                         updatedStream.assignConnection(weakConnection);
                         logger.log("ApiResponseHandler: stream updated successfully: id="
@@ -497,7 +494,7 @@ public class OnlineEventsAndStreamsManager {
                                 serverTime);
                         break;
 
-                    case DELETE_STREAM:
+                    case STREAMS_DELETE:
                         if (JsonConverter.hasStreamDeletionField(responseBody)) {
                             // stream was deleted, retrieve streamDeletion id field
                             streamsCallback.onApiSuccess(
