@@ -8,9 +8,11 @@ import com.pryv.interfaces.EventsCallback;
 import com.pryv.interfaces.EventsManager;
 import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.interfaces.UpdateCacheCallback;
+import com.pryv.model.Attachment;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +41,6 @@ public class ConnectionEvents implements EventsManager {
             cache.update(updateCacheCallback);
         }
         api.getEvents(filter, eventsCallback);
-
     }
 
     @Override
@@ -50,7 +51,16 @@ public class ConnectionEvents implements EventsManager {
             cache.update(updateCacheCallback);
         }
         api.createEvent(newEvent, eventsCallback);
+    }
 
+    @Override
+    public void createWithAttachment(final Event newEventWithAttachment, final EventsCallback eventsCallback) {
+        if (weakConnection.get().isCacheActive() && (cacheScope == null || cacheScope.hasInScope(newEventWithAttachment))) {
+            cache.createEvent(newEventWithAttachment, eventsCallback);
+
+            cache.update(updateCacheCallback);
+        }
+        api.createEventWithAttachment(newEventWithAttachment, eventsCallback);
     }
 
     @Override
@@ -61,7 +71,6 @@ public class ConnectionEvents implements EventsManager {
             cache.update(updateCacheCallback);
         }
         api.deleteEvent(eventToDelete, eventsCallback);
-
     }
 
     @Override
@@ -72,7 +81,6 @@ public class ConnectionEvents implements EventsManager {
             cache.update(updateCacheCallback);
         }
         api.updateEvent(eventToUpdate, eventsCallback);
-
     }
 
     public void setCacheScope(Filter scope) {
