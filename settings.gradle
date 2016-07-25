@@ -1,1 +1,1 @@
-include ':java-specific', ':commons', ':android-specific'
+include ':java-lib', ':commons', ':android-lib'
