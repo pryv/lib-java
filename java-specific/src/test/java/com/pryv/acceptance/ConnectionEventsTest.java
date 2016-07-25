@@ -7,6 +7,7 @@ import com.pryv.Filter;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.database.DBinitCallback;
+import com.pryv.model.Attachment;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
 import com.pryv.interfaces.GetEventsCallback;
@@ -17,6 +18,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -238,16 +240,6 @@ public class ConnectionEventsTest {
         deleteSingleAcitivityStream(singleAcivityStream);
     }
 
-    @Test
-    public void testMusReturnAnErrorWhenEventParametersAreInvalid() {
-        Event missingStreamIdEvent = new Event();
-        missingStreamIdEvent.setType("note/txt");
-        missingStreamIdEvent.setContent("i am missing a streamId, will generate apiError");
-        connection.events.create(missingStreamIdEvent, eventsCallback);
-        Awaitility.await().until(hasApiResult());
-        assertTrue(apiError);
-    }
-
     // TODO same as other
     // @Test
     public void
@@ -279,10 +271,42 @@ public class ConnectionEventsTest {
         deleteSingleAcitivityStream(singleActivityStream);
     }
 
-    // TODO add eventsManager.createEventWithAttachment()
+    @Test
+    public void testMusReturnAnErrorWhenEventParametersAreInvalid() {
+        Event missingStreamIdEvent = new Event();
+        missingStreamIdEvent.setType("note/txt");
+        missingStreamIdEvent.setContent("i am missing a streamId, will generate apiError");
+        connection.events.create(missingStreamIdEvent, eventsCallback);
+        Awaitility.await().until(hasApiResult());
+        assertTrue(apiError);
+    }
+
     @Test
     public void testCreateEventsWithAttachmentWithValidDataMustWork() {
+        Attachment attachment = new Attachment();
+        File attachmentFile = new File(getClass().getClassLoader().getResource("resources/photo.PNG").getPath());
+        attachment.setFile(attachmentFile);
+        assertTrue(attachment.getFile().length() > 0);
+        attachment.setType("image/png");
+        attachment.setFileName(attachmentFile.getName());
 
+        // create encapsulating event
+        Event eventWithAttachment = new Event();
+        eventWithAttachment.setStreamId(testSupportStream.getId());
+        eventWithAttachment.addAttachment(attachment);
+        eventWithAttachment.setStreamId(testSupportStream.getId());
+        eventWithAttachment.setType("picture/attached");
+        eventWithAttachment.setDescription("This is a test event with an image.");
+
+        // create event with attachment
+        connection.events.createWithAttachment(eventWithAttachment, eventsCallback);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+        assertNotNull(apiEvent);
+        assertNotNull(apiEvent.getAttachments());
+        assertEquals(apiEvent.getAttachments().size(), 1);
+        Attachment createdAttachment = apiEvent.getFirstAttachment();
+        assertNotNull(createdAttachment.getId());
     }
 
     /**
