@@ -2,7 +2,7 @@ apply plugin: 'java'
 
 ext {
     libraryName = 'Pryv Java library'
-    artifact = 'java-lib'
+    artifact = 'java'
     libraryDescription = 'Pryv library for Java apps.'
 }
 

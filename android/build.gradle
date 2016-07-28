@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 ext {
     libraryName = 'Pryv Android library'
-    artifact = 'android-lib'
+    artifact = 'android'
     libraryDescription = 'Pryv library for Android apps.'
 }
 
