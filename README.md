@@ -61,33 +61,7 @@ Android project:
 ```
 
 ## Java Integration
-In order to build and run a Java application that uses Pryv library, first be sure that [Gradle](http://www.gradle.org/downloads) is installed and that you have a build.gradle file at the root of your project. This file should looks like the following:
-
-```
-apply plugin: 'java'
-apply plugin: 'application'
-
-mainClassName = 'package.mainClass'
-
-repositories {
-  mavenCentral()
-	jcenter()
-}
-
-dependencies {
-    compile 'com.pryv:java:1.0.0'
-}
-
-jar {
-    baseName = 'baseName'
-    version =  '1.0.0'
-}
-```
-
-The mainClassName should be renamed according to your main class and the jar block specifies how the JAR file will be named (in this case, it will render baseName-0.1.0.jar).
-
-You can then use Pryv's features by importing them in your Java classes.
-From the command-line, run `gradle build` to build your project and `gradle run` to run it.
+Please see [https://github.com/pryv/app-java-examples](https://github.com/pryv/app-java-examples).
 
 ## Android Integration
 
