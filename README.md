@@ -10,7 +10,7 @@ Java library to authorize, authenticate and access Pryv users data as defined in
 
 Since this library aims to be compatible with Java and Android environment, it contains a Java library and an Android library that both have a Commons library as dependency. Thus, please import the dependency depending on the platform you are targeting as follows :
 
-To add a dependency using **Gradle**, use the following :
+### Gradle
 
 Java project:
 ```
@@ -22,7 +22,7 @@ Android project:
 compile 'com.pryv:android:1.0.0'
 ```
 
-To add a dependency using **Maven**, use the following :
+### Maven
 
 Java project:
 ```
@@ -44,7 +44,7 @@ Android project:
 </dependency>
 ```
 
-To add a dependency using **Ivy**, use the following :
+### Ivy
 
 Java project:
 ```
@@ -59,6 +59,39 @@ Android project:
   <artifact name='$AID' ext='pom'></artifact>
 </dependency>
 ```
+
+## Java Integration
+In order to build and run a Java application that uses Pryv library, first be sure that [Gradle](http://www.gradle.org/downloads) is installed and that you have a build.gradle file at the root of your project. This file should looks like the following:
+
+```
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'package.mainClass'
+
+repositories {
+  mavenCentral()
+	jcenter()
+}
+
+dependencies {
+    compile 'com.pryv:java:1.0.0'
+}
+
+jar {
+    baseName = 'baseName'
+    version =  '1.0.0'
+}
+```
+
+The mainClassName should be renamed according to your main class and the jar block specifies how the JAR file will be named (in this case, it will render baseName-0.1.0.jar).
+
+You can then use Pryv's features by importing them in your Java classes.
+From the command-line, run `gradle build` to build your project and `gradle run` to run it.
+
+## Android Integration
+
+Please see [https://github.com/pryv/app-android-example](https://github.com/pryv/app-android-example).
 
 ## Contribute
 
