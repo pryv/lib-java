@@ -9,7 +9,7 @@ package com.pryv;
  */
 public class Pryv {
 
-  public static String DOMAIN = "pryv.io";
+  public static String DOMAIN = "pryv.me";
   public static String USERNAME = "javalib";
   public static String REGISTRATION_URL = "https://reg." + DOMAIN + "/access";
   public static String URL = "https://" + USERNAME + "." + DOMAIN;
