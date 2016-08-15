@@ -8,7 +8,9 @@ Java library to authorize, authenticate and access Pryv users data as defined in
 
 ## Import
 
-To add a dependency using **Gradle**, use the following (according to the platform you are targeting):
+Since this library aims to be compatible with Java and Android environment, it contains a Java library and an Android library that both have a Commons library as dependency. Thus, please import the dependency depending on the platform you are targeting as follows :
+
+To add a dependency using **Gradle**, use the following :
 
 Java project:
 ```
@@ -20,7 +22,7 @@ Android project:
 compile 'com.pryv:android:1.0.0'
 ```
 
-To add a dependency using **Maven**, use the following (according to the platform you are targeting):
+To add a dependency using **Maven**, use the following :
 
 Java project:
 ```
@@ -42,7 +44,7 @@ Android project:
 </dependency>
 ```
 
-To add a dependency using **Ivy**, use the following (according to the platform you are targeting):
+To add a dependency using **Ivy**, use the following :
 
 Java project:
 ```
