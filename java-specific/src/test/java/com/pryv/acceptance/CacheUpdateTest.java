@@ -127,7 +127,7 @@ public class CacheUpdateTest {
     }
 
     @Test
-    public void testUpdateCache() {
+    public void testConnectionEventsCallUpdatesCacheWithValues() {
 
         Event newEvent = new Event(testSupportStream.getId(),
                 "note/txt", "i am a test event");
@@ -163,6 +163,11 @@ public class CacheUpdateTest {
             }
             assertTrue(found);
         }
+    }
+
+    public void testCacheUpdateIsNotCalledWhenCalledFast() {
+        Event newEvent = new Event(testSupportStream.getId(), "note/txt", "i am a test event");
+
     }
 
     private static Callable<Boolean> hasUpdateResult() {
