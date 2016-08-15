@@ -25,9 +25,9 @@ task clean(type: Delete) {
 
 ext {
     bintrayRepo = 'maven'
-    bintrayName = 'pryv-java-android-lib'
+    bintrayName = 'pryv-lib'
     publishedGroupId = 'com.pryv'
-    libraryVersion = '0.2.0'
+    libraryVersion = '1.0.0'
     siteUrl = 'http://api.pryv.com'
     gitUrl = 'https://github.com/pryv/lib-java.git'
     licenseName = 'BSD'

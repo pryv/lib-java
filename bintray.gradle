@@ -19,7 +19,6 @@ if (project.hasProperty("android")) { // Android libraries
     }
 }
 
-
 /*task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir

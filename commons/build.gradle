@@ -7,8 +7,8 @@ ext {
     libraryDescription = 'Common package shared among Java and Android specific libraries.'
 }
 
-group = 'com.pryv'
-version = '1.0.0'
+group = publishedGroupId
+version = libraryVersion
 
 description = """com.pryv:lib"""
 
