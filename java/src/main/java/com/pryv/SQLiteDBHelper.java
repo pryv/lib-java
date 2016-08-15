@@ -71,6 +71,7 @@ public class SQLiteDBHelper implements DBHelper {
   public SQLiteDBHelper(Filter scope, String cacheFolderPath, OnlineEventsAndStreamsManager api,
                         WeakReference<AbstractConnection> weakConnection,
                         DBinitCallback initCallback) {
+    this.lastUpdate = 0.0;
     this.scope = scope;
     this.api = api;
     this.weakConnection = weakConnection;
@@ -114,6 +115,10 @@ public class SQLiteDBHelper implements DBHelper {
    * @param updateCacheCallback
    */
   public void update(final UpdateCacheCallback updateCacheCallback) {
+
+    if (System.currentTimeMillis() / 1000 - lastUpdate < 10.0) {
+      return;
+    }
     Filter filter = new Filter();
     filter.setIncludeDeletions(true);
     filter.setModifiedSince(lastUpdate);
@@ -141,7 +146,7 @@ public class SQLiteDBHelper implements DBHelper {
         }*/
 
         updateCacheCallback.apiCallback(events, eventDeletions, null, null, serverTime);
-
+        lastUpdate = serverTime;
 
       }
 
