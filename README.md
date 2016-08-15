@@ -8,28 +8,55 @@ Java library to authorize, authenticate and access Pryv users data as defined in
 
 ## Import
 
-We have not yet published the library on Gradle, but you can load it in yor **Gradle** build using [JitPack](https://jitpack.io/) as follows:
+Since this library aims to be compatible with Java and Android environment, it contains a Java library and an Android library that both have a Commons library as dependency. Thus, please import the dependency depending on the platform you are targeting as follows :
 
+To add a dependency using **Gradle**, use the following :
+
+Java project:
 ```
-repositories {
-    maven {
-        url "https://jitpack.io"
-    }
-	jcenter()
-}
-
-dependencies {
-	compile 'com.github.Pryv:lib-java:master-SNAPSHOT'
-}
+compile 'com.pryv:java:1.0.0'
 ```
 
-To add a dependency using **Maven**, use the following:
+Android project:
+```
+compile 'com.pryv:android:1.0.0'
+```
 
+To add a dependency using **Maven**, use the following :
+
+Java project:
 ```
 <dependency>
-		<groupId>com.pryv</groupId>
-		<artifactId>lib</artifactId>
-		<version>0.1.0</version>
+  <groupId>com.pryv</groupId>
+  <artifactId>java</artifactId>
+  <version>1.0.0</version>
+  <type>pom</type>
+</dependency>
+```
+
+Android project:
+```
+<dependency>
+  <groupId>com.pryv</groupId>
+  <artifactId>android</artifactId>
+  <version>1.0.0</version>
+  <type>pom</type>
+</dependency>
+```
+
+To add a dependency using **Ivy**, use the following :
+
+Java project:
+```
+<dependency org='com.pryv' name='java' rev='1.0.0'>
+  <artifact name='$AID' ext='pom'></artifact>
+</dependency>
+```
+
+Android project:
+```
+<dependency org='com.pryv' name='android' rev='1.0.0'>
+  <artifact name='$AID' ext='pom'></artifact>
 </dependency>
 ```
 
@@ -64,10 +91,6 @@ Install [Maven](http://books.sonatype.com/mvnref-book/reference/installation-sec
 `mvn install` installs the package into the local repository, makes it available for use as a dependency in other projects locally.
 
 [additional information](http://maven.apache.org/guides/getting-started/maven-in-five-minutes.html)
-
-#### JAR
-
-After running `mvn package`, include the `lib-java-0.1.0-jar-with-dependencies.jar` file in your classpath.
 
 ## License
 
