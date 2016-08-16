@@ -69,11 +69,9 @@ Please see [https://github.com/pryv/app-android-example](https://github.com/pryv
 
 ## Contribute
 
-### Gradle
-
 `./gradlew` installs the appropriate version of gradle. You can also install it manually [here](https://docs.gradle.org/current/userguide/installation.html).
 
-#### Build and tests
+### Build and tests
 
 `gradle compileJava` compiles the source files.
 
@@ -82,22 +80,6 @@ Please see [https://github.com/pryv/app-android-example](https://github.com/pryv
 `gradle -Dtest.single={TestClassName} test` runs a single test class.
 
 `gradle jar` builds the JAR with
-
-### Maven
-
-Install [Maven](http://books.sonatype.com/mvnref-book/reference/installation-sect-maven-install.html).
-
-#### Build and tests
-
-`mvn compile` compiles the source code.
-
-`mvn test` runs the tests.
-
-`mvn package` builds the JAR with depencies file in the /target subdirectory and runs the tests.
-
-`mvn install` installs the package into the local repository, makes it available for use as a dependency in other projects locally.
-
-[additional information](http://maven.apache.org/guides/getting-started/maven-in-five-minutes.html)
 
 ## License
 
