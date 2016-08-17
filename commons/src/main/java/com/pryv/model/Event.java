@@ -69,7 +69,6 @@ public class Event {
   /**
    * empty Event constructor
    */
-  // TODO: Time?
   public Event() {
     this.generateId();
     this.updateSupervisor();

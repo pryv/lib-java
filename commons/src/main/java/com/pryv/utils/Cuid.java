@@ -1,6 +1,5 @@
 package com.pryv.utils;
 
-import java.lang.management.ManagementFactory;
 import java.util.Date;
 
 /**
@@ -20,19 +19,22 @@ public class Cuid {
 
     private static int counter = 0;
 
-    // TODO: make this crossplatform
+    // TODO: find a crossplatform solution for pid instead of osVersion
     private static String getHostInfo(String idFallback, String nameFallback) {
-        String jvmName = ManagementFactory.getRuntimeMXBean().getName();
-        final int index = jvmName.indexOf('@');
-        if (index < 1) {
+        try {
+            String osVersion = System.getProperty("os.version").replaceAll("[^0-9]", "");
+            String userName = System.getProperty("user.name");
+            osVersion = osVersion.length()<1 ? idFallback: osVersion;
+            userName = userName.length()<1 ? nameFallback: userName;
+
+            return String.format("%s@%s", osVersion, userName);
+
+        } catch (Exception e) {
             return String.format("%s@%s", idFallback, nameFallback);
         }
-
-        return jvmName;
     }
 
     private static String getFingerprint() {
-        // TODO: adapt this according to crossplatform getHostInfo
         String hostInfo = getHostInfo(Long.toString(new Date().getTime()), "dummy-host");
         String hostId = hostInfo.split("@")[0];
         String hostname = hostInfo.split("@")[1];
@@ -44,7 +46,6 @@ public class Cuid {
 
         String idBlock = pad(Long.toString(Long.parseLong(hostId), BASE), 2);
         String nameBlock = pad(Integer.toString(acc), 2);
-
         return idBlock + nameBlock;
     }
 

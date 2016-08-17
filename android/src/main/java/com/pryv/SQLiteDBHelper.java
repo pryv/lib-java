@@ -679,7 +679,6 @@ public class SQLiteDBHelper extends SQLiteOpenHelper implements DBHelper{
         return stream;
     }
 
-    // TODO: Check supervisor !!! see Event.createOrReuse(result);
     private Event getEventFromCursor(Cursor c) throws IOException {
         String id = c.getString(c.getColumnIndex(QueryGenerator.EVENTS_ID_KEY));
         String streamId = c.getString(c.getColumnIndex(QueryGenerator.EVENTS_STREAM_ID_KEY));
