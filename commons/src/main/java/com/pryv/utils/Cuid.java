@@ -19,32 +19,16 @@ public class Cuid {
 
     private static int counter = 0;
 
-    // TODO: find a crossplatform solution for pid instead of osVersion
-    private static String getHostInfo(String idFallback, String nameFallback) {
-        try {
-            String osVersion = System.getProperty("os.version").replaceAll("[^0-9]", "");
-            String userName = System.getProperty("user.name");
-            osVersion = osVersion.length()<1 ? idFallback: osVersion;
-            userName = userName.length()<1 ? nameFallback: userName;
-
-            return String.format("%s@%s", osVersion, userName);
-
-        } catch (Exception e) {
-            return String.format("%s@%s", idFallback, nameFallback);
-        }
-    }
-
-    private static String getFingerprint() {
-        String hostInfo = getHostInfo(Long.toString(new Date().getTime()), "dummy-host");
-        String hostId = hostInfo.split("@")[0];
-        String hostname = hostInfo.split("@")[1];
+    public static String getFingerprint() {
+        long hostId = Thread.currentThread().getId();
+        String hostname =  System.getProperty("user.name") + System.getProperty("os.version");
 
         int acc = hostname.length() + BASE;
         for (int i = 0; i < hostname.length(); i++) {
             acc += acc + (int) hostname.charAt(i);
         }
 
-        String idBlock = pad(Long.toString(Long.parseLong(hostId), BASE), 2);
+        String idBlock = pad(Long.toString(hostId, BASE), 2);
         String nameBlock = pad(Integer.toString(acc), 2);
         return idBlock + nameBlock;
     }
