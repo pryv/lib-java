@@ -24,9 +24,15 @@ task clean(type: Delete) {
 }
 
 ext {
-    // Publish commands:
+    // Publish procedure:
+    // increment libraryVersion just above
     // gradlew install
     // gradlew bintrayUpload
+    // update Readme
+    // git commit -am "<libraryVersion>"
+    // git push
+    // git tag -a <libraryVersion> <commit hash> -m "Publish message"
+    // git push origin --tags
     bintrayRepo = 'maven'
     bintrayName = 'pryv-lib'
     publishedGroupId = 'com.pryv'
