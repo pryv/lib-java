@@ -19,13 +19,13 @@ if (project.hasProperty("android")) { // Android libraries
     }
 }
 
-/*task javadocJar(type: Jar, dependsOn: javadoc) {
+task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
-}*/
+}
 
 artifacts {
-    //archives javadocJar
+    archives javadocJar
     archives sourcesJar
 }
 
@@ -50,7 +50,7 @@ bintray {
         version {
             desc = libraryDescription
             gpg {
-                sign = false //Determines whether to GPG sign the files. The default is false
+                sign = true //Determines whether to GPG sign the files. The default is false
                 //Optional. The passphrase for GPG signing'
 				// passphrase = properties.getProperty("bintray.gpg.password")
             }
