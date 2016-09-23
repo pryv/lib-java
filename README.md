@@ -22,6 +22,7 @@ Android project:
 compile 'com.pryv:android:1.0.2'
 ```
 
+<!--
 ### Maven
 
 Java project:
@@ -59,6 +60,7 @@ Android project:
   <artifact name='$AID' ext='pom'></artifact>
 </dependency>
 ```
+-->
 
 ## Java Integration
 Please see [https://github.com/pryv/app-java-examples](https://github.com/pryv/app-java-examples).
