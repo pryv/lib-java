@@ -33,6 +33,7 @@ ext {
     // git push
     // git tag -a <libraryVersion> <commit hash> -m "Publish message"
     // git push origin --tags
+    // update Java Getting started
     bintrayRepo = 'maven'
     bintrayName = 'pryv-lib'
     publishedGroupId = 'com.pryv'
