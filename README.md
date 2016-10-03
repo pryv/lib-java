@@ -45,6 +45,7 @@ Android project:
 ```
 
 For additional importation strategies, please visit our [Bintray page](https://bintray.com/techpryv/maven/pryv-lib).
+
 You can for example get the sources (Jar, Aar, pom) of the lib by clicking on the *Files* tab.
 
 ## Java Integration
