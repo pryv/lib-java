@@ -44,9 +44,19 @@ Android project:
 </dependency>
 ```
 
-For additional importation strategies, please visit our [Bintray page](https://bintray.com/techpryv/maven/pryv-lib).
+### Jars, Aars
 
-You can for example get the sources (Jar, Aar, pom) of the lib by clicking on the *Files* tab.
+Please visit our [Bintray page](https://bintray.com/techpryv/maven/pryv-lib), where you can get the sources (Jar, Aar) of the lib by clicking on the *Files* tab.
+
+Download and import the source files listed below in your libs folder.
+
+Java project:
+  * [pryv-lib-commons-with-dependencies-1.0.3.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fcommons%2F1.0.3%2Fpryv-lib-commons-with-dependencies-1.0.3.jar)
+  * [java-1.0.3.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fjava%2F1.0.3%2Fjava-1.0.3.jar)
+
+Android project:
+  * [pryv-lib-commons-with-dependencies-1.0.3.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fcommons%2F1.0.3%2Fpryv-lib-commons-with-dependencies-1.0.3.jar)
+  * [android-1.0.3.aar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fandroid%2F1.0.3%2Fandroid-1.0.3.aar)
 
 ## Java Integration
 Please see [https://github.com/pryv/app-java-examples](https://github.com/pryv/app-java-examples).
