@@ -46,7 +46,7 @@ Android project:
 
 ### Jars, Aars
 
-Please visit our [Bintray page](https://bintray.com/techpryv/maven/pryv-lib), where you can get the sources (Jar, Aar) of the lib by clicking on the *Files* tab.
+Our [Bintray page](https://bintray.com/techpryv/maven/pryv-lib) hosts the sources (Jar, Aar) of the lib under the *Files* tab.
 
 Download and import the source files listed below in your libs folder.
 
