@@ -43,5 +43,17 @@ dependencies {
     testOutput sourceSets.test.output
 }
 
+// Task for fat jar generation (with all dependencies inside)
+// Run 'gradlew fatJar', jar will be generated in build/libs
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': libraryName,
+                'Implementation-Version': libraryVersion
+    }
+    baseName = bintrayName + '-' + artifact + '-with-dependencies'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
 apply from: '../jcenter.gradle'
 apply from: '../bintray.gradle'
