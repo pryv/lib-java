@@ -5,6 +5,7 @@ import com.pryv.model.Event;
 import com.pryv.util.TestUtils;
 import com.pryv.utils.JsonConverter;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,6 +18,8 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 
@@ -43,6 +46,29 @@ public class EventTest {
   public void setUp() throws Exception {
     testEvent = DummyData.generateFullEvent();
     jsonEvent = DummyData.generateJsonEvent();
+  }
+
+  @Test
+  public void testGetDateShouldReturnNullWhenNoTimeIsSet() {
+    Event e = new Event();
+    assertNull(e.getDate());
+  }
+
+  @Test
+  public void testGetDateShouldReturnAValueWhenTimeIsSet() {
+    Event e = new Event();
+    double time = System.currentTimeMillis() / 1000.0;
+    e.setTime(time);
+    assertEquals(time, e.getDate().getMillis() / 1000.0, 0.0);
+  }
+
+  @Test
+  public void testSetDateShouldWorkWithoutAweakConnection() {
+    Event e = new Event();
+    DateTime date = new DateTime();
+    e.setDate(date);
+    assertEquals(e.getTime(), date.getMillis() / 1000.0, 0.0);
+    assertEquals(e.getDate().getMillis(), date.getMillis());
   }
 
   @Test

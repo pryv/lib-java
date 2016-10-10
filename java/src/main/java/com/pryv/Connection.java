@@ -188,7 +188,7 @@ public class Connection implements AbstractConnection {
      *
      * @param pServerTime
      */
-    private void computeDelta(Double pServerTime) {
+    private void updateDelta(Double pServerTime) {
         if (pServerTime != null) {
             deltaTime = pServerTime - System.currentTimeMillis() / millisToSeconds;
         }

@@ -312,10 +312,14 @@ public class Event {
     if (time == null) {
       return null;
     }
-    if (weakConnection.get() == null) {
-      return new DateTime(time.doubleValue());
+    AbstractConnection con = null;
+    if (weakConnection != null) {
+      con = weakConnection.get();
     }
-    return weakConnection.get().serverTimeInSystemDate(time);
+    if (con == null) {
+      return new DateTime((long) (time.doubleValue() * 1000));
+    }
+    return con.serverTimeInSystemDate(time);
   }
 
   /**
@@ -327,11 +331,16 @@ public class Event {
   public void setDate(DateTime date) {
     if (date == null) {
       time = null;
-    }
-    if (weakConnection.get() == null) {
+    } else {
       time = date.getMillis() / 1000.0;
+      AbstractConnection con = null;
+      if (weakConnection != null) {
+        con = weakConnection.get();
+      }
+      if (con != null) {
+        time = con.serverTimeInSystemDate(date.getMillis() / 1000.0).getMillis() / 1000.0;
+      }
     }
-    weakConnection.get().serverTimeInSystemDate(date.getMillis() / 1000.0);
   }
 
   /**
