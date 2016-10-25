@@ -20,13 +20,14 @@ repositories {
     maven { url "http://repo.maven.apache.org/maven2" }
 }
 
-configurations {
-    testOutput
+sourceSets {
+    test {
+        output.resourcesDir = "build/classes/test/resources"
+    }
 }
 
-task copyTestResources(type: Copy, dependsOn: processTestResources) {
-    from "${projectDir}/src/test/resources"
-    into "${buildDir}/classes/test/resources"
+configurations {
+    testOutput
 }
 
 dependencies {
