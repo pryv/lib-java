@@ -242,7 +242,7 @@ public class OnlineEventsAndStreamsManager {
                         + tokenUrlArgument);
 
                 Request request = new Request.Builder()
-                        .url(streamsUrl + tokenUrlArgument)
+                        .url(streamsUrl + tokenUrlArgument) // add here like in EVENTS_GET
                         .get()
                         .build();
                 try {

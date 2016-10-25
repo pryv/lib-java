@@ -152,9 +152,26 @@ public class ConnectionStreamsTest {
         connection.getRootStreams();
     }
 
-    // TODO
+    @Test
     public void testGetStreamsMustReturnStreamsMatchingTheGivenFilter() {
+        Stream childStream1 = new Stream("childStream1", "childStream1");
+        childStream1.setParentId(testSupportStream.getId());
+        Stream childStream2 = new Stream("childStream2", "childStream2");
+        childStream2.setParentId(testSupportStream.getId());
+        connection.streams.create(testSupportStream, streamsCallback);
 
+        // TODO: call getStream with rootStream in parentStream filter
+        // verify for cache and api streams
+    }
+
+    @Test
+    public void testGetStreamsWithStateSetToAllMustReturnTrashedStreamsAsWell() {
+        //TODO: create a stream under testSupportStream, delete it and make the get request
+        // verify with cache and api
+    }
+
+    @Test void testGetStreamsWithIncludeDeletionsMustReturnDeletedStreamsAsWell() {
+        //TODO: same as above, but delete it twice
     }
 
     // TODO
