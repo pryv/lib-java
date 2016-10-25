@@ -9,7 +9,7 @@ ext {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':commons')
-    testCompile project(path: ':commons', configuration: 'testOutput')
+    compile project(path: ':commons')
     testCompile group: 'junit', name: 'junit', version:'4.11'
 }
 
