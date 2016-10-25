@@ -81,11 +81,12 @@ public class DummyData {
       new Stream(STREAM_CHILD_ID, STREAM_CHILD_NAME,
         STREAM_ID, null, null, null, STREAM_CHILD_TRASHED, STREAM_CHILD_CREATED,
         STREAM_CHILD_CREATED_BY, STREAM_CHILD_MODIFIED, STREAM_CHILD_MODIFIED_BY);
+    HashSet<Stream> children = new HashSet<>();
+    children.add(streamChild);
     Stream testStream =
       new Stream(STREAM_ID, STREAM_NAME, null, STREAM_SINGLE_ACTIVITY,
-        streamClientData, null, STREAM_TRASHED, STREAM_CREATED, STREAM_CREATED_BY, STREAM_MODIFIED,
+        streamClientData, children, STREAM_TRASHED, STREAM_CREATED, STREAM_CREATED_BY, STREAM_MODIFIED,
         STREAM_MODIFIED_BY);
-    testStream.addChildStream(streamChild);
     return testStream;
   }
 
