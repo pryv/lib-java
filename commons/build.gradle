@@ -20,6 +20,16 @@ repositories {
     maven { url "http://repo.maven.apache.org/maven2" }
 }
 
+sourceSets {
+    test {
+        output.resourcesDir = "build/classes/test/resources"
+    }
+}
+
+configurations {
+    testOutput
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.3.3'
@@ -31,12 +41,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version:'4.11'
     testCompile group: 'org.jacoco', name: 'jacoco-maven-plugin', version:'0.7.1.201405082137'
     compile 'commons-codec:commons-codec:1.2'
-}
-
-sourceSets {
-    test {
-        output.resourcesDir = "build/classes/test/resources"
-    }
+    testOutput sourceSets.test.output
 }
 
 // Task for fat jar generation (with all dependencies inside)
