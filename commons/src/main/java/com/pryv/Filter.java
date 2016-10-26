@@ -270,7 +270,7 @@ public class Filter {
       sb.append("&" + LIMIT_URL_KEY + "=" + limit);
     }
     if (state != null) {
-      sb.append("&" + STATE_URL_KEY + "=" + state);
+      sb.append("&" + STATE_URL_KEY + "=" + state.toString().toLowerCase());
     }
     if (modifiedSince != null) {
       sb.append("&" + MODIFIED_SINCE_URL_KEY + "=" + modifiedSince);
