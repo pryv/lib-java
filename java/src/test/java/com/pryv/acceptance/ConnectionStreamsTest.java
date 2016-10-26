@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -215,6 +216,7 @@ public class ConnectionStreamsTest {
 
         // Get streams with state all Filter
         Filter filter = new Filter();
+        filter.setParentId(testSupportStream.getId());
         filter.setState(Filter.State.ALL);
         connection.streams.get(filter, getStreamsCallback);
         Awaitility.await().until(hasCacheResult());
@@ -223,7 +225,7 @@ public class ConnectionStreamsTest {
         assertFalse(apiError);
 
         // Check that retrieved streams contain the trashed child
-        assertTrue((cacheStreams!=null && cacheStreams.containsValue(childStream3)) || (streams!=null && streams.containsValue(childStream3)));
+        assertTrue((cacheStreams!=null && cacheStreams.containsKey(childStream3.getId())) || (streams!=null && streams.containsKey(childStream3.getId())));
     }
 
     @Test
@@ -253,6 +255,7 @@ public class ConnectionStreamsTest {
 
         // Get streams with include deletions Filter
         Filter filter = new Filter();
+        filter.setParentId(testSupportStream.getId());
         filter.setIncludeDeletions(true);
         connection.streams.get(filter, getStreamsCallback);
         Awaitility.await().until(hasCacheResult());
@@ -261,7 +264,7 @@ public class ConnectionStreamsTest {
         assertFalse(apiError);
 
         // Check that retrieved streams contain the deleted child
-        assertTrue((cacheStreams!=null && cacheStreams.containsValue(childStream4)) || (streams!=null && streams.containsValue(childStream4)));
+        assertTrue((cacheStreams!=null && cacheStreams.containsKey(childStream4.getId())) || (streams!=null && streams.containsKey(childStream4.getId())));
     }
 
     // TODO
