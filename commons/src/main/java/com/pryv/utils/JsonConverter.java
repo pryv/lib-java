@@ -35,6 +35,9 @@ public class JsonConverter {
   private final static String STREAM_KEY = "stream";
   private final static String STREAMS_KEY = "streams";
 
+  private final static String STREAM_DELETIONS_KEY = "streamDeletions";
+  private final static String DELETED_KEY = "deleted";
+
   private final static String STOPPED_ID_KEY = "stoppedId";
 
   private final static String META_KEY = "meta";
@@ -265,7 +268,7 @@ public class JsonConverter {
     throws IOException {
     JsonNode arrNode = toJsonNode(jsonStreamsArray).get(STREAMS_KEY);
     Map<String, Stream> newStreams = new HashMap<String, Stream>();
-    if (arrNode.isArray()) {
+    if (arrNode!=null && arrNode.isArray()) {
       logger.log("JsonConverter: number of received root streams: " + arrNode.size());
       for (final JsonNode objNode : arrNode) {
         String str = objNode.toString();
@@ -277,6 +280,33 @@ public class JsonConverter {
     }
 
     return newStreams;
+  }
+
+  /**
+   * Deserialize a JSON containing the field "streamDeletions" into a Map<String,
+   * Double> with Stream id as key and deletion time as value
+   *
+   * @param jsonStreamDeletionsArray
+   * @return
+   * @throws IOException
+   */
+  public static Map<String, Double> createStreamDeletionsTreeFromJson(String jsonStreamDeletionsArray)
+          throws IOException {
+    JsonNode arrNode = toJsonNode(jsonStreamDeletionsArray).get(STREAM_DELETIONS_KEY);
+    Map<String, Double> deletedStreams = new HashMap<String, Double>();
+    if (arrNode!=null && arrNode.isArray()) {
+      logger.log("JsonConverter: number of received deleted streams: " + arrNode.size());
+      for (final JsonNode objNode : arrNode) {
+        String str = objNode.toString();
+        logger.log("JsonConverter: deserializing deleted stream: " + str);
+        String streamId = objNode.get(ID_KEY).textValue();
+        Double deletionTime = objNode.get(DELETED_KEY).asDouble();
+        deletedStreams.put(streamId, deletionTime);
+        logger.log("JsonConverter: stream deleted: id = " + streamId);
+      }
+    }
+
+    return deletedStreams;
   }
 
   /**

@@ -473,7 +473,8 @@ public class OnlineEventsAndStreamsManager {
                         for (Stream receivedStream : receivedStreams.values()) {
                             receivedStream.assignConnection(weakConnection);
                         }
-                        Map<String, Double> streamDeletions = null;
+                        Map<String, Double> streamDeletions =
+                                JsonConverter.createStreamDeletionsTreeFromJson(responseBody);
                         getStreamsCallback.apiCallback(receivedStreams, streamDeletions, serverTime);
                         break;
 
