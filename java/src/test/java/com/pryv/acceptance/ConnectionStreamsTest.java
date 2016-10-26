@@ -176,15 +176,16 @@ public class ConnectionStreamsTest {
         Filter filter = new Filter();
         filter.setParentId(testSupportStream.getId());
         connection.streams.get(filter, getStreamsCallback);
-        Awaitility.await().until(hasCacheResult());
-        assertFalse(cacheError);
 
         // Check parentID of retrieved streams
+        /*
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
         if(cacheStreams != null) {
             for(Stream stream: cacheStreams.values()) {
                 assertEquals(testSupportStream.getId(),stream.getParentId());
             }
-        }
+        }*/
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
         if(streams != null) {
