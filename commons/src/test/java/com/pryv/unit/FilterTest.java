@@ -101,7 +101,7 @@ public class FilterTest {
     testFilter.addType("unit");
     testFilter.setState(State.ALL);
     String urlFormat =
-      "&fromTime=100.0&toTime=200.0&streams[]=testStreamId&tags[]=tag&types[]=unit&running=false&sortAscending=false&skip=0&limit=100&state=ALL&modifiedSince=150.0";
+      "&fromTime=100.0&toTime=200.0&streams[]=testStreamId&tags[]=tag&types[]=unit&running=false&sortAscending=false&skip=0&limit=100&state=all&modifiedSince=150.0";
     System.out.println("expecting:\t\t" + urlFormat);
     System.out.println("received:\t\t" + testFilter.toUrlParameters());
     assertEquals(urlFormat, testFilter.toUrlParameters());
