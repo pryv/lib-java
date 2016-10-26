@@ -186,6 +186,7 @@ public class ConnectionStreamsTest {
         // Should at least return the two children created above
         assertFalse(cacheStream==null && streams==null);
 
+        // TODO: check filter handling in cache and uncomment this test
         // Check parentID of retrieved streams
         /*
         Awaitility.await().until(hasCacheResult());
@@ -232,6 +233,7 @@ public class ConnectionStreamsTest {
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
 
+        // TODO: check implementation in cache
         // Check that retrieved streams contain the trashed child
         assertTrue((cacheStreams!=null && cacheStreams.containsKey(childStream3.getId()) && cacheStreams.get(childStream3.getId()).isTrashed()) || (streams!=null && streams.containsKey(childStream3.getId()) && streams.get(childStream3.getId()).isTrashed()));
     }
@@ -271,6 +273,7 @@ public class ConnectionStreamsTest {
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
 
+        // TODO: check implementation in cache
         // Check that retrieved streams contain the deleted child
         assertTrue((cacheStreamDeletions!=null && cacheStreamDeletions.containsKey(childStream4.getId()) && cacheStreamDeletions.get(childStream4.getId())>=time) || (streamDeletions!=null && streamDeletions.containsKey(childStream4.getId()) && streamDeletions.get(childStream4.getId())>=time));
     }
