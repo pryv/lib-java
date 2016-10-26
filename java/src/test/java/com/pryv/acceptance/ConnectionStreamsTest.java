@@ -24,6 +24,7 @@ import java.util.concurrent.Callable;
 
 import resources.TestCredentials;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
@@ -158,10 +159,29 @@ public class ConnectionStreamsTest {
         childStream1.setParentId(testSupportStream.getId());
         Stream childStream2 = new Stream("childStream2", "childStream2");
         childStream2.setParentId(testSupportStream.getId());
-        connection.streams.create(testSupportStream, streamsCallback);
-
-        // TODO: call getStream with rootStream in parentStream filter
-        // verify for cache and api streams
+        connection.streams.create(childStream1, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+        connection.streams.create(childStream2, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+        Filter filter = new Filter();
+        filter.setParentId(testSupportStream.getId());
+        connection.streams.get(filter, getStreamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        for(Stream stream: cacheStreams.values()) {
+           assertEquals(testSupportStream.getId(),stream.getParentId());
+        }
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+        for(Stream stream: streams.values()) {
+            assertEquals(testSupportStream.getId(),stream.getParentId());
+        }
     }
 
     @Test
@@ -170,7 +190,8 @@ public class ConnectionStreamsTest {
         // verify with cache and api
     }
 
-    @Test void testGetStreamsWithIncludeDeletionsMustReturnDeletedStreamsAsWell() {
+    @Test
+    public void testGetStreamsWithIncludeDeletionsMustReturnDeletedStreamsAsWell() {
         //TODO: same as above, but delete it twice
     }
 
