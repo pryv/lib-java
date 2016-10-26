@@ -237,12 +237,16 @@ public class OnlineEventsAndStreamsManager {
         new Thread() {
             @Override
             public void run() {
+                String url = streamsUrl + tokenUrlArgument;
+                if (filter != null) {
+                    url += filter.toUrlParameters();
+                }
+
                 logger.log("OnlineEventsAndStreamsManager: get: Get request at: "
-                        + streamsUrl
-                        + tokenUrlArgument);
+                        + url);
 
                 Request request = new Request.Builder()
-                        .url(streamsUrl + tokenUrlArgument) // add here like in EVENTS_GET
+                        .url(url)
                         .get()
                         .build();
                 try {

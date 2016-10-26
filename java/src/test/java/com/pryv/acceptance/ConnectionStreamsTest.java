@@ -180,13 +180,17 @@ public class ConnectionStreamsTest {
         assertFalse(cacheError);
 
         // Check parentID of retrieved streams
-        for(Stream stream: cacheStreams.values()) {
-           assertEquals(testSupportStream.getId(),stream.getParentId());
+        if(cacheStreams != null) {
+            for(Stream stream: cacheStreams.values()) {
+                assertEquals(testSupportStream.getId(),stream.getParentId());
+            }
         }
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
-        for(Stream stream: streams.values()) {
-            assertEquals(testSupportStream.getId(),stream.getParentId());
+        if(streams != null) {
+            for(Stream stream: streams.values()) {
+                assertEquals(testSupportStream.getId(),stream.getParentId());
+            }
         }
     }
 
@@ -218,7 +222,7 @@ public class ConnectionStreamsTest {
         assertFalse(apiError);
 
         // Check that retrieved streams contain the trashed child
-        assertTrue(cacheStreams.containsValue(childStream3) || streams.containsValue(childStream3));
+        assertTrue((cacheStreams!=null && cacheStreams.containsValue(childStream3)) || (streams!=null && streams.containsValue(childStream3)));
     }
 
     @Test
@@ -256,7 +260,7 @@ public class ConnectionStreamsTest {
         assertFalse(apiError);
 
         // Check that retrieved streams contain the deleted child
-        assertTrue(cacheStreams.containsValue(childStream4) || streams.containsValue(childStream4));
+        assertTrue((cacheStreams!=null && cacheStreams.containsValue(childStream4)) || (streams!=null && streams.containsValue(childStream4)));
     }
 
     // TODO
