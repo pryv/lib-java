@@ -34,12 +34,12 @@ public class FilterTest {
     Integer limit = 0;
     State state = State.DEFAULT;
     Double modifiedSince = 50.0;
-    Stream parent = new Stream("parentId","parentName");
+    String parentId = "parentId";
     Boolean includeDeletions = true;
     Double includeDeletionsSince = 50.0;
     Filter filter =
       new Filter(from, to, streams, tags, types, running, sortAscending, skip, limit, state,
-        modifiedSince, parent.getId(), includeDeletions, includeDeletionsSince);
+        modifiedSince, parentId, includeDeletions, includeDeletionsSince);
     assertEquals(from, filter.getFromTime());
     assertEquals(to, filter.getToTime());
     assertEquals(streams, filter.getStreamIds());
@@ -51,7 +51,7 @@ public class FilterTest {
     assertEquals(limit, filter.getLimit());
     assertEquals(state, filter.getState());
     assertEquals(modifiedSince, filter.getModifiedSince());
-    assertEquals(parent.getId(), filter.getParentId());
+    assertEquals(parentId, filter.getParentId());
     assertEquals(includeDeletions, filter.getIncludeDeletions());
     assertEquals(includeDeletionsSince, filter.getIncludeDeletionsSince());
   }
