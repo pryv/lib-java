@@ -19,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -43,6 +44,8 @@ public class ConnectionStreamsTest {
     private static List<Event> cacheEvents;
     private static Map<String, Stream> streams;
     private static Map<String, Stream> cacheStreams;
+    private static Map<String, Double> cacheStreamDeletions;
+    private static Map<String, Double> streamDeletions;
 
     private static Stream testSupportStream;
 
@@ -115,6 +118,8 @@ public class ConnectionStreamsTest {
         cacheEvents = null;
         streams = null;
         cacheStreams = null;
+        streamDeletions = null;
+        cacheStreamDeletions = null;
         apiSuccess = false;
         apiError = false;
         cacheSuccess = false;
@@ -225,7 +230,7 @@ public class ConnectionStreamsTest {
         assertFalse(apiError);
 
         // Check that retrieved streams contain the trashed child
-        assertTrue((cacheStreams!=null && cacheStreams.containsKey(childStream3.getId())) || (streams!=null && streams.containsKey(childStream3.getId())));
+        assertTrue((cacheStreams!=null && cacheStreams.containsKey(childStream3.getId()) && cacheStreams.get(childStream3.getId()).isTrashed()) || (streams!=null && streams.containsKey(childStream3.getId()) && streams.get(childStream3.getId()).isTrashed()));
     }
 
     @Test
@@ -233,6 +238,7 @@ public class ConnectionStreamsTest {
         // Create child
         Stream childStream4 = new Stream("childStream4", "childStream4");
         childStream4.setParentId(testSupportStream.getId());
+        Double time = System.currentTimeMillis() / 1000.0;
         connection.streams.create(childStream4, streamsCallback);
         Awaitility.await().until(hasCacheResult());
         assertFalse(cacheError);
@@ -255,8 +261,7 @@ public class ConnectionStreamsTest {
 
         // Get streams with include deletions Filter
         Filter filter = new Filter();
-        filter.setParentId(testSupportStream.getId());
-        filter.setIncludeDeletions(true);
+        filter.setIncludeDeletionsSince(time);
         connection.streams.get(filter, getStreamsCallback);
         Awaitility.await().until(hasCacheResult());
         assertFalse(cacheError);
@@ -264,7 +269,7 @@ public class ConnectionStreamsTest {
         assertFalse(apiError);
 
         // Check that retrieved streams contain the deleted child
-        assertTrue((cacheStreams!=null && cacheStreams.containsKey(childStream4.getId())) || (streams!=null && streams.containsKey(childStream4.getId())));
+        assertTrue((cacheStreamDeletions!=null && cacheStreamDeletions.containsKey(childStream4.getId()) && cacheStreamDeletions.get(childStream4.getId())>=time) || (streamDeletions!=null && streamDeletions.containsKey(childStream4.getId()) && streamDeletions.get(childStream4.getId())>=time));
     }
 
     // TODO
@@ -528,6 +533,7 @@ public class ConnectionStreamsTest {
             public void cacheCallback(Map<String, Stream> streams, Map<String, Double> streamDeletions) {
                 logger.log("cacheCallback with " + streams.size() + " streams.");
                 cacheStreams = streams;
+                cacheStreamDeletions = streamDeletions;
                 cacheSuccess = true;
             }
 
@@ -539,9 +545,10 @@ public class ConnectionStreamsTest {
 
             @Override
             public void apiCallback(Map<String, Stream> receivedStreams,
-                                    Map<String, Double> streamDeletions, Double serverTime) {
+                                    Map<String, Double> receivedStreamDeletions, Double serverTime) {
                 logger.log("apiCallback with " + receivedStreams.size() + " streams.");
                 streams = receivedStreams;
+                streamDeletions = receivedStreamDeletions;
                 apiSuccess = true;
             }
 
