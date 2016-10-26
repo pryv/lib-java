@@ -46,7 +46,7 @@ public class Filter {
   private Double modifiedSince;
   private String parentId;
   private Boolean includeDeletions;
-  private Boolean includeDeletionsSince;
+  private Double includeDeletionsSince;
 
   /**
    * Filter class constructor. All fields are optional: use null when unused.
@@ -73,10 +73,16 @@ public class Filter {
    *          which state
    * @param modifiedSince
    *          since when is it modified
+   * @param parentId
+   *          parent id
+   * @param includeDeletions
+   *          include deleted
+   * @param includeDeletionsSince
+   *          include deleted since specified time
    */
   public Filter(Double from, Double to, Set<Stream> streams, Set<String> tags,
     Set<String> types, Boolean running, Boolean sortAscending, Integer skip, Integer limit,
-    State state, Double modifiedSince, String parentId, Boolean includeDeletions, Boolean includeDeletionsSince) {
+    State state, Double modifiedSince, String parentId, Boolean includeDeletions, Double includeDeletionsSince) {
     this.fromTime = from;
     this.toTime = to;
     this.streams = streams;
@@ -417,7 +423,7 @@ public class Filter {
     return includeDeletions;
   }
 
-  public Boolean getIncludeDeletionsSince() {
+  public Double getIncludeDeletionsSince() {
     return includeDeletionsSince;
   }
 
@@ -473,7 +479,7 @@ public class Filter {
     this.includeDeletions = includeDeletions;
   }
 
-  public void setIncludeDeletionsSince(Boolean includeDeletionsSince) {
+  public void setIncludeDeletionsSince(Double includeDeletionsSince) {
     this.includeDeletionsSince = includeDeletionsSince;
   }
 
