@@ -34,9 +34,12 @@ public class FilterTest {
     Integer limit = 0;
     State state = State.DEFAULT;
     Double modifiedSince = 50.0;
+    Stream parent = new Stream("parentId","parentName");
+    Boolean includeDeletions = true;
+    Double includeDeletionsSince = 50.0;
     Filter filter =
       new Filter(from, to, streams, tags, types, running, sortAscending, skip, limit, state,
-        modifiedSince, null, null, null);
+        modifiedSince, parent.getId(), includeDeletions, includeDeletionsSince);
     assertEquals(from, filter.getFromTime());
     assertEquals(to, filter.getToTime());
     assertEquals(streams, filter.getStreamIds());
@@ -48,6 +51,9 @@ public class FilterTest {
     assertEquals(limit, filter.getLimit());
     assertEquals(state, filter.getState());
     assertEquals(modifiedSince, filter.getModifiedSince());
+    assertEquals(parent.getId(), filter.getParentId());
+    assertEquals(includeDeletions, filter.getIncludeDeletions());
+    assertEquals(includeDeletionsSince, filter.getIncludeDeletionsSince());
   }
 
   @Test
@@ -100,10 +106,11 @@ public class FilterTest {
     testFilter.setToTime(200.0);
     testFilter.addType("unit");
     testFilter.setState(State.ALL);
+    testFilter.setParentId("parentId");
+    testFilter.setIncludeDeletions(true);
+    testFilter.setIncludeDeletionsSince(50.0);
     String urlFormat =
-      "&fromTime=100.0&toTime=200.0&streams[]=testStreamId&tags[]=tag&types[]=unit&running=false&sortAscending=false&skip=0&limit=100&state=all&modifiedSince=150.0";
-    System.out.println("expecting:\t\t" + urlFormat);
-    System.out.println("received:\t\t" + testFilter.toUrlParameters());
+      "&fromTime=100.0&toTime=200.0&streams[]=testStreamId&tags[]=tag&types[]=unit&running=false&sortAscending=false&skip=0&limit=100&state=all&modifiedSince=150.0&parentId=parentId&includeDeletions=true&includeDeletionsSince=50.0";
     assertEquals(urlFormat, testFilter.toUrlParameters());
   }
 
