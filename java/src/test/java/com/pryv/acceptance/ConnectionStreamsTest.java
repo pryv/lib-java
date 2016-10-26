@@ -156,6 +156,7 @@ public class ConnectionStreamsTest {
 
     @Test
     public void testGetStreamsMustReturnStreamsMatchingTheGivenFilter() {
+        // Create children
         Stream childStream1 = new Stream("childStream1", "childStream1");
         childStream1.setParentId(testSupportStream.getId());
         Stream childStream2 = new Stream("childStream2", "childStream2");
@@ -170,11 +171,15 @@ public class ConnectionStreamsTest {
         assertFalse(cacheError);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
+
+        // Get streams with specified parentID in Filter
         Filter filter = new Filter();
         filter.setParentId(testSupportStream.getId());
         connection.streams.get(filter, getStreamsCallback);
         Awaitility.await().until(hasCacheResult());
         assertFalse(cacheError);
+
+        // Check parentID of retrieved streams
         for(Stream stream: cacheStreams.values()) {
            assertEquals(testSupportStream.getId(),stream.getParentId());
         }
@@ -187,6 +192,7 @@ public class ConnectionStreamsTest {
 
     @Test
     public void testGetStreamsWithStateSetToAllMustReturnTrashedStreamsAsWell() {
+        // Create child
         Stream childStream3 = new Stream("childStream3", "childStream3");
         childStream3.setParentId(testSupportStream.getId());
         connection.streams.create(childStream3, streamsCallback);
@@ -194,11 +200,15 @@ public class ConnectionStreamsTest {
         assertFalse(cacheError);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
+
+        // Trash child
         connection.streams.delete(childStream3, false, streamsCallback);
         Awaitility.await().until(hasCacheResult());
         assertFalse(cacheError);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
+
+        // Get streams with state all Filter
         Filter filter = new Filter();
         filter.setState(Filter.State.ALL);
         connection.streams.get(filter, getStreamsCallback);
@@ -206,12 +216,47 @@ public class ConnectionStreamsTest {
         assertFalse(cacheError);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
+
+        // Check that retrieved streams contain the trashed child
         assertTrue(cacheStreams.containsValue(childStream3) || streams.containsValue(childStream3));
     }
 
     @Test
     public void testGetStreamsWithIncludeDeletionsMustReturnDeletedStreamsAsWell() {
-        //TODO: same as above, but delete it twice
+        // Create child
+        Stream childStream4 = new Stream("childStream4", "childStream4");
+        childStream4.setParentId(testSupportStream.getId());
+        connection.streams.create(childStream4, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+
+        // Trash child
+        connection.streams.delete(childStream4, false, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+
+        // Delete child
+        connection.streams.delete(childStream4, false, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+
+        // Get streams with include deletions Filter
+        Filter filter = new Filter();
+        filter.setIncludeDeletions(true);
+        connection.streams.get(filter, getStreamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+
+        // Check that retrieved streams contain the deleted child
+        assertTrue(cacheStreams.containsValue(childStream4) || streams.containsValue(childStream4));
     }
 
     // TODO
