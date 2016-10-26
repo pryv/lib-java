@@ -183,6 +183,9 @@ public class ConnectionStreamsTest {
         filter.setParentId(testSupportStream.getId());
         connection.streams.get(filter, getStreamsCallback);
 
+        // Should at least return the two children created above
+        assertFalse(cacheStream==null && streams==null);
+
         // Check parentID of retrieved streams
         /*
         Awaitility.await().until(hasCacheResult());
