@@ -27,6 +27,7 @@ import resources.TestCredentials;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ConnectionStreamsTest {
 
@@ -186,8 +187,26 @@ public class ConnectionStreamsTest {
 
     @Test
     public void testGetStreamsWithStateSetToAllMustReturnTrashedStreamsAsWell() {
-        //TODO: create a stream under testSupportStream, delete it and make the get request
-        // verify with cache and api
+        Stream childStream3 = new Stream("childStream3", "childStream3");
+        childStream3.setParentId(testSupportStream.getId());
+        connection.streams.create(childStream3, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+        connection.streams.delete(childStream3, false, streamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+        Filter filter = new Filter();
+        filter.setState(Filter.State.ALL);
+        connection.streams.get(filter, getStreamsCallback);
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+        assertTrue(cacheStreams.containsValue(childStream3) || streams.containsValue(childStream3));
     }
 
     @Test
