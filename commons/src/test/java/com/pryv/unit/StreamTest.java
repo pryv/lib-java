@@ -115,6 +115,7 @@ public class StreamTest {
     assertEquals(null, pStream.getParentId());
     assertEquals(DummyData.getStreamSingleActivity(), pStream.isSingleActivity());
     assertEquals(DummyData.getStreamClientData(), pStream.getClientData());
+    assertNotNull(pStream.getChildren());
     for (Stream child : pStream.getChildren()) {
       assertEquals(DummyData.getStreamChildId(), child.getId());
     }

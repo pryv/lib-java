@@ -81,7 +81,7 @@ public class Stream {
     children = pChildren;
     if (pChildren != null) {
       for (Stream stream : pChildren) {
-        childrenMap.put(stream.getId(), stream);
+        addChildStream(stream);
       }
     }
     trashed = pTrashed;

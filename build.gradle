@@ -28,6 +28,8 @@ ext {
     // increment libraryVersion just above
     // gradlew install
     // gradlew bintrayUpload
+    // gradlew fatJar
+    // upload commons fat jar to bintray (manually, located in lib-java\commons\build\libs\pryv-lib-commons-with-dependencies-1.0.3.jar)
     // update Readme
     // git commit -am "<libraryVersion>"
     // git push
@@ -37,7 +39,7 @@ ext {
     bintrayRepo = 'maven'
     bintrayName = 'pryv-lib'
     publishedGroupId = 'com.pryv'
-    libraryVersion = '1.0.3'
+    libraryVersion = '1.0.4'
     siteUrl = 'http://api.pryv.com'
     gitUrl = 'https://github.com/pryv/lib-java.git'
     licenseName = 'BSD'

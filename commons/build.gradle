@@ -20,13 +20,14 @@ repositories {
     maven { url "http://repo.maven.apache.org/maven2" }
 }
 
-configurations {
-    testOutput
+sourceSets {
+    test {
+        output.resourcesDir = "build/classes/test/resources"
+    }
 }
 
-task copyTestResources(type: Copy, dependsOn: processTestResources) {
-    from "${projectDir}/src/test/resources"
-    into "${buildDir}/classes/test/resources"
+configurations {
+    testOutput
 }
 
 dependencies {
@@ -41,6 +42,18 @@ dependencies {
     testCompile group: 'org.jacoco', name: 'jacoco-maven-plugin', version:'0.7.1.201405082137'
     compile 'commons-codec:commons-codec:1.2'
     testOutput sourceSets.test.output
+}
+
+// Task for fat jar generation (with all dependencies inside)
+// Run 'gradlew fatJar', jar will be generated in build/libs
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': libraryName,
+                'Implementation-Version': libraryVersion
+    }
+    baseName = bintrayName + '-' + artifact + '-with-dependencies'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
 
 apply from: '../jcenter.gradle'
