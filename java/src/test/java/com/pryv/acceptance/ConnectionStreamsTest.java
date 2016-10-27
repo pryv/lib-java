@@ -183,21 +183,22 @@ public class ConnectionStreamsTest {
         filter.setParentId(testSupportStream.getId());
         connection.streams.get(filter, getStreamsCallback);
 
+        Awaitility.await().until(hasCacheResult());
+        assertFalse(cacheError);
+        Awaitility.await().until(hasApiResult());
+        assertFalse(apiError);
+
         // Should at least return the two children created above
         assertFalse(cacheStreams==null && apiStreams==null);
 
         // TODO: check filter handling in cache and uncomment this test
         // Check parentID of retrieved streams
         /*
-        Awaitility.await().until(hasCacheResult());
-        assertFalse(cacheError);
         if(cacheStreams != null) {
             for(Stream stream: cacheStreams.values()) {
                 assertEquals(testSupportStream.getId(),stream.getParentId());
             }
         }*/
-        Awaitility.await().until(hasApiResult());
-        assertFalse(apiError);
         if(apiStreams != null) {
             for(Stream stream: apiStreams.values()) {
                 assertEquals(testSupportStream.getId(),stream.getParentId());
