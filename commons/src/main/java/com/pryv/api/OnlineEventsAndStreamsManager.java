@@ -237,12 +237,16 @@ public class OnlineEventsAndStreamsManager {
         new Thread() {
             @Override
             public void run() {
+                String url = streamsUrl + tokenUrlArgument;
+                if (filter != null) {
+                    url += filter.toUrlParameters();
+                }
+
                 logger.log("OnlineEventsAndStreamsManager: get: Get request at: "
-                        + streamsUrl
-                        + tokenUrlArgument);
+                        + url);
 
                 Request request = new Request.Builder()
-                        .url(streamsUrl + tokenUrlArgument)
+                        .url(url)
                         .get()
                         .build();
                 try {
@@ -469,7 +473,8 @@ public class OnlineEventsAndStreamsManager {
                         for (Stream receivedStream : receivedStreams.values()) {
                             receivedStream.assignConnection(weakConnection);
                         }
-                        Map<String, Double> streamDeletions = null;
+                        Map<String, Double> streamDeletions =
+                                JsonConverter.createStreamDeletionsTreeFromJson(responseBody);
                         getStreamsCallback.apiCallback(receivedStreams, streamDeletions, serverTime);
                         break;
 
