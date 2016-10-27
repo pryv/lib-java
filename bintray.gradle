@@ -13,7 +13,7 @@ if (project.hasProperty("android")) { // Android libraries
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
     }
 } else { // Java libraries
-    task sourcesJar(type: Jar, dependsOn: classes) {
+    task sourcesJar(type: Jar, dependsOn: [classes,':commons:fatJar']) {
         classifier = 'sources'
         from sourceSets.main.allSource
     }
