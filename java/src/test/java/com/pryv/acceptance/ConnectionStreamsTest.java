@@ -161,7 +161,7 @@ public class ConnectionStreamsTest {
     }
 
     @Test
-    public void testGetStreamsMustReturnStreamsMatchingTheGivenFilter() {
+    public void testGetStreamsWithParentIdSetMustReturnStreamsMatchingTheGivenFilter() {
         // Create children
         Stream childStream1 = new Stream("childStream1", "childStream1");
         childStream1.setParentId(testSupportStream.getId());
@@ -251,12 +251,13 @@ public class ConnectionStreamsTest {
         // Create child
         Stream deletedChild = new Stream("deletedChild", "deletedChild");
         deletedChild.setParentId(testSupportStream.getId());
-        Double time = System.currentTimeMillis() / 1000.0;
         connection.streams.create(deletedChild, streamsCallback);
         Awaitility.await().until(hasCacheResult());
         assertFalse(cacheError);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
+
+        Double time = apiStream.getCreated();
 
         // Trash child
         connection.streams.delete(deletedChild, false, streamsCallback);
