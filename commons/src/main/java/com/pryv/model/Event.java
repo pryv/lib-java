@@ -275,7 +275,7 @@ public class Event {
   }
 
   /**
-   * creates a map <attachmentId, Attachment> and returns it
+   * creates a map {@code Map<attachmentId, Attachment>} and returns it
    *
    * @return
    */

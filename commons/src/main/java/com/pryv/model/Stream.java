@@ -253,7 +253,7 @@ public class Stream {
   }
 
   /**
-   * Add a stream as child to caller. If children list & map are null,
+   * Add a stream as child to caller. If children list {@literal &} map are null,
    * instantiates them. The child's parentId field is updated.
    *
    * @param childStream

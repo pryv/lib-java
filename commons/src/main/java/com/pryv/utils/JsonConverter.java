@@ -211,7 +211,7 @@ public class JsonConverter {
   }
 
   /**
-   * Deserialize a JSON containing the field "events" into a List<Event>
+   * Deserialize a JSON containing the field "events" into a {@code List<Event>}
    *
    * @param jsonEventsArray
    * @return
@@ -257,8 +257,8 @@ public class JsonConverter {
   }
 
   /**
-   * Deserialize a JSON containing the field "streams" into a Map<String,
-   * Stream> with Stream id as key
+   * Deserialize a JSON containing the field "streams" into a {@code Map<String,
+   * Stream>} with Stream id as key
    *
    * @param jsonStreamsArray
    * @return
@@ -283,8 +283,8 @@ public class JsonConverter {
   }
 
   /**
-   * Deserialize a JSON containing the field "streamDeletions" into a Map<String,
-   * Double> with Stream id as key and deletion time as value
+   * Deserialize a JSON containing the field "streamDeletions" into a {@code Map<String,
+   * Double>} with Stream id as key and deletion time as value
    *
    * @param jsonStreamDeletionsArray
    * @return

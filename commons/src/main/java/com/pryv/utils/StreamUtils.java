@@ -15,7 +15,7 @@ public class StreamUtils {
 
   /**
    * Returns a reference to the child Stream with ID childId contained in the
-   * Map<String, Stream> pStreams. The search is done in Breadth-First.
+   * {@code Map<String, Stream>} pStreams. The search is done in Breadth-First.
    *
    * @param searchId
    *          the ID of the Stream you are looking for
