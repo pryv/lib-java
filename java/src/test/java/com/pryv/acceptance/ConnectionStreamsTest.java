@@ -172,11 +172,15 @@ public class ConnectionStreamsTest {
         assertFalse(cacheError);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
+        cacheSuccess = false;
+        apiSuccess = false;
         connection.streams.create(childStream2, streamsCallback);
         Awaitility.await().until(hasCacheResult());
         assertFalse(cacheError);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
+        cacheSuccess = false;
+        apiSuccess = false;
 
         // Get streams with specified parentID in Filter
         Filter filter = new Filter();
@@ -216,6 +220,8 @@ public class ConnectionStreamsTest {
         assertFalse(cacheError);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
+        cacheSuccess = false;
+        apiSuccess = false;
 
         // Trash child
         connection.streams.delete(trashedChild, false, streamsCallback);
@@ -223,6 +229,8 @@ public class ConnectionStreamsTest {
         assertFalse(cacheError);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
+        cacheSuccess = false;
+        apiSuccess = false;
 
         // Get streams with state all Filter
         Filter filter = new Filter();
@@ -256,6 +264,8 @@ public class ConnectionStreamsTest {
         assertFalse(cacheError);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
+        cacheSuccess = false;
+        apiSuccess = false;
 
         Double time = apiStream.getCreated();
 
@@ -265,6 +275,8 @@ public class ConnectionStreamsTest {
         assertFalse(cacheError);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
+        cacheSuccess = false;
+        apiSuccess = false;
 
         // Delete child
         connection.streams.delete(deletedChild, false, streamsCallback);
@@ -272,6 +284,8 @@ public class ConnectionStreamsTest {
         assertFalse(cacheError);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
+        cacheSuccess = false;
+        apiSuccess = false;
 
         // Get streams with include deletions Filter
         Filter filter = new Filter();
