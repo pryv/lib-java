@@ -93,7 +93,7 @@ public class FilterTest {
   }
 
   @Test
-  public void testToUrlParameters() {
+  public void testToUrlValidParameters() {
     Filter testFilter = new Filter();
     testFilter.setFromTime(100.0);
     testFilter.setLimit(100);
@@ -112,6 +112,26 @@ public class FilterTest {
     String urlFormat =
       "&fromTime=100.0&toTime=200.0&streams[]=testStreamId&tags[]=tag&types[]=unit&running=false&sortAscending=false&skip=0&limit=100&state=all&modifiedSince=150.0&parentId=parentId&includeDeletions=true&includeDeletionsSince=50.0";
     assertEquals(urlFormat, testFilter.toUrlParameters());
+  }
+
+  @Test
+  public void testToUrlInvalidParameters() {
+    Filter testFilter = new Filter();
+    testFilter.setFromTime(null);
+    testFilter.setLimit(null);
+    testFilter.setModifiedSince(null);
+    testFilter.setRunning(null);
+    testFilter.setSkip(null);
+    testFilter.setSortAscending(null);
+    testFilter.addStream(null);
+    testFilter.addTag(null);
+    testFilter.setToTime(null);
+    testFilter.addType(null);
+    testFilter.setState(null);
+    testFilter.setParentId(null);
+    testFilter.setIncludeDeletions(null);
+    testFilter.setIncludeDeletionsSince(null);
+    assertEquals("", testFilter.toUrlParameters());
   }
 
   @Test

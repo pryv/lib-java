@@ -132,6 +132,9 @@ public class Stream {
    * empty constructor
    */
   public Stream() {
+    if (id == null) {
+      generateId();
+    }
   }
 
   /**

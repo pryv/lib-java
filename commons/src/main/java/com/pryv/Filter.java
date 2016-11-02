@@ -205,10 +205,12 @@ public class Filter {
    * @param stream
    */
   public void addStream(Stream stream) {
-    if (this.streams == null) {
-      this.streams = new HashSet<Stream>();
+    if(stream!=null) {
+      if (this.streams == null) {
+        this.streams = new HashSet<Stream>();
+      }
+      this.streams.add(stream);
     }
-    this.streams.add(stream);
   }
 
   /**
@@ -217,10 +219,12 @@ public class Filter {
    * @param pTag
    */
   public void addTag(String pTag) {
-    if (tags == null) {
-      tags = new HashSet<String>();
+    if(pTag!=null) {
+      if (tags == null) {
+        tags = new HashSet<String>();
+      }
+      tags.add(pTag);
     }
-    tags.add(pTag);
   }
 
   /**
@@ -229,10 +233,12 @@ public class Filter {
    * @param pType
    */
   public void addType(String pType) {
-    if (types == null) {
-      types = new HashSet<String>();
+    if(pType!=null) {
+      if (types == null) {
+        types = new HashSet<String>();
+      }
+      types.add(pType);
     }
-    types.add(pType);
   }
 
   /**
@@ -250,7 +256,9 @@ public class Filter {
     }
     if (streams != null) {
       for (Stream stream : streams) {
-        sb.append("&" + STREAMS_URL_KEY + "=" + stream.getId());
+        if(stream.getId()!=null) {
+          sb.append("&" + STREAMS_URL_KEY + "=" + stream.getId());
+        }
       }
     }
     if (tags != null) {
@@ -433,18 +441,6 @@ public class Filter {
 
   public void setToTime(Double pToTime) {
     this.toTime = pToTime;
-  }
-
-  public void setStreamIds(Set<Stream> streams) {
-    this.streams = streams;
-  }
-
-  public void setTags(Set<String> pTags) {
-    this.tags = pTags;
-  }
-
-  public void setTypes(Set<String> pTypes) {
-    this.types = pTypes;
   }
 
   public void setRunning(Boolean pRunning) {
