@@ -21,6 +21,21 @@ public class QueryGenerator {
    */
   private static final String EVENTS_TABLE_NAME = "EVENTS";
   private static final String STREAMS_TABLE_NAME = "STREAMS";
+  private static final String ACCESSES_TABLE_NAME = "ACCESSES";
+
+  /**
+   * Accesses Table keys
+   */
+  public static final String ACCESSES_ID_KEY = "ACCESSES_ID_KEY";
+  public static final String ACCESSES_TOKEN_KEY = "ACCESSES_TOKEN_KEY";
+  public static final String ACCESSES_NAME_KEY = "ACCESSES_NAME_KEY";
+  public static final String ACCESSES_CREATED_KEY = "ACCESSES_CREATED_KEY";
+  public static final String ACCESSES_CREATED_BY_KEY = "ACCESSES_CREATED_BY_KEY";
+  public static final String ACCESSES_MODIFIED_KEY = "ACCESSES_MODIFIED_KEY";
+  public static final String ACCESSES_MODIFIED_BY_KEY = "ACCESSES_MODIFIED_BY_KEY";
+  public static final String ACCESSES_TYPE_KEY = "ACCESSES_TYPE_KEY";
+  public static final String ACCESSES_DEVICE_NAME_KEY = "ACCESSES_DEVICE_NAME_KEY";
+  public static final String ACCESSES_LAST_USED_KEY = "ACCESSES_LAST_USED_KEY";
 
   /**
    * Events Table keys

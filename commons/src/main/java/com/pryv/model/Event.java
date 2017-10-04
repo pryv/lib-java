@@ -183,7 +183,6 @@ public class Event {
    * @param event
    * @return
    */
-  // TODO: Is it useful or new Event is already adding to supervisor?
   public static Event createOrReuse(Event event) {
     String id = event.getId();
     // TODO: merge - not replace
