@@ -25,7 +25,7 @@ import java.util.UUID;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-public class Stream {
+public class Stream extends ApiResource {
 
   private String id;
   private String name;

@@ -26,11 +26,11 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
- * OnlineEventsAndStreamsManager manages data from online Pryv API
+ * OnlineManager manages data from online Pryv API
  *
  * @author ik
  */
-public class OnlineEventsAndStreamsManager {
+public class OnlineManager {
 
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private OkHttpClient client = new OkHttpClient();
@@ -58,8 +58,8 @@ public class OnlineEventsAndStreamsManager {
      * @param token           the token passed with each request for auth
      * @param pWeakConnection weak reference to connection
      */
-    public OnlineEventsAndStreamsManager(String pUrl, String token,
-                                         WeakReference<AbstractConnection> pWeakConnection) {
+    public OnlineManager(String pUrl, String token,
+                         WeakReference<AbstractConnection> pWeakConnection) {
         eventsUrl = pUrl + "events"; // ?auth=" + token;
         streamsUrl = pUrl + "streams"; // ?auth=" + token;
         tokenUrlArgument = "?auth=" + token;
@@ -87,7 +87,7 @@ public class OnlineEventsAndStreamsManager {
                     eventWithoutAttachments.setAttachments(null);
                     String jsonEvent = JsonConverter.toJson(eventWithoutAttachments);
 
-                    logger.log("OnlineEventsAndStreamsManager: createEventWithAttachment: POST request at: "
+                    logger.log("OnlineManager: createEventWithAttachment: POST request at: "
                             + eventsUrl
                             + tokenUrlArgument
                             + ", body: "
@@ -124,14 +124,15 @@ public class OnlineEventsAndStreamsManager {
    */
 
     public void getEvents(final Filter filter, final GetEventsCallback getEventsCallback) {
-
         new Thread() {
+            @Override
             public void run() {
-                String url = eventsUrl + tokenUrlArgument;
+                String url = eventsUrl+tokenUrlArgument;
                 if (filter != null) {
                     url += filter.toUrlParameters();
                 }
-                logger.log("OnlineEventsAndStreamsManager: get: Get request at: " + url);
+
+                logger.log("OnlineManager: get: Get request at: " + url);
 
                 Request request = new Request.Builder()
                         .url(url)
@@ -139,7 +140,7 @@ public class OnlineEventsAndStreamsManager {
                         .build();
                 try {
                     Response response = client.newCall(request).execute();
-                    new ApiResponseHandler(ApiMethod.EVENTS_GET, null, getEventsCallback, null,
+                    new OnlineManager.ApiResponseHandler(OnlineManager.ApiMethod.EVENTS_GET, null, getEventsCallback, null,
                             null, null, null).handleResponse(response);
 
                 } catch (IOException e) {
@@ -156,7 +157,7 @@ public class OnlineEventsAndStreamsManager {
             public void run() {
                 try {
                     String jsonEvent = JsonConverter.toJson(newEvent);
-                    logger.log("OnlineEventsAndStreamsManager: create: Post request at: "
+                    logger.log("OnlineManager: create: Post request at: "
                             + eventsUrl
                             + tokenUrlArgument
                             + ", body: "
@@ -185,7 +186,7 @@ public class OnlineEventsAndStreamsManager {
             public void run() {
 
                 String deleteUrl = eventsUrl + "/" + eventToDelete.getId() + tokenUrlArgument;
-                logger.log("OnlineEventsAndStreamsManager: delete: Delete request at: " + deleteUrl);
+                logger.log("OnlineManager: delete: Delete request at: " + deleteUrl);
 
                 Request request = new Request.Builder()
                         .url(deleteUrl)
@@ -209,7 +210,7 @@ public class OnlineEventsAndStreamsManager {
             @Override
             public void run() {
                 String updateUrl = eventsUrl + "/" + eventToUpdate.getId() + tokenUrlArgument;
-                logger.log("OnlineEventsAndStreamsManager: update: Update request at: " + updateUrl);
+                logger.log("OnlineManager: update: Update request at: " + updateUrl);
 
                 try {
                     RequestBody bodyString = RequestBody.create(JSON, JsonConverter.toJson(eventToUpdate));
@@ -242,7 +243,7 @@ public class OnlineEventsAndStreamsManager {
                     url += filter.toUrlParameters();
                 }
 
-                logger.log("OnlineEventsAndStreamsManager: get: Get request at: "
+                logger.log("OnlineManager: get: Get request at: "
                         + url);
 
                 Request request = new Request.Builder()
@@ -268,7 +269,7 @@ public class OnlineEventsAndStreamsManager {
             public void run() {
                 try {
                     String jsonStream = JsonConverter.toJson(newStream);
-                    logger.log("OnlineEventsAndStreamsManager: create: Post request at: "
+                    logger.log("OnlineManager: create: Post request at: "
                             + streamsUrl
                             + tokenUrlArgument
                             + ", body: "
@@ -303,7 +304,7 @@ public class OnlineEventsAndStreamsManager {
                                 + tokenUrlArgument
                                 + "&mergeEventsWithParent="
                                 + mergeEventsWithParent;
-                logger.log("OnlineEventsAndStreamsManager: delete Stream: Delete request at: "
+                logger.log("OnlineManager: delete Stream: Delete request at: "
                         + deleteUrl);
                 // TODO maybe add mergeEventsWithParent as bodyString
 
@@ -329,7 +330,7 @@ public class OnlineEventsAndStreamsManager {
             @Override
             public void run() {
                 String updateUrl = streamsUrl + "/" + streamToUpdate.getId() + tokenUrlArgument;
-                logger.log("OnlineEventsAndStreamsManager: update Stream: Update request at: "
+                logger.log("OnlineManager: update Stream: Update request at: "
                         + updateUrl);
 
                 try {

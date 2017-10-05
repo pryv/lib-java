@@ -8,10 +8,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.junit.AfterClass;
@@ -22,10 +20,9 @@ import org.junit.Test;
 import resources.TestCredentials;
 
 import com.jayway.awaitility.Awaitility;
-import com.pryv.Pryv;
+import com.pryv.api.OnlineManager;
 import com.pryv.interfaces.EventsCallback;
 import com.pryv.Filter;
-import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
@@ -38,9 +35,9 @@ import com.pryv.model.Stream;
  *
  * @author ik
  */
-public class OnlineEventsAndStreamsManagerTest {
+public class OnlineManagerTest {
 
-    private static OnlineEventsAndStreamsManager online;
+    private static OnlineManager online;
 
     private static EventsCallback eventsCallback;
     private static GetEventsCallback getEventsCallback;
@@ -70,7 +67,7 @@ public class OnlineEventsAndStreamsManagerTest {
 
         String url = "https://" + TestCredentials.USERNAME + "." + TestCredentials.DOMAIN + "/";
 
-        online = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
+        online = new OnlineManager(url, TestCredentials.TOKEN, null);
 
         testSupportStream = new Stream("onlineModuleStreamID", "javaLibTestSupportStream");
         online.createStream(testSupportStream, streamsCallback);

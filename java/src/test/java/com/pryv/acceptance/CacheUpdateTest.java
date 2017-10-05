@@ -4,7 +4,7 @@ package com.pryv.acceptance;
 import com.jayway.awaitility.Awaitility;
 import com.pryv.Filter;
 import com.pryv.SQLiteDBHelper;
-import com.pryv.api.OnlineEventsAndStreamsManager;
+import com.pryv.api.OnlineManager;
 import com.pryv.database.DBinitCallback;
 import com.pryv.interfaces.EventsCallback;
 import com.pryv.interfaces.GetEventsCallback;
@@ -62,7 +62,7 @@ public class CacheUpdateTest {
     private static boolean updateSuccess = false;
     private static boolean updateError = false;
 
-    private static OnlineEventsAndStreamsManager api;
+    private static OnlineManager api;
     private static SQLiteDBHelper db;
 
     private static Filter scope;
@@ -78,7 +78,7 @@ public class CacheUpdateTest {
 
         String url = "https://" + TestCredentials.USERNAME + "." + TestCredentials.DOMAIN + "/";
 
-        api = new OnlineEventsAndStreamsManager(url, TestCredentials.TOKEN, null);
+        api = new OnlineManager(url, TestCredentials.TOKEN, null);
 
         String streamId = "onlineModuleStreamID";
         testSupportStream = new Stream(streamId, "javaLibTestSupportStream");

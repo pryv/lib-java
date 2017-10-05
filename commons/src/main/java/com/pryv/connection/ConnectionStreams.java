@@ -3,7 +3,7 @@ package com.pryv.connection;
 
 import com.pryv.AbstractConnection;
 import com.pryv.Filter;
-import com.pryv.api.OnlineEventsAndStreamsManager;
+import com.pryv.api.OnlineManager;
 import com.pryv.database.DBHelper;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
@@ -19,11 +19,11 @@ import java.util.Map;
 public class ConnectionStreams implements StreamsManager {
 
     private WeakReference<AbstractConnection> weakConnection;
-    private OnlineEventsAndStreamsManager api;
+    private OnlineManager api;
     private Filter cacheScope;
     private DBHelper cache;
 
-    public ConnectionStreams(WeakReference<AbstractConnection> weakConnection, OnlineEventsAndStreamsManager api, Filter cacheScope, DBHelper cache) {
+    public ConnectionStreams(WeakReference<AbstractConnection> weakConnection, OnlineManager api, Filter cacheScope, DBHelper cache) {
         this.weakConnection = weakConnection;
         this.api = api;
         this.cacheScope = cacheScope;

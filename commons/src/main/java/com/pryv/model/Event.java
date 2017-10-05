@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.WeakHashMap;
 
 /**
@@ -35,7 +34,7 @@ import java.util.WeakHashMap;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-public class Event {
+public class Event extends ApiResource {
 
   private String id;
   private String streamId;

@@ -26,7 +26,7 @@ import java.util.WeakHashMap;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-public class Access {
+public class Access extends ApiResource {
 
   private String id;
   private String token;
