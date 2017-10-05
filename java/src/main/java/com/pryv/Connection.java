@@ -100,7 +100,7 @@ public class Connection implements AbstractConnection {
             cache = new SQLiteDBHelper(cacheScope, cacheFolder, api, weakConnection, dBinitCallback);
         }
 
-        this.accesses = new ConnectionAccesses();
+        this.accesses = new ConnectionAccesses(api);
         this.account = new ConnectionAccount();
         this.events = new ConnectionEvents(weakConnection, api, cacheScope, cache);
         this.profile = new ConnectionProfile();

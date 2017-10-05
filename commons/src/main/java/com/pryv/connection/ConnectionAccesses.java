@@ -1,36 +1,32 @@
 package com.pryv.connection;
 
-import com.pryv.AbstractConnection;
 import com.pryv.api.OnlineManager;
-import com.pryv.interfaces.EventsCallback;
 import com.pryv.model.Access;
-
-import java.lang.ref.WeakReference;
 
 public class ConnectionAccesses {
 
-    private WeakReference<AbstractConnection> weakConnection;
     private OnlineManager api;
+    private static final String ENDPOINT = "accesses";
 
-    public ConnectionAccesses(WeakReference<AbstractConnection> weakConnection, OnlineManager api) {
-        this.weakConnection = weakConnection;
+
+    public ConnectionAccesses(OnlineManager api) {
         this.api = api;
     }
 
     public void get() {
-
+        api.get(ENDPOINT, null);
     }
 
     public void create(final Access newAccess) {
-
+        api.create(ENDPOINT, newAccess, null);
     }
 
-    public void delete(final Access accessToDelete) {
-
+    public void delete(final String accessId) {
+        api.delete(ENDPOINT, accessId, false);
     }
 
-    public void update(final Access accessToUpdate) {
-
+    public void update(final String accessId, final Access updatedAccess) {
+        api.update(ENDPOINT, accessId, updatedAccess);
     }
 
 }

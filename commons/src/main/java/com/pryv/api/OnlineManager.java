@@ -1,11 +1,14 @@
 package com.pryv.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pryv.AbstractConnection;
 import com.pryv.Filter;
 import com.pryv.interfaces.EventsCallback;
 import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
+import com.pryv.model.ApiResource;
+import com.pryv.model.Attachment;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
 import com.pryv.utils.JsonConverter;
@@ -34,9 +37,11 @@ public class OnlineManager {
 
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private OkHttpClient client = new OkHttpClient();
+    private HttpClient httpClient = new HttpClient();
 
     private String eventsUrl;
     private String streamsUrl;
+    private String apiUrl;
     private String tokenUrlArgument;
 
     /**
@@ -60,10 +65,35 @@ public class OnlineManager {
      */
     public OnlineManager(String pUrl, String token,
                          WeakReference<AbstractConnection> pWeakConnection) {
+        apiUrl = pUrl;
         eventsUrl = pUrl + "events"; // ?auth=" + token;
         streamsUrl = pUrl + "streams"; // ?auth=" + token;
         tokenUrlArgument = "?auth=" + token;
         weakConnection = pWeakConnection;
+    }
+
+    public void get(String endpoint, Filter filter) {
+        httpClient.getRequest(apiUrl+endpoint, tokenUrlArgument, filter).exec();
+    }
+
+    public void create(String endpoint, ApiResource resource, Attachment attachment) {
+        try {
+            httpClient.createRequest(apiUrl+endpoint, tokenUrlArgument, resource, attachment).exec();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void update(String endpoint, String resourceId, ApiResource resource) {
+        try {
+            httpClient.updateRequest(apiUrl+endpoint, tokenUrlArgument, resourceId, resource).exec();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void delete(String endpoint, String resourceId, Boolean mergeEventsWithParent) {
+        httpClient.deleteRequest(apiUrl+endpoint, tokenUrlArgument, resourceId, mergeEventsWithParent).exec();
     }
 
   /*

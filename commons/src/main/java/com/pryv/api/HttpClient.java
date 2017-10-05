@@ -7,20 +7,30 @@ import com.pryv.model.Attachment;
 import com.pryv.utils.JsonConverter;
 
 import java.io.File;
+import java.io.IOException;
 
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * Created by thiebaudmodoux on 05.10.17.
  */
 
-public class RequestFactory {
+public class HttpClient {
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private OkHttpClient client;
 
-    public static Request getRequest(String endpoint, String tokenParameter, Filter filter) {
+    public HttpClient() {
+        client = new OkHttpClient();
+    }
+
+    public ApiRequest getRequest(String endpoint, String tokenParameter, Filter filter) {
         String url = endpoint + tokenParameter;
         if (filter != null) {
             url += filter.toUrlParameters();
@@ -29,10 +39,10 @@ public class RequestFactory {
                 .url(url)
                 .get()
                 .build();
-        return request;
+        return new ApiRequest(request);
     }
 
-    public static Request createRequest(String endpoint, String tokenParameter, ApiResource newResource, Attachment attachment) throws JsonProcessingException {
+    public ApiRequest createRequest(String endpoint, String tokenParameter, ApiResource newResource, Attachment attachment) throws JsonProcessingException {
         String url = endpoint + tokenParameter;
         String jsonEvent = JsonConverter.toJson(newResource);
         RequestBody body;
@@ -52,10 +62,10 @@ public class RequestFactory {
                 .url(url)
                 .post(body)
                 .build();
-        return request;
+        return new ApiRequest(request);
     }
 
-    public static Request updateRequest(String endpoint, String tokenParameter, String resourceId, ApiResource updatedResource) throws JsonProcessingException {
+    public ApiRequest updateRequest(String endpoint, String tokenParameter, String resourceId, ApiResource updatedResource) throws JsonProcessingException {
         String url = endpoint + "/" + resourceId + tokenParameter;
         String jsonEvent = JsonConverter.toJson(updatedResource);
         RequestBody body = RequestBody.create(JSON, jsonEvent);
@@ -63,10 +73,10 @@ public class RequestFactory {
                 .url(url)
                 .put(body)
                 .build();
-        return request;
+        return new ApiRequest(request);
     }
 
-    public static Request deleteRequest(String endpoint, String tokenParameter, String resourceId, Boolean mergeEventsWithParent) {
+    public ApiRequest deleteRequest(String endpoint, String tokenParameter, String resourceId, Boolean mergeEventsWithParent) {
         String url = endpoint + "/" + resourceId + tokenParameter;
         if(mergeEventsWithParent) {
             url += "&mergeEventsWithParent=true";
@@ -75,6 +85,30 @@ public class RequestFactory {
                 .url(url)
                 .delete()
                 .build();
-        return request;
+        return new ApiRequest(request);
+    }
+
+    public class ApiRequest {
+        private Request httpRequest;
+
+        public ApiRequest(Request httpRequest) {
+            this.httpRequest = httpRequest;
+        }
+
+        public void exec() {
+            client.newCall(httpRequest)
+                    .enqueue(new Callback() {
+                        @Override
+                        public void onFailure(final Call call, IOException e) {
+
+                        }
+
+                        @Override
+                        public void onResponse(Call call, final Response response) throws IOException {
+                            String res = response.body().string();
+
+                        }
+                    });
+        }
     }
 }
