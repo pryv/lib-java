@@ -41,7 +41,6 @@ public class ConnectionAccessesTest {
     private static Access access;
 
     private static String accessName = "testAccess";
-    private static String permissionName = "testPermission";
     private static String streamId = "testStreamId";
     private static Permission.Level permissionLevel = Permission.Level.read;
     private static String deletedId;
@@ -66,7 +65,7 @@ public class ConnectionAccessesTest {
 
         Access newAccess = new Access();
         newAccess.setName(accessName);
-        newAccess.addPermission(new Permission(streamId, permissionLevel, permissionName));
+        newAccess.addPermission(new Permission(streamId, permissionLevel, null));
         connection.accesses.create(newAccess, createCallback);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
@@ -77,12 +76,10 @@ public class ConnectionAccessesTest {
         assertNotNull(access.getToken());
         assertNotNull(access.getCreated());
         assertNotNull(access.getCreatedBy());
-        assertNotNull(access.getLastUsed());
         assertNotNull(access.getModified());
         assertNotNull(access.getModifiedBy());
         assertNotNull(access.getType());
         assertEquals(access.getName(), accessName);
-        assertEquals(access.getPermissions().get(0).getDefaultName(), permissionName);
         assertEquals(access.getPermissions().get(0).getStreamId(), streamId);
         assertEquals(access.getPermissions().get(0).getLevel(), permissionLevel);
     }
@@ -112,7 +109,7 @@ public class ConnectionAccessesTest {
         assertTrue(accesses.size() > 0);
         Boolean found = false;
         for (Access access: accesses) {
-            if(access.getId() == accessId) {
+            if(access.getId().equals(accessId)) {
                 found = true;
                 break;
             }
@@ -126,9 +123,8 @@ public class ConnectionAccessesTest {
         String newAccessName = "newAccess";
         String newStreamId = "newStreamId";
         Permission.Level newPermissionLevel = Permission.Level.contribute;
-        String newPermissionName = "newPermissionName";
         newAccess.setName(newAccessName);
-        newAccess.addPermission(new Permission(newStreamId, newPermissionLevel, newPermissionName));
+        newAccess.addPermission(new Permission(newStreamId, newPermissionLevel, null));
 
         connection.accesses.update(accessId, newAccess ,updateCallback);
         Awaitility.await().until(hasApiResult());
@@ -136,7 +132,6 @@ public class ConnectionAccessesTest {
         assertTrue(apiSuccess);
         assertNotNull(access);
         assertEquals(access.getName(), newAccessName);
-        assertEquals(access.getPermissions().get(0).getDefaultName(), newPermissionName);
         assertEquals(access.getPermissions().get(0).getStreamId(), newStreamId);
         assertEquals(access.getPermissions().get(0).getLevel(), newPermissionLevel);
     }
@@ -157,6 +152,7 @@ public class ConnectionAccessesTest {
             @Override
             public void onSuccess(String successMessage, List resources, Double serverTime) {
                 accesses = resources;
+                apiSuccess = true;
             }
 
             @Override

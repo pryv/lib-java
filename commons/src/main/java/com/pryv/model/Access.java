@@ -57,8 +57,6 @@ public class Access extends ApiResource {
    * empty Access constructor
    */
   public Access() {
-    this.generateId();
-    this.updateSupervisor();
   }
 
   /**
@@ -68,8 +66,6 @@ public class Access extends ApiResource {
    * @param permissions
    */
   public Access(String name, ArrayList<Permission> permissions) {
-    this.generateId();
-    this.updateSupervisor();
     this.name = name;
     this.permissions = permissions;
   }

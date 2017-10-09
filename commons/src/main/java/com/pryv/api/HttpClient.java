@@ -27,15 +27,17 @@ import okhttp3.Response;
 public class HttpClient {
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private OkHttpClient client;
-    private String baseUrl;
+    private String apiUrl;
+    private String tokenParameter;
 
     public HttpClient(String apiUrl, String tokenParameter) {
         client = new OkHttpClient();
-        baseUrl = apiUrl + tokenParameter;
+        this.apiUrl = apiUrl;
+        this.tokenParameter = tokenParameter;
     }
 
     public ApiRequest getRequest(String endpoint, Filter filter, ApiCallback callback) {
-        String url = baseUrl + endpoint;
+        String url = apiUrl + endpoint + tokenParameter;
         if (filter != null) {
             url += filter.toUrlParameters();
         }
@@ -47,7 +49,7 @@ public class HttpClient {
     }
 
     public ApiRequest createRequest(String endpoint, ApiResource newResource, Attachment attachment, ApiCallback callback) {
-        String url = baseUrl + endpoint;
+        String url = apiUrl + endpoint + tokenParameter;
         String jsonEvent = null;
         try {
             jsonEvent = JsonConverter.toJson(newResource);
@@ -75,7 +77,7 @@ public class HttpClient {
     }
 
     public ApiRequest updateRequest(String endpoint, String resourceId, ApiResource updatedResource, ApiCallback callback) {
-        String url = baseUrl + endpoint + "/" + resourceId;
+        String url = apiUrl + endpoint + "/" + resourceId + tokenParameter;
         String jsonEvent = null;
         try {
             jsonEvent = JsonConverter.toJson(updatedResource);
@@ -91,7 +93,7 @@ public class HttpClient {
     }
 
     public ApiRequest deleteRequest(String endpoint, String resourceId, Boolean mergeEventsWithParent, ApiCallback callback) {
-        String url = baseUrl + endpoint + "/" + resourceId;
+        String url = apiUrl + endpoint + "/" + resourceId + tokenParameter;
         if(mergeEventsWithParent) {
             url += "&mergeEventsWithParent=true";
         }
@@ -133,9 +135,9 @@ public class HttpClient {
 
                         int statusCode = response.code();
                         if (statusCode == HttpURLConnection.HTTP_CREATED || statusCode == HttpURLConnection.HTTP_OK) {
-                            callback.onSuccess(""+statusCode, responseBody, serverTime);
+                            callback.onSuccess(response.message(), responseBody, serverTime);
                         } else {
-                            callback.onError(""+statusCode, serverTime);
+                            callback.onError(responseBody, serverTime);
                         }
                     }
                 });
