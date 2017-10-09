@@ -149,9 +149,11 @@ public class Access extends ApiResource {
    *
    * @return the Access
    */
-  public Access createOrReuse() {
-    updateSupervisor();
-    return this;
+  public static Access createOrReuse(Access access) {
+    String id = access.getId();
+    // TODO: merge - not replace
+    supervisor.put(id, access);
+    return access;
   }
 
   /**

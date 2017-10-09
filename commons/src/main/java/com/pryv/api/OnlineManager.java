@@ -469,11 +469,11 @@ public class OnlineManager {
 
                     case EVENTS_DELETE:
                         if (JsonConverter.hasEventDeletionField(responseBody)) {
-                            // stream was deleted, retrieve streamDeletion id field
+                            // event was deleted, retrieve streamDeletion id field
                             eventsCallback.onApiSuccess(
                                     JsonConverter.retrieveDeleteEventId(responseBody), null, null, serverTime);
                         } else {
-                            // stream was trashed, forward as an update to callback
+                            // event was trashed, forward as an update to callback
                             Event trashedEvent = JsonConverter.retrieveEventFromJson(responseBody);
                             trashedEvent.assignConnection(weakConnection);
                             trashedEvent.setId(event.getId());

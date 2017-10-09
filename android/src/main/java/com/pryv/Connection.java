@@ -2,6 +2,7 @@ package com.pryv;
 
 import android.content.Context;
 
+import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.api.OnlineManager;
 import com.pryv.connection.ConnectionAccesses;
 import com.pryv.connection.ConnectionAccount;
@@ -100,11 +101,11 @@ public class Connection implements AbstractConnection {
         if (isCacheActive) {
             String cacheFolder = "cache/" + generateCacheFolderName() + "/";
             new File(cacheFolder).mkdirs();
-            
+
             cache = new SQLiteDBHelper(context, cacheScope, cacheFolder, api, weakConnection, dBinitCallback);
         }
 
-        this.accesses = new ConnectionAccesses();
+        this.accesses = new ConnectionAccesses(weakConnection, api);
         this.account = new ConnectionAccount();
         this.events = new ConnectionEvents(weakConnection, api, cacheScope, cache);
         this.profile = new ConnectionProfile();
