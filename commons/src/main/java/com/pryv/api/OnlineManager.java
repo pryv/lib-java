@@ -1,21 +1,15 @@
 package com.pryv.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pryv.AbstractConnection;
 import com.pryv.Filter;
-import com.pryv.connection.ConnectionAccesses;
-import com.pryv.interfaces.ApiCallback;
 import com.pryv.interfaces.EventsCallback;
 import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
-import com.pryv.model.ApiResource;
-import com.pryv.model.Attachment;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
 import com.pryv.utils.JsonConverter;
 import com.pryv.utils.Logger;
-import com.sun.org.glassfish.external.amx.MBeanListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +18,6 @@ import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Map;
 
-import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
