@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -42,9 +43,12 @@ public class ConnectionAccessesTest {
 
     private static String accessName = "testAccess";
     private static String streamId = "testStreamId";
+    private static String accessType = "shared";
     private static Permission.Level permissionLevel = Permission.Level.read;
     private static String deletedId;
     private static String accessId;
+    private static Double creationTime;
+    private static String accessToken;
 
     private static boolean apiSuccess = false;
     private static boolean apiError = false;
@@ -66,6 +70,8 @@ public class ConnectionAccessesTest {
         Access newAccess = new Access();
         newAccess.setName(accessName);
         newAccess.addPermission(new Permission(streamId, permissionLevel, null));
+        newAccess.setType(accessType);
+        Long requestTime = System.currentTimeMillis()/1000;
         connection.accesses.create(newAccess, createCallback);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
@@ -73,15 +79,22 @@ public class ConnectionAccessesTest {
         assertNotNull(access);
         accessId = access.getId();
         assertNotNull(accessId);
-        assertNotNull(access.getToken());
-        assertNotNull(access.getCreated());
-        assertNotNull(access.getCreatedBy());
-        assertNotNull(access.getModified());
-        assertNotNull(access.getModifiedBy());
-        assertNotNull(access.getType());
+        accessToken = access.getToken();
+        assertNotNull(accessToken);
+        creationTime = access.getCreated();
+        assertEquals(creationTime, requestTime.doubleValue(), 180);
+        assertEquals(access.getCreatedBy(), TestCredentials.TOKENID);
+        assertEquals(access.getModified(), creationTime);
+        assertEquals(access.getModifiedBy(), TestCredentials.TOKENID);
+        assertEquals(access.getType(), accessType);
         assertEquals(access.getName(), accessName);
-        assertEquals(access.getPermissions().get(0).getStreamId(), streamId);
-        assertEquals(access.getPermissions().get(0).getLevel(), permissionLevel);
+        ArrayList<Permission> permissions = access.getPermissions();
+        assertNotNull(permissions);
+        assertTrue(permissions.size() > 0);
+        Permission firstPermission = permissions.get(0);
+        assertNotNull(firstPermission);
+        assertEquals(firstPermission.getStreamId(), streamId);
+        assertEquals(firstPermission.getLevel(), permissionLevel);
     }
 
     @AfterClass
@@ -122,18 +135,31 @@ public class ConnectionAccessesTest {
         Access newAccess = new Access();
         String newAccessName = "newAccess";
         String newStreamId = "newStreamId";
+        String newId = "testId";
         Permission.Level newPermissionLevel = Permission.Level.contribute;
         newAccess.setName(newAccessName);
         newAccess.addPermission(new Permission(newStreamId, newPermissionLevel, null));
-
+        newAccess.setId(newId);
+        Long updateTime = System.currentTimeMillis()/1000;
         connection.accesses.update(accessId, newAccess ,updateCallback);
         Awaitility.await().until(hasApiResult());
         assertFalse(apiError);
         assertTrue(apiSuccess);
         assertNotNull(access);
         assertEquals(access.getName(), newAccessName);
-        assertEquals(access.getPermissions().get(0).getStreamId(), newStreamId);
-        assertEquals(access.getPermissions().get(0).getLevel(), newPermissionLevel);
+        ArrayList<Permission> permissions = access.getPermissions();
+        assertNotNull(permissions);
+        assertTrue(permissions.size() > 0);
+        Permission firstPermission = permissions.get(0);
+        assertNotNull(firstPermission);
+        assertEquals(firstPermission.getStreamId(), newStreamId);
+        assertEquals(firstPermission.getLevel(), newPermissionLevel);
+        assertEquals(access.getCreated(), creationTime);
+        assertEquals(access.getCreatedBy(), TestCredentials.TOKENID);
+        assertEquals(access.getModifiedBy(), TestCredentials.TOKENID);
+        assertEquals(access.getModified(), updateTime, 180);
+        assertEquals(access.getType(), accessType);
+        assertEquals(access.getToken(), accessToken);
     }
 
     private static Callable<Boolean> hasApiResult() {

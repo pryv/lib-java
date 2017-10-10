@@ -2,7 +2,6 @@ package com.pryv;
 
 import android.content.Context;
 
-import com.pryv.api.OnlineEventsAndStreamsManager;
 import com.pryv.api.OnlineManager;
 import com.pryv.connection.ConnectionAccesses;
 import com.pryv.connection.ConnectionAccount;
