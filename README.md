@@ -67,17 +67,13 @@ Please see [https://github.com/pryv/app-android-example](https://github.com/pryv
 
 ## Contribute
 
-`./gradlew` installs the appropriate version of gradle. You can also install it manually [here](https://docs.gradle.org/current/userguide/installation.html).
+Use the Gradle Wrapper to run the following tasks:
 
-### Build and tests
+`gradlew install` builds the project.
 
-`gradle compileJava` compiles the source files.
+`gradlew test` runs the tests.
 
-`gradle test` runs the tests.
-
-`gradle -Dtest.single={TestClassName} test` runs a single test class.
-
-`gradle jar` builds the JAR with
+`gradlew -Dtest.single={TestClassName} test` runs a single test class.
 
 ## License
 
