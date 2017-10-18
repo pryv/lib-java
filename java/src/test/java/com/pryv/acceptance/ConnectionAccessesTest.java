@@ -61,9 +61,7 @@ public class ConnectionAccessesTest {
         instantiateCallbacks();
 
         connection =
-                new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, TestCredentials.DOMAIN, true, new DBinitCallback());
-
-        connection.setupCacheScope(new Filter());
+                new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, TestCredentials.DOMAIN, false, new DBinitCallback());
 
         apiSuccess = false;
 
