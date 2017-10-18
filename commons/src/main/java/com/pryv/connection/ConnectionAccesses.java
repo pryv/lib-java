@@ -19,7 +19,7 @@ public class ConnectionAccesses {
 
     private WeakReference<AbstractConnection> weakConnection;
     private OnlineManager api;
-    private static final String ENDPOINT = "accesses";
+    private static final String PATH = "accesses";
     private static final String ACCESS_KEY = "access";
     private static final String ACCESSES_KEY = "accesses";
     private static final String ACCESS_DELETION_KEY = "accessDeletion";
@@ -53,7 +53,7 @@ public class ConnectionAccesses {
                 userCallback.onError(errorMessage, serverTime);
             }
         };
-        httpClient.getRequest(ENDPOINT, null, getCallback).exec();
+        httpClient.getRequest(PATH, null, getCallback).exec();
     }
 
     public void create(final Access newAccess, final CreateCallback userCallback) {
@@ -75,7 +75,7 @@ public class ConnectionAccesses {
                 userCallback.onError(errorMessage, serverTime);
             }
         };
-        httpClient.createRequest(ENDPOINT, newAccess, null, createCallback).exec();
+        httpClient.createRequest(PATH, newAccess, null, createCallback).exec();
     }
 
     public void delete(final String accessId, final DeleteCallback userCallback) {
@@ -96,7 +96,7 @@ public class ConnectionAccesses {
                 userCallback.onError(errorMessage, serverTime);
             }
         };
-        httpClient.deleteRequest(ENDPOINT, accessId, false, deleteCallback).exec();
+        httpClient.deleteRequest(PATH, accessId, false, deleteCallback).exec();
     }
 
     public void update(final String accessId, final Access updatedAccess, final UpdateCallback userCallback) {
@@ -118,7 +118,7 @@ public class ConnectionAccesses {
                 userCallback.onError(errorMessage, serverTime);
             }
         };
-        httpClient.updateRequest(ENDPOINT, accessId, updatedAccess, updateCallback).exec();
+        httpClient.updateRequest(PATH, accessId, updatedAccess, updateCallback).exec();
     }
 
 }
