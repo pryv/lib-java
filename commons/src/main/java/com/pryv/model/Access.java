@@ -204,8 +204,10 @@ public class Access extends ApiResource {
     id = temp.id;
     token = temp.token;
     name = temp.name;
+
+    permissions = new ArrayList<>();
     for (Permission permission : temp.permissions) {
-      addPermission(permission);
+      permissions.add(cloner.deepClone(permission));
     }
 
     created = temp.created;
