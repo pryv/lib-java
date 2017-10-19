@@ -75,6 +75,8 @@ Please see [https://github.com/pryv/app-android-example](https://github.com/pryv
 
 `gradle test` runs the tests.
 
+`gradle test -i` runs the tests in verbose mode.
+
 `gradle -Dtest.single={TestClassName} test` runs a single test class.
 
 `gradle jar` builds the JAR with
