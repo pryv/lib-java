@@ -171,10 +171,10 @@ public class ConnectionAccessesTest {
     }
 
     private static void instantiateCallbacks() {
-        getCallback = new GetCallback() {
+        getCallback = new GetCallback<Access>() {
 
             @Override
-            public void onSuccess(String successMessage, List resources, Double serverTime) {
+            public void onSuccess(String successMessage, List<Access> resources, Double serverTime) {
                 accesses = resources;
                 apiSuccess = true;
             }
@@ -185,10 +185,10 @@ public class ConnectionAccessesTest {
                 apiError = true;
             }
         };
-        createCallback = new CreateCallback() {
+        createCallback = new CreateCallback<Access>() {
             @Override
-            public void onSuccess(String successMessage, ApiResource resource, Double serverTime) {
-                access = (Access) resource;
+            public void onSuccess(String successMessage, Access resource, Double serverTime) {
+                access = resource;
                 apiSuccess = true;
             }
 
@@ -198,10 +198,10 @@ public class ConnectionAccessesTest {
                 apiError = true;
             }
         };
-        updateCallback = new UpdateCallback() {
+        updateCallback = new UpdateCallback<Access>() {
             @Override
-            public void onSuccess(String successMessage, ApiResource resource, Double serverTime) {
-                access = (Access) resource;
+            public void onSuccess(String successMessage, Access resource, Double serverTime) {
+                access = resource;
                 apiSuccess = true;
             }
 
@@ -211,7 +211,7 @@ public class ConnectionAccessesTest {
                 apiError = true;
             }
         };
-        deleteCallback = new DeleteCallback() {
+        deleteCallback = new DeleteCallback<Access>() {
             @Override
             public void onSuccess(String successMessage, String id, Double serverTime) {
                 deletedId = id;
