@@ -14,12 +14,12 @@ Since this library aims to be compatible with Java and Android environment, it c
 
 Java project:
 ```
-compile 'com.pryv:java:1.0.5'
+compile 'com.pryv:java:1.0.6'
 ```
 
 Android project:
 ```
-compile 'com.pryv:android:1.0.5'
+compile 'com.pryv:android:1.0.6'
 ```
 
 ### Maven
@@ -29,7 +29,7 @@ Java project:
 <dependency>
   <groupId>com.pryv</groupId>
   <artifactId>java</artifactId>
-  <version>1.0.5</version>
+  <version>1.0.6</version>
   <type>pom</type>
 </dependency>
 ```
@@ -39,7 +39,7 @@ Android project:
 <dependency>
   <groupId>com.pryv</groupId>
   <artifactId>android</artifactId>
-  <version>1.0.5</version>
+  <version>1.0.6</version>
   <type>pom</type>
 </dependency>
 ```
@@ -51,12 +51,12 @@ Our [Bintray page](https://bintray.com/techpryv/maven/pryv-lib) hosts the source
 Download and import the source files listed below in your libs folder.
 
 Java project:
-  * [pryv-lib-commons-with-dependencies-1.0.5.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fcommons%2F1.0.5%2Fpryv-lib-commons-with-dependencies-1.0.5.jar)
-  * [java-1.0.5.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fjava%2F1.0.5%2Fjava-1.0.5.jar)
+  * [pryv-lib-commons-with-dependencies-1.0.6.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fcommons%2F1.0.6%2Fpryv-lib-commons-with-dependencies-1.0.6.jar)
+  * [java-1.0.6.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fjava%2F1.0.6%2Fjava-1.0.6.jar)
 
 Android project:
-  * [pryv-lib-commons-with-dependencies-1.0.5.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fcommons%2F1.0.5%2Fpryv-lib-commons-with-dependencies-1.0.5.jar)
-  * [android-1.0.5.aar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fandroid%2F1.0.5%2Fandroid-1.0.5.aar)
+  * [pryv-lib-commons-with-dependencies-1.0.6.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fcommons%2F1.0.6%2Fpryv-lib-commons-with-dependencies-1.0.6.jar)
+  * [android-1.0.6.aar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fandroid%2F1.0.6%2Fandroid-1.0.6.aar)
 
 ## Java Integration
 Please see [https://github.com/pryv/app-java-examples](https://github.com/pryv/app-java-examples).
