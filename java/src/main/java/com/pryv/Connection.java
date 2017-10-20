@@ -1,6 +1,6 @@
 package com.pryv;
 
-import com.pryv.api.OnlineEventsAndStreamsManager;
+import com.pryv.api.OnlineManager;
 import com.pryv.database.DBHelper;
 import com.pryv.database.DBinitCallback;
 import com.pryv.model.Stream;
@@ -39,7 +39,7 @@ public class Connection implements AbstractConnection {
     private boolean isApiActive = true;
     private boolean isCacheActive = true;
 
-    private OnlineEventsAndStreamsManager api;
+    private OnlineManager api;
 
     private Filter cacheScope;
     private DBHelper cache;
@@ -90,7 +90,7 @@ public class Connection implements AbstractConnection {
         flatStreams = new ConcurrentHashMap<String, Stream>();
 
         if (isApiActive) {
-            api = new OnlineEventsAndStreamsManager(urlEndpoint, token, this.weakConnection);
+            api = new OnlineManager(urlEndpoint, token, this.weakConnection);
         }
 
         if (isCacheActive) {
@@ -100,7 +100,7 @@ public class Connection implements AbstractConnection {
             cache = new SQLiteDBHelper(cacheScope, cacheFolder, api, weakConnection, dBinitCallback);
         }
 
-        this.accesses = new ConnectionAccesses();
+        this.accesses = new ConnectionAccesses(weakConnection, api);
         this.account = new ConnectionAccount();
         this.events = new ConnectionEvents(weakConnection, api, cacheScope, cache);
         this.profile = new ConnectionProfile();

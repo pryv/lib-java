@@ -73,6 +73,8 @@ Use the Gradle Wrapper to run the following tasks:
 
 `gradlew test` runs the tests.
 
+`gradlew test -i` runs the tests in verbose mode.
+
 `gradlew -Dtest.single={TestClassName} test` runs a single test class.
 
 ## License

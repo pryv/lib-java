@@ -2,17 +2,15 @@ package com.pryv.connection;
 
 import com.pryv.AbstractConnection;
 import com.pryv.Filter;
-import com.pryv.api.OnlineEventsAndStreamsManager;
+import com.pryv.api.OnlineManager;
 import com.pryv.database.DBHelper;
 import com.pryv.interfaces.EventsCallback;
 import com.pryv.interfaces.EventsManager;
 import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.interfaces.UpdateCacheCallback;
-import com.pryv.model.Attachment;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
@@ -20,11 +18,11 @@ import java.util.Map;
 public class ConnectionEvents implements EventsManager {
 
     private WeakReference<AbstractConnection> weakConnection;
-    private OnlineEventsAndStreamsManager api;
+    private OnlineManager api;
     private Filter cacheScope;
     private DBHelper cache;
 
-    public ConnectionEvents(WeakReference<AbstractConnection> weakConnection, OnlineEventsAndStreamsManager api, Filter cacheScope, DBHelper cache) {
+    public ConnectionEvents(WeakReference<AbstractConnection> weakConnection, OnlineManager api, Filter cacheScope, DBHelper cache) {
         this.weakConnection = weakConnection;
         this.api = api;
         this.cacheScope = cacheScope;

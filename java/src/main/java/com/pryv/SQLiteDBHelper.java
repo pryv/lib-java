@@ -18,13 +18,11 @@ import java.util.Set;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.pryv.Pryv;
-import com.pryv.api.OnlineEventsAndStreamsManager;
+import com.pryv.api.OnlineManager;
 import com.pryv.database.DBHelper;
 import com.pryv.database.DBinitCallback;
 import com.pryv.database.QueryGenerator;
 import com.pryv.interfaces.EventsCallback;
-import com.pryv.Filter;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.interfaces.UpdateCacheCallback;
@@ -53,7 +51,7 @@ public class SQLiteDBHelper implements DBHelper {
   private WeakReference<AbstractConnection> weakConnection;
 
   private Filter scope;
-  private OnlineEventsAndStreamsManager api;
+  private OnlineManager api;
   private Double lastUpdate;
 
   private Logger logger = Logger.getInstance();
@@ -68,7 +66,7 @@ public class SQLiteDBHelper implements DBHelper {
    * @param initCallback
    *          callback to notify failure
    */
-  public SQLiteDBHelper(Filter scope, String cacheFolderPath, OnlineEventsAndStreamsManager api,
+  public SQLiteDBHelper(Filter scope, String cacheFolderPath, OnlineManager api,
                         WeakReference<AbstractConnection> weakConnection,
                         DBinitCallback initCallback) {
     this.lastUpdate = 0.0;

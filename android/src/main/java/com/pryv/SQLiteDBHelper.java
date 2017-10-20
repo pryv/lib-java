@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.pryv.api.OnlineEventsAndStreamsManager;
+import com.pryv.api.OnlineManager;
 import com.pryv.database.DBHelper;
 import com.pryv.database.DBinitCallback;
 import com.pryv.database.QueryGenerator;
@@ -40,7 +40,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper implements DBHelper{
     // weak reference to Pryv's Connection
     private WeakReference<AbstractConnection> weakConnection;
     private Filter scope;
-    private OnlineEventsAndStreamsManager api;
+    private OnlineManager api;
     private Double lastUpdate;
     private Logger logger = Logger.getInstance();
     private DBinitCallback initCallback;
@@ -56,7 +56,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper implements DBHelper{
      * @param weakConnection
      * @param initCallback    callback to notify failure
      */
-    public SQLiteDBHelper(Context context, Filter scope, String cacheFolderPath, OnlineEventsAndStreamsManager api,
+    public SQLiteDBHelper(Context context, Filter scope, String cacheFolderPath, OnlineManager api,
                           WeakReference<AbstractConnection> weakConnection,
                           DBinitCallback initCallback) {
         super(context, Pryv.DATABASE_NAME, null, DATABASE_VERSION);

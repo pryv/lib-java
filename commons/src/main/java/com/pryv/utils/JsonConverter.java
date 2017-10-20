@@ -6,6 +6,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pryv.model.Access;
+import com.pryv.model.ApiResource;
 import com.pryv.model.Attachment;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
@@ -377,6 +379,31 @@ public class JsonConverter {
     } else {
       return null;
     }
+  }
+
+  public static <T extends ApiResource> List<T> retrieveResourcesFromJson(String jsonResourcesArray, String resourceKey, Class<T> resource) throws IOException {
+    JsonNode arrNode = toJsonNode(jsonResourcesArray).get(resourceKey);
+    List<T> newResources = new ArrayList<>();
+    if (arrNode != null) {
+      if (arrNode.isArray()) {
+        for (final JsonNode objNode : arrNode) {
+          String str = objNode.toString();
+          T newResource = jsonMapper.readValue(str, resource);
+          newResources.add(newResource);
+        }
+      }
+    }
+    return newResources;
+  }
+
+  public static <T extends ApiResource> T retrieveResourceFromJson(String jsonResource, String resourceKey, Class<T> resource) throws IOException {
+    JsonNode eventNode = toJsonNode(jsonResource).get(resourceKey);
+    return jsonMapper.readValue(eventNode.toString(), resource);
+  }
+
+  public static String retrieveDeletedResourceId(String jsonResponse, String resourceKey) throws IOException {
+    String deletedResourceId = toJsonNode(jsonResponse).get(resourceKey).get(ID_KEY).textValue();
+    return deletedResourceId;
   }
 
   /**

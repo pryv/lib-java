@@ -71,4 +71,10 @@ public class Permission {
 
   }
 
+  @Override
+  public String toString() {
+    return "{\"defaultName\":\"" + defaultName + "\","
+            + "\"streamId\":\"" + streamId + "\","
+            + "\"level\":\"" + level + "\"}";
+  }
 }
