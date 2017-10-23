@@ -3,7 +3,6 @@ package com.pryv.acceptance;
 
 import com.jayway.awaitility.Awaitility;
 import com.pryv.Filter;
-import com.pryv.SQLiteDBHelper;
 import com.pryv.api.OnlineManager;
 import com.pryv.database.DBinitCallback;
 import com.pryv.interfaces.GetStreamsCallback;

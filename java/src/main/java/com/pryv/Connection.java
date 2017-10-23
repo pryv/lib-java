@@ -36,13 +36,7 @@ public class Connection implements AbstractConnection {
     private String urlEndpoint;
     private String registrationUrl;
 
-    private boolean isApiActive = true;
-    private boolean isCacheActive = true;
-
     private OnlineManager api;
-
-    private Filter cacheScope;
-    private DBHelper cache;
 
     private WeakReference<AbstractConnection> weakConnection;
 
@@ -71,10 +65,8 @@ public class Connection implements AbstractConnection {
      * @param username
      * @param token
      * @param domain
-     * @param isCacheUsed;
-     * @param dBinitCallback
      */
-    public Connection(String username, String token, String domain, boolean isCacheUsed, DBinitCallback dBinitCallback) {
+    public Connection(String username, String token, String domain) {
 
         this.username = username;
         this.token = token;
@@ -82,23 +74,12 @@ public class Connection implements AbstractConnection {
         buildUrlEndpoint();
         buildRegistrationUrl();
 
-        this.isCacheActive = isCacheUsed;
-
         this.weakConnection = new WeakReference<AbstractConnection>(this);
 
         rootStreams = new ConcurrentHashMap<String, Stream>();
         flatStreams = new ConcurrentHashMap<String, Stream>();
 
-        if (isApiActive) {
-            api = new OnlineManager(urlEndpoint, token, this.weakConnection);
-        }
-
-        if (isCacheActive) {
-            String cacheFolder = "cache/" + generateCacheFolderName() + "/";
-            new File(cacheFolder).mkdirs();
-            
-            cache = new SQLiteDBHelper(cacheScope, cacheFolder, api, weakConnection, dBinitCallback);
-        }
+        api = new OnlineManager(urlEndpoint, token);
 
         this.accesses = new ConnectionAccesses(weakConnection, api);
         this.account = new ConnectionAccount();
@@ -106,54 +87,6 @@ public class Connection implements AbstractConnection {
         this.profile = new ConnectionProfile();
         this.streams = new ConnectionStreams(weakConnection, api);
     }
-
-    public boolean isApiActive() {
-        return this.isApiActive;
-    }
-
-    public boolean isCacheActive() {
-        return this.isCacheActive;
-    }
-
-    /**
-     * activate API calls
-     */
-    public void activateApi() {
-        this.isApiActive = true;
-    }
-
-    /**
-     * disable usage of API calls
-     */
-    public void deactivateApi() {
-        this.isApiActive = false;
-    }
-
-    /**
-     * activate usage of local cache
-     */
-    public void activateCache() {
-        this.isCacheActive = true;
-    }
-
-    /**
-     * deactive local cache
-     */
-    public void deactivateCache() {
-        this.isCacheActive = false;
-    }
-
-    /**
-     * Assign a scope to the cache. This defines the scope of the data stored in the local cache.
-     * Activates the cache.
-     *
-     * @param scope
-     */
-    public void setupCacheScope(Filter scope) {
-        this.cacheScope = scope;
-        activateCache();
-        cache.setScope(scope);
-    };
 
     private String buildUrlEndpoint() {
         this.urlEndpoint = "https://" + username + "." + domain + "/";
