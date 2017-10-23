@@ -1,11 +1,8 @@
 package com.pryv.connection;
 
 import com.pryv.AbstractConnection;
-import com.pryv.Filter;
 import com.pryv.api.HttpClient;
 import com.pryv.api.OnlineManager;
-import com.pryv.model.Access;
-import com.pryv.model.Attachment;
 import com.pryv.model.Event;
 import com.pryv.utils.JsonConverter;
 
@@ -70,8 +67,8 @@ public class ConnectionEvents {
         }
     }
 
-    public Event update(final String eventId, final Event updateEvent) throws IOException {
-        HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, eventId, updateEvent).exec();
+    public Event update(final Event updateEvent) throws IOException {
+        HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, updateEvent.getId(), updateEvent).exec();
         Event updatedEvent = JsonConverter.retrieveEventFromJson(apiResponse.getJsonBody());
         updatedEvent.assignConnection(weakConnection);
         updatedEvent.setId(updateEvent.getId());

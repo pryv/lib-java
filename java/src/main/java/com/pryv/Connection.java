@@ -104,7 +104,7 @@ public class Connection implements AbstractConnection {
         this.account = new ConnectionAccount();
         this.events = new ConnectionEvents(weakConnection, api);
         this.profile = new ConnectionProfile();
-        this.streams = new ConnectionStreams(weakConnection, api, cacheScope, cache);
+        this.streams = new ConnectionStreams(weakConnection, api);
     }
 
     public boolean isApiActive() {
@@ -153,7 +153,6 @@ public class Connection implements AbstractConnection {
         this.cacheScope = scope;
         activateCache();
         cache.setScope(scope);
-        streams.setCacheScope(scope);
     };
 
     private String buildUrlEndpoint() {

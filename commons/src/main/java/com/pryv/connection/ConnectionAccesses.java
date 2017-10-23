@@ -49,8 +49,8 @@ public class ConnectionAccesses {
         return deletedId;
     }
 
-    public Access update(final String accessId, final Access updateAccess) throws IOException {
-        HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, accessId, updateAccess).exec();
+    public Access update(final Access updateAccess) throws IOException {
+        HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, updateAccess.getId(), updateAccess).exec();
         Access updatedAccess = JsonConverter.retrieveResourceFromJson(apiResponse.getJsonBody(), ACCESS_KEY, Access.class);
         updatedAccess.assignConnection(weakConnection);
         Access.createOrReuse(updatedAccess);
