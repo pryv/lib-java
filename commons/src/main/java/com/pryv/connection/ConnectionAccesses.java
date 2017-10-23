@@ -3,11 +3,6 @@ package com.pryv.connection;
 import com.pryv.AbstractConnection;
 import com.pryv.api.HttpClient;
 import com.pryv.api.OnlineManager;
-import com.pryv.interfaces.ApiCallback;
-import com.pryv.interfaces.CreateCallback;
-import com.pryv.interfaces.DeleteCallback;
-import com.pryv.interfaces.GetCallback;
-import com.pryv.interfaces.UpdateCallback;
 import com.pryv.model.Access;
 import com.pryv.utils.JsonConverter;
 
@@ -31,94 +26,37 @@ public class ConnectionAccesses {
         this.httpClient = api.getHttpClient();
     }
 
-    public void get(final GetCallback userCallback) {
-        ApiCallback getCallback = new ApiCallback() {
-            @Override
-            public void onSuccess(String successMessage, String responseBody, Double serverTime) {
-                try {
-                    List<Access> receivedAccesses = JsonConverter.retrieveResourcesFromJson(responseBody, ACCESSES_KEY, Access.class);
-                    // TODO: also included in JSON converter?
-                    for (Access receivedAccess : receivedAccesses) {
-                        receivedAccess.assignConnection(weakConnection);
-                        Access.createOrReuse(receivedAccess);
-                        userCallback.onSuccess(successMessage, receivedAccesses, serverTime);
-                    }
-                } catch (IOException e) {
-                    userCallback.onError(e.getMessage(), null);
-                }
-            }
-
-            @Override
-            public void onError(String errorMessage, Double serverTime) {
-                userCallback.onError(errorMessage, serverTime);
-            }
-        };
-        httpClient.getRequest(PATH, null, getCallback).exec();
+    public List<Access> get() throws IOException {
+        HttpClient.ApiResponse apiResponse = httpClient.getRequest(PATH, null).exec();
+        List<Access> receivedAccesses = JsonConverter.retrieveResourcesFromJson(apiResponse.getJsonBody(), ACCESSES_KEY, Access.class);
+        // TODO: also included in JSON converter?
+        for (Access receivedAccess : receivedAccesses) {
+            receivedAccess.assignConnection(weakConnection);
+            Access.createOrReuse(receivedAccess);
+        }
+        return receivedAccesses;
     }
 
-    public void create(final Access newAccess, final CreateCallback userCallback) {
-        ApiCallback createCallback = new ApiCallback() {
-            @Override
-            public void onSuccess(String successMessage, String responseBody, Double serverTime) {
-                try {
-                    Access createdAccess = JsonConverter.retrieveResourceFromJson(responseBody, ACCESS_KEY, Access.class);
-                    createdAccess.assignConnection(weakConnection);
-                    Access.createOrReuse(createdAccess);
-                    userCallback.onSuccess(successMessage, createdAccess, serverTime);
-                } catch (IOException e) {
-                    userCallback.onError(e.getMessage(), serverTime);
-                }
-            }
-
-            @Override
-            public void onError(String errorMessage, Double serverTime) {
-                userCallback.onError(errorMessage, serverTime);
-            }
-        };
-        httpClient.createRequest(PATH, newAccess, null, createCallback).exec();
+    public Access create(final Access newAccess) throws IOException {
+        HttpClient.ApiResponse apiResponse = httpClient.createRequest(PATH, newAccess, null).exec();
+        Access createdAccess = JsonConverter.retrieveResourceFromJson(apiResponse.getJsonBody(), ACCESS_KEY, Access.class);
+        createdAccess.assignConnection(weakConnection);
+        Access.createOrReuse(createdAccess);
+        return createdAccess;
     }
 
-    public void delete(final String accessId, final DeleteCallback userCallback) {
-        ApiCallback deleteCallback = new ApiCallback() {
-            @Override
-            public void onSuccess(String successMessage, String responseBody, Double serverTime) {
-                try {
-                    String deletedId = JsonConverter.retrieveDeletedResourceId(responseBody, ACCESS_DELETION_KEY);
-                    userCallback.onSuccess(successMessage, deletedId, serverTime);
-
-                } catch (IOException e) {
-                    userCallback.onError(e.getMessage(), serverTime);
-                }
-            }
-
-            @Override
-            public void onError(String errorMessage, Double serverTime) {
-                userCallback.onError(errorMessage, serverTime);
-            }
-        };
-        httpClient.deleteRequest(PATH, accessId, false, deleteCallback).exec();
+    public String delete(final String accessId) throws IOException {
+        HttpClient.ApiResponse apiResponse = httpClient.deleteRequest(PATH, accessId, false).exec();
+        String deletedId = JsonConverter.retrieveDeletedResourceId(apiResponse.getJsonBody(), ACCESS_DELETION_KEY);
+        return deletedId;
     }
 
-    public void update(final String accessId, final Access updatedAccess, final UpdateCallback userCallback) {
-        ApiCallback updateCallback = new ApiCallback() {
-            @Override
-            public void onSuccess(String successMessage, String responseBody, Double serverTime) {
-                try {
-                    Access updatedAccess = JsonConverter.retrieveResourceFromJson(responseBody, ACCESS_KEY, Access.class);
-                    updatedAccess.assignConnection(weakConnection);
-                    Access.createOrReuse(updatedAccess);
-                    userCallback.onSuccess(successMessage, updatedAccess, serverTime);
-                } catch (IOException e) {
-                    userCallback.onError(e.getMessage(), serverTime);
-                }
-            }
-
-            @Override
-            public void onError(String errorMessage, Double serverTime) {
-                userCallback.onError(errorMessage, serverTime);
-            }
-        };
-        httpClient.updateRequest(PATH, accessId, updatedAccess, updateCallback).exec();
+    public Access update(final String accessId, final Access updateAccess) throws IOException {
+        HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, accessId, updateAccess).exec();
+        Access updatedAccess = JsonConverter.retrieveResourceFromJson(apiResponse.getJsonBody(), ACCESS_KEY, Access.class);
+        updatedAccess.assignConnection(weakConnection);
+        Access.createOrReuse(updatedAccess);
+        return updatedAccess;
     }
 
 }
