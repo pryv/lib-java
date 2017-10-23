@@ -2,7 +2,6 @@ package com.pryv.acceptance;
 
 import com.jayway.awaitility.Awaitility;
 import com.pryv.Connection;
-import com.pryv.interfaces.EventsCallback;
 import com.pryv.Filter;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
@@ -10,7 +9,6 @@ import com.pryv.database.DBinitCallback;
 import com.pryv.model.Attachment;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
-import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.utils.Logger;
 
 import org.junit.AfterClass;

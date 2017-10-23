@@ -1,12 +1,8 @@
 package com.pryv.database;
 
 import com.pryv.Filter;
-import com.pryv.connection.ConnectionStreams;
-import com.pryv.interfaces.EventsCallback;
-import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
-import com.pryv.interfaces.UpdateCacheCallback;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
 

@@ -21,9 +21,7 @@ import resources.TestCredentials;
 
 import com.jayway.awaitility.Awaitility;
 import com.pryv.api.OnlineManager;
-import com.pryv.interfaces.EventsCallback;
 import com.pryv.Filter;
-import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.model.Attachment;
@@ -39,8 +37,6 @@ public class OnlineManagerTest {
 
     private static OnlineManager online;
 
-    private static EventsCallback eventsCallback;
-    private static GetEventsCallback getEventsCallback;
     private static StreamsCallback streamsCallback;
     private static GetStreamsCallback getStreamsCallback;
 
@@ -60,10 +56,8 @@ public class OnlineManagerTest {
     @BeforeClass
     public static void setUp() throws Exception {
 
-        instanciateEventsCallback();
         instanciateStreamsCallback();
         instanciateGetStreamsCallback();
-        instanciateGetEventsCallback();
 
         String url = "https://" + TestCredentials.USERNAME + "." + TestCredentials.DOMAIN + "/";
 
@@ -254,61 +248,6 @@ public class OnlineManagerTest {
             @Override
             public Boolean call() throws Exception {
                 return (success || error);
-            }
-        };
-    }
-
-    private static void instanciateGetEventsCallback() {
-        getEventsCallback = new GetEventsCallback() {
-            @Override
-            public void cacheCallback(List<Event> events, Map<String, Double> eventDeletions) {
-                fail("should not be called");
-            }
-
-            @Override
-            public void onCacheError(String errorMessage) {
-                fail("should not be called");
-            }
-
-            @Override
-            public void apiCallback(List<Event> receivedEvents, Map<String, Double> eventDeletions,
-                                    Double serverTime) {
-                events = receivedEvents;
-                success = true;
-            }
-
-            @Override
-            public void onApiError(String errorMessage, Double serverTime) {
-
-            }
-        };
-    }
-
-    private static void instanciateEventsCallback() {
-        eventsCallback = new EventsCallback() {
-
-            @Override
-            public void onApiSuccess(String successMessage, Event event, String pStoppedId,
-                                     Double pServerTime) {
-                System.out.println("OnlineEventsManagerTest: eventsSuccess msg: " + successMessage);
-                stoppedId = pStoppedId;
-                success = true;
-                singleEvent = event;
-            }
-
-            @Override
-            public void onApiError(String errorMessage, Double pServerTime) {
-                error = true;
-            }
-
-            @Override
-            public void onCacheSuccess(String successMessage, Event event) {
-                fail("should not be called");
-            }
-
-            @Override
-            public void onCacheError(String errorMessage) {
-                fail("should not be called");
             }
         };
     }

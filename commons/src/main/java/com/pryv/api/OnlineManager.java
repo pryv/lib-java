@@ -2,8 +2,6 @@ package com.pryv.api;
 
 import com.pryv.AbstractConnection;
 import com.pryv.Filter;
-import com.pryv.interfaces.EventsCallback;
-import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.model.Event;
@@ -36,7 +34,6 @@ public class OnlineManager {
     private OkHttpClient client = new OkHttpClient();
     private HttpClient httpClient;
 
-    private String eventsUrl;
     private String streamsUrl;
     private String apiUrl;
     private String tokenUrlArgument;
@@ -63,7 +60,6 @@ public class OnlineManager {
     public OnlineManager(String pUrl, String token,
                          WeakReference<AbstractConnection> pWeakConnection) {
         apiUrl = pUrl;
-        eventsUrl = pUrl + "events"; // ?auth=" + token;
         streamsUrl = pUrl + "streams"; // ?auth=" + token;
         tokenUrlArgument = "?auth=" + token;
         weakConnection = pWeakConnection;
@@ -74,170 +70,6 @@ public class OnlineManager {
             httpClient = new HttpClient(apiUrl, tokenUrlArgument);
         }
         return httpClient;
-    }
-
-  /*
-   * Attachments
-   */
-
-    /**
-     * Create a new Event with an attachment
-     *
-     * @param eventWithAttachment
-     * @param cacheEventsCallback
-     */
-    public void createEventWithAttachment(final Event eventWithAttachment,
-                                          final EventsCallback cacheEventsCallback) {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Event eventWithoutAttachments = new Event();
-                    eventWithoutAttachments.merge(eventWithAttachment, JsonConverter.getCloner());
-                    eventWithoutAttachments.setAttachments(null);
-                    String jsonEvent = JsonConverter.toJson(eventWithoutAttachments);
-
-                    logger.log("OnlineManager: createEventWithAttachment: POST request at: "
-                            + eventsUrl
-                            + tokenUrlArgument
-                            + ", body: "
-                            + jsonEvent);
-
-                    File file = eventWithAttachment.getFirstAttachment().getFile();
-
-                    // create Multipart HTTP Entity
-                    RequestBody body = new MultipartBody.Builder()
-                            .setType(MultipartBody.FORM)
-                            .addFormDataPart("event", jsonEvent)
-                            .addFormDataPart("file", file.getName(), RequestBody.create(null, file))
-                            .build();
-
-                    Request request = new Request.Builder()
-                            .url(eventsUrl + tokenUrlArgument)
-                            .post(body)
-                            .build();
-
-                    Response response = client.newCall(request).execute();
-                    new ApiResponseHandler(ApiMethod.EVENTS_CREATE, cacheEventsCallback, null, null, null,
-                            eventWithAttachment, null).handleResponse(response);
-
-                } catch (IOException e) {
-                    cacheEventsCallback.onApiError(e.getMessage(), null);
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
-  /*
-   * Events management
-   */
-
-    public void getEvents(final Filter filter, final GetEventsCallback getEventsCallback) {
-        new Thread() {
-            @Override
-            public void run() {
-                String url = eventsUrl+tokenUrlArgument;
-                if (filter != null) {
-                    url += filter.toUrlParameters();
-                }
-
-                logger.log("OnlineManager: get: Get request at: " + url);
-
-                Request request = new Request.Builder()
-                        .url(url)
-                        .get()
-                        .build();
-                try {
-                    Response response = client.newCall(request).execute();
-                    new OnlineManager.ApiResponseHandler(OnlineManager.ApiMethod.EVENTS_GET, null, getEventsCallback, null,
-                            null, null, null).handleResponse(response);
-
-                } catch (IOException e) {
-                    getEventsCallback.onApiError(e.getMessage(), null);
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
-    public void createEvent(final Event newEvent, final EventsCallback cacheEventsCallback) {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    String jsonEvent = JsonConverter.toJson(newEvent);
-                    logger.log("OnlineManager: create: Post request at: "
-                            + eventsUrl
-                            + tokenUrlArgument
-                            + ", body: "
-                            + jsonEvent);
-
-                    RequestBody bodyString = RequestBody.create(JSON, jsonEvent);
-                    Request request = new Request.Builder()
-                            .url(eventsUrl + tokenUrlArgument)
-                            .post(bodyString)
-                            .build();
-                    Response response = client.newCall(request).execute();
-                    new ApiResponseHandler(ApiMethod.EVENTS_CREATE, cacheEventsCallback, null,
-                            null, null, newEvent, null).handleResponse(response);
-
-                } catch (IOException e) {
-                    cacheEventsCallback.onApiError(e.getMessage(), null);
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
-    public void deleteEvent(final Event eventToDelete, final EventsCallback cacheEventsCallback) {
-        new Thread() {
-            @Override
-            public void run() {
-
-                String deleteUrl = eventsUrl + "/" + eventToDelete.getId() + tokenUrlArgument;
-                logger.log("OnlineManager: delete: Delete request at: " + deleteUrl);
-
-                Request request = new Request.Builder()
-                        .url(deleteUrl)
-                        .delete()
-                        .build();
-                try {
-                    Response response = client.newCall(request).execute();
-                    new ApiResponseHandler(ApiMethod.EVENTS_DELETE, cacheEventsCallback, null,
-                            null, null, eventToDelete, null).handleResponse(response);
-
-                } catch (IOException e) {
-                    cacheEventsCallback.onApiError(e.getMessage(), null);
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
-    public void updateEvent(final Event eventToUpdate, final EventsCallback cacheEventsCallback) {
-        new Thread() {
-            @Override
-            public void run() {
-                String updateUrl = eventsUrl + "/" + eventToUpdate.getId() + tokenUrlArgument;
-                logger.log("OnlineManager: update: Update request at: " + updateUrl);
-
-                try {
-                    RequestBody bodyString = RequestBody.create(JSON, JsonConverter.toJson(eventToUpdate));
-                    Request request = new Request.Builder()
-                            .url(updateUrl)
-                            .put(bodyString)
-                            .build();
-                    Response response = client.newCall(request).execute();
-                    new ApiResponseHandler(ApiMethod.EVENTS_UPDATE, cacheEventsCallback, null,
-                            null, null, eventToUpdate, null).handleResponse(response);
-
-                } catch (IOException e) {
-                    cacheEventsCallback.onApiError(e.getMessage(), null);
-                    e.printStackTrace();
-                }
-            }
-        }.start();
     }
 
   /*
@@ -369,12 +201,8 @@ public class OnlineManager {
     private class ApiResponseHandler {
 
         private ApiMethod apiMethod;
-        private EventsCallback eventsCallback;
-        private GetEventsCallback getEventsCallback;
         private StreamsCallback streamsCallback;
         private GetStreamsCallback getStreamsCallback;
-        private Event event;
-        private Stream stream;
 
         /**
          * Constructor for ApiResponseHandler. Depending on wether the requests
@@ -383,23 +211,14 @@ public class OnlineManager {
          * item to retrieve the id on the server response.
          *
          * @param apiMethod
-         * @param eventsCallback
-         * @param getEventsCallback
          * @param streamsCallback
          * @param getStreamsCallback
-         * @param event
          * @param stream
          */
-        public ApiResponseHandler(ApiMethod apiMethod, final EventsCallback eventsCallback,
-                                  final GetEventsCallback getEventsCallback,
+        public ApiResponseHandler(ApiMethod apiMethod,
                                   final StreamsCallback streamsCallback,
-                                  final GetStreamsCallback getStreamsCallback,
-                                  final Event event, final Stream stream) {
-            this.event = event;
-            this.stream = stream;
+                                  final GetStreamsCallback getStreamsCallback, final Stream stream) {
             this.apiMethod = apiMethod;
-            this.eventsCallback = eventsCallback;
-            this.getEventsCallback = getEventsCallback;
             this.streamsCallback = streamsCallback;
             this.getStreamsCallback = getStreamsCallback;
         }
@@ -420,63 +239,6 @@ public class OnlineManager {
             if (statusCode == HttpURLConnection.HTTP_CREATED || statusCode == HttpURLConnection.HTTP_OK) {
                 // saul good
                 switch (apiMethod) {
-
-                    case EVENTS_GET:
-                        List<Event> receivedEvents = JsonConverter.createEventsFromJson(responseBody);
-                        for (Event receivedEvent : receivedEvents) {
-                            receivedEvent.assignConnection(weakConnection);
-                            Event.createOrReuse(receivedEvent);
-                        }
-                        Map<String, Double> eventDeletions = null;
-                        logger.log("ApiResponseHandler: received "
-                                + receivedEvents.size()
-                                + " event(s) from API.");
-                        getEventsCallback.apiCallback(receivedEvents, eventDeletions, serverTime);
-                        break;
-
-                    case EVENTS_CREATE:
-                        String stoppedId = JsonConverter.retrieveStoppedIdFromJson(responseBody);
-                        Event createdEvent = JsonConverter.retrieveEventFromJson(responseBody);
-                        createdEvent.assignConnection(weakConnection);
-                        Event.createOrReuse(createdEvent);
-                        logger.log("ApiResponseHandler: event created successfully: Id="
-                                + createdEvent.getId());
-                        eventsCallback.onApiSuccess(
-                                "Online: event with Id="
-                                        + createdEvent.getId()
-                                        + " created on API", createdEvent, stoppedId, serverTime);
-                        break;
-
-                    case EVENTS_UPDATE:
-                        Event updatedEvent = JsonConverter.retrieveEventFromJson(responseBody);
-                        updatedEvent.assignConnection(weakConnection);
-                        updatedEvent.setId(event.getId());
-                        Event.createOrReuse(updatedEvent);
-                        logger.log("ApiResponseHandler: event updated successfully: Id="
-                                + updatedEvent.getId());
-                        eventsCallback.onApiSuccess(
-                                "Online: event with Id="
-                                        + updatedEvent.getId()
-                                        + " updated on API", updatedEvent, null, serverTime);
-                        break;
-
-                    case EVENTS_DELETE:
-                        if (JsonConverter.hasEventDeletionField(responseBody)) {
-                            // event was deleted, retrieve streamDeletion id field
-                            eventsCallback.onApiSuccess(
-                                    JsonConverter.retrieveDeleteEventId(responseBody), null, null, serverTime);
-                        } else {
-                            // event was trashed, forward as an update to callback
-                            Event trashedEvent = JsonConverter.retrieveEventFromJson(responseBody);
-                            trashedEvent.assignConnection(weakConnection);
-                            trashedEvent.setId(event.getId());
-                            Event.createOrReuse(trashedEvent);
-                            eventsCallback.onApiSuccess(
-                                    "Online: event with Id="
-                                            + trashedEvent.getId()
-                                            + " trashed on API", trashedEvent, null, serverTime);
-                        }
-                        break;
 
                     case STREAMS_GET:
                         Map<String, Stream> receivedStreams =
@@ -535,10 +297,6 @@ public class OnlineManager {
                     streamsCallback.onApiError(responseBody, serverTime);
                 } else if (getStreamsCallback != null) {
                     getStreamsCallback.onApiError(responseBody, serverTime);
-                } else if (eventsCallback != null) {
-                    eventsCallback.onApiError(responseBody, serverTime);
-                } else if (getEventsCallback != null) {
-                    getEventsCallback.onApiError(responseBody, serverTime);
                 }
             }
             return null;

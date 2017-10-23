@@ -13,7 +13,6 @@ import java.util.List;
 public class ConnectionAccesses {
 
     private WeakReference<AbstractConnection> weakConnection;
-    private OnlineManager api;
     private static final String PATH = "accesses";
     private static final String ACCESS_KEY = "access";
     private static final String ACCESSES_KEY = "accesses";
@@ -22,7 +21,6 @@ public class ConnectionAccesses {
 
     public ConnectionAccesses(WeakReference<AbstractConnection> weakConnection, OnlineManager api) {
         this.weakConnection = weakConnection;
-        this.api = api;
         this.httpClient = api.getHttpClient();
     }
 

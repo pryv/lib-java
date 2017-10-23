@@ -4,8 +4,6 @@ import com.jayway.awaitility.Awaitility;
 import com.pryv.Connection;
 import com.pryv.Filter;
 import com.pryv.database.DBinitCallback;
-import com.pryv.interfaces.EventsCallback;
-import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.model.Event;
@@ -18,8 +16,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;

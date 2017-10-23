@@ -5,7 +5,6 @@ import android.content.Context;
 import com.pryv.api.OnlineManager;
 import com.pryv.connection.ConnectionAccesses;
 import com.pryv.connection.ConnectionAccount;
-import com.pryv.connection.ConnectionEvents;
 import com.pryv.connection.ConnectionProfile;
 import com.pryv.connection.ConnectionStreams;
 import com.pryv.database.DBHelper;
@@ -28,7 +27,7 @@ public class Connection implements AbstractConnection {
 
     public ConnectionAccesses accesses;
     public ConnectionAccount account;
-    public ConnectionEvents events;
+    public com.pryv.connection.Connection events;
     public ConnectionProfile profile;
     public ConnectionStreams streams;
 
@@ -106,7 +105,7 @@ public class Connection implements AbstractConnection {
 
         this.accesses = new ConnectionAccesses(weakConnection, api);
         this.account = new ConnectionAccount();
-        this.events = new ConnectionEvents(weakConnection, api, cacheScope, cache);
+        this.events = new com.pryv.connection.Connection(weakConnection, api, cacheScope, cache);
         this.profile = new ConnectionProfile();
         this.streams = new ConnectionStreams(weakConnection, api, cacheScope, cache);
     }

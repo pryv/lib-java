@@ -22,9 +22,7 @@ import org.junit.runners.MethodSorters;
 
 import com.jayway.awaitility.Awaitility;
 import com.pryv.SQLiteDBHelper;
-import com.pryv.interfaces.EventsCallback;
 import com.pryv.Filter;
-import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.database.DBinitCallback;

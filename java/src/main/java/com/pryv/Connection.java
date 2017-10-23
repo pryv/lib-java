@@ -1,12 +1,12 @@
 package com.pryv;
 
 import com.pryv.api.OnlineManager;
+import com.pryv.connection.ConnectionEvents;
 import com.pryv.database.DBHelper;
 import com.pryv.database.DBinitCallback;
 import com.pryv.model.Stream;
 import com.pryv.connection.ConnectionAccesses;
 import com.pryv.connection.ConnectionAccount;
-import com.pryv.connection.ConnectionEvents;
 import com.pryv.connection.ConnectionProfile;
 import com.pryv.connection.ConnectionStreams;
 import com.pryv.utils.Logger;
@@ -102,7 +102,7 @@ public class Connection implements AbstractConnection {
 
         this.accesses = new ConnectionAccesses(weakConnection, api);
         this.account = new ConnectionAccount();
-        this.events = new ConnectionEvents(weakConnection, api, cacheScope, cache);
+        this.events = new ConnectionEvents(weakConnection, api);
         this.profile = new ConnectionProfile();
         this.streams = new ConnectionStreams(weakConnection, api, cacheScope, cache);
     }
@@ -153,7 +153,6 @@ public class Connection implements AbstractConnection {
         this.cacheScope = scope;
         activateCache();
         cache.setScope(scope);
-        events.setCacheScope(scope);
         streams.setCacheScope(scope);
     };
 

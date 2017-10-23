@@ -8,7 +8,6 @@ import com.pryv.database.DBHelper;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.interfaces.StreamsManager;
-import com.pryv.interfaces.UpdateCacheCallback;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
 

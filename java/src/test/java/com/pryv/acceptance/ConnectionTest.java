@@ -4,8 +4,6 @@ package com.pryv.acceptance;
 import com.jayway.awaitility.Awaitility;
 import com.pryv.Connection;
 import com.pryv.database.DBinitCallback;
-import com.pryv.interfaces.EventsCallback;
-import com.pryv.interfaces.GetEventsCallback;
 import com.pryv.interfaces.GetStreamsCallback;
 import com.pryv.interfaces.StreamsCallback;
 import com.pryv.model.Event;

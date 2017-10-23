@@ -2,102 +2,81 @@ package com.pryv.connection;
 
 import com.pryv.AbstractConnection;
 import com.pryv.Filter;
+import com.pryv.api.HttpClient;
 import com.pryv.api.OnlineManager;
-import com.pryv.database.DBHelper;
-import com.pryv.interfaces.EventsCallback;
-import com.pryv.interfaces.EventsManager;
-import com.pryv.interfaces.GetEventsCallback;
-import com.pryv.interfaces.UpdateCacheCallback;
+import com.pryv.model.Access;
+import com.pryv.model.Attachment;
 import com.pryv.model.Event;
-import com.pryv.model.Stream;
+import com.pryv.utils.JsonConverter;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.List;
-import java.util.Map;
 
-public class ConnectionEvents implements EventsManager {
+public class ConnectionEvents {
 
     private WeakReference<AbstractConnection> weakConnection;
-    private OnlineManager api;
-    private Filter cacheScope;
-    private DBHelper cache;
+    private static final String PATH = "events";
+    private HttpClient httpClient;
 
-    public ConnectionEvents(WeakReference<AbstractConnection> weakConnection, OnlineManager api, Filter cacheScope, DBHelper cache) {
+    public ConnectionEvents(WeakReference<AbstractConnection> weakConnection, OnlineManager api) {
         this.weakConnection = weakConnection;
-        this.api = api;
-        this.cacheScope = cacheScope;
-        this.cache = cache;
+        this.httpClient = api.getHttpClient();
     }
 
-    @Override
-    public void get(final Filter filter, final GetEventsCallback eventsCallback) {
-        if (weakConnection.get().isCacheActive() && (filter == null || filter.isIncludedInScope(cacheScope))) {
-            cache.getEvents(filter, eventsCallback);
-            // to execute in separate Thread
-            // can be launched separately since write is not done until all reads are finished.
-
-            cache.update(updateCacheCallback);
+    public List<Event> get() throws IOException {
+        HttpClient.ApiResponse apiResponse = httpClient.getRequest(PATH, null).exec();
+        List<Event> receivedEvents = JsonConverter.createEventsFromJson(apiResponse.getJsonBody());
+        for (Event receivedEvent : receivedEvents) {
+            receivedEvent.assignConnection(weakConnection);
+            Event.createOrReuse(receivedEvent);
         }
-        api.getEvents(filter, eventsCallback);
+        return receivedEvents;
     }
 
-    @Override
-    public void create(final Event newEvent, final EventsCallback eventsCallback) {
-        if (weakConnection.get().isCacheActive() && (cacheScope == null || cacheScope.hasInScope(newEvent))) {
-            cache.createEvent(newEvent, eventsCallback);
+    public Event create(final Event newEvent) throws IOException {
+        HttpClient.ApiResponse apiResponse;
 
-            cache.update(updateCacheCallback);
+        if(newEvent.getFirstAttachment() != null) {
+            Event eventWithoutAttachments = new Event();
+            eventWithoutAttachments.merge(newEvent, JsonConverter.getCloner());
+            eventWithoutAttachments.setAttachments(null);
+            apiResponse = httpClient.createRequest(PATH, eventWithoutAttachments, newEvent.getFirstAttachment()).exec();
+        } else {
+            apiResponse = httpClient.createRequest(PATH, newEvent, null).exec();
         }
-        api.createEvent(newEvent, eventsCallback);
+
+        String json = apiResponse.getJsonBody();
+        Event createdEvent = JsonConverter.retrieveEventFromJson(json);
+        createdEvent.assignConnection(weakConnection);
+        Event.createOrReuse(createdEvent);
+        return createdEvent;
     }
 
-    @Override
-    public void createWithAttachment(final Event newEventWithAttachment, final EventsCallback eventsCallback) {
-        if (weakConnection.get().isCacheActive() && (cacheScope == null || cacheScope.hasInScope(newEventWithAttachment))) {
-            cache.createEvent(newEventWithAttachment, eventsCallback);
-
-            cache.update(updateCacheCallback);
+    public String delete(final String eventId) throws IOException {
+        HttpClient.ApiResponse apiResponse = httpClient.deleteRequest(PATH, eventId, false).exec();
+        String json = apiResponse.getJsonBody();
+        if (JsonConverter.hasEventDeletionField(json)) {
+            // event was deleted
+            String deletedEventId = JsonConverter.retrieveDeleteEventId(json);
+            return deletedEventId;
+        } else {
+            // event was trashed
+            Event trashedEvent = JsonConverter.retrieveEventFromJson(json);
+            trashedEvent.assignConnection(weakConnection);
+            trashedEvent.setId(eventId);
+            Event.createOrReuse(trashedEvent);
+            return eventId;
         }
-        api.createEventWithAttachment(newEventWithAttachment, eventsCallback);
     }
 
-    @Override
-    public void delete(final Event eventToDelete, final EventsCallback eventsCallback) {
-        if (weakConnection.get().isCacheActive() && (cacheScope.hasInScope(eventToDelete))) {
-            cache.deleteEvent(eventToDelete, eventsCallback);
-
-            cache.update(updateCacheCallback);
-        }
-        api.deleteEvent(eventToDelete, eventsCallback);
+    public Event update(final String eventId, final Event updateEvent) throws IOException {
+        HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, eventId, updateEvent).exec();
+        Event updatedEvent = JsonConverter.retrieveEventFromJson(apiResponse.getJsonBody());
+        updatedEvent.assignConnection(weakConnection);
+        updatedEvent.setId(updateEvent.getId());
+        Event.createOrReuse(updatedEvent);
+        return updatedEvent;
     }
-
-    @Override
-    public void update(final Event eventToUpdate, final EventsCallback eventsCallback) {
-        if (weakConnection.get().isCacheActive() && (cacheScope == null || cacheScope.hasInScope(eventToUpdate))) {
-            cache.updateEvent(eventToUpdate, eventsCallback);
-
-            cache.update(updateCacheCallback);
-        }
-        api.updateEvent(eventToUpdate, eventsCallback);
-    }
-
-    public void setCacheScope(Filter scope) {
-        this.cacheScope = scope;
-    }
-
-    // TODO
-    private UpdateCacheCallback updateCacheCallback = new UpdateCacheCallback() {
-        @Override
-        public void apiCallback(List<Event> events, Map<String, Double> eventDeletions,
-                                Map<String, Stream> streams, Map<String, Double> streamDeletions,
-                                Double serverTime) {
-
-        }
-
-        @Override
-        public void onError(String errorMessage, Double serverTime) {
-
-        }
-    };
 
 }
