@@ -24,14 +24,7 @@ public class ConnectionTest {
 
   @Before
   public void setUp() throws Exception {
-    connection = new Connection("testUID2", "token", "pryv.io", true, new DBinitCallback());
-  }
-
-  @Test
-  public void testIdCachingGeneration() {
-    String idCaching = connection.generateCacheFolderName();
-    System.out.println("test id caching generation: generated: " + idCaching);
-    assertNotNull(idCaching);
+    connection = new Connection("testUID2", "token", "pryv.io");
   }
 
 }

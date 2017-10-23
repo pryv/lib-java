@@ -1,7 +1,6 @@
 package com.pryv.acceptance;
 
 import com.pryv.Connection;
-import com.pryv.database.DBinitCallback;
 import com.pryv.model.Access;
 import com.pryv.model.Permission;
 
@@ -34,8 +33,7 @@ public class ConnectionAccessesTest {
     @BeforeClass
     public static void testCreateAccess() throws IOException {
 
-        connection =
-                new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, TestCredentials.DOMAIN, false, new DBinitCallback());
+        connection = new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, TestCredentials.DOMAIN);
 
         Access newAccess = new Access();
         newAccess.setName(accessName);

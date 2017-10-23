@@ -1,6 +1,7 @@
 package com.pryv.connection;
 
 import com.pryv.AbstractConnection;
+import com.pryv.Filter;
 import com.pryv.api.HttpClient;
 import com.pryv.api.OnlineManager;
 import com.pryv.model.Event;
@@ -21,8 +22,8 @@ public class ConnectionEvents {
         this.httpClient = api.getHttpClient();
     }
 
-    public List<Event> get() throws IOException {
-        HttpClient.ApiResponse apiResponse = httpClient.getRequest(PATH, null).exec();
+    public List<Event> get(Filter filter) throws IOException {
+        HttpClient.ApiResponse apiResponse = httpClient.getRequest(PATH, filter).exec();
         List<Event> receivedEvents = JsonConverter.createEventsFromJson(apiResponse.getJsonBody());
         for (Event receivedEvent : receivedEvents) {
             receivedEvent.assignConnection(weakConnection);
