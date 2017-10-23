@@ -32,7 +32,7 @@ public class ConnectionEvents {
         return receivedEvents;
     }
 
-    public Event create(final Event newEvent) throws IOException {
+    public Event create(Event newEvent) throws IOException {
         HttpClient.ApiResponse apiResponse;
 
         if(newEvent.getFirstAttachment() != null) {
@@ -51,7 +51,7 @@ public class ConnectionEvents {
         return createdEvent;
     }
 
-    public String delete(final String eventId) throws IOException {
+    public String delete(String eventId) throws IOException {
         HttpClient.ApiResponse apiResponse = httpClient.deleteRequest(PATH, eventId, false).exec();
         String json = apiResponse.getJsonBody();
         if (JsonConverter.hasEventDeletionField(json)) {
@@ -68,7 +68,7 @@ public class ConnectionEvents {
         }
     }
 
-    public Event update(final Event updateEvent) throws IOException {
+    public Event update(Event updateEvent) throws IOException {
         HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, updateEvent.getId(), updateEvent).exec();
         Event updatedEvent = JsonConverter.retrieveEventFromJson(apiResponse.getJsonBody());
         updatedEvent.assignConnection(weakConnection);

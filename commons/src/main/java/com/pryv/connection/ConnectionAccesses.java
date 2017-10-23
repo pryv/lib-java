@@ -35,7 +35,7 @@ public class ConnectionAccesses {
         return receivedAccesses;
     }
 
-    public Access create(final Access newAccess) throws IOException {
+    public Access create(Access newAccess) throws IOException {
         HttpClient.ApiResponse apiResponse = httpClient.createRequest(PATH, newAccess, null).exec();
         Access createdAccess = JsonConverter.retrieveResourceFromJson(apiResponse.getJsonBody(), ACCESS_KEY, Access.class);
         createdAccess.assignConnection(weakConnection);
@@ -43,13 +43,13 @@ public class ConnectionAccesses {
         return createdAccess;
     }
 
-    public String delete(final String accessId) throws IOException {
+    public String delete(String accessId) throws IOException {
         HttpClient.ApiResponse apiResponse = httpClient.deleteRequest(PATH, accessId, false).exec();
         String deletedId = JsonConverter.retrieveDeletedResourceId(apiResponse.getJsonBody(), ACCESS_DELETION_KEY);
         return deletedId;
     }
 
-    public Access update(final String accessId, final Access updateAccess) throws IOException {
+    public Access update(String accessId, Access updateAccess) throws IOException {
         HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, accessId, updateAccess).exec();
         Access updatedAccess = JsonConverter.retrieveResourceFromJson(apiResponse.getJsonBody(), ACCESS_KEY, Access.class);
         updatedAccess.assignConnection(weakConnection);
