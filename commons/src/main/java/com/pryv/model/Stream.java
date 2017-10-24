@@ -5,11 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.pryv.AbstractConnection;
-import com.pryv.database.QueryGenerator;
 
 import java.lang.ref.WeakReference;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -89,25 +86,6 @@ public class Stream extends ApiResource {
     createdBy = pCreatedBy;
     modified = pModified;
     modifiedBy = pModifiedBy;
-  }
-
-  /**
-   * build Stream when retrieved from cache
-   *
-   * @param result
-   * @throws SQLException
-   */
-  public Stream(ResultSet result) throws SQLException {
-    id = result.getString(QueryGenerator.STREAMS_ID_KEY);
-    name = result.getString(QueryGenerator.STREAMS_NAME_KEY);
-    trashed = result.getBoolean(QueryGenerator.STREAMS_TRASHED_KEY);
-    created = result.getDouble(QueryGenerator.STREAMS_CREATED_KEY);
-    createdBy = result.getString(QueryGenerator.STREAMS_CREATED_BY_KEY);
-    modified = result.getDouble(QueryGenerator.STREAMS_MODIFIED_KEY);
-    modifiedBy = result.getString(QueryGenerator.STREAMS_MODIFIED_BY_KEY);
-    parentId = result.getString(QueryGenerator.STREAMS_PARENT_ID_KEY);
-    singleActivity = result.getBoolean(QueryGenerator.STREAMS_SINGLE_ACTIVITY_KEY);
-    setClientDataFromAString(result.getString(QueryGenerator.STREAMS_CLIENT_DATA_KEY));
   }
 
   /**

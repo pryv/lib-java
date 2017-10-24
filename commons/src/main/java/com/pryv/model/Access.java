@@ -5,15 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.pryv.AbstractConnection;
-import com.pryv.database.QueryGenerator;
 import com.pryv.utils.Cuid;
 import com.pryv.utils.JsonConverter;
 import com.rits.cloning.Cloner;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -106,38 +102,6 @@ public class Access extends ApiResource {
     lastUsed = pLastUsed;
 
     this.updateSupervisor();
-  }
-
-  /**
-   * Build an Access from a ResultSet, used when retrieving Access objects from the SQLite Cache.
-   * This takes care of instantiating a new Access only in the case when it isn't existing yet.
-   *
-   * @param result The ResultSet
-   * @return The Acccess
-   * @throws SQLException
-   * @throws IOException
-   */
-  public static Access createOrReuse(ResultSet result) throws SQLException, IOException {
-    // TODO: Add query keys
-    String id = result.getString(QueryGenerator.ACCESSES_ID_KEY);
-    Access access = supervisor.get(id);
-    if (access == null) {
-      access = new Access();
-    }
-
-    access.setId(result.getString(QueryGenerator.ACCESSES_ID_KEY));
-    access.setToken(result.getString(QueryGenerator.ACCESSES_TOKEN_KEY));
-    access.setName(result.getString(QueryGenerator.ACCESSES_NAME_KEY));
-    // TODO: Deserialize and set permissions
-    access.setCreated(result.getDouble(QueryGenerator.ACCESSES_CREATED_KEY));
-    access.setCreatedBy(result.getString(QueryGenerator.ACCESSES_CREATED_BY_KEY));
-    access.setModified(result.getDouble(QueryGenerator.ACCESSES_MODIFIED_KEY));
-    access.setModifiedBy(result.getString(QueryGenerator.ACCESSES_MODIFIED_BY_KEY));
-    access.setType(result.getString(QueryGenerator.ACCESSES_TYPE_KEY));
-    access.setDeviceName(result.getString(QueryGenerator.ACCESSES_DEVICE_NAME_KEY));
-    access.setLastUsed(result.getDouble(QueryGenerator.ACCESSES_LAST_USED_KEY));
-
-    return access;
   }
 
   /**

@@ -5,19 +5,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.pryv.AbstractConnection;
-import com.pryv.database.QueryGenerator;
 import com.pryv.utils.Cuid;
 import com.pryv.utils.JsonConverter;
 import com.rits.cloning.Cloner;
 
 import org.joda.time.DateTime;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -136,44 +131,6 @@ public class Event extends ApiResource {
     clientData = pClientData;
     trashed = pTrashed;
     this.updateSupervisor();
-  }
-
-  /**
-   * Build an event from a ResultSet, used when retrieving Event objects from the SQLite Cache.
-   * This takes care of instanciating a new Event only in the case when it isn't existing yet.
-   *
-   * @param result The
-   * @return
-   * @throws SQLException
-   * @throws IOException
-   */
-  public static Event createOrReuse(ResultSet result) throws SQLException, IOException {
-    String id = result.getString(QueryGenerator.EVENTS_ID_KEY);
-    Event event = supervisor.get(id);
-    if (event == null) {
-      event = new Event();
-    }
-    event.setId(result.getString(QueryGenerator.EVENTS_ID_KEY));
-    event.setStreamId(result.getString(QueryGenerator.EVENTS_STREAM_ID_KEY));
-    event.setTime(result.getDouble(QueryGenerator.EVENTS_TIME_KEY));
-    event.setType(result.getString(QueryGenerator.EVENTS_TYPE_KEY));
-    event.setCreated(result.getDouble(QueryGenerator.EVENTS_CREATED_KEY));
-    event.setCreatedBy(result.getString(QueryGenerator.EVENTS_CREATED_BY_KEY));
-    event.setModified(result.getDouble(QueryGenerator.EVENTS_MODIFIED_KEY));
-    event.setModifiedBy(result.getString(QueryGenerator.EVENTS_MODIFIED_BY_KEY));
-    event.setDuration(result.getDouble(QueryGenerator.EVENTS_DURATION_KEY));
-    event.setContent(result.getObject(QueryGenerator.EVENTS_CONTENT_KEY));
-    String tagsString = result.getString(QueryGenerator.EVENTS_TAGS_KEY);
-    if (tagsString != null) {
-      Set <String> tags = new HashSet<String>(Arrays.asList(tagsString.split(",")));
-      event.setTags(tags);
-    }
-    event.setDescription(result.getString(QueryGenerator.EVENTS_DESCRIPTION_KEY));
-    // TODO fetch Attachments elsewhere
-    event.setClientDataFromAstring(result.getString(QueryGenerator.EVENTS_CLIENT_DATA_KEY));
-    event.setTrashed(result.getBoolean(QueryGenerator.EVENTS_TRASHED_KEY));
-    event.setAttachments(JsonConverter.deserializeAttachments(result.getString(QueryGenerator.EVENTS_ATTACHMENTS_KEY)));
-    return event;
   }
 
   /**
