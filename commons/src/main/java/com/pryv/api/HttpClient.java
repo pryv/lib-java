@@ -8,6 +8,7 @@ import com.pryv.utils.JsonConverter;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -102,6 +103,10 @@ public class HttpClient {
             String json = response.body().string();
             double time = JsonConverter.retrieveServerTime(json);
             int status = response.code();
+            // TODO: Throw custom ApiException, use of status+time in response
+            if (status != HttpURLConnection.HTTP_CREATED && status != HttpURLConnection.HTTP_OK) {
+                throw new IOException(json);
+            }
             ApiResponse apiResponse = new ApiResponse(json, time, status);
             return apiResponse;
         }
