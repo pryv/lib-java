@@ -28,6 +28,9 @@ public class ConnectionTest {
 
         testSupportStream = new Stream("onlineModuleStreamID", "javaLibTestSupportStream");
         connection.streams.create(testSupportStream);
+
+        Map<String, Stream> retrievedStream = connection.streams.get(null);
+        assertTrue(retrievedStream.size() > 0);
     }
 
     @AfterClass

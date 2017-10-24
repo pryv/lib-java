@@ -39,8 +39,11 @@ public class ConnectionEventsTest {
         testSupportStream.merge(createdStream, true);
         assertNotNull(testSupportStream.getId());
 
-        connection.events.create(new Event(testSupportStream.getId(),
-                "note/txt", "i am a test event"));
+        Event testEvent = new Event();
+        testEvent.setStreamId(testSupportStream.getId());
+        testEvent.setType("note/txt");
+        testEvent.setContent("i am a test event");
+        connection.events.create(testEvent);
     }
 
     @AfterClass

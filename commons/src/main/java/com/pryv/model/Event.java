@@ -237,8 +237,10 @@ public class Event extends ApiResource {
   @JsonIgnore
   public Map<String, Attachment> getAttachmentsMap() {
     Map<String, Attachment> attachmentsMap = new HashMap<String, Attachment>();
-    for (Attachment attachment : attachments) {
-      attachmentsMap.put(attachment.getId(), attachment);
+    if(attachments != null && !attachments.isEmpty()) {
+      for (Attachment attachment : attachments) {
+        attachmentsMap.put(attachment.getId(), attachment);
+      }
     }
     return attachmentsMap;
   }
@@ -251,8 +253,8 @@ public class Event extends ApiResource {
    */
   @JsonIgnore
   public Attachment getFirstAttachment() {
-    for (Attachment attachment : attachments) {
-      return attachment;
+    if(attachments != null && !attachments.isEmpty()) {
+      return attachments.iterator().next();
     }
     return null;
   }
