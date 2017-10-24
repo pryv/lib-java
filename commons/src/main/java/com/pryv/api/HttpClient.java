@@ -84,6 +84,8 @@ public class HttpClient {
         // TODO: set elsewhere
         if(mergeEventsWithParent) {
             url += "&mergeEventsWithParent=true";
+        } else {
+            url += "&mergeEventsWithParent=false";
         }
         Request request = new Request.Builder()
                 .url(url)

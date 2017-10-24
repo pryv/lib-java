@@ -69,6 +69,7 @@ public class ConnectionStreamsTest {
         assertEquals(nameUpdate, updatedStream.getName());
 
         // trash
+        connection.streams.delete(updatedStream.getId(), false);
         /* TODO: review trash return
         Stream trashedStream = connection.streams.delete(updatedStream.getId(), false);
         assertNotNull(trashedStream);
@@ -76,6 +77,7 @@ public class ConnectionStreamsTest {
         */
 
         // delete
+        connection.streams.delete(updatedStream.getId(), false);
         /* TODO: review delete return
         Stream deletedStream = connection.streams.delete(trashedStream.getId(), false);
         assertNull(deletedStream);
@@ -223,7 +225,7 @@ public class ConnectionStreamsTest {
         TestUtils.checkStream(newStream, createdStream);
     }
 
-    @Test
+    @Test(expected = IOException.class)
     public void testCreateStreamMustReturnAnErrorIfAStreamWithTheSameNameExistsAtTheSameTreeLevel() throws IOException {
         Stream someStream = new Stream("someStreamThatWillBotherNext", "my lovely stream name");
         someStream.setParentId(testSupportStream.getId());
@@ -234,7 +236,7 @@ public class ConnectionStreamsTest {
         connection.streams.create(duplicateIdStream);
     }
 
-    @Test
+    @Test(expected = IOException.class)
     public void testCreateStreamMustReturnAnErrorIfAStreamWithTheSameIdAlreadyExists() throws IOException {
         Stream someStream = new Stream("someStreamWithANiceId", "Well I dont care");
         someStream.setParentId(testSupportStream.getId());
