@@ -28,6 +28,7 @@ public class ConnectionEvents {
             receivedEvent.assignConnection(weakConnection);
             Event.createOrReuse(receivedEvent);
         }
+        // TODO: retrieve eventDeletions
         return receivedEvents;
     }
 
@@ -47,6 +48,7 @@ public class ConnectionEvents {
         Event createdEvent = JsonConverter.retrieveEventFromJson(json);
         createdEvent.assignConnection(weakConnection);
         Event.createOrReuse(createdEvent);
+        // TODO: handle stopid, startid
         return createdEvent;
     }
 

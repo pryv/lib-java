@@ -31,6 +31,7 @@ public class ConnectionAccesses {
             receivedAccess.assignConnection(weakConnection);
             Access.createOrReuse(receivedAccess);
         }
+        // TODO: retrieve accessDeletions
         return receivedAccesses;
     }
 

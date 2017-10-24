@@ -49,7 +49,7 @@ public class HttpClient {
         String url = apiUrl + endpoint + tokenParameter;
         String jsonEvent = JsonConverter.toJson(newResource);
         RequestBody body;
-        // TODO: handle multiple attachments
+        // TODO: handle multiple attachments, do it elsewhere?
         if(attachment != null) {
             File file = attachment.getFile();
             body = new MultipartBody.Builder()
@@ -81,6 +81,7 @@ public class HttpClient {
 
     public ApiRequest deleteRequest(String endpoint, String resourceId, Boolean mergeEventsWithParent) {
         String url = apiUrl + endpoint + "/" + resourceId + tokenParameter;
+        // TODO: set elsewhere
         if(mergeEventsWithParent) {
             url += "&mergeEventsWithParent=true";
         }

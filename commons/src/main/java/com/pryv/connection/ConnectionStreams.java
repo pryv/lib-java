@@ -30,6 +30,7 @@ public class ConnectionStreams {
         for (Stream receivedStream : receivedStreams.values()) {
             receivedStream.assignConnection(weakConnection);
         }
+        // TODO: retrieve streamDeletions
         Map<String, Double> streamDeletions =
                 JsonConverter.createStreamDeletionsTreeFromJson(json);
         weakConnection.get().updateRootStreams(receivedStreams);
