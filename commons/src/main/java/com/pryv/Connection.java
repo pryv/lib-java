@@ -33,8 +33,6 @@ public class Connection implements AbstractConnection {
     private String urlEndpoint;
     private String registrationUrl;
 
-    private OnlineManager api;
-
     private WeakReference<AbstractConnection> weakConnection;
 
     /**
@@ -75,8 +73,6 @@ public class Connection implements AbstractConnection {
 
         rootStreams = new ConcurrentHashMap<String, Stream>();
         flatStreams = new ConcurrentHashMap<String, Stream>();
-
-        api = new OnlineManager(urlEndpoint, token);
 
         HttpClient httpClient = new HttpClient(urlEndpoint, "?auth=" + token);
 
