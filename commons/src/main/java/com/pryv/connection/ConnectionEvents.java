@@ -3,7 +3,6 @@ package com.pryv.connection;
 import com.pryv.AbstractConnection;
 import com.pryv.Filter;
 import com.pryv.api.HttpClient;
-import com.pryv.api.OnlineManager;
 import com.pryv.model.Event;
 import com.pryv.utils.JsonConverter;
 
@@ -17,9 +16,9 @@ public class ConnectionEvents {
     private static final String PATH = "events";
     private HttpClient httpClient;
 
-    public ConnectionEvents(WeakReference<AbstractConnection> weakConnection, OnlineManager api) {
+    public ConnectionEvents(WeakReference<AbstractConnection> weakConnection, HttpClient client) {
         this.weakConnection = weakConnection;
-        this.httpClient = api.getHttpClient();
+        this.httpClient = client;
     }
 
     public List<Event> get(Filter filter) throws IOException {

@@ -4,7 +4,6 @@ package com.pryv.connection;
 import com.pryv.AbstractConnection;
 import com.pryv.Filter;
 import com.pryv.api.HttpClient;
-import com.pryv.api.OnlineManager;
 import com.pryv.model.Stream;
 import com.pryv.utils.JsonConverter;
 
@@ -18,9 +17,9 @@ public class ConnectionStreams {
     private HttpClient httpClient;
     private static final String PATH = "streams";
 
-    public ConnectionStreams(WeakReference<AbstractConnection> weakConnection, OnlineManager api) {
+    public ConnectionStreams(WeakReference<AbstractConnection> weakConnection, HttpClient client) {
         this.weakConnection = weakConnection;
-        this.httpClient = api.getHttpClient();
+        this.httpClient = client;
     }
 
     public Map<String, Stream> get(Filter filter) throws IOException {

@@ -1,20 +1,17 @@
 package com.pryv;
 
-import com.pryv.api.OnlineManager;
-import com.pryv.connection.ConnectionEvents;
-import com.pryv.database.DBHelper;
-import com.pryv.database.DBinitCallback;
-import com.pryv.model.Stream;
+import com.pryv.api.HttpClient;
 import com.pryv.connection.ConnectionAccesses;
 import com.pryv.connection.ConnectionAccount;
+import com.pryv.connection.ConnectionEvents;
 import com.pryv.connection.ConnectionProfile;
 import com.pryv.connection.ConnectionStreams;
+import com.pryv.model.Stream;
 import com.pryv.utils.Logger;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.joda.time.DateTime;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -81,11 +78,13 @@ public class Connection implements AbstractConnection {
 
         api = new OnlineManager(urlEndpoint, token);
 
-        this.accesses = new ConnectionAccesses(weakConnection, api);
+        HttpClient httpClient = new HttpClient(urlEndpoint, "?auth=" + token);
+
+        this.accesses = new ConnectionAccesses(weakConnection, httpClient);
         this.account = new ConnectionAccount();
-        this.events = new ConnectionEvents(weakConnection, api);
+        this.events = new ConnectionEvents(weakConnection, httpClient);
         this.profile = new ConnectionProfile();
-        this.streams = new ConnectionStreams(weakConnection, api);
+        this.streams = new ConnectionStreams(weakConnection, httpClient);
     }
 
     private String buildUrlEndpoint() {

@@ -2,7 +2,6 @@ package com.pryv.connection;
 
 import com.pryv.AbstractConnection;
 import com.pryv.api.HttpClient;
-import com.pryv.api.OnlineManager;
 import com.pryv.model.Access;
 import com.pryv.utils.JsonConverter;
 
@@ -19,9 +18,9 @@ public class ConnectionAccesses {
     private static final String ACCESS_DELETION_KEY = "accessDeletion";
     private HttpClient httpClient;
 
-    public ConnectionAccesses(WeakReference<AbstractConnection> weakConnection, OnlineManager api) {
+    public ConnectionAccesses(WeakReference<AbstractConnection> weakConnection, HttpClient client) {
         this.weakConnection = weakConnection;
-        this.httpClient = api.getHttpClient();
+        this.httpClient = client;
     }
 
     public List<Access> get() throws IOException {

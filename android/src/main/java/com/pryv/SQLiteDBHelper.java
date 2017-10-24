@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.pryv.api.OnlineManager;
 import com.pryv.database.DBHelper;
 import com.pryv.database.DBinitCallback;
 import com.pryv.database.QueryGenerator;
