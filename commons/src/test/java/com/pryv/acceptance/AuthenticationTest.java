@@ -1,20 +1,20 @@
 package com.pryv.acceptance;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
+import com.jayway.awaitility.Awaitility;
+import com.pryv.Pryv;
+import com.pryv.auth.AuthController;
+import com.pryv.auth.AuthView;
+import com.pryv.model.Permission;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.jayway.awaitility.Awaitility;
-import com.pryv.Pryv;
-import com.pryv.model.Permission;
-import com.pryv.auth.AuthController;
-import com.pryv.auth.AuthView;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  *

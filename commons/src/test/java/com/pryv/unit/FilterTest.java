@@ -1,18 +1,18 @@
 package com.pryv.unit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import org.junit.Test;
-
 import com.pryv.Filter;
 import com.pryv.Filter.State;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
+
+import org.junit.Test;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * class used to test the Filter class's methods

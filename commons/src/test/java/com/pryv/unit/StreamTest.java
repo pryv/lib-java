@@ -1,21 +1,21 @@
 package com.pryv.unit;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.pryv.model.Stream;
+import com.pryv.utils.JsonConverter;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.IOException;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import java.io.IOException;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.pryv.model.Stream;
-import com.pryv.utils.JsonConverter;
 
 /**
  * Unit tests for Stream class params and functions

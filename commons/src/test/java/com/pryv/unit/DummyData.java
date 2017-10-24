@@ -1,16 +1,16 @@
 package com.pryv.unit;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pryv.model.Attachment;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
 import com.pryv.utils.JsonConverter;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * generates dummy data for testing

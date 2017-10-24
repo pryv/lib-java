@@ -1,14 +1,10 @@
 package com.pryv.unit;
 
-import static org.junit.Assert.assertNotNull;
+import com.pryv.Connection;
 
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.pryv.Connection;
-import com.pryv.database.DBinitCallback;
 
 public class ConnectionTest {
 

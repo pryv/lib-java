@@ -1,16 +1,16 @@
 package com.pryv.unit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.io.IOException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pryv.model.Permission;
+import com.pryv.utils.JsonConverter;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pryv.model.Permission;
-import com.pryv.utils.JsonConverter;
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * unit test for Permission object
