@@ -1,5 +1,6 @@
 package com.pryv.acceptance;
 
+import com.jayway.awaitility.Awaitility;
 import com.pryv.Connection;
 import com.pryv.Filter;
 import com.pryv.model.Attachment;
@@ -20,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class ConnectionEventsTest {
@@ -49,6 +51,37 @@ public class ConnectionEventsTest {
         connection.streams.delete(testSupportStream.getId(), false);
     }
 
+    @Test
+    public void testCreateUpdateAndDeleteEvent() throws IOException {
+
+        // create event
+        Event testEvent = new Event();
+        testEvent.setStreamId(testSupportStream.getId());
+        testEvent.setType("note/txt");
+        testEvent.setContent("this is the content");
+        Event createdEvent = connection.events.create(testEvent);
+        assertNotNull(createdEvent);
+        assertNotNull(createdEvent.getId());
+        assertNotNull(createdEvent.getCreated());
+        assertNotNull(createdEvent.getCreatedBy());
+        assertNotNull(createdEvent.getModified());
+        assertNotNull(createdEvent.getModifiedBy());
+
+        // update event
+        String newContent = "updated content";
+        createdEvent.setContent(newContent);
+        Event updatedEvent = connection.events.update(createdEvent);
+        assertEquals(updatedEvent.getContent(), newContent);
+
+        // delete event
+        /* TODO: review delete return
+        Event trashedEvent = connection.events.delete(updatedEvent.getId());
+        assertTrue(trashedEvent.isTrashed());
+        Event deletedEvent = connection.events.delete(trashedEvent);
+        assertNull(deletedEvent);
+        */
+    }
+
     /**
      * GET EVENTS
      */
@@ -65,6 +98,13 @@ public class ConnectionEventsTest {
     @Test
     public void testGetEventsWithANullFilterShouldReturnNonTrashedEvents() throws IOException {
         List<Event> retrievedEvents = connection.events.get(null);
+        assertTrue(retrievedEvents.size() > 0);
+    }
+
+    @Test
+    public void testFetchEventsWithEmptyFilter() throws IOException {
+        List<Event> retrievedEvents = connection.events.get(new Filter());
+        assertNotNull(retrievedEvents);
         assertTrue(retrievedEvents.size() > 0);
     }
 
@@ -93,6 +133,28 @@ public class ConnectionEventsTest {
         filter.setToTime(11.0);
         List<Event> retrievedEvents = connection.events.get(filter);
         assertTrue(retrievedEvents.size() == 0);
+    }
+
+    @Test
+    public void testFetchEventsForAStream() throws IOException {
+        // create event
+        Event testEvent = new Event();
+        testEvent.setStreamId(testSupportStream.getId());
+        testEvent.setType("note/txt");
+        testEvent.setContent("this is a test Event. Please delete");
+        connection.events.create(testEvent);
+
+        // create filter
+        Filter filter = new Filter();
+        filter.addStream(testSupportStream);
+
+        // fetch events
+        List<Event> retrievedEvents = connection.events.get(filter);
+
+        assertTrue(retrievedEvents.size() > 0);
+        for (Event event : retrievedEvents) {
+            assertEquals(event.getStreamId(), testSupportStream.getId());
+        }
     }
 
     /**

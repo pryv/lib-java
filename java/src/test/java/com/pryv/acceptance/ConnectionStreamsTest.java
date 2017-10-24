@@ -1,5 +1,6 @@
 package com.pryv.acceptance;
 
+import com.jayway.awaitility.Awaitility;
 import com.pryv.Connection;
 import com.pryv.Filter;
 import com.pryv.model.Event;
@@ -16,7 +17,9 @@ import java.util.Map;
 import resources.TestCredentials;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class ConnectionStreamsTest {
@@ -46,9 +49,49 @@ public class ConnectionStreamsTest {
         connection.streams.delete(testSupportStream.getId(), false);
     }
 
+    @Test
+    public void testCreateUpdateAndDeleteStream() throws IOException {
+        Stream testStream = new Stream("connectionStreamsTestStreamId", "connectionStreamsTestStreamId");
+
+        // create
+        Stream createdStream = connection.streams.create(testStream);
+        assertNotNull(createdStream);
+        assertNotNull(createdStream.getId());
+        assertNotNull(createdStream.getCreated());
+        assertNotNull(createdStream.getCreatedBy());
+        assertNotNull(createdStream.getModified());
+        assertNotNull(createdStream.getModifiedBy());
+
+        // update
+        String nameUpdate = "connectionStreamsTestNewStreamId";
+        createdStream.setName(nameUpdate);
+        Stream updatedStream = connection.streams.update(createdStream);
+        assertEquals(nameUpdate, updatedStream.getName());
+
+        // trash
+        /* TODO: review trash return
+        Stream trashedStream = connection.streams.delete(updatedStream.getId(), false);
+        assertNotNull(trashedStream);
+        assertTrue(trashedStream.isTrashed());
+        */
+
+        // delete
+        /* TODO: review delete return
+        Stream deletedStream = connection.streams.delete(trashedStream.getId(), false);
+        assertNull(deletedStream);
+        */
+    }
+
     /**
      * GET STREAMS
      */
+
+    @Test
+    public void testFetchStreams() throws IOException {
+        Map<String, Stream> retrievedStreams = connection.streams.get(null);
+        assertNotNull(retrievedStreams);
+        assertTrue(retrievedStreams.size() > 0);
+    }
 
     @Test
     public void testGetStreamsMustReturnATreeOfNonTrashedStreamsWithANullFilter() throws IOException {
