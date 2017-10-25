@@ -37,7 +37,7 @@ ext {
     bintrayRepo = 'maven'
     bintrayName = 'pryv-lib'
     publishedGroupId = 'com.pryv'
-    libraryVersion = 'a.b.c'
+    libraryVersion = '1.0.6'
     siteUrl = 'http://api.pryv.com'
     gitUrl = 'https://github.com/pryv/lib-java.git'
     licenseName = 'BSD'
