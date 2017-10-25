@@ -88,11 +88,10 @@ public class ConnectionAccessesTest {
         Access newAccess = new Access();
         String newAccessName = "newAccess";
         String newStreamId = "newStreamId";
-        String newId = "testId";
         Permission.Level newPermissionLevel = Permission.Level.contribute;
         newAccess.setName(newAccessName);
         newAccess.addPermission(new Permission(newStreamId, newPermissionLevel, null));
-        newAccess.setId(newId);
+        newAccess.setId(accessId);
         Long updateTime = System.currentTimeMillis()/1000;
         Access updatedAccess = connection.accesses.update(newAccess);
         assertNotNull(updatedAccess);
