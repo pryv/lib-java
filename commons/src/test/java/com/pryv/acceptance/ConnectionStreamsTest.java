@@ -127,14 +127,6 @@ public class ConnectionStreamsTest {
         // Should at least return the two children created above
         assertNotNull(retrievedStreams);
 
-        // TODO: check filter handling in cache and uncomment this test
-        // Check parentID of retrieved streams
-        /*
-        if(cacheStreams != null) {
-            for(Stream stream: cacheStreams.values()) {
-                assertEquals(testSupportStream.getId(),stream.getParentId());
-            }
-        }*/
         for(Stream stream: retrievedStreams.values()) {
             assertEquals(testSupportStream.getId(),stream.getParentId());
         }

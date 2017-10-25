@@ -94,7 +94,7 @@ public class ConnectionAccessesTest {
         newAccess.addPermission(new Permission(newStreamId, newPermissionLevel, null));
         newAccess.setId(newId);
         Long updateTime = System.currentTimeMillis()/1000;
-        Access updatedAccess = connection.accesses.update(accessId, newAccess);
+        Access updatedAccess = connection.accesses.update(newAccess);
         assertNotNull(updatedAccess);
         assertEquals(updatedAccess.getName(), newAccessName);
         ArrayList<Permission> permissions = updatedAccess.getPermissions();

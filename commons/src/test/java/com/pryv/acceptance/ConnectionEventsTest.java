@@ -75,12 +75,17 @@ public class ConnectionEventsTest {
         assertEquals(updatedEvent.getContent(), newContent);
 
         // delete event
-        /* TODO: review delete return
+        /* TODO: Use this if returning an Event instead of a deletion id
         Event trashedEvent = connection.events.delete(updatedEvent.getId());
         assertTrue(trashedEvent.isTrashed());
         Event deletedEvent = connection.events.delete(trashedEvent);
         assertNull(deletedEvent);
         */
+        String trashedEventId = connection.events.delete(updatedEvent.getId());
+        assertEquals(updatedEvent.getId(), trashedEventId);
+
+        String deletedEventId = connection.events.delete(updatedEvent.getId());
+        assertEquals(updatedEvent.getId(), deletedEventId);
     }
 
     /**
@@ -309,7 +314,7 @@ public class ConnectionEventsTest {
         eventToTrash = createdEvent;
         assertFalse(eventToTrash.isTrashed());
 
-        /* Use this if returning an Event instead of a deletion id
+        /* TODO: Use this if returning an Event instead of a deletion id
         connection.events.delete(eventToTrash);
         assertNotNull(apiEvent);
         assertEquals(eventToTrash.getContent(), apiEvent.getContent());
@@ -328,7 +333,7 @@ public class ConnectionEventsTest {
         eventToDelete = createdEvent;
 
         // trash event
-        /* Use this if returning an Event instead of a deletion id
+        /* TODO: Use this if returning an Event instead of a deletion id
         connection.events.delete(eventToDelete);
         assertNotNull(apiEvent);
         assertEquals(eventToDelete.getContent(), apiEvent.getContent());
@@ -338,7 +343,7 @@ public class ConnectionEventsTest {
         assertEquals(eventToDelete.getId(), eventTrashingId);
 
         // delete event
-        /* Use this if returning an Event instead of a deletion id
+        /* TODO: Use this if returning an Event instead of a deletion id
         connection.events.delete(eventToDelete);
         assertNull(apiEvent);
         */
