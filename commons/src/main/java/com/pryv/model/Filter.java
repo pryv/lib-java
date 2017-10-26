@@ -1,7 +1,4 @@
-package com.pryv;
-
-import com.pryv.model.Event;
-import com.pryv.model.Stream;
+package com.pryv.model;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -204,11 +201,12 @@ public class Filter {
    *
    * @param stream
    */
-  public void addStream(Stream stream) {
+  public Filter addStream(Stream stream) {
     if (this.streams == null) {
       this.streams = new HashSet<Stream>();
     }
     this.streams.add(stream);
+    return this;
   }
 
   /**
@@ -216,11 +214,12 @@ public class Filter {
    *
    * @param pTag
    */
-  public void addTag(String pTag) {
+  public Filter addTag(String pTag) {
     if (tags == null) {
       tags = new HashSet<String>();
     }
     tags.add(pTag);
+    return this;
   }
 
   /**
@@ -228,11 +227,12 @@ public class Filter {
    *
    * @param pType
    */
-  public void addType(String pType) {
+  public Filter addType(String pType) {
     if (types == null) {
       types = new HashSet<String>();
     }
     types.add(pType);
+    return this;
   }
 
   /**
@@ -427,60 +427,74 @@ public class Filter {
     return includeDeletionsSince;
   }
 
-  public void setFromTime(Double pFromTime) {
+  public Filter setFromTime(Double pFromTime) {
     this.fromTime = pFromTime;
+    return this;
   }
 
-  public void setToTime(Double pToTime) {
+  public Filter setToTime(Double pToTime) {
     this.toTime = pToTime;
+    return this;
   }
 
-  public void setStreamIds(Set<Stream> streams) {
+  public Filter setStreamIds(Set<Stream> streams) {
     this.streams = streams;
+    return this;
   }
 
-  public void setTags(Set<String> pTags) {
+  public Filter setTags(Set<String> pTags) {
     this.tags = pTags;
+    return this;
   }
 
-  public void setTypes(Set<String> pTypes) {
+  public Filter setTypes(Set<String> pTypes) {
     this.types = pTypes;
+    return this;
   }
 
-  public void setRunning(Boolean pRunning) {
+  public Filter setRunning(Boolean pRunning) {
     this.running = pRunning;
+    return this;
   }
 
-  public void setSortAscending(Boolean pSortAscending) {
+  public Filter setSortAscending(Boolean pSortAscending) {
     this.sortAscending = pSortAscending;
+    return this;
   }
 
-  public void setSkip(Integer pSkip) {
+  public Filter setSkip(Integer pSkip) {
     this.skip = pSkip;
+    return this;
   }
 
-  public void setLimit(Integer pLimit) {
+  public Filter setLimit(Integer pLimit) {
     this.limit = pLimit;
+    return this;
   }
 
-  public void setState(State pState) {
+  public Filter setState(State pState) {
     this.state = pState;
+    return this;
   }
 
-  public void setModifiedSince(Double pModifiedSince) {
+  public Filter setModifiedSince(Double pModifiedSince) {
     this.modifiedSince = pModifiedSince;
+    return this;
   };
 
-  public void setParentId(String parentId) {
+  public Filter setParentId(String parentId) {
     this.parentId = parentId;
+    return this;
   }
 
-  public void setIncludeDeletions(Boolean includeDeletions) {
+  public Filter setIncludeDeletions(Boolean includeDeletions) {
     this.includeDeletions = includeDeletions;
+    return this;
   }
 
-  public void setIncludeDeletionsSince(Double includeDeletionsSince) {
+  public Filter setIncludeDeletionsSince(Double includeDeletionsSince) {
     this.includeDeletionsSince = includeDeletionsSince;
+    return this;
   }
 
   /**

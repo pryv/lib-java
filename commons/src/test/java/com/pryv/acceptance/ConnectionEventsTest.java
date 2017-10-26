@@ -1,7 +1,7 @@
 package com.pryv.acceptance;
 
 import com.pryv.Connection;
-import com.pryv.Filter;
+import com.pryv.model.Filter;
 import com.pryv.model.Attachment;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
@@ -38,10 +38,11 @@ public class ConnectionEventsTest {
 
         assertNotNull(createdStream.getId());
 
-        Event testEvent = new Event();
-        testEvent.setStreamId(testSupportStream.getId());
-        testEvent.setType("note/txt");
-        testEvent.setContent("i am a test event");
+        Event testEvent = new Event()
+                .setStreamId(testSupportStream.getId())
+                .setType("note/txt")
+                .setContent("i am a test event");
+
         connection.events.create(testEvent);
     }
 
@@ -55,11 +56,13 @@ public class ConnectionEventsTest {
     public void testCreateUpdateAndDeleteEvent() throws IOException {
 
         // create event
-        Event testEvent = new Event();
-        testEvent.setStreamId(testSupportStream.getId());
-        testEvent.setType("note/txt");
-        testEvent.setContent("this is the content");
+        Event testEvent = new Event()
+                .setStreamId(testSupportStream.getId())
+                .setType("note/txt")
+                .setContent("this is the content");
+
         Event createdEvent = connection.events.create(testEvent);
+
         assertNotNull(createdEvent);
         assertNotNull(createdEvent.getId());
         assertNotNull(createdEvent.getCreated());
@@ -70,7 +73,9 @@ public class ConnectionEventsTest {
         // update event
         String newContent = "updated content";
         createdEvent.setContent(newContent);
+
         Event updatedEvent = connection.events.update(createdEvent);
+
         assertEquals(updatedEvent.getContent(), newContent);
 
         // delete event
@@ -120,12 +125,15 @@ public class ConnectionEventsTest {
     }
 
     public void testGetEventsMustReturnEventsMatchingTheFilter() throws IOException {
-        Filter filter = new Filter();
         int numLimit = 10;
         String type = "note/txt";
-        filter.setLimit(numLimit);
-        filter.addType(type);
+
+        Filter filter = new Filter()
+                .setLimit(numLimit)
+                .addType(type);
+
         List<Event> retrievedEvents = connection.events.get(filter);
+
         assertTrue(retrievedEvents.size() == 10);
         for (Event event: retrievedEvents) {
             assertTrue(event.getType().equals(type));
@@ -133,25 +141,27 @@ public class ConnectionEventsTest {
     }
 
     public void testGetEventsMustReturnAnEmptyMapWhenTheFilterMatchesNoEvents() throws IOException {
-        Filter filter = new Filter();
-        filter.setFromTime(10.0);
-        filter.setToTime(11.0);
+        Filter filter = new Filter()
+                .setFromTime(10.0)
+                .setToTime(11.0);
+
         List<Event> retrievedEvents = connection.events.get(filter);
+
         assertTrue(retrievedEvents.size() == 0);
     }
 
     @Test
     public void testFetchEventsForAStream() throws IOException {
         // create event
-        Event testEvent = new Event();
-        testEvent.setStreamId(testSupportStream.getId());
-        testEvent.setType("note/txt");
-        testEvent.setContent("this is a test Event. Please delete");
+        Event testEvent = new Event()
+                .setStreamId(testSupportStream.getId())
+                .setType("note/txt")
+                .setContent("this is a test Event. Please delete");
+
         connection.events.create(testEvent);
 
         // create filter
-        Filter filter = new Filter();
-        filter.addStream(testSupportStream);
+        Filter filter = new Filter().addStream(testSupportStream);
 
         // fetch events
         List<Event> retrievedEvents = connection.events.get(filter);
@@ -168,11 +178,13 @@ public class ConnectionEventsTest {
 
     @Test
     public void testCreateEventsMustAcceptAnEventWithMinimalParamsAndFillReadOnlyFields() throws IOException {
-        Event minimalEvent = new Event();
-        minimalEvent.setStreamId(testSupportStream.getId());
-        minimalEvent.setType("note/txt");
-        minimalEvent.setContent("I am used in create event test, please delete me");
+        Event minimalEvent = new Event()
+                .setStreamId(testSupportStream.getId())
+                .setType("note/txt")
+                .setContent("I am used in create event test, please delete me");
+
         Event createdEvent = connection.events.create(minimalEvent);
+
         assertNotNull(createdEvent);
         assertNotNull(createdEvent.getId());
         assertNotNull(createdEvent.getTime());
@@ -198,22 +210,25 @@ public class ConnectionEventsTest {
         Stream singleAcivityStream = createSingleActivityStream();
 
         // create running Event
-        Event runningEvent = new Event();
-        runningEvent.setStreamId(singleAcivityStream.getId());
-        runningEvent.setType("activity/plain");
-        runningEvent.setDuration(null);
+        Event runningEvent = new Event()
+                .setStreamId(singleAcivityStream.getId())
+                .setType("activity/plain")
+                .setDuration(null);
+
         Event createdEvent = connection.events.create(runningEvent);
+
         assertNotNull(createdEvent);
         runningEvent = createdEvent;
         String myStoppedId = runningEvent.getId();
 
         // create Event that will stop running event
         Event stopperEvent = new Event(singleAcivityStream.getId(), "activity/plain", null);
+
         connection.events.create(stopperEvent);
         // TODO compare stoppedId
 
         // delete singleActivity Stream
-        deleteSingleAcitivityStream(singleAcivityStream);
+        deleteSingleActivityStream(singleAcivityStream);
     }
 
     // TODO same as other
@@ -224,50 +239,57 @@ public class ConnectionEventsTest {
 
         Double time = 1000.0;
         Double duration = 500.0;
-        Event runningEvent = new Event();
-        runningEvent.setStreamId(singleActivityStream.getId());
-        runningEvent.setType("activity/plain");
-        runningEvent.setTime(time);
-        runningEvent.setDuration(duration);
+
+        Event runningEvent = new Event()
+                .setStreamId(singleActivityStream.getId())
+                .setType("activity/plain")
+                .setTime(time)
+                .setDuration(duration);
+
         connection.events.create(runningEvent);
 
-        Event invalidEvent = new Event();
-        invalidEvent.setStreamId(singleActivityStream.getId());
-        invalidEvent.setType("activity/plain");
-        invalidEvent.setTime(time + duration / 2);
-        invalidEvent.setDuration(duration);
+        Event invalidEvent = new Event()
+                .setStreamId(singleActivityStream.getId())
+                .setType("activity/plain")
+                .setTime(time + duration / 2)
+                .setDuration(duration);
+
         connection.events.create(invalidEvent);
 
-        deleteSingleAcitivityStream(singleActivityStream);
+        deleteSingleActivityStream(singleActivityStream);
     }
 
     @Test(expected = IOException.class)
     public void testMusReturnAnErrorWhenEventParametersAreInvalid() throws IOException {
-        Event missingStreamIdEvent = new Event();
-        missingStreamIdEvent.setType("note/txt");
-        missingStreamIdEvent.setContent("i am missing a streamId, will generate apiError");
+        Event missingStreamIdEvent = new Event()
+                .setType("note/txt")
+                .setContent("i am missing a streamId, will generate apiError");
+
         connection.events.create(missingStreamIdEvent);
     }
 
     @Test
     public void testCreateEventsWithAttachmentWithValidDataMustWork() throws IOException {
-        Attachment attachment = new Attachment();
         File attachmentFile = new File(getClass().getClassLoader().getResource("resources/photo.PNG").getPath());
-        attachment.setFile(attachmentFile);
+
+        Attachment attachment = new Attachment()
+                .setFile(attachmentFile)
+                .setType("image/png")
+                .setFileName(attachmentFile.getName());
+
         assertTrue(attachment.getFile().length() > 0);
-        attachment.setType("image/png");
-        attachment.setFileName(attachmentFile.getName());
 
         // create encapsulating event
-        Event eventWithAttachment = new Event();
-        eventWithAttachment.setStreamId(testSupportStream.getId());
-        eventWithAttachment.addAttachment(attachment);
-        eventWithAttachment.setStreamId(testSupportStream.getId());
-        eventWithAttachment.setType("picture/attached");
-        eventWithAttachment.setDescription("This is a test event with an image.");
+        Event eventWithAttachment = new Event()
+                .setStreamId(testSupportStream.getId())
+                .addAttachment(attachment)
+                .setStreamId(testSupportStream.getId())
+                .setType("picture/attached")
+                .setDescription("This is a test event with an image.");
 
         // create event with attachment
         Event createdEvent = connection.events.create(eventWithAttachment);
+
         assertNotNull(createdEvent);
         assertNotNull(createdEvent.getAttachments());
         assertEquals(createdEvent.getAttachments().size(), 1);
@@ -290,7 +312,9 @@ public class ConnectionEventsTest {
         assertEquals(initialEvent.getContent(), eventToUpdate.getContent());
 
         eventToUpdate.setContent("i have beeen updated");
+
         Event updatedEvent = connection.events.update(eventToUpdate);
+
         assertNotNull(updatedEvent);
         assertEquals(updatedEvent.getId(), initialEvent.getId());
         assertEquals(updatedEvent.getContent(), eventToUpdate.getContent());
@@ -351,17 +375,19 @@ public class ConnectionEventsTest {
     }
 
     private Stream createSingleActivityStream() throws IOException {
-        Stream singleActivityStream = new Stream();
-        singleActivityStream.setId("singleActivityStream");
-        singleActivityStream.setName("singleActivityStream");
-        singleActivityStream.setSingleActivity(true);
+        Stream singleActivityStream = new Stream()
+                .setId("singleActivityStream")
+                .setName("singleActivityStream")
+                .setSingleActivity(true);
+
         Stream createdStream = connection.streams.create(singleActivityStream);
+
         assertEquals(createdStream.getName(), singleActivityStream.getName());
-        singleActivityStream = createdStream;
-        return singleActivityStream;
+
+        return createdStream;
     }
 
-    private void deleteSingleAcitivityStream(Stream singleActivityStream) throws IOException {
+    private void deleteSingleActivityStream(Stream singleActivityStream) throws IOException {
         connection.streams.delete(singleActivityStream.getId(), false);
         connection.streams.delete(singleActivityStream.getId(), false);
     }

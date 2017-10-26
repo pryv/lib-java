@@ -33,9 +33,9 @@ public class StreamTest {
 
   @Test
   public void testAddAndRemoveChild() {
-    Stream parent = new Stream("parentId", "parentName");
     Stream child = new Stream("childId", "childName");
-    parent.addChildStream(child);
+    Stream parent = new Stream("parentId", "parentName")
+            .addChildStream(child);
     assertEquals(parent.getId(), child.getParentId());
     parent.removeChildStream(child);
     assertNull(child.getParentId());
@@ -45,21 +45,21 @@ public class StreamTest {
 
   @Test
   public void testIsChildTrue() {
-    Stream parent = new Stream("parentId", null);
-    Stream child = new Stream("childId", null);
     Stream grandChild = new Stream("grandChildId", null);
-    parent.addChildStream(child);
-    child.addChildStream(grandChild);
+    Stream child = new Stream("childId", null)
+            .addChildStream(grandChild);
+    Stream parent = new Stream("parentId", null)
+            .addChildStream(child);
     assertTrue(parent.hasChild(grandChild.getId()));
   }
 
   @Test
   public void testIsChildFalse() {
-    Stream parent = new Stream("parentId", null);
-    Stream child = new Stream("childId", null);
     Stream grandChild = new Stream("grandChildId", null);
-    parent.addChildStream(child);
-    child.addChildStream(grandChild);
+    Stream child = new Stream("childId", null)
+            .addChildStream(grandChild);
+    Stream parent = new Stream("parentId", null)
+            .addChildStream(child);
     assertFalse(parent.hasChild("blop"));
   }
 

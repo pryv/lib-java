@@ -153,55 +153,67 @@ public class Access extends ApiResource {
     return lastUsed;
   }
 
-  public void setId(String id) {
+  public Access  setId(String id) {
     this.id = id;
+    return this;
   }
 
-  public void setToken(String token) {
+  public Access setToken(String token) {
     this.token = token;
+    return this;
   }
 
-  public void setName(String name) {
+  public Access setName(String name) {
     this.name = name;
+    return this;
   }
 
-  public void setPermissions(ArrayList<Permission> permissions) {
+  public Access setPermissions(ArrayList<Permission> permissions) {
     this.permissions = permissions;
+    return this;
   }
 
-  public void addPermission(Permission permission) {
+  public Access addPermission(Permission permission) {
     if (permissions == null) {
       permissions = new ArrayList<Permission>();
     }
     permissions.add(permission);
+    return this;
   }
 
-  public void setCreated(Double created) {
+  public Access setCreated(Double created) {
     this.created = created;
+    return this;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public Access setCreatedBy(String createdBy) {
     this.createdBy = createdBy;
+    return this;
   }
 
-  public void setModified(Double modified) {
+  public Access setModified(Double modified) {
     this.modified = modified;
+    return this;
   }
 
-  public void setModifiedBy(String modifiedBy) {
+  public Access setModifiedBy(String modifiedBy) {
     this.modifiedBy = modifiedBy;
+    return this;
   }
 
-  public void setType(String type) {
+  public Access setType(String type) {
     this.type = type;
+    return this;
   }
 
-  public void setDeviceName(String deviceName) {
+  public Access setDeviceName(String deviceName) {
     this.deviceName = deviceName;
+    return this;
   }
 
-  public void setLastUsed(Double lastUsed) {
+  public Access setLastUsed(Double lastUsed) {
     this.lastUsed = lastUsed;
+    return this;
   }
 
 }

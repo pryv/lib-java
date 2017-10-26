@@ -35,12 +35,14 @@ public class ConnectionAccessesTest {
 
         connection = new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, TestCredentials.DOMAIN);
 
-        Access newAccess = new Access();
-        newAccess.setName(accessName);
-        newAccess.addPermission(new Permission(streamId, permissionLevel, null));
-        newAccess.setType(accessType);
+        Access newAccess = new Access()
+                .setName(accessName)
+                .addPermission(new Permission(streamId, permissionLevel, null))
+                .setType(accessType);
+
         Long requestTime = System.currentTimeMillis()/1000;
         Access createdAccess = connection.accesses.create(newAccess);
+
         assertNotNull(createdAccess);
         accessId = createdAccess.getId();
         assertNotNull(accessId);
@@ -85,15 +87,18 @@ public class ConnectionAccessesTest {
 
     @Test
     public void testUpdateAccess() throws IOException {
-        Access newAccess = new Access();
         String newAccessName = "newAccess";
         String newStreamId = "newStreamId";
         Permission.Level newPermissionLevel = Permission.Level.contribute;
-        newAccess.setName(newAccessName);
-        newAccess.addPermission(new Permission(newStreamId, newPermissionLevel, null));
-        newAccess.setId(accessId);
+
+        Access newAccess = new Access()
+                .setName(newAccessName)
+                .addPermission(new Permission(newStreamId, newPermissionLevel, null))
+                .setId(accessId);
+
         Long updateTime = System.currentTimeMillis()/1000;
         Access updatedAccess = connection.accesses.update(newAccess);
+
         assertNotNull(updatedAccess);
         assertEquals(updatedAccess.getName(), newAccessName);
         ArrayList<Permission> permissions = updatedAccess.getPermissions();

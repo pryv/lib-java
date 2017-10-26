@@ -53,19 +53,18 @@ public class EventTest {
 
   @Test
   public void testSetDateShouldWork() {
-    Event e = new Event();
     DateTime date = new DateTime();
-    e.setDate(date);
+    Event e = new Event().setDate(date);
     assertEquals(e.getTime(), date.getMillis() / 1000.0, 0.0);
     assertEquals(e.getDate().getMillis(), date.getMillis());
   }
 
   @Test
   public void testEmptyConstructor() {
-    Event event = new Event();
-    event.setStreamId(STREAM_ID);
-    event.setType(TYPE);
-    event.setContent(CONTENT);
+    Event event = new Event()
+            .setStreamId(STREAM_ID)
+            .setType(TYPE)
+            .setContent(CONTENT);
     assertTrue(event.getId().matches(CUID_REGEX));
     assertEquals(STREAM_ID, event.getStreamId());
     assertEquals(TYPE, event.getType());

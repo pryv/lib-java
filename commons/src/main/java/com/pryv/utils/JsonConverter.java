@@ -311,21 +311,6 @@ public class JsonConverter {
   }
 
   /**
-   * reset all fields of an attachments to values from JSON glossary json
-   *
-   * @param json
-   * @param toUpdate
-   * @throws JsonParseException
-   * @throws JsonMappingException
-   * @throws IOException
-   */
-  public static void resetAttachmentFromJson(String json, Attachment toUpdate)
-    throws JsonParseException, JsonMappingException, IOException {
-    Attachment temp = jsonMapper.readValue(json, Attachment.class);
-    toUpdate.merge(temp);
-  }
-
-  /**
    * Deserializes an array of Attachments into a Set of attachments
    *
    * @param jsonAttachments

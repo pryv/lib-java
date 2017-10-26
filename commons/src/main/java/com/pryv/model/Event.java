@@ -176,7 +176,7 @@ public class Event extends ApiResource {
    * @param date
    */
   @JsonIgnore
-  public void setDate(DateTime date) {
+  public Event setDate(DateTime date) {
     if (date == null) {
       time = null;
     } else {
@@ -185,6 +185,7 @@ public class Event extends ApiResource {
        */
       time = date.getMillis() / 1000.0;
     }
+    return this;
   }
 
   /**
@@ -220,7 +221,7 @@ public class Event extends ApiResource {
    * @param source
    */
   @JsonIgnore
-  public void setClientDataFromAstring(String source) {
+  public Event setClientDataFromAstring(String source) {
     if (source != null) {
       String[] cdPairs = source.split(":");
       if (clientData == null) {
@@ -228,6 +229,7 @@ public class Event extends ApiResource {
       }
       clientData.put(cdPairs[0], cdPairs[1]);
     }
+    return this;
   }
 
   /**
@@ -235,11 +237,12 @@ public class Event extends ApiResource {
    *
    * @param tag
    */
-  public void addTag(String tag) {
+  public Event addTag(String tag) {
     if (tags == null) {
       tags = new HashSet<String>();
     }
     tags.add(tag);
+    return this;
   }
 
   /**
@@ -248,11 +251,12 @@ public class Event extends ApiResource {
    * @param attachment
    *          the attachment we wish to add
    */
-  public void addAttachment(Attachment attachment) {
+  public Event addAttachment(Attachment attachment) {
     if (attachments == null) {
       attachments = new HashSet<Attachment>();
     }
     attachments.add(attachment);
+    return this;
   }
 
   /**
@@ -261,7 +265,7 @@ public class Event extends ApiResource {
    * @param attachmentId
    *          the id of the attachment we wish to remove
    */
-  public void removeAttachment(String attachmentId) {
+  public Event removeAttachment(String attachmentId) {
     for (Attachment attachment : attachments) {
       if (attachment.getId().equals(attachmentId)) {
         attachments.remove(attachment);
@@ -270,6 +274,7 @@ public class Event extends ApiResource {
         }
       }
     }
+    return this;
   }
 
   @Override
@@ -355,63 +360,78 @@ public class Event extends ApiResource {
     }
   }
 
-  public void setId(String id) {
+  public Event setId(String id) {
     this.id = id;
+    return this;
   }
 
-  public void setStreamId(String streamId) {
+  public Event setStreamId(String streamId) {
     this.streamId = streamId;
+    return this;
   }
 
-  public void setTime(Double time) {
+  public Event setTime(Double time) {
     this.time = time;
+    return this;
   }
 
-  public void setType(String type) {
+  public Event setType(String type) {
     this.type = type;
+    return this;
   }
 
-  public void setCreated(Double created) {
+  public Event setCreated(Double created) {
     this.created = created;
+    return this;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public Event setCreatedBy(String createdBy) {
     this.createdBy = createdBy;
+    return this;
   }
 
-  public void setModified(Double modified) {
+  public Event setModified(Double modified) {
     this.modified = modified;
+    return this;
   }
 
-  public void setModifiedBy(String modifiedBy) {
+  public Event setModifiedBy(String modifiedBy) {
     this.modifiedBy = modifiedBy;
+    return this;
   }
 
-  public void setDuration(Double duration) {
+  public Event setDuration(Double duration) {
     this.duration = duration;
+    return this;
   }
 
-  public void setContent(Object content) {
+  public Event setContent(Object content) {
     this.content = content;
+    return this;
   }
 
-  public void setTags(Set<String> tags) {
+  public Event setTags(Set<String> tags) {
     this.tags = tags;
+    return this;
   }
 
-  public void setDescription(String description) {
+  public Event setDescription(String description) {
     this.description = description;
+    return this;
   }
 
-  public void setAttachments(Set<Attachment> attachments) {
+  public Event setAttachments(Set<Attachment> attachments) {
     this.attachments = attachments;
+    return this;
   }
 
-  public void setClientData(Map<String, Object> clientData) {
+  public Event setClientData(Map<String, Object> clientData) {
     this.clientData = clientData;
+    return this;
   }
 
-  public void setTrashed(Boolean trashed) {
+  public Event setTrashed(Boolean trashed) {
     this.trashed = trashed;
+    return this;
   }
 }

@@ -1,6 +1,6 @@
 package com.pryv.connection;
 
-import com.pryv.Filter;
+import com.pryv.model.Filter;
 import com.pryv.api.HttpClient;
 import com.pryv.model.Attachment;
 import com.pryv.model.Event;
@@ -50,15 +50,13 @@ public class ConnectionEvents {
         } else {
             // event was trashed
             Event trashedEvent = JsonConverter.retrieveEventFromJson(json);
-            trashedEvent.setId(eventId);
-            return eventId;
+            return trashedEvent.getId();
         }
     }
 
     public Event update(Event updateEvent) throws IOException {
         HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, updateEvent.getId(), updateEvent).exec();
         Event updatedEvent = JsonConverter.retrieveEventFromJson(apiResponse.getJsonBody());
-        updatedEvent.setId(updateEvent.getId());
         return updatedEvent;
     }
 

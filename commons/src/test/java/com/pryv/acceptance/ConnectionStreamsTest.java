@@ -1,7 +1,7 @@
 package com.pryv.acceptance;
 
 import com.pryv.Connection;
-import com.pryv.Filter;
+import com.pryv.model.Filter;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
 import com.pryv.util.TestUtils;
@@ -35,10 +35,11 @@ public class ConnectionStreamsTest {
         Stream createdStream = connection.streams.create(testSupportStream);
         assertNotNull(createdStream.getId());
 
-        Event testEvent = new Event();
-        testEvent.setStreamId(testSupportStream.getId());
-        testEvent.setType("note/txt");
-        testEvent.setContent("i am a test event");
+        Event testEvent = new Event()
+                .setStreamId(testSupportStream.getId())
+                .setType("note/txt")
+                .setContent("i am a test event");
+
         connection.events.create(testEvent);
     }
 
@@ -96,12 +97,14 @@ public class ConnectionStreamsTest {
 
     @Test
     public void testGetStreamsMustReturnATreeOfNonTrashedStreamsWithANullFilter() throws IOException {
-        Stream s1 = new Stream(null, "someStreamOne");
-        s1.setParentId(testSupportStream.getId());
-        Stream s2 = new Stream(null, "someOtherStream");
-        s2.setParentId(testSupportStream.getId());
+        Stream s1 = new Stream(null, "someStreamOne")
+                .setParentId(testSupportStream.getId());
+        Stream s2 = new Stream(null, "someOtherStream")
+                .setParentId(testSupportStream.getId());
+
         connection.streams.create(s1);
         connection.streams.create(s2);
+
         Map<String, Stream> retrievedStreams = connection.streams.get(null);
         assertNotNull(retrievedStreams);
 
@@ -111,16 +114,18 @@ public class ConnectionStreamsTest {
     @Test
     public void testGetStreamsWithParentIdSetMustReturnStreamsMatchingTheGivenFilter() throws IOException {
         // Create children
-        Stream childStream1 = new Stream("childStream1", "childStream1");
-        childStream1.setParentId(testSupportStream.getId());
-        Stream childStream2 = new Stream("childStream2", "childStream2");
-        childStream2.setParentId(testSupportStream.getId());
+        Stream childStream1 = new Stream("childStream1", "childStream1")
+                .setParentId(testSupportStream.getId());
+        Stream childStream2 = new Stream("childStream2", "childStream2")
+                .setParentId(testSupportStream.getId());
+
         connection.streams.create(childStream1);
         connection.streams.create(childStream2);
 
         // Get streams with specified parentID in Filter
-        Filter filter = new Filter();
-        filter.setParentId(testSupportStream.getId());
+        Filter filter = new Filter()
+                .setParentId(testSupportStream.getId());
+
         Map<String, Stream> retrievedStreams = connection.streams.get(filter);
 
         // Should at least return the two children created above
@@ -134,17 +139,18 @@ public class ConnectionStreamsTest {
     @Test
     public void testGetStreamsWithStateSetToAllMustReturnTrashedStreamsAsWell() throws IOException {
         // Create child
-        Stream trashedChild = new Stream("trashedChild", "trashedChild");
-        trashedChild.setParentId(testSupportStream.getId());
+        Stream trashedChild = new Stream("trashedChild", "trashedChild")
+                .setParentId(testSupportStream.getId());
         connection.streams.create(trashedChild);
 
         // Trash child
         connection.streams.delete(trashedChild.getId(), false);
 
         // Get streams with state all Filter
-        Filter filter = new Filter();
+        Filter filter = new Filter()
+                .setState(Filter.State.ALL);
         //filter.setParentId(testSupportStream.getId());
-        filter.setState(Filter.State.ALL);
+
         Map<String, Stream> retrievedStreams = connection.streams.get(filter);
 
         // Check that retrieved streams contain the trashed child
@@ -161,10 +167,10 @@ public class ConnectionStreamsTest {
     @Test
     public void testGetStreamsWithIncludeDeletionsMustReturnDeletedStreamsAsWell() throws IOException {
         // Create child
-        Stream deletedChild = new Stream("deletedChild", "deletedChild");
-        deletedChild.setParentId(testSupportStream.getId());
-        Stream createdStream = connection.streams.create(deletedChild);
+        Stream deletedChild = new Stream("deletedChild", "deletedChild")
+                .setParentId(testSupportStream.getId());
 
+        Stream createdStream = connection.streams.create(deletedChild);
         Double time = createdStream.getCreated();
 
         // Trash child
@@ -174,8 +180,9 @@ public class ConnectionStreamsTest {
         connection.streams.delete(deletedChild.getId(), false);
 
         // Get streams with include deletions Filter
-        Filter filter = new Filter();
-        filter.setIncludeDeletionsSince(time);
+        Filter filter = new Filter()
+                .setIncludeDeletionsSince(time);
+
         connection.streams.get(filter);
 
         // Check that retrieved streams contain the deleted child
@@ -208,8 +215,9 @@ public class ConnectionStreamsTest {
 
     @Test
     public void testCreateStreamMustAcceptAValidStream() throws IOException {
-        Stream newStream = new Stream("myNewId", "myNewStream");
-        newStream.setParentId(testSupportStream.getId());
+        Stream newStream = new Stream("myNewId", "myNewStream")
+                .setParentId(testSupportStream.getId());
+
         Stream createdStream = connection.streams.create(newStream);
 
         assertNotNull(createdStream);
@@ -218,23 +226,27 @@ public class ConnectionStreamsTest {
 
     @Test(expected = IOException.class)
     public void testCreateStreamMustReturnAnErrorIfAStreamWithTheSameNameExistsAtTheSameTreeLevel() throws IOException {
-        Stream someStream = new Stream("someStreamThatWillBotherNext", "my lovely stream name");
-        someStream.setParentId(testSupportStream.getId());
+        Stream someStream = new Stream("someStreamThatWillBotherNext", "my lovely stream name")
+                .setParentId(testSupportStream.getId());
+
         connection.streams.create(someStream);
 
-        Stream duplicateIdStream = new Stream("copyNameSteam", someStream.getName());
-        duplicateIdStream.setParentId(testSupportStream.getId());
+        Stream duplicateIdStream = new Stream("copyNameSteam", someStream.getName())
+                .setParentId(testSupportStream.getId());
+
         connection.streams.create(duplicateIdStream);
     }
 
     @Test(expected = IOException.class)
     public void testCreateStreamMustReturnAnErrorIfAStreamWithTheSameIdAlreadyExists() throws IOException {
-        Stream someStream = new Stream("someStreamWithANiceId", "Well I dont care");
-        someStream.setParentId(testSupportStream.getId());
+        Stream someStream = new Stream("someStreamWithANiceId", "Well I dont care")
+                .setParentId(testSupportStream.getId());
+
         connection.streams.create(someStream);
 
-        Stream duplicateIdStream = new Stream(someStream.getId(), "I will not be created");
-        duplicateIdStream.setParentId(testSupportStream.getId());
+        Stream duplicateIdStream = new Stream(someStream.getId(), "I will not be created")
+                .setParentId(testSupportStream.getId());
+
         connection.streams.create(duplicateIdStream);
     }
 
