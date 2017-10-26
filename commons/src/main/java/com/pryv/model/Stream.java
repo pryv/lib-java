@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.pryv.AbstractConnection;
 
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,12 +28,6 @@ public class Stream extends ApiResource {
   private String createdBy;
   private Double modified;
   private String modifiedBy;
-
-  /**
-   * a weak reference to the connection to which the Event is linked
-   */
-  @JsonIgnore
-  private WeakReference<AbstractConnection> weakConnection;
 
   // optional
   private Boolean trashed;
@@ -120,25 +112,6 @@ public class Stream extends ApiResource {
   }
 
   /**
-   * Assign a weak reference to the ConnectionOld
-   *
-   * @param weakConnection
-   */
-  public void assignConnection(WeakReference<AbstractConnection> weakConnection) {
-    this.weakConnection = weakConnection;
-  }
-
-  /**
-   * Returns the reference to the ConnectionOld to which the Event is linked if
-   * any.
-   *
-   * @return
-   */
-  public AbstractConnection getWeakConnection() {
-    return weakConnection.get();
-  }
-
-  /**
    * Copy all of Stream <tt>updatedStream</tt> values into the caller Stream.
    *
    * @param updatedStream
@@ -147,7 +120,6 @@ public class Stream extends ApiResource {
    *          if set to <tt>true</tt>, children are also merged
    */
   public void merge(Stream updatedStream, boolean withChildren) {
-    weakConnection = updatedStream.weakConnection;
     setId(updatedStream.id);
     setName(updatedStream.name);
     setParentId(updatedStream.parentId);

@@ -6,6 +6,8 @@ import com.pryv.model.ApiResource;
 import com.pryv.model.Attachment;
 import com.pryv.utils.JsonConverter;
 
+import org.joda.time.DateTime;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -26,6 +28,14 @@ public class HttpClient {
     private OkHttpClient client;
     private String apiUrl;
     private String tokenParameter;
+
+    // TODO: server time calculations should be in HttpClient
+    private double serverTime = 0.0;
+    /**
+     * RTT between server and system: deltaTime = serverTime - systemTime
+     */
+    private double deltaTime = 0.0;
+    private final Double millisToSeconds = 1000.0;
 
     public HttpClient(String apiUrl, String tokenParameter) {
         client = new OkHttpClient();
@@ -136,6 +146,29 @@ public class HttpClient {
 
         public int getStatus() {
             return status;
+        }
+    }
+
+    /**
+     * Returns a DateTime object representing the time in the system reference.
+     *
+     * @param time
+     *          the time in the server reference
+     * @return
+     */
+    public DateTime serverTimeInSystemDate(double time) {
+        return new DateTime(System.currentTimeMillis() / millisToSeconds + deltaTime);
+    }
+
+    /**
+     * calculates the difference between server and system time: deltaTime =
+     * serverTime - systemTime
+     *
+     * @param pServerTime
+     */
+    private void updateDelta(Double pServerTime) {
+        if (pServerTime != null) {
+            deltaTime = pServerTime - System.currentTimeMillis() / millisToSeconds;
         }
     }
 }

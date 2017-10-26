@@ -1,15 +1,12 @@
 package com.pryv.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.pryv.AbstractConnection;
 import com.pryv.utils.Cuid;
 import com.pryv.utils.JsonConverter;
 import com.rits.cloning.Cloner;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -37,12 +34,6 @@ public class Access extends ApiResource {
   private String type;
   private String deviceName;
   private Double lastUsed;
-
-  /**
-   * a weak reference to the connection to which the Access is linked
-   */
-  @JsonIgnore
-  private WeakReference<AbstractConnection> weakConnection;
 
   /**
    * used in order to prevent instantiating an Access multiple times.
@@ -136,25 +127,6 @@ public class Access extends ApiResource {
   }
 
   /**
-   * Assign a weak reference to the ConnectionOld
-   *
-   * @param weakconnection
-   */
-  public void assignConnection(WeakReference<AbstractConnection> weakconnection) {
-    this.weakConnection = weakconnection;
-  }
-
-  /**
-   * Returns the reference to the ConnectionOld to which the Access is linked if
-   * any.
-   *
-   * @return
-   */
-  public AbstractConnection getWeakConnection() {
-    return weakConnection.get();
-  }
-
-  /**
    * Copy all temp Access's values into caller Access.
    *
    * @param temp
@@ -163,7 +135,6 @@ public class Access extends ApiResource {
    *          com.rits.cloning.Cloner instance from JsonConverter util class
    */
   public void merge(Access temp, Cloner cloner) {
-    weakConnection = temp.weakConnection;
 
     id = temp.id;
     token = temp.token;

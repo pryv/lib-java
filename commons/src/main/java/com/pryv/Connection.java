@@ -12,14 +12,13 @@ import com.pryv.utils.Logger;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.joda.time.DateTime;
 
-import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Pryv API connection - Object used to manipulate Events and Streams data.
  */
-public class Connection implements AbstractConnection {
+public class Connection {
 
     public ConnectionAccesses accesses;
     public ConnectionAccount account;
@@ -33,26 +32,7 @@ public class Connection implements AbstractConnection {
     private String urlEndpoint;
     private String registrationUrl;
 
-    private WeakReference<AbstractConnection> weakConnection;
-
-    /**
-     * Streams with no parent stream. the key is the id
-     */
-    private Map<String, Stream> rootStreams;
-
-    /**
-     * All Streams stored in the Supervisor. the key is the id
-     */
-    private Map<String, Stream> flatStreams;
-
     private Logger logger = Logger.getInstance();
-
-    private double serverTime = 0.0;
-    /**
-     * RTT between server and system: deltaTime = serverTime - systemTime
-     */
-    private double deltaTime = 0.0;
-    private final Double millisToSeconds = 1000.0;
 
     /**
      * Main object to manipulate Pryv data, instanciate it with the required parameters.
@@ -69,18 +49,13 @@ public class Connection implements AbstractConnection {
         buildUrlEndpoint();
         buildRegistrationUrl();
 
-        this.weakConnection = new WeakReference<AbstractConnection>(this);
-
-        rootStreams = new ConcurrentHashMap<String, Stream>();
-        flatStreams = new ConcurrentHashMap<String, Stream>();
-
         HttpClient httpClient = new HttpClient(urlEndpoint, "?auth=" + token);
 
-        this.accesses = new ConnectionAccesses(weakConnection, httpClient);
+        this.accesses = new ConnectionAccesses(httpClient);
         this.account = new ConnectionAccount();
-        this.events = new ConnectionEvents(weakConnection, httpClient);
+        this.events = new ConnectionEvents(httpClient);
         this.profile = new ConnectionProfile();
-        this.streams = new ConnectionStreams(weakConnection, httpClient);
+        this.streams = new ConnectionStreams(httpClient);
     }
 
     private String buildUrlEndpoint() {
@@ -95,29 +70,6 @@ public class Connection implements AbstractConnection {
 
     private String getUrlRegistration() {
         return this.registrationUrl;
-    }
-
-    /**
-     * Returns a DateTime object representing the time in the system reference.
-     *
-     * @param time
-     *          the time in the server reference
-     * @return
-     */
-    public DateTime serverTimeInSystemDate(double time) {
-        return new DateTime(System.currentTimeMillis() / millisToSeconds + deltaTime);
-    }
-
-    /**
-     * calculates the difference between server and system time: deltaTime =
-     * serverTime - systemTime
-     *
-     * @param pServerTime
-     */
-    private void updateDelta(Double pServerTime) {
-        if (pServerTime != null) {
-            deltaTime = pServerTime - System.currentTimeMillis() / millisToSeconds;
-        }
     }
 
     /**
@@ -136,57 +88,7 @@ public class Connection implements AbstractConnection {
      * @return
      */
     public Map<String, Stream> getRootStreams() {
-        return rootStreams;
-    }
-
-    /**
-     * update the rootsStreams values
-     *
-     * @param rootStreams
-     */
-    public void updateRootStreams(Map<String, Stream> rootStreams) {
-        this.rootStreams = rootStreams;
-    }
-
-    /**
-     * fixes Streams' children properties based on parentIds
-     */
-    private void recomputeRootStreamsTree() {
-        rootStreams.clear();
-
-        String parentId = null;
-        // set root streams
-        for (Stream potentialRootStream : flatStreams.values()) {
-            // clear children fields
-            potentialRootStream.clearChildren();
-            parentId = potentialRootStream.getParentId();
-            if (parentId == null) {
-                logger.log("StreamsSupervisor: adding rootStream: id="
-                        + potentialRootStream.getId()
-                        + ", name="
-                        + potentialRootStream.getName());
-                rootStreams.put(potentialRootStream.getId(), potentialRootStream);
-            }
-        }
-
-        // assign children
-        for (Stream childStream : flatStreams.values()) {
-            parentId = childStream.getParentId();
-            if (parentId != null) {
-                if (flatStreams.containsKey(parentId)) {
-                    logger.log("StreamsSupervisor: adding childStream: id="
-                            + childStream.getId()
-                            + ", name="
-                            + childStream.getName()
-                            + " to "
-                            + parentId);
-                    Stream parent = flatStreams.get(parentId);
-                    if (parent != null) {
-                        parent.addChildStream(childStream);
-                    }
-                }
-            }
-        }
+        return streams.getRootStreams();
     }
 
 }

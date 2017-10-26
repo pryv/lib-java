@@ -60,7 +60,7 @@ public class EventTest {
   }
 
   @Test
-  public void testSetDateShouldWorkWithoutAweakConnection() {
+  public void testSetDateShouldWork() {
     Event e = new Event();
     DateTime date = new DateTime();
     e.setDate(date);

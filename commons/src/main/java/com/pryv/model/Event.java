@@ -4,14 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.pryv.AbstractConnection;
 import com.pryv.utils.Cuid;
 import com.pryv.utils.JsonConverter;
 import com.rits.cloning.Cloner;
 
 import org.joda.time.DateTime;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -48,12 +46,6 @@ public class Event extends ApiResource {
   private Set<Attachment> attachments;
   private Map<String, Object> clientData;
   private Boolean trashed;
-
-  /**
-   * a weak reference to the connection to which the Event is linked
-   */
-  @JsonIgnore
-  private WeakReference<AbstractConnection> weakConnection;
 
   /**
    * used in order to prevent instanciating an Event multiple times.
@@ -166,25 +158,6 @@ public class Event extends ApiResource {
   }
 
   /**
-   * Assign a weak reference to the ConnectionOld
-   *
-   * @param weakconnection
-   */
-  public void assignConnection(WeakReference<AbstractConnection> weakconnection) {
-    this.weakConnection = weakconnection;
-  }
-
-  /**
-   * Returns the reference to the ConnectionOld to which the Event is linked if
-   * any.
-   *
-   * @return
-   */
-  public AbstractConnection getWeakConnection() {
-    return weakConnection.get();
-  }
-
-  /**
    * Copy all temp Event's values into caller Event.
    *
    * @param temp
@@ -193,7 +166,6 @@ public class Event extends ApiResource {
    *          com.rits.cloning.Cloner instance from JsonConverter util class
    */
   public void merge(Event temp, Cloner cloner) {
-    weakConnection = temp.weakConnection;
     id = temp.id;
     streamId = temp.streamId;
     time = temp.time;
@@ -269,14 +241,10 @@ public class Event extends ApiResource {
     if (time == null) {
       return null;
     }
-    AbstractConnection con = null;
-    if (weakConnection != null) {
-      con = weakConnection.get();
-    }
-    if (con == null) {
-      return new DateTime((long) (time.doubleValue() * 1000));
-    }
-    return con.serverTimeInSystemDate(time);
+    /* TODO: Use of server time from HttpClient instead of Connection
+        return con.serverTimeInSystemDate(time);
+     */
+    return new DateTime((long) (time.doubleValue() * 1000));
   }
 
   /**
@@ -289,14 +257,10 @@ public class Event extends ApiResource {
     if (date == null) {
       time = null;
     } else {
+      /* TODO: Use of server time from HttpClient instead of Connection
+          time = con.serverTimeInSystemDate(date.getMillis() / 1000.0).getMillis() / 1000.0;
+       */
       time = date.getMillis() / 1000.0;
-      AbstractConnection con = null;
-      if (weakConnection != null) {
-        con = weakConnection.get();
-      }
-      if (con != null) {
-        time = con.serverTimeInSystemDate(date.getMillis() / 1000.0).getMillis() / 1000.0;
-      }
     }
   }
 
