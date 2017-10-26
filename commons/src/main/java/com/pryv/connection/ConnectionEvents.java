@@ -2,6 +2,7 @@ package com.pryv.connection;
 
 import com.pryv.Filter;
 import com.pryv.api.HttpClient;
+import com.pryv.model.Attachment;
 import com.pryv.model.Event;
 import com.pryv.utils.JsonConverter;
 
@@ -20,9 +21,6 @@ public class ConnectionEvents {
     public List<Event> get(Filter filter) throws IOException {
         HttpClient.ApiResponse apiResponse = httpClient.getRequest(PATH, filter).exec();
         List<Event> receivedEvents = JsonConverter.createEventsFromJson(apiResponse.getJsonBody());
-        for (Event receivedEvent : receivedEvents) {
-            Event.createOrReuse(receivedEvent);
-        }
         // TODO: retrieve eventDeletions
         return receivedEvents;
     }
@@ -30,18 +28,14 @@ public class ConnectionEvents {
     public Event create(Event newEvent) throws IOException {
         HttpClient.ApiResponse apiResponse;
 
-        if(newEvent.getFirstAttachment() != null) {
-            Event eventWithoutAttachments = new Event();
-            eventWithoutAttachments.merge(newEvent, JsonConverter.getCloner());
-            eventWithoutAttachments.setAttachments(null);
-            apiResponse = httpClient.createRequest(PATH, eventWithoutAttachments, newEvent.getFirstAttachment()).exec();
-        } else {
-            apiResponse = httpClient.createRequest(PATH, newEvent, null).exec();
+        Attachment firstAttachment = newEvent.getFirstAttachment();
+        if(firstAttachment != null) {
+            newEvent.setAttachments(null);
         }
+        apiResponse = httpClient.createRequest(PATH, newEvent, firstAttachment).exec();
 
         String json = apiResponse.getJsonBody();
         Event createdEvent = JsonConverter.retrieveEventFromJson(json);
-        Event.createOrReuse(createdEvent);
         // TODO: handle stopid, startid
         return createdEvent;
     }
@@ -57,7 +51,6 @@ public class ConnectionEvents {
             // event was trashed
             Event trashedEvent = JsonConverter.retrieveEventFromJson(json);
             trashedEvent.setId(eventId);
-            Event.createOrReuse(trashedEvent);
             return eventId;
         }
     }
@@ -66,7 +59,6 @@ public class ConnectionEvents {
         HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, updateEvent.getId(), updateEvent).exec();
         Event updatedEvent = JsonConverter.retrieveEventFromJson(apiResponse.getJsonBody());
         updatedEvent.setId(updateEvent.getId());
-        Event.createOrReuse(updatedEvent);
         return updatedEvent;
     }
 

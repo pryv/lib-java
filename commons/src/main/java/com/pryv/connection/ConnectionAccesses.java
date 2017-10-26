@@ -22,10 +22,6 @@ public class ConnectionAccesses {
     public List<Access> get() throws IOException {
         HttpClient.ApiResponse apiResponse = httpClient.getRequest(PATH, null).exec();
         List<Access> receivedAccesses = JsonConverter.retrieveResourcesFromJson(apiResponse.getJsonBody(), ACCESSES_KEY, Access.class);
-        // TODO: also included in JSON converter?
-        for (Access receivedAccess : receivedAccesses) {
-            Access.createOrReuse(receivedAccess);
-        }
         // TODO: retrieve accessDeletions
         return receivedAccesses;
     }
@@ -33,7 +29,6 @@ public class ConnectionAccesses {
     public Access create(Access newAccess) throws IOException {
         HttpClient.ApiResponse apiResponse = httpClient.createRequest(PATH, newAccess, null).exec();
         Access createdAccess = JsonConverter.retrieveResourceFromJson(apiResponse.getJsonBody(), ACCESS_KEY, Access.class);
-        Access.createOrReuse(createdAccess);
         return createdAccess;
     }
 
@@ -46,7 +41,6 @@ public class ConnectionAccesses {
     public Access update(Access updateAccess) throws IOException {
         HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, updateAccess.getId(), updateAccess).exec();
         Access updatedAccess = JsonConverter.retrieveResourceFromJson(apiResponse.getJsonBody(), ACCESS_KEY, Access.class);
-        Access.createOrReuse(updatedAccess);
         return updatedAccess;
     }
 

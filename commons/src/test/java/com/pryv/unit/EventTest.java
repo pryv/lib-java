@@ -1,21 +1,15 @@
 package com.pryv.unit;
 
-import com.pryv.model.Attachment;
 import com.pryv.model.Event;
 import com.pryv.util.TestUtils;
-import com.pryv.utils.JsonConverter;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -30,7 +24,6 @@ import static org.junit.Assert.assertTrue;
 public class EventTest {
 
   private Event testEvent;
-  private String jsonEvent;
 
   private static final String ID = "test-id";
   private static final String STREAM_ID = "test-stream-id";
@@ -42,7 +35,6 @@ public class EventTest {
   @Before
   public void setUp() throws Exception {
     testEvent = DummyData.generateFullEvent();
-    jsonEvent = DummyData.generateJsonEvent();
   }
 
   @Test
@@ -92,68 +84,6 @@ public class EventTest {
   @Test
   public void testFullConstructor() {
     TestUtils.checkEvent(testEvent, testEvent);
-  }
-
-  @Test
-  public void testMerge() {
-    String eventId = "eventId";
-    String streamId = "parentId";
-    String attachmentId = "aId";
-    String filename = "filename";
-    String attachmentType = "picture/attached";
-    int size = 100;
-    String token = "token";
-    Attachment attachment = new Attachment(attachmentId, filename, attachmentType, size, token);
-    Set<Attachment> attachments = new HashSet<Attachment>();
-    attachments.add(attachment);
-    Map<String, Object> clientData = new HashMap<String, Object>();
-    String key = "key";
-    String val = "value";
-    clientData.put(key, val);
-    String content = "blablabla";
-    Double created = 123.0;
-    String createdBy = "bob";
-    String description = "testDescription";
-    Double duration = 500.0;
-    Double modified = 155.0;
-    String modifiedBy = "bill";
-    String ref1 = "ref1";
-    String tag1 = "tag1";
-    String tag2 = "tag2";
-    Set<String> tags = new HashSet<String>();
-    tags.add(tag1);
-    tags.add(tag2);
-    Double time = 1234.0;
-    Boolean trashed = false;
-    String eventType = "myType";
-    testEvent =
-      new Event(eventId, streamId, time, duration, eventType, content, tags,
-        description, attachments, clientData, trashed, created, createdBy, modified, modifiedBy);
-    Event mergeDestination = new Event();
-    mergeDestination.merge(testEvent, JsonConverter.getCloner());
-    assertEquals(eventId, mergeDestination.getId());
-    assertEquals(streamId, mergeDestination.getStreamId());
-    assertEquals(time, mergeDestination.getTime());
-    assertEquals(duration, mergeDestination.getDuration());
-    assertEquals(eventType, mergeDestination.getType());
-    assertEquals(content, mergeDestination.getContent());
-    assertTrue(areStringSetsEqualInContent(tags, mergeDestination.getTags()));
-    assertEquals(description, mergeDestination.getDescription());
-    assertNotEquals(attachments, mergeDestination.getAttachments());
-    int attachmentsCount = attachments.size();
-    for (Attachment att : attachments) {
-      for (Attachment mergedAtt : mergeDestination.getAttachments()) {
-        if (att.getId().equals(mergedAtt.getId())) {
-          attachmentsCount--;
-          assertNotEquals(att, mergedAtt);
-          assertEquals(att.getFileName(), att.getFileName());
-          assertEquals(att.getReadToken(), mergedAtt.getReadToken());
-          assertEquals(att.getSize(), mergedAtt.getSize());
-          assertEquals(att.getType(), mergedAtt.getType());
-        }
-      }
-    }
-    assertEquals(attachmentsCount, 0);
   }
 
   /**

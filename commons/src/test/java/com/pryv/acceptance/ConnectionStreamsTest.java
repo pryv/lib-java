@@ -33,8 +33,7 @@ public class ConnectionStreamsTest {
 
         testSupportStream = new Stream("onlineModuleStreamID", "javaLibTestSupportStream");
         Stream createdStream = connection.streams.create(testSupportStream);
-        testSupportStream.merge(createdStream, true);
-        assertNotNull(testSupportStream.getId());
+        assertNotNull(createdStream.getId());
 
         Event testEvent = new Event();
         testEvent.setStreamId(testSupportStream.getId());

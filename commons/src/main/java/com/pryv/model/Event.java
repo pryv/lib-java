@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.pryv.utils.Cuid;
-import com.pryv.utils.JsonConverter;
-import com.rits.cloning.Cloner;
 
 import org.joda.time.DateTime;
 
@@ -17,7 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 
 /**
  * Event data structure from Pryv
@@ -48,16 +45,10 @@ public class Event extends ApiResource {
   private Boolean trashed;
 
   /**
-   * used in order to prevent instanciating an Event multiple times.
-   */
-  private static Map<String, Event> supervisor = new WeakHashMap<String, Event>();
-
-  /**
    * empty Event constructor
    */
   public Event() {
     this.generateId();
-    this.updateSupervisor();
   }
 
   /**
@@ -69,7 +60,6 @@ public class Event extends ApiResource {
    */
   public Event(String streamId, String type, String content) {
     this.generateId();
-    this.updateSupervisor();
     this.streamId = streamId;
     this.type = type;
     this.content = content;
@@ -122,20 +112,6 @@ public class Event extends ApiResource {
     attachments = pAttachments;
     clientData = pClientData;
     trashed = pTrashed;
-    this.updateSupervisor();
-  }
-
-  /**
-   * saves the Event in the supervisor if needed
-   *
-   * @param event
-   * @return
-   */
-  public static Event createOrReuse(Event event) {
-    String id = event.getId();
-    // TODO: merge - not replace
-    supervisor.put(id, event);
-    return event;
   }
 
   /**
@@ -146,59 +122,6 @@ public class Event extends ApiResource {
       this.id = Cuid.createCuid();
     }
     return this.id;
-  }
-
-  private void updateSupervisor() {
-    String id = this.getId();
-    if(supervisor.containsKey(id)) {
-      supervisor.get(id).merge(this, JsonConverter.getCloner());
-    } else {
-      supervisor.put(id,this);
-    }
-  }
-
-  /**
-   * Copy all temp Event's values into caller Event.
-   *
-   * @param temp
-   *          the Event from which the fields are merged
-   * @param cloner
-   *          com.rits.cloning.Cloner instance from JsonConverter util class
-   */
-  public void merge(Event temp, Cloner cloner) {
-    id = temp.id;
-    streamId = temp.streamId;
-    time = temp.time;
-    duration = temp.duration;
-    type = temp.type;
-    content = temp.content;
-    if (temp.tags != null) {
-      tags = new HashSet<String>();
-      for (String tag : temp.tags) {
-        tags.add(tag);
-      }
-    }
-
-    description = temp.description;
-    if (temp.attachments != null) {
-      attachments = new HashSet<Attachment>();
-      for (Attachment attachment : temp.attachments) {
-        attachments.add(cloner.deepClone(attachment));
-      }
-    }
-    if (temp.clientData != null) {
-      clientData = new HashMap<String, Object>();
-      for (String key : temp.clientData.keySet()) {
-        clientData.put(key, temp.clientData.get(key));
-      }
-    }
-    trashed = temp.trashed;
-    created = temp.created;
-    createdBy = temp.createdBy;
-    modified = temp.modified;
-    modifiedBy = temp.modifiedBy;
-
-    temp = null;
   }
 
   /**
@@ -241,7 +164,7 @@ public class Event extends ApiResource {
     if (time == null) {
       return null;
     }
-    /* TODO: Use of server time from HttpClient instead of Connection
+    /* TODO: Use of server time from HttpClient
         return con.serverTimeInSystemDate(time);
      */
     return new DateTime((long) (time.doubleValue() * 1000));
@@ -257,7 +180,7 @@ public class Event extends ApiResource {
     if (date == null) {
       time = null;
     } else {
-      /* TODO: Use of server time from HttpClient instead of Connection
+      /* TODO: Use of server time from HttpClient
           time = con.serverTimeInSystemDate(date.getMillis() / 1000.0).getMillis() / 1000.0;
        */
       time = date.getMillis() / 1000.0;

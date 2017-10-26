@@ -4,12 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.pryv.utils.Cuid;
-import com.pryv.utils.JsonConverter;
-import com.rits.cloning.Cloner;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 /**
  * Access data structure from Pryv
@@ -34,11 +30,6 @@ public class Access extends ApiResource {
   private String type;
   private String deviceName;
   private Double lastUsed;
-
-  /**
-   * used in order to prevent instantiating an Access multiple times.
-   */
-  private static Map<String, Access> supervisor = new WeakHashMap<String, Access>();
 
   /**
    * empty Access constructor
@@ -91,20 +82,6 @@ public class Access extends ApiResource {
     type = pType;
     deviceName = pDeviceName;
     lastUsed = pLastUsed;
-
-    this.updateSupervisor();
-  }
-
-  /**
-   * saves the Access in the supervisor if needed
-   *
-   * @return the Access
-   */
-  public static Access createOrReuse(Access access) {
-    String id = access.getId();
-    // TODO: merge - not replace
-    supervisor.put(id, access);
-    return access;
   }
 
   /**
@@ -115,45 +92,6 @@ public class Access extends ApiResource {
       this.id = Cuid.createCuid();
     }
     return this.id;
-  }
-
-  private void updateSupervisor() {
-    String id = this.getId();
-    if(supervisor.containsKey(id)) {
-      supervisor.get(id).merge(this, JsonConverter.getCloner());
-    } else {
-      supervisor.put(id,this);
-    }
-  }
-
-  /**
-   * Copy all temp Access's values into caller Access.
-   *
-   * @param temp
-   *          the Access from which the fields are merged
-   * @param cloner
-   *          com.rits.cloning.Cloner instance from JsonConverter util class
-   */
-  public void merge(Access temp, Cloner cloner) {
-
-    id = temp.id;
-    token = temp.token;
-    name = temp.name;
-
-    permissions = new ArrayList<>();
-    for (Permission permission : temp.permissions) {
-      permissions.add(cloner.deepClone(permission));
-    }
-
-    created = temp.created;
-    createdBy = temp.createdBy;
-    modified = temp.modified;
-    modifiedBy = temp.modifiedBy;
-    type = temp.type;
-    deviceName = temp.deviceName;
-    lastUsed = temp.lastUsed;
-
-    temp = null;
   }
 
   @Override

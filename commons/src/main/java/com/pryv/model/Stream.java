@@ -112,38 +112,6 @@ public class Stream extends ApiResource {
   }
 
   /**
-   * Copy all of Stream <tt>updatedStream</tt> values into the caller Stream.
-   *
-   * @param updatedStream
-   *          the Stream whose fields are copied
-   * @param withChildren
-   *          if set to <tt>true</tt>, children are also merged
-   */
-  public void merge(Stream updatedStream, boolean withChildren) {
-    setId(updatedStream.id);
-    setName(updatedStream.name);
-    setParentId(updatedStream.parentId);
-    setSingleActivity(updatedStream.singleActivity);
-    setTrashed(updatedStream.trashed);
-    setCreated(updatedStream.created);
-    setCreatedBy(updatedStream.createdBy);
-    setModified(updatedStream.modified);
-    setModifiedBy(updatedStream.modifiedBy);
-    if (updatedStream.clientData != null) {
-      clientData = new HashMap<String, Object>();
-      for (String key : updatedStream.clientData.keySet()) {
-        clientData.put(key, updatedStream.clientData.get(key));
-      }
-    }
-    if (updatedStream.children != null && withChildren == true) {
-      this.clearChildren();
-      for (Stream childStream : updatedStream.children) {
-        addChildStream(childStream);
-      }
-    }
-  }
-
-  /**
    * format client data to printable. eg.: "keyA:valueA,keyB:valueB, ..."
    *
    * @return client data in readable form as a String.

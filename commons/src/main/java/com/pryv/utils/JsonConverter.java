@@ -326,40 +326,6 @@ public class JsonConverter {
   }
 
   /**
-   * reset all fields of Event toUpdate to values from JSON glossary json
-   *
-   * @param json
-   *          The glossary containing the values to which the Event's fields are
-   *          updated.
-   * @param toUpdate
-   *          The Event reference whose fields are reset.
-   * @throws JsonParseException
-   * @throws JsonMappingException
-   * @throws IOException
-   */
-  public static void resetEventFromJson(String json, Event toUpdate) throws JsonParseException,
-    JsonMappingException, IOException {
-    Event temp = jsonMapper.readValue(json, Event.class);
-    toUpdate.merge(temp, cloner);
-  }
-
-  /**
-   * reset all fields of Stream toUpdate to values retrieved from JSON glossary
-   * json
-   *
-   * @param json
-   * @param toUpdate
-   * @throws JsonParseException
-   * @throws JsonMappingException
-   * @throws IOException
-   */
-  public static void resetStreamFromJson(String json, Stream toUpdate) throws JsonParseException,
-    JsonMappingException, IOException {
-    Stream temp = jsonMapper.readValue(json, Stream.class);
-    toUpdate.merge(temp, true);
-  }
-
-  /**
    * Deserializes an array of Attachments into a Set of attachments
    *
    * @param jsonAttachments

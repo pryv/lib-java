@@ -29,7 +29,7 @@ public class HttpClient {
     private String apiUrl;
     private String tokenParameter;
 
-    // TODO: server time calculations should be in HttpClient
+    // TODO: actually make these server time calculations
     private double serverTime = 0.0;
     /**
      * RTT between server and system: deltaTime = serverTime - systemTime
