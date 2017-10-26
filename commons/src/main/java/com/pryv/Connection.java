@@ -9,11 +9,7 @@ import com.pryv.connection.ConnectionStreams;
 import com.pryv.model.Stream;
 import com.pryv.utils.Logger;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.joda.time.DateTime;
-
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Pryv API connection - Object used to manipulate Events and Streams data.
@@ -27,7 +23,6 @@ public class Connection {
     public ConnectionStreams streams;
 
     private String username;
-    private String token;
     private String domain;
     private String urlEndpoint;
     private String registrationUrl;
@@ -44,7 +39,6 @@ public class Connection {
     public Connection(String username, String token, String domain) {
 
         this.username = username;
-        this.token = token;
         this.domain = domain;
         buildUrlEndpoint();
         buildRegistrationUrl();
@@ -70,16 +64,6 @@ public class Connection {
 
     private String getUrlRegistration() {
         return this.registrationUrl;
-    }
-
-    /**
-     * returns the a name for the cache folder
-     *
-     * @return
-     */
-    public String generateCacheFolderName() {
-        return DigestUtils.md5Hex(this.urlEndpoint + "/" + token) + "_" + username + "_"
-                +  domain + "_" + token;
     }
 
     /**

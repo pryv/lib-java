@@ -1,14 +1,12 @@
 package com.pryv.connection;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pryv.Filter;
 import com.pryv.api.HttpClient;
 import com.pryv.model.Stream;
 import com.pryv.utils.JsonConverter;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
