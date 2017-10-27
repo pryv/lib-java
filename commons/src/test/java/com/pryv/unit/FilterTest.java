@@ -1,8 +1,8 @@
 package com.pryv.unit;
 
+import com.pryv.model.Event;
 import com.pryv.model.Filter;
 import com.pryv.model.Filter.State;
-import com.pryv.model.Event;
 import com.pryv.model.Stream;
 
 import org.junit.Test;

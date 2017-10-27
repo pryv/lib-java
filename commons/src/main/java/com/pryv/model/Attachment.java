@@ -16,7 +16,7 @@ import java.io.File;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-public class Attachment implements Cloneable {
+public class Attachment {
 
   private String id;
   private String fileName;

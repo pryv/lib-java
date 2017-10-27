@@ -7,7 +7,6 @@ import com.pryv.connection.ConnectionEvents;
 import com.pryv.connection.ConnectionProfile;
 import com.pryv.connection.ConnectionStreams;
 import com.pryv.model.Stream;
-import com.pryv.utils.Logger;
 
 import java.util.Map;
 
@@ -26,8 +25,6 @@ public class Connection {
     private String domain;
     private String urlEndpoint;
     private String registrationUrl;
-
-    private Logger logger = Logger.getInstance();
 
     /**
      * Main object to manipulate Pryv data, instanciate it with the required parameters.

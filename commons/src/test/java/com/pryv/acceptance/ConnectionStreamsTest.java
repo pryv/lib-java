@@ -1,8 +1,8 @@
 package com.pryv.acceptance;
 
 import com.pryv.Connection;
-import com.pryv.model.Filter;
 import com.pryv.model.Event;
+import com.pryv.model.Filter;
 import com.pryv.model.Stream;
 import com.pryv.util.TestUtils;
 

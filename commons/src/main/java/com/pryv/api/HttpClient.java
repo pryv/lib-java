@@ -1,9 +1,9 @@
 package com.pryv.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.pryv.model.Filter;
 import com.pryv.model.ApiResource;
 import com.pryv.model.Attachment;
+import com.pryv.model.Filter;
 import com.pryv.utils.JsonConverter;
 
 import org.joda.time.DateTime;

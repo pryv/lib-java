@@ -1,8 +1,8 @@
 package com.pryv.connection;
 
 
-import com.pryv.model.Filter;
 import com.pryv.api.HttpClient;
+import com.pryv.model.Filter;
 import com.pryv.model.Stream;
 import com.pryv.utils.JsonConverter;
 

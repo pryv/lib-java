@@ -1,9 +1,9 @@
 package com.pryv.connection;
 
-import com.pryv.model.Filter;
 import com.pryv.api.HttpClient;
 import com.pryv.model.Attachment;
 import com.pryv.model.Event;
+import com.pryv.model.Filter;
 import com.pryv.utils.JsonConverter;
 
 import java.io.IOException;

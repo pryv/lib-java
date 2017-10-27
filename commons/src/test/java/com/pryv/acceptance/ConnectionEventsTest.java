@@ -1,9 +1,9 @@
 package com.pryv.acceptance;
 
 import com.pryv.Connection;
-import com.pryv.model.Filter;
 import com.pryv.model.Attachment;
 import com.pryv.model.Event;
+import com.pryv.model.Filter;
 import com.pryv.model.Stream;
 
 import org.junit.AfterClass;
