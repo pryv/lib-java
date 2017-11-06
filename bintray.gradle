@@ -2,7 +2,7 @@ apply plugin: 'com.jfrog.bintray'
 
 version = libraryVersion
 
-task sourcesJar(type: Jar, dependsOn: [classes,':commons:fatJar']) {
+task sourcesJar(type: Jar, dependsOn: [classes /*,':commons:fatJar'*/]) {
     classifier = 'sources'
     from sourceSets.main.allSource
 }
