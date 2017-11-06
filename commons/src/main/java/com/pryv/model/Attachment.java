@@ -16,7 +16,7 @@ import java.io.File;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-public class Attachment implements Cloneable {
+public class Attachment {
 
   private String id;
   private String fileName;
@@ -53,24 +53,29 @@ public class Attachment implements Cloneable {
     readToken = pReadToken;
   }
 
-  public void setId(String id) {
+  public Attachment setId(String id) {
     this.id = id;
+    return this;
   }
 
-  public void setFileName(String fileName) {
+  public Attachment setFileName(String fileName) {
     this.fileName = fileName;
+    return this;
   }
 
-  public void setType(String type) {
+  public Attachment setType(String type) {
     this.type = type;
+    return this;
   }
 
-  public void setSize(long size) {
+  public Attachment setSize(long size) {
     this.size = size;
+    return this;
   }
 
-  public void setReadToken(String readToken) {
+  public Attachment setReadToken(String readToken) {
     this.readToken = readToken;
+    return this;
   }
 
   public String getId() {
@@ -97,23 +102,10 @@ public class Attachment implements Cloneable {
     return file;
   }
 
-  /**
-   * copy all fields from temp to the calling Attachment
-   *
-   * @param temp
-   *          other Attachment whose fields are copied
-   */
-  public void merge(Attachment temp) {
-    id = temp.getId();
-    fileName = temp.getFileName();
-    type = temp.getType();
-    size = temp.getSize();
-    readToken = temp.getReadToken();
-  }
-
-  public void setFile(File file) {
+  public Attachment setFile(File file) {
     this.file = file;
     this.size = file.length();
+    return this;
   }
 
 }

@@ -24,18 +24,11 @@ task clean(type: Delete) {
 }
 
 ext {
-    // Publish procedure:
+    // Release procedure:
     // increment libraryVersion just above
     // gradlew install
     // gradlew bintrayUpload (your local.properties file should provide:
     //      bintray.user=techpryv and bintray.key=..., see https://bintray.com/techpryv)
-    // gradlew fatJar
-    // upload commons fat jar to bintray (manually:
-    //      go to https://bintray.com/techpryv/maven/pryv-lib/<libraryVersion>/upload
-    //      set Target Repository Path to /com/pryv/commons/<libraryVersion>
-    //      add the following local file: lib-java/commons/build/libs/pryv-lib-commons-with-dependencies-<libraryVersion>.jar
-    //      click Save Changes
-    //      check that the jar file is saved to the right place and confirm the Notice message by clicking Publish
     // find and replace all occurrences of <libraryVersion> in Readme with new version number
     // git add, git commit -m "<libraryVersion>", git push
     // git tag -a <libraryVersion> <commit hash> -m "Publish message"

@@ -4,27 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.pryv.AbstractConnection;
-import com.pryv.database.QueryGenerator;
 import com.pryv.utils.Cuid;
-import com.pryv.utils.JsonConverter;
-import com.rits.cloning.Cloner;
 
 import org.joda.time.DateTime;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 
 /**
  * Event data structure from Pryv
@@ -55,22 +45,10 @@ public class Event extends ApiResource {
   private Boolean trashed;
 
   /**
-   * a weak reference to the connection to which the Event is linked
-   */
-  @JsonIgnore
-  private WeakReference<AbstractConnection> weakConnection;
-
-  /**
-   * used in order to prevent instanciating an Event multiple times.
-   */
-  private static Map<String, Event> supervisor = new WeakHashMap<String, Event>();
-
-  /**
    * empty Event constructor
    */
   public Event() {
     this.generateId();
-    this.updateSupervisor();
   }
 
   /**
@@ -82,7 +60,6 @@ public class Event extends ApiResource {
    */
   public Event(String streamId, String type, String content) {
     this.generateId();
-    this.updateSupervisor();
     this.streamId = streamId;
     this.type = type;
     this.content = content;
@@ -135,58 +112,6 @@ public class Event extends ApiResource {
     attachments = pAttachments;
     clientData = pClientData;
     trashed = pTrashed;
-    this.updateSupervisor();
-  }
-
-  /**
-   * Build an event from a ResultSet, used when retrieving Event objects from the SQLite Cache.
-   * This takes care of instanciating a new Event only in the case when it isn't existing yet.
-   *
-   * @param result The
-   * @return
-   * @throws SQLException
-   * @throws IOException
-   */
-  public static Event createOrReuse(ResultSet result) throws SQLException, IOException {
-    String id = result.getString(QueryGenerator.EVENTS_ID_KEY);
-    Event event = supervisor.get(id);
-    if (event == null) {
-      event = new Event();
-    }
-    event.setId(result.getString(QueryGenerator.EVENTS_ID_KEY));
-    event.setStreamId(result.getString(QueryGenerator.EVENTS_STREAM_ID_KEY));
-    event.setTime(result.getDouble(QueryGenerator.EVENTS_TIME_KEY));
-    event.setType(result.getString(QueryGenerator.EVENTS_TYPE_KEY));
-    event.setCreated(result.getDouble(QueryGenerator.EVENTS_CREATED_KEY));
-    event.setCreatedBy(result.getString(QueryGenerator.EVENTS_CREATED_BY_KEY));
-    event.setModified(result.getDouble(QueryGenerator.EVENTS_MODIFIED_KEY));
-    event.setModifiedBy(result.getString(QueryGenerator.EVENTS_MODIFIED_BY_KEY));
-    event.setDuration(result.getDouble(QueryGenerator.EVENTS_DURATION_KEY));
-    event.setContent(result.getObject(QueryGenerator.EVENTS_CONTENT_KEY));
-    String tagsString = result.getString(QueryGenerator.EVENTS_TAGS_KEY);
-    if (tagsString != null) {
-      Set <String> tags = new HashSet<String>(Arrays.asList(tagsString.split(",")));
-      event.setTags(tags);
-    }
-    event.setDescription(result.getString(QueryGenerator.EVENTS_DESCRIPTION_KEY));
-    // TODO fetch Attachments elsewhere
-    event.setClientDataFromAstring(result.getString(QueryGenerator.EVENTS_CLIENT_DATA_KEY));
-    event.setTrashed(result.getBoolean(QueryGenerator.EVENTS_TRASHED_KEY));
-    event.setAttachments(JsonConverter.deserializeAttachments(result.getString(QueryGenerator.EVENTS_ATTACHMENTS_KEY)));
-    return event;
-  }
-
-  /**
-   * saves the Event in the supervisor if needed
-   *
-   * @param event
-   * @return
-   */
-  public static Event createOrReuse(Event event) {
-    String id = event.getId();
-    // TODO: merge - not replace
-    supervisor.put(id, event);
-    return event;
   }
 
   /**
@@ -199,79 +124,6 @@ public class Event extends ApiResource {
     return this.id;
   }
 
-  private void updateSupervisor() {
-    String id = this.getId();
-    if(supervisor.containsKey(id)) {
-      supervisor.get(id).merge(this, JsonConverter.getCloner());
-    } else {
-      supervisor.put(id,this);
-    }
-  }
-
-  /**
-   * Assign a weak reference to the ConnectionOld
-   *
-   * @param weakconnection
-   */
-  public void assignConnection(WeakReference<AbstractConnection> weakconnection) {
-    this.weakConnection = weakconnection;
-  }
-
-  /**
-   * Returns the reference to the ConnectionOld to which the Event is linked if
-   * any.
-   *
-   * @return
-   */
-  public AbstractConnection getWeakConnection() {
-    return weakConnection.get();
-  }
-
-  /**
-   * Copy all temp Event's values into caller Event.
-   *
-   * @param temp
-   *          the Event from which the fields are merged
-   * @param cloner
-   *          com.rits.cloning.Cloner instance from JsonConverter util class
-   */
-  public void merge(Event temp, Cloner cloner) {
-    weakConnection = temp.weakConnection;
-    id = temp.id;
-    streamId = temp.streamId;
-    time = temp.time;
-    duration = temp.duration;
-    type = temp.type;
-    content = temp.content;
-    if (temp.tags != null) {
-      tags = new HashSet<String>();
-      for (String tag : temp.tags) {
-        tags.add(tag);
-      }
-    }
-
-    description = temp.description;
-    if (temp.attachments != null) {
-      attachments = new HashSet<Attachment>();
-      for (Attachment attachment : temp.attachments) {
-        attachments.add(cloner.deepClone(attachment));
-      }
-    }
-    if (temp.clientData != null) {
-      clientData = new HashMap<String, Object>();
-      for (String key : temp.clientData.keySet()) {
-        clientData.put(key, temp.clientData.get(key));
-      }
-    }
-    trashed = temp.trashed;
-    created = temp.created;
-    createdBy = temp.createdBy;
-    modified = temp.modified;
-    modifiedBy = temp.modifiedBy;
-
-    temp = null;
-  }
-
   /**
    * creates a map {@code Map<attachmentId, Attachment>} and returns it
    *
@@ -280,8 +132,10 @@ public class Event extends ApiResource {
   @JsonIgnore
   public Map<String, Attachment> getAttachmentsMap() {
     Map<String, Attachment> attachmentsMap = new HashMap<String, Attachment>();
-    for (Attachment attachment : attachments) {
-      attachmentsMap.put(attachment.getId(), attachment);
+    if(attachments != null && !attachments.isEmpty()) {
+      for (Attachment attachment : attachments) {
+        attachmentsMap.put(attachment.getId(), attachment);
+      }
     }
     return attachmentsMap;
   }
@@ -294,8 +148,8 @@ public class Event extends ApiResource {
    */
   @JsonIgnore
   public Attachment getFirstAttachment() {
-    for (Attachment attachment : attachments) {
-      return attachment;
+    if(attachments != null && !attachments.isEmpty()) {
+      return attachments.iterator().next();
     }
     return null;
   }
@@ -310,14 +164,10 @@ public class Event extends ApiResource {
     if (time == null) {
       return null;
     }
-    AbstractConnection con = null;
-    if (weakConnection != null) {
-      con = weakConnection.get();
-    }
-    if (con == null) {
-      return new DateTime((long) (time.doubleValue() * 1000));
-    }
-    return con.serverTimeInSystemDate(time);
+    /* TODO: Use of server time from HttpClient
+        return con.serverTimeInSystemDate(time);
+     */
+    return new DateTime((long) (time.doubleValue() * 1000));
   }
 
   /**
@@ -326,19 +176,16 @@ public class Event extends ApiResource {
    * @param date
    */
   @JsonIgnore
-  public void setDate(DateTime date) {
+  public Event setDate(DateTime date) {
     if (date == null) {
       time = null;
     } else {
+      /* TODO: Use of server time from HttpClient
+          time = con.serverTimeInSystemDate(date.getMillis() / 1000.0).getMillis() / 1000.0;
+       */
       time = date.getMillis() / 1000.0;
-      AbstractConnection con = null;
-      if (weakConnection != null) {
-        con = weakConnection.get();
-      }
-      if (con != null) {
-        time = con.serverTimeInSystemDate(date.getMillis() / 1000.0).getMillis() / 1000.0;
-      }
     }
+    return this;
   }
 
   /**
@@ -374,7 +221,7 @@ public class Event extends ApiResource {
    * @param source
    */
   @JsonIgnore
-  public void setClientDataFromAstring(String source) {
+  public Event setClientDataFromAstring(String source) {
     if (source != null) {
       String[] cdPairs = source.split(":");
       if (clientData == null) {
@@ -382,6 +229,7 @@ public class Event extends ApiResource {
       }
       clientData.put(cdPairs[0], cdPairs[1]);
     }
+    return this;
   }
 
   /**
@@ -389,11 +237,12 @@ public class Event extends ApiResource {
    *
    * @param tag
    */
-  public void addTag(String tag) {
+  public Event addTag(String tag) {
     if (tags == null) {
       tags = new HashSet<String>();
     }
     tags.add(tag);
+    return this;
   }
 
   /**
@@ -402,11 +251,12 @@ public class Event extends ApiResource {
    * @param attachment
    *          the attachment we wish to add
    */
-  public void addAttachment(Attachment attachment) {
+  public Event addAttachment(Attachment attachment) {
     if (attachments == null) {
       attachments = new HashSet<Attachment>();
     }
     attachments.add(attachment);
+    return this;
   }
 
   /**
@@ -415,7 +265,7 @@ public class Event extends ApiResource {
    * @param attachmentId
    *          the id of the attachment we wish to remove
    */
-  public void removeAttachment(String attachmentId) {
+  public Event removeAttachment(String attachmentId) {
     for (Attachment attachment : attachments) {
       if (attachment.getId().equals(attachmentId)) {
         attachments.remove(attachment);
@@ -424,6 +274,7 @@ public class Event extends ApiResource {
         }
       }
     }
+    return this;
   }
 
   @Override
@@ -509,63 +360,78 @@ public class Event extends ApiResource {
     }
   }
 
-  public void setId(String id) {
+  public Event setId(String id) {
     this.id = id;
+    return this;
   }
 
-  public void setStreamId(String streamId) {
+  public Event setStreamId(String streamId) {
     this.streamId = streamId;
+    return this;
   }
 
-  public void setTime(Double time) {
+  public Event setTime(Double time) {
     this.time = time;
+    return this;
   }
 
-  public void setType(String type) {
+  public Event setType(String type) {
     this.type = type;
+    return this;
   }
 
-  public void setCreated(Double created) {
+  public Event setCreated(Double created) {
     this.created = created;
+    return this;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public Event setCreatedBy(String createdBy) {
     this.createdBy = createdBy;
+    return this;
   }
 
-  public void setModified(Double modified) {
+  public Event setModified(Double modified) {
     this.modified = modified;
+    return this;
   }
 
-  public void setModifiedBy(String modifiedBy) {
+  public Event setModifiedBy(String modifiedBy) {
     this.modifiedBy = modifiedBy;
+    return this;
   }
 
-  public void setDuration(Double duration) {
+  public Event setDuration(Double duration) {
     this.duration = duration;
+    return this;
   }
 
-  public void setContent(Object content) {
+  public Event setContent(Object content) {
     this.content = content;
+    return this;
   }
 
-  public void setTags(Set<String> tags) {
+  public Event setTags(Set<String> tags) {
     this.tags = tags;
+    return this;
   }
 
-  public void setDescription(String description) {
+  public Event setDescription(String description) {
     this.description = description;
+    return this;
   }
 
-  public void setAttachments(Set<Attachment> attachments) {
+  public Event setAttachments(Set<Attachment> attachments) {
     this.attachments = attachments;
+    return this;
   }
 
-  public void setClientData(Map<String, Object> clientData) {
+  public Event setClientData(Map<String, Object> clientData) {
     this.clientData = clientData;
+    return this;
   }
 
-  public void setTrashed(Boolean trashed) {
+  public Event setTrashed(Boolean trashed) {
     this.trashed = trashed;
+    return this;
   }
 }

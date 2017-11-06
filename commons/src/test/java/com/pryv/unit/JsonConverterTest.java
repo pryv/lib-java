@@ -1,10 +1,15 @@
 package com.pryv.unit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.pryv.model.Attachment;
+import com.pryv.model.Event;
+import com.pryv.model.Stream;
+import com.pryv.utils.JsonConverter;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,16 +22,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.pryv.model.Attachment;
-import com.pryv.model.Event;
-import com.pryv.model.Stream;
-import com.pryv.utils.JsonConverter;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 /**
  * Class used to test JsonConverter methods
@@ -95,11 +94,11 @@ public class JsonConverterTest {
 
     @Test
     public void testMarshallStream() {
-        Stream parent = new Stream(null, null);
         Stream child1 = new Stream(null, null);
         Stream child2 = new Stream(null, null);
-        parent.addChildStream(child1);
-        parent.addChildStream(child2);
+        Stream parent = new Stream(null, null)
+                .addChildStream(child1)
+                .addChildStream(child2);
         try {
             System.out.println("marshall stream result: " + JsonConverter.toJson(parent));
         } catch (JsonProcessingException e) {
@@ -152,7 +151,6 @@ public class JsonConverterTest {
 
     @Test
     public void testMarshallEvent() {
-        Event testEvent = new Event();
         String id = "testId";
         String streamId = "testStream";
         String content = "";
@@ -163,26 +161,28 @@ public class JsonConverterTest {
         double modified = 200.0;
         double time = 300.0;
         String type = "note/txt";
-        testEvent.setId(id);
         Map<String, Object> clientData = new HashMap<String, Object>();
         clientData.put("color", "blue");
         clientData.put("height", 100);
-        testEvent.setClientData(clientData);
-        testEvent.setContent(content);
-        testEvent.setCreated(created);
-        testEvent.setCreatedBy(testerId);
-        testEvent.setDescription(description);
-        testEvent.setDuration(duration);
-        testEvent.setModified(modified);
-        testEvent.setModifiedBy(testerId);
-        testEvent.setStreamId(streamId);
         Set<String> tags = new HashSet<String>();
         tags.add("tag1");
         tags.add("tag2");
-        testEvent.setTags(tags);
-        testEvent.setTime(time);
-        testEvent.setTrashed(false);
-        testEvent.setType(type);
+
+        Event testEvent = new Event()
+                .setId(id)
+                .setClientData(clientData)
+                .setContent(content)
+                .setCreated(created)
+                .setCreatedBy(testerId)
+                .setDescription(description)
+                .setDuration(duration)
+                .setModified(modified)
+                .setModifiedBy(testerId)
+                .setStreamId(streamId)
+                .setTags(tags)
+                .setTime(time)
+                .setTrashed(false)
+                .setType(type);
         try {
             System.out.println("Marshall event result: " + JsonConverter.toJson(testEvent));
         } catch (JsonProcessingException e) {

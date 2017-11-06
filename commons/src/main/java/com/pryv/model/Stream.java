@@ -4,12 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.pryv.AbstractConnection;
-import com.pryv.database.QueryGenerator;
 
-import java.lang.ref.WeakReference;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,12 +28,6 @@ public class Stream extends ApiResource {
   private String createdBy;
   private Double modified;
   private String modifiedBy;
-
-  /**
-   * a weak reference to the connection to which the Event is linked
-   */
-  @JsonIgnore
-  private WeakReference<AbstractConnection> weakConnection;
 
   // optional
   private Boolean trashed;
@@ -92,25 +81,6 @@ public class Stream extends ApiResource {
   }
 
   /**
-   * build Stream when retrieved from cache
-   *
-   * @param result
-   * @throws SQLException
-   */
-  public Stream(ResultSet result) throws SQLException {
-    id = result.getString(QueryGenerator.STREAMS_ID_KEY);
-    name = result.getString(QueryGenerator.STREAMS_NAME_KEY);
-    trashed = result.getBoolean(QueryGenerator.STREAMS_TRASHED_KEY);
-    created = result.getDouble(QueryGenerator.STREAMS_CREATED_KEY);
-    createdBy = result.getString(QueryGenerator.STREAMS_CREATED_BY_KEY);
-    modified = result.getDouble(QueryGenerator.STREAMS_MODIFIED_KEY);
-    modifiedBy = result.getString(QueryGenerator.STREAMS_MODIFIED_BY_KEY);
-    parentId = result.getString(QueryGenerator.STREAMS_PARENT_ID_KEY);
-    singleActivity = result.getBoolean(QueryGenerator.STREAMS_SINGLE_ACTIVITY_KEY);
-    setClientDataFromAString(result.getString(QueryGenerator.STREAMS_CLIENT_DATA_KEY));
-  }
-
-  /**
    * minimal Constructor. Requires only mandatory fields. If id field is null a
    * random id is generated using the UUID algorithm.
    *
@@ -137,60 +107,8 @@ public class Stream extends ApiResource {
   /**
    * Assign unique ID to the Stream - to execute ONCE upon creation
    */
-  public void generateId() {
+  private void generateId() {
     this.id = UUID.randomUUID().toString();
-  }
-
-  /**
-   * Assign a weak reference to the ConnectionOld
-   *
-   * @param weakConnection
-   */
-  public void assignConnection(WeakReference<AbstractConnection> weakConnection) {
-    this.weakConnection = weakConnection;
-  }
-
-  /**
-   * Returns the reference to the ConnectionOld to which the Event is linked if
-   * any.
-   *
-   * @return
-   */
-  public AbstractConnection getWeakConnection() {
-    return weakConnection.get();
-  }
-
-  /**
-   * Copy all of Stream <tt>updatedStream</tt> values into the caller Stream.
-   *
-   * @param updatedStream
-   *          the Stream whose fields are copied
-   * @param withChildren
-   *          if set to <tt>true</tt>, children are also merged
-   */
-  public void merge(Stream updatedStream, boolean withChildren) {
-    weakConnection = updatedStream.weakConnection;
-    setId(updatedStream.id);
-    setName(updatedStream.name);
-    setParentId(updatedStream.parentId);
-    setSingleActivity(updatedStream.singleActivity);
-    setTrashed(updatedStream.trashed);
-    setCreated(updatedStream.created);
-    setCreatedBy(updatedStream.createdBy);
-    setModified(updatedStream.modified);
-    setModifiedBy(updatedStream.modifiedBy);
-    if (updatedStream.clientData != null) {
-      clientData = new HashMap<String, Object>();
-      for (String key : updatedStream.clientData.keySet()) {
-        clientData.put(key, updatedStream.clientData.get(key));
-      }
-    }
-    if (updatedStream.children != null && withChildren == true) {
-      this.clearChildren();
-      for (Stream childStream : updatedStream.children) {
-        addChildStream(childStream);
-      }
-    }
   }
 
   /**
@@ -219,7 +137,7 @@ public class Stream extends ApiResource {
    *
    * @param source
    */
-  public void setClientDataFromAString(String source) {
+  public Stream setClientDataFromAString(String source) {
     if (source != null) {
       if (source.length() > 0) {
         String[] cdPairs = source.split(":");
@@ -229,6 +147,7 @@ public class Stream extends ApiResource {
         clientData.put(cdPairs[0], cdPairs[1]);
       }
     }
+    return this;
   }
 
   /**
@@ -258,7 +177,7 @@ public class Stream extends ApiResource {
    *
    * @param childStream
    */
-  public void addChildStream(Stream childStream) {
+  public Stream addChildStream(Stream childStream) {
     if (childrenMap == null || children == null) {
       children = new HashSet<Stream>();
       childrenMap = new HashMap<String, Stream>();
@@ -270,6 +189,7 @@ public class Stream extends ApiResource {
     } else {
       System.out.println("Error: Stream.addChildStream() - no cycles allowed");
     }
+    return this;
   }
 
   /**
@@ -279,7 +199,7 @@ public class Stream extends ApiResource {
    * @param childStream
    *          the child Stream to remove
    */
-  public void removeChildStream(Stream childStream) {
+  public Stream removeChildStream(Stream childStream) {
     if (children != null && childrenMap != null) {
       childrenMap.remove(childStream.getId());
       children.remove(childStream);
@@ -291,14 +211,16 @@ public class Stream extends ApiResource {
     } else {
       System.out.println("Error: Trying to remove a child that is not registered as such.");
     }
+    return this;
   }
 
   /**
    * remove all the child Streams of the Stream.
    */
-  public void clearChildren() {
+  public Stream clearChildren() {
     children = null;
     childrenMap = null;
+    return this;
   }
 
   @Override
@@ -367,27 +289,32 @@ public class Stream extends ApiResource {
     return modifiedBy;
   }
 
-  public void setId(String id) {
+  public Stream setId(String id) {
     this.id = id;
+    return this;
   }
 
-  public void setName(String name) {
+  public Stream setName(String name) {
     this.name = name;
+    return this;
   }
 
-  public void setParentId(String parentId) {
+  public Stream setParentId(String parentId) {
     this.parentId = parentId;
+    return this;
   }
 
-  public void setSingleActivity(Boolean singleActivity) {
+  public Stream setSingleActivity(Boolean singleActivity) {
     this.singleActivity = singleActivity;
+    return this;
   }
 
-  public void setClientData(Map<String, Object> clientData) {
+  public Stream setClientData(Map<String, Object> clientData) {
     this.clientData = clientData;
+    return this;
   }
 
-  public void setChildren(Set<Stream> children) {
+  public Stream setChildren(Set<Stream> children) {
     this.children = children;
     if (children != null) {
       for (Stream stream : children) {
@@ -397,26 +324,32 @@ public class Stream extends ApiResource {
         childrenMap.put(stream.getId(), stream);
       }
     }
+    return this;
   }
 
-  public void setTrashed(Boolean trashed) {
+  public Stream setTrashed(Boolean trashed) {
     this.trashed = trashed;
+    return this;
   }
 
-  public void setCreated(Double created) {
+  public Stream setCreated(Double created) {
     this.created = created;
+    return this;
   }
 
-  public void setCreatedBy(String createdBy) {
+  public Stream setCreatedBy(String createdBy) {
     this.createdBy = createdBy;
+    return this;
   }
 
-  public void setModified(Double modified) {
+  public Stream setModified(Double modified) {
     this.modified = modified;
+    return this;
   }
 
-  public void setModifiedBy(String modifiedBy) {
+  public Stream setModifiedBy(String modifiedBy) {
     this.modifiedBy = modifiedBy;
+    return this;
   }
 
 }

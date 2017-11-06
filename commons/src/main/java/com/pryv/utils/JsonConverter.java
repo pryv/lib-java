@@ -6,12 +6,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pryv.model.Access;
 import com.pryv.model.ApiResource;
 import com.pryv.model.Attachment;
 import com.pryv.model.Event;
 import com.pryv.model.Stream;
-import com.rits.cloning.Cloner;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,7 +27,6 @@ import java.util.Set;
 public class JsonConverter {
 
   private static ObjectMapper jsonMapper = new ObjectMapper();
-  private static Cloner cloner = new Cloner();
   private static Logger logger = Logger.getInstance();
 
   private final static String EVENT_KEY = "event";
@@ -61,8 +58,7 @@ public class JsonConverter {
    * @throws JsonMappingException
    * @throws IOException
    */
-  public static <T> Object fromJson(String jsonSource, Class<T> type) throws JsonParseException,
-    JsonMappingException, IOException {
+  public static <T> Object fromJson(String jsonSource, Class<T> type) throws IOException {
     return jsonMapper.readValue(jsonSource, type);
   }
 
@@ -88,7 +84,7 @@ public class JsonConverter {
    * @throws JsonProcessingException
    * @throws IOException
    */
-  public static JsonNode toJsonNode(String source) throws JsonProcessingException, IOException {
+  public static JsonNode toJsonNode(String source) throws IOException {
     return jsonMapper.readTree(source);
   }
 
@@ -101,8 +97,7 @@ public class JsonConverter {
    * @throws JsonProcessingException
    * @throws IOException
    */
-  public static double retrieveServerTime(String jsonResponse) throws JsonProcessingException,
-    IOException {
+  public static double retrieveServerTime(String jsonResponse) throws IOException {
     double serverTime = toJsonNode(jsonResponse).get(META_KEY).get(SERVER_TIME_KEY).doubleValue();
     logger.log("JsonConverter: retrieved time: " + serverTime);
     return serverTime;
@@ -117,8 +112,7 @@ public class JsonConverter {
    * @throws JsonProcessingException
    * @throws IOException
    */
-  public static String retrieveDeletedStreamId(String json) throws JsonProcessingException,
-    IOException {
+  public static String retrieveDeletedStreamId(String json) throws IOException {
     String deletedStreamId = toJsonNode(json).get(STREAM_DELETION_KEY).get(ID_KEY).textValue();
     logger.log("JsonConverter: retrieved stream deletion id: " + deletedStreamId);
     return deletedStreamId;
@@ -133,8 +127,7 @@ public class JsonConverter {
    * @throws JsonProcessingException
    * @throws IOException
    */
-  public static String retrieveDeleteEventId(String json) throws JsonProcessingException,
-    IOException {
+  public static String retrieveDeleteEventId(String json) throws IOException {
     String deletedEventId = toJsonNode(json).get(EVENT_DELETION_KEY).get(ID_KEY).textValue();
     logger.log("JsonConverter: retrieved event deletion id: " + deletedEventId);
     return deletedEventId;
@@ -149,8 +142,7 @@ public class JsonConverter {
    * @throws JsonProcessingException
    * @throws IOException
    */
-  public static Boolean hasEventDeletionField(String json) throws JsonProcessingException,
-    IOException {
+  public static Boolean hasEventDeletionField(String json) throws IOException {
     if (toJsonNode(json).findValue(EVENT_DELETION_KEY) != null) {
       return true;
     } else {
@@ -167,8 +159,7 @@ public class JsonConverter {
    * @throws JsonProcessingException
    * @throws IOException
    */
-  public static Boolean hasStreamDeletionField(String json) throws JsonProcessingException,
-    IOException {
+  public static Boolean hasStreamDeletionField(String json) throws IOException {
     if (toJsonNode(json).findValue(STREAM_DELETION_KEY) != null) {
       return true;
     } else {
@@ -185,10 +176,9 @@ public class JsonConverter {
    * @throws JsonProcessingException
    * @throws IOException
    */
-  public static Event retrieveEventFromJson(String jsonSource) throws JsonProcessingException,
-    IOException {
+  public static Event retrieveEventFromJson(String jsonSource) throws IOException {
     JsonNode eventNode = toJsonNode(jsonSource).get(EVENT_KEY);
-    return jsonMapper.readValue(eventNode.toString(), Event.class);
+    return jsonMapper.treeToValue(eventNode, Event.class);
   }
 
   /**
@@ -200,11 +190,10 @@ public class JsonConverter {
    * @throws JsonProcessingException
    * @throws IOException
    */
-  public static String retrieveStoppedIdFromJson(String jsonSource) throws JsonProcessingException,
-          IOException {
+  public static String retrieveStoppedIdFromJson(String jsonSource) throws IOException {
     JsonNode stoppedIdNode = toJsonNode(jsonSource).get(STOPPED_ID_KEY);
     if (stoppedIdNode != null) {
-      String stoppedId = stoppedIdNode.toString();
+      String stoppedId = stoppedIdNode.textValue();
       logger.log("JsonConverter: retrieved stoppedId: " + stoppedId);
       return stoppedId;
     } else {
@@ -221,19 +210,16 @@ public class JsonConverter {
    * @throws JsonMappingException
    * @throws IOException
    */
-  public static List<Event> createEventsFromJson(String jsonEventsArray)
-    throws JsonParseException, JsonMappingException, IOException {
+  public static List<Event> createEventsFromJson(String jsonEventsArray) throws IOException {
 
     JsonNode arrNode = toJsonNode(jsonEventsArray).get(EVENTS_KEY);
 
-    List<Event> newEvents = new ArrayList<Event>();
+    List<Event> newEvents = new ArrayList<>();
     if (arrNode != null) {
       if (arrNode.isArray()) {
         logger.log("JsonConverter: number of received events: " + arrNode.size());
         for (final JsonNode objNode : arrNode) {
-          String str = objNode.toString();
-          logger.log("JsonConverter: deserializing event: " + str);
-          Event eventToAdd = jsonMapper.readValue(str, Event.class);
+          Event eventToAdd = jsonMapper.treeToValue(objNode, Event.class);
           newEvents.add(eventToAdd);
           logger.log("JsonConverter: event created: id = " + eventToAdd.getId());
         }
@@ -252,10 +238,9 @@ public class JsonConverter {
    * @throws JsonProcessingException
    * @throws IOException
    */
-  public static Stream retrieveStreamFromJson(String jsonSource) throws JsonProcessingException,
-    IOException {
+  public static Stream retrieveStreamFromJson(String jsonSource) throws IOException {
     JsonNode eventNode = toJsonNode(jsonSource).get(STREAM_KEY);
-    return jsonMapper.readValue(eventNode.toString(), Stream.class);
+    return jsonMapper.treeToValue(eventNode, Stream.class);
   }
 
   /**
@@ -266,16 +251,13 @@ public class JsonConverter {
    * @return
    * @throws IOException
    */
-  public static Map<String, Stream> createStreamsTreeFromJson(String jsonStreamsArray)
-    throws IOException {
+  public static Map<String, Stream> createStreamsTreeFromJson(String jsonStreamsArray) throws IOException {
     JsonNode arrNode = toJsonNode(jsonStreamsArray).get(STREAMS_KEY);
     Map<String, Stream> newStreams = new HashMap<String, Stream>();
     if (arrNode!=null && arrNode.isArray()) {
       logger.log("JsonConverter: number of received root streams: " + arrNode.size());
       for (final JsonNode objNode : arrNode) {
-        String str = objNode.toString();
-        logger.log("JsonConverter: deserializing stream: " + str);
-        Stream streamToAdd = jsonMapper.readValue(str, Stream.class);
+        Stream streamToAdd = jsonMapper.treeToValue(objNode, Stream.class);
         newStreams.put(streamToAdd.getId(), streamToAdd);
         logger.log("JsonConverter: stream created: id = " + streamToAdd.getId());
       }
@@ -299,8 +281,6 @@ public class JsonConverter {
     if (arrNode!=null && arrNode.isArray()) {
       logger.log("JsonConverter: number of received deleted streams: " + arrNode.size());
       for (final JsonNode objNode : arrNode) {
-        String str = objNode.toString();
-        logger.log("JsonConverter: deserializing deleted stream: " + str);
         String streamId = objNode.get(ID_KEY).textValue();
         Double deletionTime = objNode.get(DELETED_KEY).asDouble();
         deletedStreams.put(streamId, deletionTime);
@@ -309,55 +289,6 @@ public class JsonConverter {
     }
 
     return deletedStreams;
-  }
-
-  /**
-   * reset all fields of an attachments to values from JSON glossary json
-   *
-   * @param json
-   * @param toUpdate
-   * @throws JsonParseException
-   * @throws JsonMappingException
-   * @throws IOException
-   */
-  public static void resetAttachmentFromJson(String json, Attachment toUpdate)
-    throws JsonParseException, JsonMappingException, IOException {
-    Attachment temp = jsonMapper.readValue(json, Attachment.class);
-    toUpdate.merge(temp);
-  }
-
-  /**
-   * reset all fields of Event toUpdate to values from JSON glossary json
-   *
-   * @param json
-   *          The glossary containing the values to which the Event's fields are
-   *          updated.
-   * @param toUpdate
-   *          The Event reference whose fields are reset.
-   * @throws JsonParseException
-   * @throws JsonMappingException
-   * @throws IOException
-   */
-  public static void resetEventFromJson(String json, Event toUpdate) throws JsonParseException,
-    JsonMappingException, IOException {
-    Event temp = jsonMapper.readValue(json, Event.class);
-    toUpdate.merge(temp, cloner);
-  }
-
-  /**
-   * reset all fields of Stream toUpdate to values retrieved from JSON glossary
-   * json
-   *
-   * @param json
-   * @param toUpdate
-   * @throws JsonParseException
-   * @throws JsonMappingException
-   * @throws IOException
-   */
-  public static void resetStreamFromJson(String json, Stream toUpdate) throws JsonParseException,
-    JsonMappingException, IOException {
-    Stream temp = jsonMapper.readValue(json, Stream.class);
-    toUpdate.merge(temp, true);
   }
 
   /**
@@ -370,8 +301,7 @@ public class JsonConverter {
    * @throws JsonMappingException
    * @throws IOException
    */
-  public static Set<Attachment> deserializeAttachments(String jsonAttachments)
-    throws JsonParseException, JsonMappingException, IOException {
+  public static Set<Attachment> deserializeAttachments(String jsonAttachments) throws IOException {
     if (jsonAttachments != null) {
       return jsonMapper.readValue(jsonAttachments.replace("\\\'", "\'"),
         new TypeReference<Set<Attachment>>() {
@@ -384,13 +314,10 @@ public class JsonConverter {
   public static <T extends ApiResource> List<T> retrieveResourcesFromJson(String jsonResourcesArray, String resourceKey, Class<T> resource) throws IOException {
     JsonNode arrNode = toJsonNode(jsonResourcesArray).get(resourceKey);
     List<T> newResources = new ArrayList<>();
-    if (arrNode != null) {
-      if (arrNode.isArray()) {
-        for (final JsonNode objNode : arrNode) {
-          String str = objNode.toString();
-          T newResource = jsonMapper.readValue(str, resource);
-          newResources.add(newResource);
-        }
+    if (arrNode != null && arrNode.isArray()) {
+      for (final JsonNode objNode : arrNode) {
+        T newResource = jsonMapper.treeToValue(objNode, resource);
+        newResources.add(newResource);
       }
     }
     return newResources;
@@ -398,21 +325,12 @@ public class JsonConverter {
 
   public static <T extends ApiResource> T retrieveResourceFromJson(String jsonResource, String resourceKey, Class<T> resource) throws IOException {
     JsonNode eventNode = toJsonNode(jsonResource).get(resourceKey);
-    return jsonMapper.readValue(eventNode.toString(), resource);
+    return jsonMapper.treeToValue(eventNode, resource);
   }
 
   public static String retrieveDeletedResourceId(String jsonResponse, String resourceKey) throws IOException {
     String deletedResourceId = toJsonNode(jsonResponse).get(resourceKey).get(ID_KEY).textValue();
     return deletedResourceId;
-  }
-
-  /**
-   * Returns Cloner object
-   *
-   * @return
-   */
-  public static Cloner getCloner() {
-    return cloner;
   }
 
 }
