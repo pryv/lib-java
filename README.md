@@ -8,55 +8,29 @@ Java library to authorize, authenticate and access Pryv users data as defined in
 
 ## Import
 
-Since this library aims to be compatible with Java and Android environment, it contains a Java library and an Android library that both have a Commons library as dependency. Thus, please import the dependency depending on the platform you are targeting as follows :
-
 ### Gradle
 
-Java project:
 ```
-compile 'com.pryv:java:1.0.6'
-```
-
-Android project:
-```
-compile 'com.pryv:android:1.0.6'
+compile 'com.pryv:commons:1.0.7'
 ```
 
 ### Maven
 
-Java project:
 ```
 <dependency>
   <groupId>com.pryv</groupId>
-  <artifactId>java</artifactId>
-  <version>1.0.6</version>
+  <artifactId>commons</artifactId>
+  <version>1.0.7</version>
   <type>pom</type>
 </dependency>
 ```
 
-Android project:
-```
-<dependency>
-  <groupId>com.pryv</groupId>
-  <artifactId>android</artifactId>
-  <version>1.0.6</version>
-  <type>pom</type>
-</dependency>
-```
+### Jar
 
-### Jars, Aars
+Our [Bintray page](https://bintray.com/techpryv/maven/pryv-lib) hosts the sources (jar) of the libs under the *Files* tab.
 
-Our [Bintray page](https://bintray.com/techpryv/maven/pryv-lib) hosts the sources (Jar, Aar) of the libs under the *Files* tab.
-
-Download and import the source files listed below in your libs folder.
-
-Java project:
-  * [pryv-lib-commons-with-dependencies-1.0.6.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fcommons%2F1.0.6%2Fpryv-lib-commons-with-dependencies-1.0.6.jar)
-  * [java-1.0.6.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fjava%2F1.0.6%2Fjava-1.0.6.jar)
-
-Android project:
-  * [pryv-lib-commons-with-dependencies-1.0.6.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fcommons%2F1.0.6%2Fpryv-lib-commons-with-dependencies-1.0.6.jar)
-  * [android-1.0.6.aar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fandroid%2F1.0.6%2Fandroid-1.0.6.aar)
+Download and import the following jar file listed below in your libs folder: [commons-1.0.7.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fcommons%2F1.0.7%2Fcommons-1.0.7.jar
+)
 
 ## Java Integration
 Please see [https://github.com/pryv/app-java-examples](https://github.com/pryv/app-java-examples).

@@ -27,17 +27,18 @@ ext {
     // Release procedure:
     // increment libraryVersion just above
     // gradlew install
+    // test within Java/Android example apps
     // gradlew bintrayUpload (your local.properties file should provide:
     //      bintray.user=techpryv and bintray.key=..., see https://bintray.com/techpryv)
     // find and replace all occurrences of <libraryVersion> in Readme with new version number
     // git add, git commit -m "<libraryVersion>", git push
     // git tag -a <libraryVersion> <commit hash> -m "Publish message"
     // git push origin --tags
-    // update Java Getting started
+    // update Java Getting started and Java/Android example apps
     bintrayRepo = 'maven'
     bintrayName = 'pryv-lib'
     publishedGroupId = 'com.pryv'
-    libraryVersion = '1.0.6'
+    libraryVersion = '1.0.7'
     siteUrl = 'http://api.pryv.com'
     gitUrl = 'https://github.com/pryv/lib-java.git'
     licenseName = 'BSD'
