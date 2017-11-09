@@ -27,7 +27,6 @@ public class ApiRequest {
         String json = response.body().string();
         double time = JsonConverter.retrieveServerTime(json);
         int status = response.code();
-        // TODO: Throw custom ApiException, use of status+time in response
         if (status != HttpURLConnection.HTTP_CREATED && status != HttpURLConnection.HTTP_OK) {
             throw new IOException(json);
         }
