@@ -216,4 +216,12 @@ public class Access extends ApiResource {
     return this;
   }
 
+  public Access cloneMutableFields() {
+    return new Access()
+            .setId(null)
+            .setName(this.name)
+            .setPermissions(this.permissions)
+            .setDeviceName(this.deviceName);
+  }
+
 }

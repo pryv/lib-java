@@ -39,7 +39,8 @@ public class ConnectionAccesses {
     }
 
     public Access update(Access updateAccess) throws IOException {
-        HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, updateAccess.getId(), updateAccess).exec();
+        Access update = updateAccess.cloneMutableFields();
+        HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, updateAccess.getId(), update).exec();
         Access updatedAccess = JsonConverter.retrieveResourceFromJson(apiResponse.getJsonBody(), ACCESS_KEY, Access.class);
         return updatedAccess;
     }

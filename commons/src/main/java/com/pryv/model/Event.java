@@ -8,6 +8,7 @@ import com.pryv.utils.Cuid;
 
 import org.joda.time.DateTime;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -433,5 +434,19 @@ public class Event extends ApiResource {
   public Event setTrashed(Boolean trashed) {
     this.trashed = trashed;
     return this;
+  }
+
+  public Event cloneMutableFields() {
+    return new Event()
+            .setId(null)
+            .setStreamId(this.streamId)
+            .setTime(this.time)
+            .setType(this.type)
+            .setDuration(this.duration)
+            .setContent(this.content)
+            .setTags(this.tags)
+            .setDescription(this.description)
+            .setClientData(this.clientData)
+            .setTrashed(this.trashed);
   }
 }

@@ -58,7 +58,8 @@ public class ConnectionStreams {
     }
 
     public Stream update(Stream streamToUpdate) throws IOException {
-        HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, streamToUpdate.getId(), streamToUpdate).exec();
+        Stream update = streamToUpdate.cloneMutableFields();
+        HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, streamToUpdate.getId(), update).exec();
         Stream updatedStream = JsonConverter.retrieveStreamFromJson(apiResponse.getJsonBody());
         return updatedStream;
     }
