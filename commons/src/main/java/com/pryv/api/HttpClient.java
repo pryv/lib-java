@@ -9,15 +9,12 @@ import com.pryv.utils.JsonConverter;
 import org.joda.time.DateTime;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.HttpURLConnection;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
 /**
  * Created by thiebaudmodoux on 05.10.17.
@@ -52,7 +49,7 @@ public class HttpClient {
                 .url(url)
                 .get()
                 .build();
-        return new ApiRequest(request);
+        return new ApiRequest(request, client);
     }
 
     public ApiRequest createRequest(String endpoint, ApiResource newResource, Attachment attachment) throws JsonProcessingException {
@@ -75,7 +72,7 @@ public class HttpClient {
                 .url(url)
                 .post(body)
                 .build();
-        return new ApiRequest(request);
+        return new ApiRequest(request, client);
     }
 
     public ApiRequest updateRequest(String endpoint, String resourceId, ApiResource updatedResource) throws JsonProcessingException {
@@ -86,7 +83,7 @@ public class HttpClient {
                 .url(url)
                 .put(body)
                 .build();
-        return new ApiRequest(request);
+        return new ApiRequest(request, client);
     }
 
     public ApiRequest deleteRequest(String endpoint, String resourceId, Boolean mergeEventsWithParent) {
@@ -101,52 +98,7 @@ public class HttpClient {
                 .url(url)
                 .delete()
                 .build();
-        return new ApiRequest(request);
-    }
-
-    public class ApiRequest {
-        private Request httpRequest;
-
-        public ApiRequest(Request httpRequest) {
-            this.httpRequest = httpRequest;
-        }
-
-        public ApiResponse exec() throws IOException {
-            Response response = client.newCall(httpRequest).execute();
-            String json = response.body().string();
-            double time = JsonConverter.retrieveServerTime(json);
-            int status = response.code();
-            // TODO: Throw custom ApiException, use of status+time in response
-            if (status != HttpURLConnection.HTTP_CREATED && status != HttpURLConnection.HTTP_OK) {
-                throw new IOException(json);
-            }
-            ApiResponse apiResponse = new ApiResponse(json, time, status);
-            return apiResponse;
-        }
-    }
-
-    public class ApiResponse {
-        private String jsonBody;
-        private double serverTime;
-        private int status;
-
-        public ApiResponse (String httpResponse, double serverTime, int statusCode) {
-            this.jsonBody = httpResponse;
-            this.serverTime = serverTime;
-            this.status = statusCode;
-        }
-
-        public String getJsonBody() {
-            return jsonBody;
-        }
-
-        public double getServerTime() {
-            return serverTime;
-        }
-
-        public int getStatus() {
-            return status;
-        }
+        return new ApiRequest(request, client);
     }
 
     /**
