@@ -1,6 +1,7 @@
 package com.pryv.acceptance;
 
 import com.pryv.Connection;
+import com.pryv.exceptions.ApiException;
 import com.pryv.model.Event;
 import com.pryv.model.Filter;
 import com.pryv.model.Stream;
@@ -17,6 +18,7 @@ import resources.TestCredentials;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class ConnectionStreamsTest {
@@ -27,7 +29,7 @@ public class ConnectionStreamsTest {
 
 
     @BeforeClass
-    public static void setUp() throws IOException {
+    public static void setUp() throws IOException, ApiException {
 
         connection = new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, TestCredentials.DOMAIN);
 
@@ -44,13 +46,13 @@ public class ConnectionStreamsTest {
     }
 
     @AfterClass
-    public static void tearDown() throws IOException {
+    public static void tearDown() throws IOException, ApiException {
         connection.streams.delete(testSupportStream.getId(), false);
         connection.streams.delete(testSupportStream.getId(), false);
     }
 
     @Test
-    public void testCreateUpdateAndDeleteStream() throws IOException {
+    public void testCreateUpdateAndDeleteStream() throws IOException, ApiException {
         Stream testStream = new Stream("connectionStreamsTestStreamId", "connectionStreamsTestStreamId");
 
         // create
@@ -89,14 +91,14 @@ public class ConnectionStreamsTest {
      */
 
     @Test
-    public void testFetchStreams() throws IOException {
+    public void testFetchStreams() throws IOException, ApiException {
         Map<String, Stream> retrievedStreams = connection.streams.get(null);
         assertNotNull(retrievedStreams);
         assertTrue(retrievedStreams.size() > 0);
     }
 
     @Test
-    public void testGetStreamsMustReturnATreeOfNonTrashedStreamsWithANullFilter() throws IOException {
+    public void testGetStreamsMustReturnATreeOfNonTrashedStreamsWithANullFilter() throws IOException, ApiException {
         Stream s1 = new Stream(null, "someStreamOne")
                 .setParentId(testSupportStream.getId());
         Stream s2 = new Stream(null, "someOtherStream")
@@ -112,7 +114,7 @@ public class ConnectionStreamsTest {
     }
 
     @Test
-    public void testGetStreamsWithParentIdSetMustReturnStreamsMatchingTheGivenFilter() throws IOException {
+    public void testGetStreamsWithParentIdSetMustReturnStreamsMatchingTheGivenFilter() throws IOException, ApiException {
         // Create children
         Stream childStream1 = new Stream("childStream1", "childStream1")
                 .setParentId(testSupportStream.getId());
@@ -137,7 +139,7 @@ public class ConnectionStreamsTest {
     }
 
     @Test
-    public void testGetStreamsWithStateSetToAllMustReturnTrashedStreamsAsWell() throws IOException {
+    public void testGetStreamsWithStateSetToAllMustReturnTrashedStreamsAsWell() throws IOException, ApiException {
         // Create child
         Stream trashedChild = new Stream("trashedChild", "trashedChild")
                 .setParentId(testSupportStream.getId());
@@ -165,7 +167,7 @@ public class ConnectionStreamsTest {
     }
 
     @Test
-    public void testGetStreamsWithIncludeDeletionsMustReturnDeletedStreamsAsWell() throws IOException {
+    public void testGetStreamsWithIncludeDeletionsMustReturnDeletedStreamsAsWell() throws IOException, ApiException {
         // Create child
         Stream deletedChild = new Stream("deletedChild", "deletedChild")
                 .setParentId(testSupportStream.getId());
@@ -214,7 +216,7 @@ public class ConnectionStreamsTest {
      */
 
     @Test
-    public void testCreateStreamMustAcceptAValidStream() throws IOException {
+    public void testCreateStreamMustAcceptAValidStream() throws IOException, ApiException {
         Stream newStream = new Stream("myNewId", "myNewStream")
                 .setParentId(testSupportStream.getId());
 
@@ -224,8 +226,8 @@ public class ConnectionStreamsTest {
         TestUtils.checkStream(newStream, createdStream);
     }
 
-    @Test(expected = IOException.class)
-    public void testCreateStreamMustReturnAnErrorIfAStreamWithTheSameNameExistsAtTheSameTreeLevel() throws IOException {
+    @Test
+    public void testCreateStreamMustReturnAnErrorIfAStreamWithTheSameNameExistsAtTheSameTreeLevel() throws IOException, ApiException {
         Stream someStream = new Stream("someStreamThatWillBotherNext", "my lovely stream name")
                 .setParentId(testSupportStream.getId());
 
@@ -234,11 +236,19 @@ public class ConnectionStreamsTest {
         Stream duplicateIdStream = new Stream("copyNameSteam", someStream.getName())
                 .setParentId(testSupportStream.getId());
 
-        connection.streams.create(duplicateIdStream);
+        try {
+            connection.streams.create(duplicateIdStream);
+        } catch (ApiException e) {
+            assertNotNull(e);
+            assertNotNull(e.getId());
+            assertNotNull(e.getMsg());
+        } catch (Exception e) {
+            assertNull(e);
+        }
     }
 
-    @Test(expected = IOException.class)
-    public void testCreateStreamMustReturnAnErrorIfAStreamWithTheSameIdAlreadyExists() throws IOException {
+    @Test
+    public void testCreateStreamMustReturnAnErrorIfAStreamWithTheSameIdAlreadyExists() throws IOException, ApiException {
         Stream someStream = new Stream("someStreamWithANiceId", "Well I dont care")
                 .setParentId(testSupportStream.getId());
 
@@ -247,7 +257,15 @@ public class ConnectionStreamsTest {
         Stream duplicateIdStream = new Stream(someStream.getId(), "I will not be created")
                 .setParentId(testSupportStream.getId());
 
-        connection.streams.create(duplicateIdStream);
+        try {
+            connection.streams.create(duplicateIdStream);
+        } catch (ApiException e) {
+            assertNotNull(e);
+            assertNotNull(e.getId());
+            assertNotNull(e.getMsg());
+        } catch (Exception e) {
+            assertNull(e);
+        }
     }
 
     // TODO check if possible

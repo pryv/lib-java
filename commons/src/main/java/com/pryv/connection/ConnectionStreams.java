@@ -1,7 +1,9 @@
 package com.pryv.connection;
 
 
+import com.pryv.api.ApiResponse;
 import com.pryv.api.HttpClient;
+import com.pryv.exceptions.ApiException;
 import com.pryv.model.Filter;
 import com.pryv.model.Stream;
 import com.pryv.utils.JsonConverter;
@@ -25,8 +27,8 @@ public class ConnectionStreams {
         this.flatStreams = new ConcurrentHashMap<>();
     }
 
-    public Map<String, Stream> get(Filter filter) throws IOException {
-        HttpClient.ApiResponse apiResponse = httpClient.getRequest(PATH, filter).exec();
+    public Map<String, Stream> get(Filter filter) throws IOException, ApiException {
+        ApiResponse apiResponse = httpClient.getRequest(PATH, filter).exec();
         String json = apiResponse.getJsonBody();
         Map<String, Stream> receivedStreams =
                 JsonConverter.createStreamsTreeFromJson(json);
@@ -37,14 +39,14 @@ public class ConnectionStreams {
         return receivedStreams;
     }
 
-    public Stream create(Stream newStream) throws IOException {
-        HttpClient.ApiResponse apiResponse = httpClient.createRequest(PATH, newStream, null).exec();
+    public Stream create(Stream newStream) throws IOException, ApiException {
+        ApiResponse apiResponse = httpClient.createRequest(PATH, newStream, null).exec();
         Stream createdStream = JsonConverter.retrieveStreamFromJson(apiResponse.getJsonBody());
         return createdStream;
     }
 
-    public String delete(String streamId, boolean mergeEventsWithParent) throws IOException {
-        HttpClient.ApiResponse apiResponse = httpClient.deleteRequest(PATH, streamId, mergeEventsWithParent).exec();
+    public String delete(String streamId, boolean mergeEventsWithParent) throws IOException, ApiException {
+        ApiResponse apiResponse = httpClient.deleteRequest(PATH, streamId, mergeEventsWithParent).exec();
         String json = apiResponse.getJsonBody();
         if (JsonConverter.hasStreamDeletionField(json)) {
             // stream was deleted
@@ -57,8 +59,8 @@ public class ConnectionStreams {
         }
     }
 
-    public Stream update(Stream streamToUpdate) throws IOException {
-        HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, streamToUpdate.getId(), streamToUpdate).exec();
+    public Stream update(Stream streamToUpdate) throws IOException, ApiException {
+        ApiResponse apiResponse = httpClient.updateRequest(PATH, streamToUpdate.getId(), streamToUpdate).exec();
         Stream updatedStream = JsonConverter.retrieveStreamFromJson(apiResponse.getJsonBody());
         return updatedStream;
     }

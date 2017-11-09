@@ -1,5 +1,6 @@
 package com.pryv.api;
 
+import com.pryv.exceptions.ApiException;
 import com.pryv.utils.JsonConverter;
 
 import java.io.IOException;
@@ -22,13 +23,14 @@ public class ApiRequest {
         this.httpClient = httpClient;
     }
 
-    public ApiResponse exec() throws IOException {
+    public ApiResponse exec() throws IOException, ApiException {
         Response response = httpClient.newCall(httpRequest).execute();
         String json = response.body().string();
         double time = JsonConverter.retrieveServerTime(json);
         int status = response.code();
         if (status != HttpURLConnection.HTTP_CREATED && status != HttpURLConnection.HTTP_OK) {
-            throw new IOException(json);
+            ApiException exception = JsonConverter.retrieveApiError(json);
+            throw exception;
         }
         ApiResponse apiResponse = new ApiResponse(json, time, status);
         return apiResponse;

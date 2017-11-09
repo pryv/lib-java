@@ -1,6 +1,7 @@
 package com.pryv.acceptance;
 
 import com.pryv.Connection;
+import com.pryv.exceptions.ApiException;
 import com.pryv.model.Access;
 import com.pryv.model.Permission;
 
@@ -31,7 +32,7 @@ public class ConnectionAccessesTest {
     private static Connection connection;
 
     @BeforeClass
-    public static void testCreateAccess() throws IOException {
+    public static void testCreateAccess() throws IOException, ApiException {
 
         connection = new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, TestCredentials.DOMAIN);
 
@@ -65,13 +66,13 @@ public class ConnectionAccessesTest {
     }
 
     @AfterClass
-    public static void testDeleteAccess() throws IOException {
+    public static void testDeleteAccess() throws IOException, ApiException {
         String deletionId = connection.accesses.delete(accessId);
         assertEquals(deletionId, accessId);
     }
 
     @Test
-    public void testGetAccess() throws IOException {
+    public void testGetAccess() throws IOException, ApiException {
         List<Access> retrievedAccesses = connection.accesses.get();
         assertNotNull(retrievedAccesses);
         assertTrue(retrievedAccesses.size() > 0);
@@ -86,7 +87,7 @@ public class ConnectionAccessesTest {
     }
 
     @Test
-    public void testUpdateAccess() throws IOException {
+    public void testUpdateAccess() throws IOException, ApiException {
         String newAccessName = "newAccess";
         String newStreamId = "newStreamId";
         Permission.Level newPermissionLevel = Permission.Level.contribute;

@@ -2,6 +2,7 @@ package com.pryv.acceptance;
 
 
 import com.pryv.Connection;
+import com.pryv.exceptions.ApiException;
 import com.pryv.model.Stream;
 
 import org.junit.AfterClass;
@@ -22,7 +23,7 @@ public class ConnectionTest {
     private static Connection connection;
 
     @BeforeClass
-    public static void setup() throws IOException {
+    public static void setup() throws IOException, ApiException {
 
         connection = new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, TestCredentials.DOMAIN);
 

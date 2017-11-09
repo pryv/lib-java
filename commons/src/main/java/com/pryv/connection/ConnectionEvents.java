@@ -1,6 +1,8 @@
 package com.pryv.connection;
 
+import com.pryv.api.ApiResponse;
 import com.pryv.api.HttpClient;
+import com.pryv.exceptions.ApiException;
 import com.pryv.model.Attachment;
 import com.pryv.model.Event;
 import com.pryv.model.Filter;
@@ -18,15 +20,15 @@ public class ConnectionEvents {
         this.httpClient = client;
     }
 
-    public List<Event> get(Filter filter) throws IOException {
-        HttpClient.ApiResponse apiResponse = httpClient.getRequest(PATH, filter).exec();
+    public List<Event> get(Filter filter) throws IOException, ApiException {
+        ApiResponse apiResponse = httpClient.getRequest(PATH, filter).exec();
         List<Event> receivedEvents = JsonConverter.createEventsFromJson(apiResponse.getJsonBody());
         // TODO: retrieve eventDeletions
         return receivedEvents;
     }
 
-    public Event create(Event newEvent) throws IOException {
-        HttpClient.ApiResponse apiResponse;
+    public Event create(Event newEvent) throws IOException, ApiException {
+        ApiResponse apiResponse;
 
         Attachment firstAttachment = newEvent.getFirstAttachment();
         if(firstAttachment != null) {
@@ -40,8 +42,8 @@ public class ConnectionEvents {
         return createdEvent;
     }
 
-    public String delete(String eventId) throws IOException {
-        HttpClient.ApiResponse apiResponse = httpClient.deleteRequest(PATH, eventId, false).exec();
+    public String delete(String eventId) throws IOException, ApiException {
+        ApiResponse apiResponse = httpClient.deleteRequest(PATH, eventId, false).exec();
         String json = apiResponse.getJsonBody();
         if (JsonConverter.hasEventDeletionField(json)) {
             // event was deleted
@@ -54,8 +56,8 @@ public class ConnectionEvents {
         }
     }
 
-    public Event update(Event updateEvent) throws IOException {
-        HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, updateEvent.getId(), updateEvent).exec();
+    public Event update(Event updateEvent) throws IOException, ApiException {
+        ApiResponse apiResponse = httpClient.updateRequest(PATH, updateEvent.getId(), updateEvent).exec();
         Event updatedEvent = JsonConverter.retrieveEventFromJson(apiResponse.getJsonBody());
         return updatedEvent;
     }
