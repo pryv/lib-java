@@ -8,7 +8,6 @@ import com.pryv.utils.Cuid;
 
 import org.joda.time.DateTime;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
