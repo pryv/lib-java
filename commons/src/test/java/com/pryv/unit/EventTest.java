@@ -1,5 +1,6 @@
 package com.pryv.unit;
 
+import com.pryv.model.Attachment;
 import com.pryv.model.Event;
 import com.pryv.util.TestUtils;
 
@@ -7,6 +8,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -83,6 +85,24 @@ public class EventTest {
   @Test
   public void testFullConstructor() {
     TestUtils.checkEvent(testEvent, testEvent);
+  }
+
+  @Test
+  public void testCloneMutableFields() {
+    Event immutableEvent = new Event();
+    immutableEvent.setId("immutable");
+    immutableEvent.setCreated(0.0);
+    immutableEvent.setCreatedBy("immutable");
+    immutableEvent.setModified(0.0);
+    immutableEvent.setModifiedBy("immutable");
+    immutableEvent.setAttachments(new HashSet<Attachment>());
+    Event mutableEvent = immutableEvent.cloneMutableFields();
+    assertNull(mutableEvent.getId());
+    assertNull(mutableEvent.getCreated());
+    assertNull(mutableEvent.getCreatedBy());
+    assertNull(mutableEvent.getModified());
+    assertNull(mutableEvent.getModifiedBy());
+    assertNull(mutableEvent.getAttachments());
   }
 
   /**
