@@ -55,7 +55,8 @@ public class ConnectionEvents {
     }
 
     public Event update(Event updateEvent) throws IOException {
-        HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, updateEvent.getId(), updateEvent).exec();
+        Event update = updateEvent.cloneMutableFields();
+        HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, updateEvent.getId(), update).exec();
         Event updatedEvent = JsonConverter.retrieveEventFromJson(apiResponse.getJsonBody());
         return updatedEvent;
     }

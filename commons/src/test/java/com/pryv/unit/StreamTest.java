@@ -5,6 +5,11 @@ import com.pryv.model.Stream;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -61,6 +66,24 @@ public class StreamTest {
     Stream parent = new Stream("parentId", null)
             .addChildStream(child);
     assertFalse(parent.hasChild("blop"));
+  }
+
+  @Test
+  public void testCloneMutableFields() {
+    Stream immutableStream = new Stream();
+    immutableStream.setId("immutable");
+    immutableStream.setCreated(0.0);
+    immutableStream.setCreatedBy("immutable");
+    immutableStream.setModified(0.0);
+    immutableStream.setModifiedBy("immutable");
+    immutableStream.setChildren(new HashSet<Stream>());
+    Stream mutableStream = immutableStream.cloneMutableFields();
+    assertNull(mutableStream.getId());
+    assertNull(mutableStream.getCreated());
+    assertNull(mutableStream.getCreatedBy());
+    assertNull(mutableStream.getModified());
+    assertNull(mutableStream.getModifiedBy());
+    assertNull(mutableStream.getChildren());
   }
 
   private void checkStreamParams(Stream pStream) {

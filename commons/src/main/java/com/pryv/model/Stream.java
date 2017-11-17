@@ -352,4 +352,14 @@ public class Stream extends ApiResource {
     return this;
   }
 
+  public Stream cloneMutableFields() {
+    return new Stream()
+            .setId(null)
+            .setParentId(this.parentId)
+            .setName(this.name)
+            .setTrashed(this.trashed)
+            .setSingleActivity(this.singleActivity)
+            .setClientData(this.clientData);
+  }
+
 }
