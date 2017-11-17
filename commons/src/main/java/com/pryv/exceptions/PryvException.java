@@ -7,8 +7,6 @@ import java.util.ArrayList;
  */
 
 abstract class PryvException extends Exception {
-    static String id;
-    static String message;
 
     public abstract String getId();
 
