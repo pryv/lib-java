@@ -434,4 +434,18 @@ public class Event extends ApiResource {
     this.trashed = trashed;
     return this;
   }
+
+  public Event cloneMutableFields() {
+    return new Event()
+            .setId(null)
+            .setStreamId(this.streamId)
+            .setTime(this.time)
+            .setType(this.type)
+            .setDuration(this.duration)
+            .setContent(this.content)
+            .setTags(this.tags)
+            .setDescription(this.description)
+            .setClientData(this.clientData)
+            .setTrashed(this.trashed);
+  }
 }

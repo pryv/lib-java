@@ -57,7 +57,8 @@ public class ConnectionEvents {
     }
 
     public Event update(Event updateEvent) throws IOException, ApiException {
-        ApiResponse apiResponse = httpClient.updateRequest(PATH, updateEvent.getId(), updateEvent).exec();
+        Event update = updateEvent.cloneMutableFields();
+        ApiResponse apiResponse = httpClient.updateRequest(PATH, updateEvent.getId(), update).exec();
         Event updatedEvent = JsonConverter.retrieveEventFromJson(apiResponse.getJsonBody());
         return updatedEvent;
     }
