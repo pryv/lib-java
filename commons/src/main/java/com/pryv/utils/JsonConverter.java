@@ -124,9 +124,9 @@ public class JsonConverter {
         subErrors.add(objNode.textValue());
       }
     }
-    String message = !msg.isNull() && msg.isTextual() ? msg.textValue(): null;
-    String id = !i.isNull() && i.isTextual() ? i.textValue(): null;
-    String data = !d.isNull() ? d.toString(): null;
+    String message = msg!=null && msg.isTextual() ? msg.textValue(): null;
+    String id = i!=null && i.isTextual() ? i.textValue(): null;
+    String data = d!=null ? d.toString(): null;
 
     return new ApiException(id, message, data, subErrors);
   }

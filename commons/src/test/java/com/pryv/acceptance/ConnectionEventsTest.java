@@ -329,10 +329,18 @@ public class ConnectionEventsTest {
         assertEquals(updatedEvent.getContent(), eventToUpdate.getContent());
     }
 
-    //@Test(expected = IOException.class)
-    public void testUpdateEventMustReturnAnErrorWhenEventDoesntExistYet() throws IOException, ApiException {
+    @Test
+    public void testUpdateEventMustReturnAnErrorWhenEventDoesntExistYet() {
         Event unexistingEvent = new Event(testSupportStream.getId(), "note/txt", "I dont exist and will generate an apiError");
-        connection.events.update(unexistingEvent);
+        try {
+            connection.events.update(unexistingEvent);
+        } catch (IOException e) {
+            assertNull(e);
+        } catch (ApiException e) {
+            assertNotNull(e);
+            assertNotNull(e.getId());
+            assertNotNull(e.getMsg());
+        }
     }
 
     /**
