@@ -7,9 +7,6 @@ import java.util.Set;
  * Filter used in Events fetching. All its fields are optional. Either
  * instantiate using full Constructor with 'null' values when fields are unused,
  * or use empty Constructor and add fields using setters or add methods.
- *
- * @author ik
- *
  */
 public class Filter {
 
@@ -167,14 +164,12 @@ public class Filter {
     // State
     Boolean stateMatch = true;
     if (state != null) {
-      if (event.isTrashed() != null) {
-        if (event.isTrashed()
-          && state.equals(State.DEFAULT)
-            || !event.isTrashed()
-            && state.equals(State.TRASHED)) {
-          stateMatch = false;
+      if (event.isTrashed()
+        && state.equals(State.DEFAULT)
+          || !event.isTrashed()
+          && state.equals(State.TRASHED)) {
+        stateMatch = false;
 
-        }
       }
     }
 

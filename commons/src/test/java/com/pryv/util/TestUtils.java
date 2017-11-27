@@ -53,9 +53,9 @@ public class TestUtils {
             if (expected.getDescription() != null) {
                 assertEquals(expected.getDescription(), actual.getDescription());
             }
-            if (expected.isTrashed() != null) {
-                assertEquals(expected.isTrashed(), actual.isTrashed());
-            }
+
+            assertEquals(expected.isTrashed(), actual.isTrashed());
+
             if (expected.getTags() != null) {
                 assertNotNull(actual.getTags());
                 boolean found = false;
@@ -123,9 +123,9 @@ public class TestUtils {
             if (expected.getModifiedBy() != null) {
                 assertEquals(expected.getModifiedBy(), received.getModifiedBy());
             }
-            if (expected.isTrashed() != null) {
-                assertEquals(expected.isTrashed(), received.isTrashed());
-            }
+
+            assertEquals(expected.isTrashed(), received.isTrashed());
+
             if (expected.isSingleActivity() != null) {
                 assertEquals(expected.isSingleActivity(), received.isSingleActivity());
             }

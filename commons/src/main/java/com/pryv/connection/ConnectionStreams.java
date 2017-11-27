@@ -1,7 +1,9 @@
 package com.pryv.connection;
 
 
+import com.pryv.api.ApiResponse;
 import com.pryv.api.HttpClient;
+import com.pryv.exceptions.ApiException;
 import com.pryv.model.Filter;
 import com.pryv.model.Stream;
 import com.pryv.utils.JsonConverter;
@@ -10,6 +12,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Encapsulate CRUD operations to Pryv API for Streams
+ */
 public class ConnectionStreams {
 
     private HttpClient httpClient;
@@ -25,41 +30,36 @@ public class ConnectionStreams {
         this.flatStreams = new ConcurrentHashMap<>();
     }
 
-    public Map<String, Stream> get(Filter filter) throws IOException {
-        HttpClient.ApiResponse apiResponse = httpClient.getRequest(PATH, filter).exec();
+    public Map<String, Stream> get(Filter filter) throws IOException, ApiException {
+        ApiResponse apiResponse = httpClient.getRequest(PATH, filter).exec();
         String json = apiResponse.getJsonBody();
         Map<String, Stream> receivedStreams =
                 JsonConverter.createStreamsTreeFromJson(json);
-        // TODO: retrieve streamDeletions
-        Map<String, Double> streamDeletions =
-                JsonConverter.createStreamDeletionsTreeFromJson(json);
         rootStreams = receivedStreams;
         return receivedStreams;
     }
 
-    public Stream create(Stream newStream) throws IOException {
-        HttpClient.ApiResponse apiResponse = httpClient.createRequest(PATH, newStream, null).exec();
+    public Stream create(Stream newStream) throws IOException, ApiException {
+        ApiResponse apiResponse = httpClient.createRequest(PATH, newStream, null).exec();
         Stream createdStream = JsonConverter.retrieveStreamFromJson(apiResponse.getJsonBody());
         return createdStream;
     }
 
-    public String delete(String streamId, boolean mergeEventsWithParent) throws IOException {
-        HttpClient.ApiResponse apiResponse = httpClient.deleteRequest(PATH, streamId, mergeEventsWithParent).exec();
+    public Stream delete(Stream deleteStream, boolean mergeEventsWithParent) throws IOException, ApiException {
+        ApiResponse apiResponse = httpClient.deleteRequest(PATH, deleteStream.getId(), mergeEventsWithParent).exec();
         String json = apiResponse.getJsonBody();
         if (JsonConverter.hasStreamDeletionField(json)) {
             // stream was deleted
-            String deletionId = JsonConverter.retrieveDeletedStreamId(json);
-            return deletionId;
+            return deleteStream.setDeleted(true);
         } else {
             // stream was trashed
-            Stream trashedStream = JsonConverter.retrieveStreamFromJson(json);
-            return trashedStream.getId();
+            return JsonConverter.retrieveStreamFromJson(json);
         }
     }
 
-    public Stream update(Stream streamToUpdate) throws IOException {
+    public Stream update(Stream streamToUpdate) throws IOException, ApiException {
         Stream update = streamToUpdate.cloneMutableFields();
-        HttpClient.ApiResponse apiResponse = httpClient.updateRequest(PATH, streamToUpdate.getId(), update).exec();
+        ApiResponse apiResponse = httpClient.updateRequest(PATH, streamToUpdate.getId(), update).exec();
         Stream updatedStream = JsonConverter.retrieveStreamFromJson(apiResponse.getJsonBody());
         return updatedStream;
     }

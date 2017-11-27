@@ -1,11 +1,7 @@
 package com.pryv.auth;
 
 /**
- *
- * view displayed to enter credentials
- *
- * @author ik
- *
+ * View displayed to enter credentials
  */
 public interface AuthView {
 

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pryv.exceptions.ApiException;
 import com.pryv.model.ApiResource;
 import com.pryv.model.Attachment;
 import com.pryv.model.Event;
@@ -19,10 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Utilitary class used to do JSON conversions
- *
- * @author ik
- *
+ * Utility class used to do JSON conversions
  */
 public class JsonConverter {
 
@@ -101,6 +99,33 @@ public class JsonConverter {
     double serverTime = toJsonNode(jsonResponse).get(META_KEY).get(SERVER_TIME_KEY).doubleValue();
     logger.log("JsonConverter: retrieved time: " + serverTime);
     return serverTime;
+  }
+
+  /**
+   * Retrieves the error field from a erroneous response from the API
+   *
+   * @param jsonResponse
+   *          the jsonResponse containing a field "error"
+   * @return
+   * @throws IOException
+   */
+  public static ApiException retrieveApiError(String jsonResponse) throws IOException {
+    JsonNode error = toJsonNode(jsonResponse).get("error");
+    JsonNode msg = error.get("message");
+    JsonNode i = error.get(ID_KEY);
+    JsonNode d = error.get("data");
+    JsonNode subErr = error.get("subErrors");
+    ArrayList<String> subErrors = new ArrayList<>();
+    if (subErr!=null && subErr.isArray()) {
+      for (final JsonNode objNode : subErr) {
+        subErrors.add(objNode.textValue());
+      }
+    }
+    String message = msg!=null && msg.isTextual() ? msg.textValue(): null;
+    String id = i!=null && i.isTextual() ? i.textValue(): null;
+    String data = d!=null ? d.toString(): null;
+
+    return new ApiException(id, message, data, subErrors);
   }
 
   /**

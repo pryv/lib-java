@@ -12,11 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- *
- * Stream object from Pryv API
- *
- * @author ik
- *
+ * Stream resource from Pryv API
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
@@ -30,7 +26,9 @@ public class Stream extends ApiResource {
   private String modifiedBy;
 
   // optional
-  private Boolean trashed;
+  private boolean trashed;
+  @JsonIgnore
+  private boolean deleted;
   private Set<Stream> children;
 
   @JsonIgnore
@@ -54,13 +52,14 @@ public class Stream extends ApiResource {
    *          optional
    * @param pChildren
    * @param pTrashed
+   * @param pDeleted
    * @param pCreated
    * @param pCreatedBy
    * @param pModified
    * @param pModifiedBy
    */
   public Stream(String pId, String pName, String pParentId, Boolean pSingleActivity,
-    Map<String, Object> pClientData, Set<Stream> pChildren, Boolean pTrashed, Double pCreated,
+    Map<String, Object> pClientData, Set<Stream> pChildren, boolean pTrashed, boolean pDeleted, Double pCreated,
     String pCreatedBy, Double pModified, String pModifiedBy) {
     id = pId;
     name = pName;
@@ -74,6 +73,7 @@ public class Stream extends ApiResource {
       }
     }
     trashed = pTrashed;
+    deleted = pDeleted;
     created = pCreated;
     createdBy = pCreatedBy;
     modified = pModified;
@@ -266,11 +266,12 @@ public class Stream extends ApiResource {
     return children;
   }
 
-  public Boolean isTrashed() {
-    if (trashed == null) {
-      return false;
-    } else
-      return trashed;
+  public boolean isTrashed() {
+    return trashed;
+  }
+
+  public boolean isDeleted() {
+    return deleted;
   }
 
   public Double getCreated() {
@@ -327,8 +328,13 @@ public class Stream extends ApiResource {
     return this;
   }
 
-  public Stream setTrashed(Boolean trashed) {
+  public Stream setTrashed(boolean trashed) {
     this.trashed = trashed;
+    return this;
+  }
+
+  public Stream setDeleted(boolean deleted) {
+    this.deleted = deleted;
     return this;
   }
 

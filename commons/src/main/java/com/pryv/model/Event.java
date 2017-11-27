@@ -17,10 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Event data structure from Pryv
- *
- * @author ik
- *
+ * Event resource from Pryv API
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
@@ -42,7 +39,9 @@ public class Event extends ApiResource {
   private String description;
   private Set<Attachment> attachments;
   private Map<String, Object> clientData;
-  private Boolean trashed;
+  private boolean trashed;
+  @JsonIgnore
+  private boolean deleted;
 
   /**
    * empty Event constructor
@@ -91,11 +90,13 @@ public class Event extends ApiResource {
    *          optional
    * @param pTrashed
    *          optional
+   * @param pDeleted
+   *          optional
    */
   public Event(String pId, String pStreamId, Double pTime, Double pDuration,
     String pType, String pContent, Set<String> pTags, String pDescription,
-    Set<Attachment> pAttachments, Map<String, Object> pClientData, Boolean pTrashed,
-    Double pCreated, String pCreatedBy, Double pModified, String pModifiedBy) {
+    Set<Attachment> pAttachments, Map<String, Object> pClientData, boolean pTrashed,
+    boolean pDeleted, Double pCreated, String pCreatedBy, Double pModified, String pModifiedBy) {
     id = pId;
     streamId = pStreamId;
     time = pTime;
@@ -112,6 +113,7 @@ public class Event extends ApiResource {
     attachments = pAttachments;
     clientData = pClientData;
     trashed = pTrashed;
+    deleted = pDeleted;
   }
 
   /**
@@ -164,9 +166,6 @@ public class Event extends ApiResource {
     if (time == null) {
       return null;
     }
-    /* TODO: Use of server time from HttpClient
-        return con.serverTimeInSystemDate(time);
-     */
     return new DateTime((long) (time.doubleValue() * 1000));
   }
 
@@ -180,9 +179,6 @@ public class Event extends ApiResource {
     if (date == null) {
       time = null;
     } else {
-      /* TODO: Use of server time from HttpClient
-          time = con.serverTimeInSystemDate(date.getMillis() / 1000.0).getMillis() / 1000.0;
-       */
       time = date.getMillis() / 1000.0;
     }
     return this;
@@ -289,6 +285,7 @@ public class Event extends ApiResource {
             + "\"attachments\":\"" + attachments + "\","
             + "\"clientData\":\"" + clientData + "\","
             + "\"trashed\":\"" + trashed + "\","
+            + "\"deleted\":\"" + deleted + "\","
             + "\"created\":\"" + created + "\","
             + "\"createdBy\":\"" + createdBy + "\","
             + "\"modified\":\"" + modified + "\","
@@ -352,12 +349,12 @@ public class Event extends ApiResource {
     return clientData;
   }
 
-  public Boolean isTrashed() {
-    if (trashed == null) {
-      return false;
-    } else {
-      return trashed;
-    }
+  public boolean isTrashed() {
+    return trashed;
+  }
+
+  public boolean isDeleted() {
+    return deleted;
   }
 
   public Event setId(String id) {
@@ -430,8 +427,13 @@ public class Event extends ApiResource {
     return this;
   }
 
-  public Event setTrashed(Boolean trashed) {
+  public Event setTrashed(boolean trashed) {
     this.trashed = trashed;
+    return this;
+  }
+
+  public Event setDeleted(boolean deleted) {
+    this.deleted = deleted;
     return this;
   }
 

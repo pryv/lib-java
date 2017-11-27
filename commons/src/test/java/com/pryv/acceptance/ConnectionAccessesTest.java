@@ -1,6 +1,7 @@
 package com.pryv.acceptance;
 
 import com.pryv.Connection;
+import com.pryv.exceptions.ApiException;
 import com.pryv.model.Access;
 import com.pryv.model.Permission;
 
@@ -24,14 +25,14 @@ public class ConnectionAccessesTest {
     private static String streamId = "testStreamId";
     private static String accessType = "shared";
     private static Permission.Level permissionLevel = Permission.Level.read;
-    private static String accessId;
+    private static Access access;
     private static Double creationTime;
     private static String accessToken;
 
     private static Connection connection;
 
     @BeforeClass
-    public static void testCreateAccess() throws IOException {
+    public static void testCreateAccess() throws IOException, ApiException {
 
         connection = new Connection(TestCredentials.USERNAME, TestCredentials.TOKEN, TestCredentials.DOMAIN);
 
@@ -41,21 +42,20 @@ public class ConnectionAccessesTest {
                 .setType(accessType);
 
         Long requestTime = System.currentTimeMillis()/1000;
-        Access createdAccess = connection.accesses.create(newAccess);
+        access = connection.accesses.create(newAccess);
 
-        assertNotNull(createdAccess);
-        accessId = createdAccess.getId();
-        assertNotNull(accessId);
-        accessToken = createdAccess.getToken();
+        assertNotNull(access);
+        assertNotNull(access.getId());
+        accessToken = access.getToken();
         assertNotNull(accessToken);
-        creationTime = createdAccess.getCreated();
+        creationTime = access.getCreated();
         assertEquals(creationTime, requestTime.doubleValue(), 180);
-        assertEquals(createdAccess.getCreatedBy(), TestCredentials.TOKENID);
-        assertEquals(createdAccess.getModified(), creationTime);
-        assertEquals(createdAccess.getModifiedBy(), TestCredentials.TOKENID);
-        assertEquals(createdAccess.getType(), accessType);
-        assertEquals(createdAccess.getName(), accessName);
-        ArrayList<Permission> permissions = createdAccess.getPermissions();
+        assertEquals(access.getCreatedBy(), TestCredentials.TOKENID);
+        assertEquals(access.getModified(), creationTime);
+        assertEquals(access.getModifiedBy(), TestCredentials.TOKENID);
+        assertEquals(access.getType(), accessType);
+        assertEquals(access.getName(), accessName);
+        ArrayList<Permission> permissions = access.getPermissions();
         assertNotNull(permissions);
         assertTrue(permissions.size() > 0);
         Permission firstPermission = permissions.get(0);
@@ -65,19 +65,19 @@ public class ConnectionAccessesTest {
     }
 
     @AfterClass
-    public static void testDeleteAccess() throws IOException {
-        String deletionId = connection.accesses.delete(accessId);
-        assertEquals(deletionId, accessId);
+    public static void testDeleteAccess() throws IOException, ApiException {
+        Access deletedAccess = connection.accesses.delete(access);
+        assertTrue(deletedAccess.isDeleted());
     }
 
     @Test
-    public void testGetAccess() throws IOException {
+    public void testGetAccess() throws IOException, ApiException {
         List<Access> retrievedAccesses = connection.accesses.get();
         assertNotNull(retrievedAccesses);
         assertTrue(retrievedAccesses.size() > 0);
         Boolean found = false;
-        for (Access access: retrievedAccesses) {
-            if(access.getId().equals(accessId)) {
+        for (Access retrievedAccess: retrievedAccesses) {
+            if(retrievedAccess.getId().equals(access.getId())) {
                 found = true;
                 break;
             }
@@ -86,18 +86,18 @@ public class ConnectionAccessesTest {
     }
 
     @Test
-    public void testUpdateAccess() throws IOException {
+    public void testUpdateAccess() throws IOException, ApiException {
         String newAccessName = "newAccess";
         String newStreamId = "newStreamId";
         Permission.Level newPermissionLevel = Permission.Level.contribute;
+        ArrayList<Permission> newPermissions = new ArrayList<>();
+        newPermissions.add(new Permission(newStreamId, newPermissionLevel, null));
 
-        Access newAccess = new Access()
-                .setName(newAccessName)
-                .addPermission(new Permission(newStreamId, newPermissionLevel, null))
-                .setId(accessId);
+        access.setName(newAccessName)
+                .setPermissions(newPermissions);
 
         Long updateTime = System.currentTimeMillis()/1000;
-        Access updatedAccess = connection.accesses.update(newAccess);
+        Access updatedAccess = connection.accesses.update(access);
 
         assertNotNull(updatedAccess);
         assertEquals(updatedAccess.getName(), newAccessName);

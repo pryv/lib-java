@@ -8,11 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.io.File;
 
 /**
- *
  * Attachment from Pryv API
- *
- * @author ik
- *
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)

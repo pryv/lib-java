@@ -9,11 +9,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /**
- *
  * Polling thread that polls the URL for login sequence state.
- *
- * @author ik
- *
  */
 public class PollingThread extends Thread {
   private AuthController controller;

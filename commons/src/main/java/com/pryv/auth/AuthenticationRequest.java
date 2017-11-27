@@ -6,11 +6,7 @@ import com.pryv.model.Permission;
 import java.util.List;
 
 /**
- *
- * encloses parameters sent to server upon authentication
- *
- * @author ik
- *
+ * Encloses parameters sent to server upon authentication
  */
 public class AuthenticationRequest {
 

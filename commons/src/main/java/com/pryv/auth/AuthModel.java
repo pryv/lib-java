@@ -19,11 +19,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
- *
- * login class
- *
- * @author ik
- *
+ * Login class
  */
 public class AuthModel {
     private AuthController controller;
