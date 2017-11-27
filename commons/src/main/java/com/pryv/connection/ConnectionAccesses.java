@@ -34,10 +34,9 @@ public class ConnectionAccesses {
         return createdAccess;
     }
 
-    public String delete(String accessId) throws IOException, ApiException {
-        ApiResponse apiResponse = httpClient.deleteRequest(PATH, accessId, false).exec();
-        String deletedId = JsonConverter.retrieveDeletedResourceId(apiResponse.getJsonBody(), ACCESS_DELETION_KEY);
-        return deletedId;
+    public Access delete(Access deleteAccess) throws IOException, ApiException {
+        httpClient.deleteRequest(PATH, deleteAccess.getId(), false).exec();
+        return deleteAccess.setDeleted(true);
     }
 
     public Access update(Access updateAccess) throws IOException, ApiException {

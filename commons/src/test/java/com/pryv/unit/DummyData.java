@@ -79,13 +79,13 @@ public class DummyData {
     streamClientData.put(STREAM_CLIENT_KEY, STREAM_CLIENT_VALUE);
     Stream streamChild =
       new Stream(STREAM_CHILD_ID, STREAM_CHILD_NAME,
-        STREAM_ID, null, null, null, STREAM_CHILD_TRASHED, STREAM_CHILD_CREATED,
+        STREAM_ID, null, null, null, STREAM_CHILD_TRASHED, false, STREAM_CHILD_CREATED,
         STREAM_CHILD_CREATED_BY, STREAM_CHILD_MODIFIED, STREAM_CHILD_MODIFIED_BY);
     HashSet<Stream> children = new HashSet<>();
     children.add(streamChild);
     Stream testStream =
       new Stream(STREAM_ID, STREAM_NAME, null, STREAM_SINGLE_ACTIVITY,
-        streamClientData, children, STREAM_TRASHED, STREAM_CREATED, STREAM_CREATED_BY, STREAM_MODIFIED,
+        streamClientData, children, STREAM_TRASHED, false, STREAM_CREATED, STREAM_CREATED_BY, STREAM_MODIFIED,
         STREAM_MODIFIED_BY);
     return testStream;
   }
@@ -117,7 +117,7 @@ public class DummyData {
     eventClientData.put(EVENT_CLIENTKEY, EVENT_CLIENTVALUE);
     return new Event(EVENT_ID, EVENT_STREAM_ID, EVENT_TIME, EVENT_DURATION,
       EVENT_TYPE, EVENT_CONTENT, eventTags, EVENT_DESCRIPTION, eventAttachments,
-      eventClientData, EVENT_TRASHED, EVENT_CREATED, EVENT_CREATEDBY, EVENT_MODIFIED,
+      eventClientData, EVENT_TRASHED, false, EVENT_CREATED, EVENT_CREATEDBY, EVENT_MODIFIED,
       EVENT_MODIFIED_BY);
 
   }

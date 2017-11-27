@@ -36,8 +36,8 @@ public class ConnectionTest {
 
     @AfterClass
     public static void tearDown() throws Exception {
-        connection.streams.delete(testSupportStream.getId(), false);
-        connection.streams.delete(testSupportStream.getId(), false);
+        connection.streams.delete(testSupportStream, false);
+        connection.streams.delete(testSupportStream, false);
     }
 
     @Test

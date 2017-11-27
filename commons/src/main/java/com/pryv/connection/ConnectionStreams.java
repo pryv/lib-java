@@ -45,17 +45,15 @@ public class ConnectionStreams {
         return createdStream;
     }
 
-    public String delete(String streamId, boolean mergeEventsWithParent) throws IOException, ApiException {
-        ApiResponse apiResponse = httpClient.deleteRequest(PATH, streamId, mergeEventsWithParent).exec();
+    public Stream delete(Stream deleteStream, boolean mergeEventsWithParent) throws IOException, ApiException {
+        ApiResponse apiResponse = httpClient.deleteRequest(PATH, deleteStream.getId(), mergeEventsWithParent).exec();
         String json = apiResponse.getJsonBody();
         if (JsonConverter.hasStreamDeletionField(json)) {
             // stream was deleted
-            String deletionId = JsonConverter.retrieveDeletedStreamId(json);
-            return deletionId;
+            return deleteStream.setDeleted(true);
         } else {
             // stream was trashed
-            Stream trashedStream = JsonConverter.retrieveStreamFromJson(json);
-            return trashedStream.getId();
+            return JsonConverter.retrieveStreamFromJson(json);
         }
     }
 

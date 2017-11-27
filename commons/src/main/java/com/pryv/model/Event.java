@@ -43,6 +43,8 @@ public class Event extends ApiResource {
   private Set<Attachment> attachments;
   private Map<String, Object> clientData;
   private Boolean trashed;
+  @JsonIgnore
+  private Boolean deleted;
 
   /**
    * empty Event constructor
@@ -91,11 +93,13 @@ public class Event extends ApiResource {
    *          optional
    * @param pTrashed
    *          optional
+   * @param pDeleted
+   *          optional
    */
   public Event(String pId, String pStreamId, Double pTime, Double pDuration,
     String pType, String pContent, Set<String> pTags, String pDescription,
     Set<Attachment> pAttachments, Map<String, Object> pClientData, Boolean pTrashed,
-    Double pCreated, String pCreatedBy, Double pModified, String pModifiedBy) {
+    Boolean pDeleted, Double pCreated, String pCreatedBy, Double pModified, String pModifiedBy) {
     id = pId;
     streamId = pStreamId;
     time = pTime;
@@ -112,6 +116,7 @@ public class Event extends ApiResource {
     attachments = pAttachments;
     clientData = pClientData;
     trashed = pTrashed;
+    deleted = pDeleted;
   }
 
   /**
@@ -289,6 +294,7 @@ public class Event extends ApiResource {
             + "\"attachments\":\"" + attachments + "\","
             + "\"clientData\":\"" + clientData + "\","
             + "\"trashed\":\"" + trashed + "\","
+            + "\"deleted\":\"" + deleted + "\","
             + "\"created\":\"" + created + "\","
             + "\"createdBy\":\"" + createdBy + "\","
             + "\"modified\":\"" + modified + "\","
@@ -353,11 +359,11 @@ public class Event extends ApiResource {
   }
 
   public Boolean isTrashed() {
-    if (trashed == null) {
-      return false;
-    } else {
-      return trashed;
-    }
+    return trashed == null ? false: trashed;
+  }
+
+  public Boolean isDeleted() {
+    return deleted == null ? false: deleted;
   }
 
   public Event setId(String id) {
@@ -432,6 +438,11 @@ public class Event extends ApiResource {
 
   public Event setTrashed(Boolean trashed) {
     this.trashed = trashed;
+    return this;
+  }
+
+  public Event setDeleted(Boolean deleted) {
+    this.deleted = deleted;
     return this;
   }
 

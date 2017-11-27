@@ -46,9 +46,10 @@ public class ConnectionStreamsTest {
     }
 
     @AfterClass
+
     public static void tearDown() throws IOException, ApiException {
-        connection.streams.delete(testSupportStream.getId(), false);
-        connection.streams.delete(testSupportStream.getId(), false);
+        connection.streams.delete(testSupportStream, false);
+        connection.streams.delete(testSupportStream, false);
     }
 
     @Test
@@ -71,19 +72,14 @@ public class ConnectionStreamsTest {
         assertEquals(nameUpdate, updatedStream.getName());
 
         // trash
-        connection.streams.delete(updatedStream.getId(), false);
-        /* TODO: review trash return
-        Stream trashedStream = connection.streams.delete(updatedStream.getId(), false);
+        Stream trashedStream = connection.streams.delete(updatedStream, false);
         assertNotNull(trashedStream);
         assertTrue(trashedStream.isTrashed());
-        */
 
         // delete
-        connection.streams.delete(updatedStream.getId(), false);
-        /* TODO: review delete return
-        Stream deletedStream = connection.streams.delete(trashedStream.getId(), false);
-        assertNull(deletedStream);
-        */
+        Stream deletedStream = connection.streams.delete(trashedStream, false);
+        assertNotNull(deletedStream);
+        assertTrue(deletedStream.isDeleted());
     }
 
     /**
@@ -146,7 +142,7 @@ public class ConnectionStreamsTest {
         connection.streams.create(trashedChild);
 
         // Trash child
-        connection.streams.delete(trashedChild.getId(), false);
+        connection.streams.delete(trashedChild, false);
 
         // Get streams with state all Filter
         Filter filter = new Filter()
@@ -176,10 +172,10 @@ public class ConnectionStreamsTest {
         Double time = createdStream.getCreated();
 
         // Trash child
-        connection.streams.delete(deletedChild.getId(), false);
+        connection.streams.delete(deletedChild, false);
 
         // Delete child
-        connection.streams.delete(deletedChild.getId(), false);
+        connection.streams.delete(deletedChild, false);
 
         // Get streams with include deletions Filter
         Filter filter = new Filter()

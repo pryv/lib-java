@@ -42,17 +42,15 @@ public class ConnectionEvents {
         return createdEvent;
     }
 
-    public String delete(String eventId) throws IOException, ApiException {
-        ApiResponse apiResponse = httpClient.deleteRequest(PATH, eventId, false).exec();
+    public Event delete(Event deleteEvent) throws IOException, ApiException {
+        ApiResponse apiResponse = httpClient.deleteRequest(PATH, deleteEvent.getId(), false).exec();
         String json = apiResponse.getJsonBody();
         if (JsonConverter.hasEventDeletionField(json)) {
             // event was deleted
-            String deletedEventId = JsonConverter.retrieveDeleteEventId(json);
-            return deletedEventId;
+            return deleteEvent.setDeleted(true);
         } else {
             // event was trashed
-            Event trashedEvent = JsonConverter.retrieveEventFromJson(json);
-            return trashedEvent.getId();
+            return JsonConverter.retrieveEventFromJson(json);
         }
     }
 

@@ -4,8 +4,6 @@ import com.pryv.model.Access;
 
 import org.junit.Test;
 
-import java.util.HashSet;
-
 import static org.junit.Assert.assertNull;
 
 /**

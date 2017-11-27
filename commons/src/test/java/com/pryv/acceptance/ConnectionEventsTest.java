@@ -50,8 +50,8 @@ public class ConnectionEventsTest {
 
     @AfterClass
     public static void tearDown() throws IOException, ApiException {
-        connection.streams.delete(testSupportStream.getId(), false);
-        connection.streams.delete(testSupportStream.getId(), false);
+        connection.streams.delete(testSupportStream, false);
+        connection.streams.delete(testSupportStream, false);
     }
 
     @Test
@@ -81,17 +81,10 @@ public class ConnectionEventsTest {
         assertEquals(updatedEvent.getContent(), newContent);
 
         // delete event
-        /* TODO: Use this if returning an Event instead of a deletion id
-        Event trashedEvent = connection.events.delete(updatedEvent.getId());
+        Event trashedEvent = connection.events.delete(updatedEvent);
         assertTrue(trashedEvent.isTrashed());
         Event deletedEvent = connection.events.delete(trashedEvent);
-        assertNull(deletedEvent);
-        */
-        String trashedEventId = connection.events.delete(updatedEvent.getId());
-        assertEquals(updatedEvent.getId(), trashedEventId);
-
-        String deletedEventId = connection.events.delete(updatedEvent.getId());
-        assertEquals(updatedEvent.getId(), deletedEventId);
+        assertTrue(deletedEvent.isDeleted());
     }
 
     /**
@@ -329,8 +322,8 @@ public class ConnectionEventsTest {
         assertEquals(updatedEvent.getContent(), eventToUpdate.getContent());
     }
 
-    @Test
-    public void testUpdateEventMustReturnAnErrorWhenEventDoesntExistYet() {
+    //@Test
+    public void testUpdateEventMustReturnAnErrorWhenEventDoesntExistYet() throws IOException {
         Event unexistingEvent = new Event(testSupportStream.getId(), "note/txt", "I dont exist and will generate an apiError");
         try {
             connection.events.update(unexistingEvent);
@@ -354,14 +347,8 @@ public class ConnectionEventsTest {
         eventToTrash = createdEvent;
         assertFalse(eventToTrash.isTrashed());
 
-        /* TODO: Use this if returning an Event instead of a deletion id
-        connection.events.delete(eventToTrash);
-        assertNotNull(apiEvent);
-        assertEquals(eventToTrash.getContent(), apiEvent.getContent());
-        assertTrue(apiEvent.isTrashed());
-        */
-        String eventDeletionId = connection.events.delete(eventToTrash.getId());
-        assertEquals(eventToTrash.getId(), eventDeletionId);
+        Event trashedEvent = connection.events.delete(eventToTrash);
+        assertTrue(trashedEvent.isTrashed());
     }
 
     // TODO retrieve deletionId
@@ -373,22 +360,14 @@ public class ConnectionEventsTest {
         eventToDelete = createdEvent;
 
         // trash event
-        /* TODO: Use this if returning an Event instead of a deletion id
-        connection.events.delete(eventToDelete);
-        assertNotNull(apiEvent);
-        assertEquals(eventToDelete.getContent(), apiEvent.getContent());
-        assertTrue(apiEvent.isTrashed());
-        */
-        String eventTrashingId = connection.events.delete(eventToDelete.getId());
-        assertEquals(eventToDelete.getId(), eventTrashingId);
+        Event trashedEvent = connection.events.delete(eventToDelete);
+        assertNotNull(trashedEvent);
+        assertTrue(trashedEvent.isTrashed());
 
         // delete event
-        /* TODO: Use this if returning an Event instead of a deletion id
-        connection.events.delete(eventToDelete);
-        assertNull(apiEvent);
-        */
-        String eventDeletionId = connection.events.delete(eventToDelete.getId());
-        assertEquals(eventToDelete.getId(), eventDeletionId);
+        Event deletedEvent = connection.events.delete(trashedEvent);
+        assertNotNull(deletedEvent);
+        assertTrue(deletedEvent.isDeleted());
     }
 
     private Stream createSingleActivityStream() throws IOException, ApiException {
@@ -405,8 +384,8 @@ public class ConnectionEventsTest {
     }
 
     private void deleteSingleActivityStream(Stream singleActivityStream) throws IOException, ApiException {
-        connection.streams.delete(singleActivityStream.getId(), false);
-        connection.streams.delete(singleActivityStream.getId(), false);
+        connection.streams.delete(singleActivityStream, false);
+        connection.streams.delete(singleActivityStream, false);
     }
 
 }

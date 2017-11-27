@@ -31,6 +31,8 @@ public class Stream extends ApiResource {
 
   // optional
   private Boolean trashed;
+  @JsonIgnore
+  private Boolean deleted;
   private Set<Stream> children;
 
   @JsonIgnore
@@ -54,13 +56,14 @@ public class Stream extends ApiResource {
    *          optional
    * @param pChildren
    * @param pTrashed
+   * @param pDeleted
    * @param pCreated
    * @param pCreatedBy
    * @param pModified
    * @param pModifiedBy
    */
   public Stream(String pId, String pName, String pParentId, Boolean pSingleActivity,
-    Map<String, Object> pClientData, Set<Stream> pChildren, Boolean pTrashed, Double pCreated,
+    Map<String, Object> pClientData, Set<Stream> pChildren, Boolean pTrashed, Boolean pDeleted, Double pCreated,
     String pCreatedBy, Double pModified, String pModifiedBy) {
     id = pId;
     name = pName;
@@ -74,6 +77,7 @@ public class Stream extends ApiResource {
       }
     }
     trashed = pTrashed;
+    deleted = pDeleted;
     created = pCreated;
     createdBy = pCreatedBy;
     modified = pModified;
@@ -267,10 +271,11 @@ public class Stream extends ApiResource {
   }
 
   public Boolean isTrashed() {
-    if (trashed == null) {
-      return false;
-    } else
-      return trashed;
+    return trashed == null ? false: trashed;
+  }
+
+  public Boolean isDeleted() {
+    return deleted == null ? false: deleted;
   }
 
   public Double getCreated() {
@@ -329,6 +334,11 @@ public class Stream extends ApiResource {
 
   public Stream setTrashed(Boolean trashed) {
     this.trashed = trashed;
+    return this;
+  }
+
+  public Stream setDeleted(Boolean deleted) {
+    this.deleted = deleted;
     return this;
   }
 
