@@ -11,6 +11,9 @@ import com.pryv.utils.JsonConverter;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Encapsulate CRUD operations to Pryv API for Events
+ */
 public class ConnectionEvents {
 
     private static final String PATH = "events";

@@ -4,11 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize.Inclusion;
 
 /**
- *
  * Permission used in authentication
- *
- * @author ik
- *
  */
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class Permission {

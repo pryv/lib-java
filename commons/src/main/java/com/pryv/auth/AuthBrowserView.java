@@ -9,11 +9,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
- *
  * Web view that is displayed to enter credentials
- *
- * @author ik
- *
  */
 public class AuthBrowserView extends Applet implements AuthView {
 

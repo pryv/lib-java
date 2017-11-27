@@ -1,11 +1,7 @@
 package com.pryv;
 
 /**
- *
  * Pryv class, contains the configuration of the API.
- *
- * @author ik
- *
  */
 public class Pryv {
 

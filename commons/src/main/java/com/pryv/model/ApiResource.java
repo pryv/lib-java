@@ -1,8 +1,7 @@
 package com.pryv.model;
 
 /**
- * Created by thiebaudmodoux on 05.10.17.
+ * Abstract resource from Pryv API
  */
-
 abstract public class ApiResource {
 }

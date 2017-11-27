@@ -1,9 +1,8 @@
 package com.pryv.api;
 
 /**
- * Created by thiebaudmodoux on 09.11.17.
+ * Model a HTTP Response from Pryv API
  */
-
 public class ApiResponse {
     private String jsonBody;
     private double serverTime;

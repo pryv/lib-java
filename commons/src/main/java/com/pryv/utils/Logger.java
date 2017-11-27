@@ -5,9 +5,6 @@ import java.io.PrintStream;
 
 /**
  * Logger
- *
- * @author ik
- *
  */
 public class Logger {
 

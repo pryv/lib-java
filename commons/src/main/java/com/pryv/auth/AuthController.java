@@ -6,12 +6,8 @@ import com.pryv.utils.Logger;
 import java.util.List;
 
 /**
- *
  * High-level used to Authenticate the user. Upon success, provides a Connection
  * with the appropriate username and token.
- *
- * @author ik
- *
  */
 public class AuthController {
 

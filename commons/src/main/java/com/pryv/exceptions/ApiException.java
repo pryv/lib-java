@@ -3,9 +3,8 @@ package com.pryv.exceptions;
 import java.util.ArrayList;
 
 /**
- * Created by thiebaudmodoux on 09.11.17.
+ * Model an Exception originated from Pryv API
  */
-
 public class ApiException extends PryvException {
 
     private String id;

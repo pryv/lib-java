@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Encapsulate CRUD operations to Pryv API for Streams
+ */
 public class ConnectionStreams {
 
     private HttpClient httpClient;

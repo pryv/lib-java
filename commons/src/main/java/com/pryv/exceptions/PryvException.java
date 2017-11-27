@@ -1,9 +1,8 @@
 package com.pryv.exceptions;
 
 /**
- * Created by thiebaudmodoux on 09.11.17.
+ * Abstract Pryv Exception
  */
-
 abstract class PryvException extends Exception {
 
     public abstract String getId();

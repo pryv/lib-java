@@ -9,6 +9,9 @@ import com.pryv.utils.JsonConverter;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Encapsulate CRUD operations to Pryv API for Accesses
+ */
 public class ConnectionAccesses {
 
     private static final String PATH = "accesses";

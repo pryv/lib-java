@@ -9,10 +9,7 @@ import com.pryv.utils.Cuid;
 import java.util.ArrayList;
 
 /**
- * Access data structure from Pryv
- *
- * @author tm
- *
+ * Access resource from Pryv API
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
@@ -32,7 +29,7 @@ public class Access extends ApiResource {
   private String deviceName;
   private Double lastUsed;
   @JsonIgnore
-  private Boolean deleted;
+  private boolean deleted;
 
   /**
    * empty Access constructor
@@ -74,7 +71,7 @@ public class Access extends ApiResource {
    */
   public Access(String pId, String pToken, String pName, ArrayList<Permission> pPermissions,
                 Double pCreated, String pCreatedBy, Double pModified, String pModifiedBy,
-                Boolean pDeleted, String pType, String pDeviceName, Double pLastUsed) {
+                boolean pDeleted, String pType, String pDeviceName, Double pLastUsed) {
     id = pId;
     token = pToken;
     name = pName;
@@ -160,10 +157,9 @@ public class Access extends ApiResource {
     return lastUsed;
   }
 
-  public Boolean getDeleted() {
-    return deleted == null ? false: deleted;
+  public boolean isDeleted() {
+    return deleted;
   }
-
 
   public Access  setId(String id) {
     this.id = id;
@@ -228,7 +224,7 @@ public class Access extends ApiResource {
     return this;
   }
 
-  public Access setDeleted(Boolean deleted) {
+  public Access setDeleted(boolean deleted) {
     this.deleted = deleted;
     return this;
   }

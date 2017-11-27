@@ -15,9 +15,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 /**
- * Created by thiebaudmodoux on 05.10.17.
+ * Model a REST client communicating with Pryv API
  */
-
 public class HttpClient {
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private OkHttpClient client;

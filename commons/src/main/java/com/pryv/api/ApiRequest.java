@@ -11,9 +11,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /**
- * Created by thiebaudmodoux on 09.11.17.
+ * Model a HTTP request to Pryv API
  */
-
 public class ApiRequest {
     private Request httpRequest;
     private OkHttpClient httpClient;

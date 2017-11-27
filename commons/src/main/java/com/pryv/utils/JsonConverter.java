@@ -20,10 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Utilitary class used to do JSON conversions
- *
- * @author ik
- *
+ * Utility class used to do JSON conversions
  */
 public class JsonConverter {
 

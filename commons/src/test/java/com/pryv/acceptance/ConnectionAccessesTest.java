@@ -67,7 +67,7 @@ public class ConnectionAccessesTest {
     @AfterClass
     public static void testDeleteAccess() throws IOException, ApiException {
         Access deletedAccess = connection.accesses.delete(access);
-        assertTrue(deletedAccess.getDeleted());
+        assertTrue(deletedAccess.isDeleted());
     }
 
     @Test
