@@ -351,9 +351,8 @@ public class ConnectionEventsTest {
         assertTrue(trashedEvent.isTrashed());
     }
 
-    // TODO retrieve deletionId
     @Test
-    public void testDeleteEventMustReturnADeletionIdWhenDeletingTwice() throws IOException, ApiException {
+    public void testDeleteEventMustReturnTheEventWithDeletedSetToTrueWhenDeletingTwice() throws IOException, ApiException {
         // create event
         Event eventToDelete = new Event(testSupportStream.getId(), "note/txt", "i will be deleted");
         Event createdEvent = connection.events.create(eventToDelete);
