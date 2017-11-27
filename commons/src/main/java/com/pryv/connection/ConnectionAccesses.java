@@ -14,7 +14,6 @@ public class ConnectionAccesses {
     private static final String PATH = "accesses";
     private static final String ACCESS_KEY = "access";
     private static final String ACCESSES_KEY = "accesses";
-    private static final String ACCESS_DELETION_KEY = "accessDeletion";
     private HttpClient httpClient;
 
     public ConnectionAccesses(HttpClient client) {
@@ -24,7 +23,6 @@ public class ConnectionAccesses {
     public List<Access> get() throws IOException, ApiException {
         ApiResponse apiResponse = httpClient.getRequest(PATH, null).exec();
         List<Access> receivedAccesses = JsonConverter.retrieveResourcesFromJson(apiResponse.getJsonBody(), ACCESSES_KEY, Access.class);
-        // TODO: retrieve accessDeletions
         return receivedAccesses;
     }
 

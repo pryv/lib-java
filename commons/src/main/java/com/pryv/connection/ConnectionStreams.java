@@ -32,9 +32,6 @@ public class ConnectionStreams {
         String json = apiResponse.getJsonBody();
         Map<String, Stream> receivedStreams =
                 JsonConverter.createStreamsTreeFromJson(json);
-        // TODO: retrieve streamDeletions
-        Map<String, Double> streamDeletions =
-                JsonConverter.createStreamDeletionsTreeFromJson(json);
         rootStreams = receivedStreams;
         return receivedStreams;
     }

@@ -6,8 +6,6 @@ import com.pryv.model.Attachment;
 import com.pryv.model.Filter;
 import com.pryv.utils.JsonConverter;
 
-import org.joda.time.DateTime;
-
 import java.io.File;
 
 import okhttp3.MediaType;
@@ -25,14 +23,6 @@ public class HttpClient {
     private OkHttpClient client;
     private String apiUrl;
     private String tokenParameter;
-
-    // TODO: actually make these server time calculations
-    private double serverTime = 0.0;
-    /**
-     * RTT between server and system: deltaTime = serverTime - systemTime
-     */
-    private double deltaTime = 0.0;
-    private final Double millisToSeconds = 1000.0;
 
     public HttpClient(String apiUrl, String tokenParameter) {
         client = new OkHttpClient();
@@ -88,7 +78,6 @@ public class HttpClient {
 
     public ApiRequest deleteRequest(String endpoint, String resourceId, Boolean mergeEventsWithParent) {
         String url = apiUrl + endpoint + "/" + resourceId + tokenParameter;
-        // TODO: set elsewhere
         if(mergeEventsWithParent) {
             url += "&mergeEventsWithParent=true";
         } else {
@@ -99,28 +88,5 @@ public class HttpClient {
                 .delete()
                 .build();
         return new ApiRequest(request, client);
-    }
-
-    /**
-     * Returns a DateTime object representing the time in the system reference.
-     *
-     * @param time
-     *          the time in the server reference
-     * @return
-     */
-    public DateTime serverTimeInSystemDate(double time) {
-        return new DateTime(System.currentTimeMillis() / millisToSeconds + deltaTime);
-    }
-
-    /**
-     * calculates the difference between server and system time: deltaTime =
-     * serverTime - systemTime
-     *
-     * @param pServerTime
-     */
-    private void updateDelta(Double pServerTime) {
-        if (pServerTime != null) {
-            deltaTime = pServerTime - System.currentTimeMillis() / millisToSeconds;
-        }
     }
 }

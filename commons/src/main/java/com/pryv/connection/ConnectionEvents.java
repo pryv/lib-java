@@ -23,7 +23,6 @@ public class ConnectionEvents {
     public List<Event> get(Filter filter) throws IOException, ApiException {
         ApiResponse apiResponse = httpClient.getRequest(PATH, filter).exec();
         List<Event> receivedEvents = JsonConverter.createEventsFromJson(apiResponse.getJsonBody());
-        // TODO: retrieve eventDeletions
         return receivedEvents;
     }
 
