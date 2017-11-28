@@ -25,9 +25,9 @@ task clean(type: Delete) {
 
 ext {
     // Release procedure:
+    // check that you are on merged master
     // increment libraryVersion just above
     // gradlew install
-    // test within Java/Android example apps
     // gradlew bintrayUpload (your local.properties file should provide:
     //      bintray.user=techpryv and bintray.key=..., see https://bintray.com/techpryv)
     // find and replace all occurrences of <libraryVersion> in Readme with new version number
@@ -38,7 +38,7 @@ ext {
     bintrayRepo = 'maven'
     bintrayName = 'pryv-lib'
     publishedGroupId = 'com.pryv'
-    libraryVersion = '2.0.0'
+    libraryVersion = '2.1.1'
     siteUrl = 'http://api.pryv.com'
     gitUrl = 'https://github.com/pryv/lib-java.git'
     licenseName = 'BSD'

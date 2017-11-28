@@ -11,7 +11,7 @@ Java library to authorize, authenticate and access Pryv users data as defined in
 ### Gradle
 
 ```
-compile 'com.pryv:commons:2.0.0'
+compile 'com.pryv:commons:2.1.1'
 ```
 
 ### Maven
@@ -20,7 +20,7 @@ compile 'com.pryv:commons:2.0.0'
 <dependency>
   <groupId>com.pryv</groupId>
   <artifactId>commons</artifactId>
-  <version>2.0.0</version>
+  <version>2.1.1</version>
   <type>pom</type>
 </dependency>
 ```
@@ -29,7 +29,7 @@ compile 'com.pryv:commons:2.0.0'
 
 Our [Bintray page](https://bintray.com/techpryv/maven/pryv-lib) hosts the sources (jar) of the libs under the *Files* tab.
 
-Download and import the following jar file listed below in your libs folder: [commons-2.0.0.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fcommons%2F2.0.0%2Fcommons-2.0.0.jar
+Download and import the following jar file listed below in your libs folder: [commons-2.1.1.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fcommons%2F2.1.1%2Fcommons-2.1.1.jar
 )
 
 ## Java Integration
