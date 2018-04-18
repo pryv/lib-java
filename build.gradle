@@ -29,7 +29,9 @@ ext {
     // increment libraryVersion just above
     // gradlew install
     // gradlew bintrayUpload (your local.properties file should provide:
-    //      bintray.user=techpryv and bintray.key=..., see https://bintray.com/techpryv)
+    //      bintray.user=techpryv and bintray.key=..., bintray.gpg=gpg_passkey see https://bintray.com/techpryv)
+    // check on Bintray that the new version is published: https://bintray.com/techpryv/maven/pryv-lib
+    // check that the new version is sync with Maven Central: https://bintray.com/techpryv/maven/pryv-lib#central
     // find and replace all occurrences of <libraryVersion> in Readme with new version number
     // git add, git commit -m "<libraryVersion>", git push
     // git tag -a <libraryVersion> <commit hash> -m "Publish message"
@@ -38,7 +40,7 @@ ext {
     bintrayRepo = 'maven'
     bintrayName = 'pryv-lib'
     publishedGroupId = 'com.pryv'
-    libraryVersion = '2.1.1'
+    libraryVersion = '2.1.2'
     siteUrl = 'http://api.pryv.com'
     gitUrl = 'https://github.com/pryv/lib-java.git'
     licenseName = 'BSD'
