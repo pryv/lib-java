@@ -51,7 +51,7 @@ Use the Gradle Wrapper to run the following tasks:
 
 `gradlew -Dtest.single={TestClassName} test` runs a single test class.
 
-## Support and waranty
+## Support and warranty
 
 Pryv provides this software for educational and demonstration purposes with no support or warranty.
 
