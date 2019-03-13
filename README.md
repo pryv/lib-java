@@ -4,7 +4,8 @@ Java library to authorize, authenticate and access Pryv users data as defined in
 
 ## Docs
 
-- [Getting started guide](http://pryv.github.io/getting-started/java/) ([examples](http://pryv.github.io/getting-started/java#Examples))
+- [Getting started guide](./getting-started.md)
+- [Examples](./getting-started.md#Examples)
 
 ## Import
 
@@ -27,12 +28,12 @@ compile 'com.pryv:commons:2.1.1'
 
 ### Jar
 
-Our [Bintray page](https://bintray.com/techpryv/maven/pryv-lib) hosts the sources (jar) of the libs under the *Files* tab.
+Our [Bintray page](https://bintray.com/techpryv/maven/pryv-lib) hosts the sources (jar) of the libs under the _Files_ tab.
 
-Download and import the following jar file listed below in your libs folder: [commons-2.1.1.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fcommons%2F2.1.1%2Fcommons-2.1.1.jar
-)
+Download and import the following jar file listed below in your libs folder: [commons-2.1.1.jar](https://bintray.com/techpryv/maven/download_file?file_path=com%2Fpryv%2Fcommons%2F2.1.1%2Fcommons-2.1.1.jar)
 
 ## Java Integration
+
 Please see [https://github.com/pryv/app-java-examples](https://github.com/pryv/app-java-examples).
 
 ## Android Integration
