@@ -39,8 +39,7 @@ AuthController authenticator = new AuthControllerImpl(REQUESTING_APP_ID, permiss
 authenticator.signIn();
 ```
 
-See also: [app authorization in the API reference](/reference/#authorizing-your-app)
-
+See also: [app authorization in the API reference](http://api.pryv.com/reference/#authorizing-your-app)
 
 ### Setup connection
 
@@ -65,7 +64,7 @@ Filter filter = new Filter(Double from, Double to, Set<Stream> streams, Set<Stri
 connection.events.get(filter, new GetEventsCallback() {
 	@Override
 	public void cacheCallback(List<Event> events, Map<String, Double> eventDeletions) {
-    	// do something            
+    	// do something
 	}
 
 	@Override
@@ -95,7 +94,7 @@ newEvent.setContent("I track, therefore I am.");
 connection.events.create(newEvent, new EventsCallback() {
 	@Override
 	public void onApiSuccess(String successMessage, Event event, String stoppedId, Double serverTime) {
-    	// do something            
+    	// do something
 	}
 
 	@Override
@@ -122,7 +121,7 @@ event.setContent = "Updated content.";
 connection.events.update(event, new EventsCallback() {
 	@Override
 	public void onApiSuccess(String successMessage, Event event, String stoppedId, Double serverTime) {
-    	// do something            
+    	// do something
 	}
 
 	@Override
@@ -148,7 +147,7 @@ connection.events.update(event, new EventsCallback() {
 connection.events.delete(event, new EventsCallback() {
 	@Override
 	public void onApiSuccess(String successMessage, Event event, String stoppedId, Double serverTime) {
-    	// do something            
+    	// do something
 	}
 
 	@Override
@@ -180,7 +179,7 @@ Filter filter = new Filter(Double from, Double to, Set<Stream> streams, Set<Stri
 connection.streams.get(filter, new GetStreamsCallback() {
 	@Override
 	public void cacheCallback(Map<String, Stream> streams, Map<String, Double> streamDeletions) {
-    	// do something            
+    	// do something
 	}
 
 	@Override
@@ -359,4 +358,4 @@ Coming soon!
 
 ### Further resources
 
-- [API reference](/reference/)
+- [API reference](http://api.pryv.com/reference/)
