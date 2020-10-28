@@ -1,6 +1,6 @@
 # Pryv library for Java and Android
 
-**Inactive development:** The development of this library has been suspended. Please refer to the [JavaScript lib](https://github.com/pryv/lib-js) for features you would expect in a Pryv client library. Please request a new 
+**Inactive development:** The development of this library has been suspended. Please refer to the [JavaScript lib](https://github.com/pryv/lib-js) for features you would expect in a Pryv client library. If you want a certain feature in the Java library, please contact us on our [community forum](https://support.pryv.com/hc/en-us/community/topics) or [hsupport@pryv.com](mailto:hsupport@pryv.com).
 
 Java library to authorize, authenticate and access Pryv users data as defined in the [Pryv API](http://api.pryv.com/).
 
